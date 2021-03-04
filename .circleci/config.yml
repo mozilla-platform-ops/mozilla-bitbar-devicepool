@@ -6,16 +6,17 @@ jobs:
       - image: cimg/python:3.9.1
     steps:
       - checkout
-      - run: pip3 install pre-commit
+      - run: pip3 install -r requirements-dev.txt
       - run: pre-commit run --all-files --verbose
   pytest:
     docker:
       - image: cimg/python:3.9.1
     steps:
       - checkout
-      - run: pip install pipenv
-      - run: pipenv install --dev
-      - run: pipenv run pytest -v mozilla_bitbar_devicepool
+      - run: pip3 install -r requirements.txt
+      - run: pip3 install -r requirements-dev.txt
+      - run: pip3 install -e .
+      - run: pytest -v mozilla_bitbar_devicepool
 
 workflows:
   ci_test:
