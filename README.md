@@ -1,5 +1,7 @@
 # mozilla-bitbar-devicepool
 
+[![CircleCI Status](https://circleci.com/gh/mozilla-platform-ops/mozilla-bitbar-devicepool.svg?style=svg)](https://app.circleci.com/pipelines/github/mozilla-platform-ops/mozilla-bitbar-devicepool)
+
 This project supports the execution of Mozilla's Android Hardware tests
 at [Bitbar](https://bitbar.com/).
 
