@@ -19,7 +19,7 @@ jobs:
       - run: pytest -v mozilla_bitbar_devicepool
 
 workflows:
-  ci_test:
+  ci_workflow:
     jobs:
       - pre_commit
       - pytest
