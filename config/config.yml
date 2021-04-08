@@ -196,7 +196,7 @@ device_groups:
     # pixel2-08:
     # pixel2-09:
     # pixel2-10:
-    # pixel2-11:
+    pixel2-11:
     pixel2-12:
     pixel2-13:
     pixel2-14:
@@ -219,9 +219,9 @@ device_groups:
     pixel2-31:
     pixel2-32:
     pixel2-33:
-    pixel2-34:
   pixel2-perf:
   pixel2-perf-2:
+    pixel2-34:
     pixel2-35:
     pixel2-36:
     pixel2-37:
@@ -238,7 +238,7 @@ device_groups:
     pixel2-48:
     pixel2-49:
     pixel2-50:
-    pixel2-51:
+    # pixel2-51: # removed from cluster due to flakiness (hangs, turns off)
     # pixel2-52: # removed from cluster due to battery bloat
     pixel2-53:
     pixel2-54:
