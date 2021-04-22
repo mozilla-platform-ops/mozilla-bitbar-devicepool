@@ -139,7 +139,7 @@ device_groups:
     # motog5-04:
     # motog5-05:
     # motog5-06:
-    # motog5-07:  # replaces 5-31  # disabled due to 2021 contract
+    motog5-07:  # replaces 5-31
     # motog5-08:
     # motog5-09:
     # motog5-10:
@@ -166,7 +166,7 @@ device_groups:
     motog5-30:
     # motog5-31:  # bad device
     motog5-32:
-    motog5-33:
+    # motog5-33:  # disabled due to 2021 contract (and battery bloat)
     motog5-34:
     motog5-35:
     motog5-36:
@@ -196,31 +196,31 @@ device_groups:
     # pixel2-08:
     # pixel2-09:
     # pixel2-10:
-    # pixel2-11:  # 11-18 disabled due to 2021 contract size
-    # pixel2-12:
-    # pixel2-13:
-    # pixel2-14:
-    # pixel2-15:
-    # pixel2-16:
-    # pixel2-17:
-    # pixel2-18:
+    pixel2-11:
+    pixel2-12:
+    # pixel2-13:  # disabled due to 2021 contract (and battery bloat)
+    # pixel2-14:  # disabled due to 2021 contract (and battery bloat)
+    pixel2-15:
+    pixel2-16:
+    pixel2-17:
+    pixel2-18:
     pixel2-19:
     pixel2-20:
     pixel2-21:
     pixel2-22:
-    pixel2-23:
-    pixel2-24:
-    pixel2-25:
-    pixel2-26:
-    pixel2-27:
+    # pixel2-23:  # disabled due to 2021 contract (and battery bloat)
+    # pixel2-24:  # disabled due to 2021 contract (and battery bloat)
+    # pixel2-25:  # disabled due to 2021 contract (and battery bloat)
+    # pixel2-26:  # disabled due to 2021 contract (and battery bloat)
+    # pixel2-27:  # disabled due to 2021 contract (and battery bloat)
     pixel2-28:
     pixel2-29:
-    pixel2-30:
-    pixel2-31:
-    pixel2-32:
-    pixel2-33:
   pixel2-perf:
   pixel2-perf-2:
+    pixel2-30:
+    pixel2-31:
+    # pixel2-32:  # disabled due to 2021 contract (and battery bloat)
+    pixel2-33:
     pixel2-34:
     pixel2-35:
     pixel2-36:
