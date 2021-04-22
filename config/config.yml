@@ -139,7 +139,7 @@ device_groups:
     # motog5-04:
     # motog5-05:
     # motog5-06:
-    motog5-07:  # replaces 5-31
+    # motog5-07:  # replaces 5-31  # disabled due to 2021 contract
     # motog5-08:
     # motog5-09:
     # motog5-10:
@@ -196,14 +196,14 @@ device_groups:
     # pixel2-08:
     # pixel2-09:
     # pixel2-10:
-    pixel2-11:
-    pixel2-12:
-    pixel2-13:
-    pixel2-14:
-    pixel2-15:
-    pixel2-16:
-    pixel2-17:
-    pixel2-18:
+    # pixel2-11:  # 11-18 disabled due to 2021 contract size
+    # pixel2-12:
+    # pixel2-13:
+    # pixel2-14:
+    # pixel2-15:
+    # pixel2-16:
+    # pixel2-17:
+    # pixel2-18:
     pixel2-19:
     pixel2-20:
     pixel2-21:
