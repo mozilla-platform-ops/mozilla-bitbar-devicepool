@@ -196,7 +196,7 @@ device_groups:
     # pixel2-08:
     # pixel2-09:
     # pixel2-10:
-    pixel2-11:
+    # pixel2-11:  # disabled, bad device
     pixel2-12:
     # pixel2-13:  # disabled due to 2021 contract (and battery bloat)
     # pixel2-14:  # disabled due to 2021 contract (and battery bloat)
@@ -211,7 +211,7 @@ device_groups:
     # pixel2-23:  # disabled due to 2021 contract (and battery bloat)
     # pixel2-24:  # disabled due to 2021 contract (and battery bloat)
     # pixel2-25:  # disabled due to 2021 contract (and battery bloat)
-    # pixel2-26:  # disabled due to 2021 contract (and battery bloat)
+    pixel2-26:
     # pixel2-27:  # disabled due to 2021 contract (and battery bloat)
     pixel2-28:
     pixel2-29:
