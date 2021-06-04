@@ -250,8 +250,8 @@ device_groups:
   pixel2-batt:
   pixel2-batt-2:
   s7-unit:
+  s7-perf:
     s7-01:
     s7-02:
-  s7-perf:
     s7-03:
     s7-04:
