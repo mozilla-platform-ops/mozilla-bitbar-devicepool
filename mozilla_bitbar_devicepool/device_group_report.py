@@ -50,6 +50,8 @@ class DeviceGroupReport:
             # print(the_item)
             if the_item:
                 for device in the_item:
+                    if "a51" in device:
+                        self.device_dict["a51"] = self.device_dict.get("a51", 0) + 1
                     if "s7" in device:
                         self.device_dict["s7"] = self.device_dict.get("s7", 0) + 1
                     if "pixel2" in device:
