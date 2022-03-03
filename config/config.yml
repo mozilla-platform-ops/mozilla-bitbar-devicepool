@@ -199,8 +199,8 @@ device_groups:
     # pixel2-60 has android 9.0 on it
     pixel2-60:
   a51-unit:
-      a51-01:
   a51-perf:
+      a51-01:
       a51-02:
   motog5-batt:
   motog5-batt-2:
