@@ -78,6 +78,22 @@ projects:
     additional_parameters:
       TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-s7
       TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-s7
+  mozilla-gw-unittest-a51:
+    device_group_name: a51-unit
+    device_model: a51
+    framework_name: mozilla-usb
+    description: Mozilla Unit tests for A51 (using generic-worker)
+    additional_parameters:
+      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-a51
+      TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-a51
+  mozilla-gw-perftest-a51:
+    device_group_name: a51-perf
+    device_model: a51
+    framework_name: mozilla-usb
+    description: Mozilla Performance tests for A51 (using generic-worker)
+    additional_parameters:
+      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-a51
+      TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-a51
   # used for building new docker images
   # mozilla-docker-build:
   #   device_group_name: motog4-docker-builder-2
@@ -177,13 +193,15 @@ device_groups:
   motog5-unit-2:
   motog5-test:
   test-1:
-    a51-01:
-    a51-02:
   test-2:
     motog5-40:
   test-3:
     # pixel2-60 has android 9.0 on it
     pixel2-60:
+  a51-unit:
+  a51-perf:
+      a51-01:
+      a51-02:
   motog5-batt:
   motog5-batt-2:
   pixel2-unit:
