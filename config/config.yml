@@ -202,6 +202,11 @@ device_groups:
   a51-perf:
       a51-01:
       a51-02:
+      a51-03:
+      a51-04:
+      a51-06:
+      a51-07:
+      a51-08:
   motog5-batt:
   motog5-batt-2:
   pixel2-unit:
