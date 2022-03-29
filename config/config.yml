@@ -194,7 +194,7 @@ device_groups:
   motog5-test:
   test-1:
   test-2:
-    # motog5-40:  # disabled due to a51 devicec increases (3/29/22)
+    # motog5-40:  # disabled due to a51 device increases (3/29/22)
   test-3:
     # pixel2-60 has android 9.0 on it
     pixel2-60:
