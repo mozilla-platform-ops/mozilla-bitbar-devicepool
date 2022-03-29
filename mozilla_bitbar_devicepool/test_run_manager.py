@@ -290,7 +290,10 @@ class TestRunManager(object):
             t1 = threading.Thread(
                 target=self.handle_queue,
                 name=project_name,
-                args=(project_name, projects_config,),
+                args=(
+                    project_name,
+                    projects_config,
+                ),
             )
             CONFIG["threads"].append(t1)
             t1.start()

@@ -62,14 +62,12 @@ class DuplicateProjectException(ConfigurationException):
 
 
 def get_filespath():
-    """Return files path where application and test files are kept.
-    """
+    """Return files path where application and test files are kept."""
     return FILESPATH
 
 
 def get_me_id():
-    """Returns the Bitbar User ID that the application is using.
-    """
+    """Returns the Bitbar User ID that the application is using."""
 
     if BITBAR_CACHE["me"] == {}:
         BITBAR_CACHE["me"] = TESTDROID.get_me()
@@ -143,8 +141,7 @@ def configure(bitbar_configpath, filespath=None, update_bitbar=False):
 
 
 def expand_configuration():
-    """Materializes the configuration. Sets default values when none are specified.
-    """
+    """Materializes the configuration. Sets default values when none are specified."""
     projects_config = CONFIG["projects"]
     project_defaults = projects_config["defaults"]
 
@@ -163,8 +160,7 @@ def expand_configuration():
 
 
 def configuration_preflight():
-    """Ensure that everything necessary for configuration is present.
-    """
+    """Ensure that everything necessary for configuration is present."""
     projects_config = CONFIG["projects"]
 
     for project_name in projects_config:

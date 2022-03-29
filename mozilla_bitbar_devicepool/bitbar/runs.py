@@ -98,7 +98,6 @@ def abort_test_run(project_id, test_run_id):
 
 # https://mozilla.testdroid.com/cloud/api/v2/admin/runs?filter=d_endTime_isnull&limit=0
 def get_active_test_runs(**kwargs):
-    """Gets active test runs.
-    """
+    """Gets active test runs."""
     response = TESTDROID.get("api/v2/admin/runs?filter=d_endTime_isnull&limit=0")
     return response["data"]
