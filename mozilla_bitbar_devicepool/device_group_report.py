@@ -40,7 +40,11 @@ class DeviceGroupReport:
             if "-builder" not in group:
                 if "test" in group:
                     self.test_result_dict[group] = get_len(the_item)
-                elif group.endswith("2") or group.startswith("s7"):
+                elif (
+                    group.endswith("2")
+                    or group.startswith("s7")
+                    or group.startswith("a51")
+                ):
                     self.gw_result_dict[group] = get_len(the_item)
                 else:
                     self.tcw_result_dict[group] = get_len(the_item)
