@@ -208,6 +208,12 @@ device_groups:
       a51-06:
       a51-07:
       a51-08:
+      a51-10:
+      a51-11:
+      a51-12:
+      a51-13:
+      a51-14:
+      a51-15:
   motog5-batt:
   motog5-batt-2:
   pixel2-unit:
