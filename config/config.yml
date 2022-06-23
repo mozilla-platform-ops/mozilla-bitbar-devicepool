@@ -155,7 +155,7 @@ device_groups:
     # motog5-04:
     # motog5-05:
     # motog5-06:
-    motog5-07:  # replaces 5-31
+    # motog5-07:  # replaces 5-31, disabled for a51
     # motog5-08:
     # motog5-09:
     # motog5-10:
@@ -166,15 +166,15 @@ device_groups:
     # motog5-14:
     # motog5-15:
     # motog5-16:
-    motog5-17:  # replaces 5-02
-    motog5-18:
-    motog5-19:
-    motog5-20:
-    motog5-21:
-    motog5-22:
-    motog5-23:
-    motog5-24:
-    motog5-25:
+    # motog5-17:  # replaces 5-02, disabled for a51
+    # motog5-18:  # disabled for a51
+    # motog5-19:  # disabled for a51
+    # motog5-20:  # disabled for a51
+    # motog5-21:  # disabled for a51
+    # motog5-22:  # disabled for a51
+    # motog5-23:  # disabled for a51
+    # motog5-24:  # disabled for a51
+    # motog5-25:  # disabled for a51
     motog5-26:
     motog5-27:
     motog5-28:
@@ -216,6 +216,17 @@ device_groups:
       a51-15:
       a51-16:
       a51-17:
+      a51-18:
+      a51-19:
+      a51-20:
+      a51-21:
+      a51-22:
+      a51-23:
+      a51-24:
+      a51-25:
+      a51-26:
+      a51-27:
+      a51-28:
   motog5-batt:
   motog5-batt-2:
   pixel2-unit:
