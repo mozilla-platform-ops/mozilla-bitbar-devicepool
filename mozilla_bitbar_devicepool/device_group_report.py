@@ -14,7 +14,7 @@ def get_len(an_object):
 
 
 class DeviceGroupReport:
-    def __init__(self, config_path=None):
+    def __init__(self, config_path=None, quiet=False):
         self.gw_result_dict = {}
         self.tcw_result_dict = {}
         self.test_result_dict = {}
@@ -23,9 +23,30 @@ class DeviceGroupReport:
             pathname = os.path.dirname(sys.argv[0])
             root_dir = os.path.abspath(os.path.join(pathname, ".."))
             self.config_path = os.path.join(root_dir, "config", "config.yml")
-            print("Using config file at '%s'." % self.config_path)
+            if not quiet:
+                print("Using config file at '%s'." % self.config_path)
         else:
             self.config_path = config_path
+
+    def get_config_devices(self):
+        # TODO: store this data in the instance and only read once
+
+        with open(self.config_path, "r") as stream:
+            try:
+                conf_yaml = yaml.safe_load(stream)
+            except yaml.YAMLError as exc:
+                print(exc)
+
+        device_names = {}
+
+        for group in conf_yaml["device_groups"]:
+            the_item = conf_yaml["device_groups"][group]
+            if the_item:
+                for device in the_item:
+                    if device == "Docker Builder":
+                        continue
+                    device_names[device] = True
+        return sorted(device_names.keys())
 
     def get_report_dict(self):
         with open(self.config_path, "r") as stream:

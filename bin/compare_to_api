@@ -1,0 +1,66 @@
+#!/usr/bin/env python3
+
+# compares bitbar api devices to devices in our config
+
+import os
+import sys
+
+try:
+    from testdroid import Testdroid
+
+    from mozilla_bitbar_devicepool.bitbar.devices import get_devices
+
+    from mozilla_bitbar_devicepool.device_group_report import DeviceGroupReport
+except ImportError:
+    print("ERROR: Please install dependencies (`pip install -r requirements.txt`)!")
+    sys.exit(1)
+
+
+TESTDROID_URL = os.environ.get("TESTDROID_URL")
+TESTDROID_APIKEY = os.environ.get("TESTDROID_APIKEY")
+if TESTDROID_URL and TESTDROID_APIKEY:
+    TESTDROID = Testdroid(apikey=TESTDROID_APIKEY, url=TESTDROID_URL)
+else:
+    TESTDROID = None
+
+# print(TESTDROID)
+
+
+# get devices from the api
+#
+# returns array of strings
+def get_device_names():
+    display_names = {}
+    for device in get_devices():
+        dn = device["displayName"]
+        # skip docker builder, not a real device
+        if dn == "Docker Builder":
+            continue
+        display_names[dn] = True
+
+    devices = sorted(display_names.keys())
+
+    return devices
+
+
+api_devices = get_device_names()
+api_devices_set = set(api_devices)
+print("api devices: ")
+print(f"  {api_devices}")
+print(f"  count: {len(api_devices)}")
+
+print("")
+
+# config_path=args.config_file
+dgri = DeviceGroupReport(quiet=True)
+config_devices = dgri.get_config_devices()
+config_devices_set = set(config_devices)
+print("config devices: ")
+print(f"  {config_devices}")
+print(f"  count: {len(config_devices)}")
+
+print("")
+print("api - config: ")
+print(f"  {api_devices_set.difference(config_devices_set)}")
+print("config - api: ")
+print(f"  {config_devices_set.difference(api_devices_set)}")
