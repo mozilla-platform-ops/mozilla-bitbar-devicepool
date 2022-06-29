@@ -55,7 +55,7 @@ print("")
 dgri = DeviceGroupReport(quiet=True)
 config_devices = dgri.get_config_devices()
 config_devices_set = set(config_devices)
-print("config devices: ")
+print(f"config ({dgri.config_path}) devices: ")
 print(f"  {config_devices}")
 print(f"  count: {len(config_devices)}")
 
