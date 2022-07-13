@@ -43,7 +43,14 @@ def get_device_names():
     return devices
 
 
-api_devices = get_device_names()
+try:
+    api_devices = get_device_names()
+except AttributeError as e:
+    print("Please ensure the bitbar env vars have been set!")
+    print("  - TESTDROID_URL and TESTDROID_APIKEY")
+    print("full exception follows")
+    print("")
+    raise e
 api_devices_set = set(api_devices)
 print("api devices: ")
 print(f"  {api_devices}")
