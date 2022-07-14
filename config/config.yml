@@ -232,24 +232,24 @@ device_groups:
   pixel2-unit:
   pixel2-unit-2:
     # pixel2-01:
-    # pixel2-02:
+    pixel2-02:
     # pixel2-03:
     # pixel2-04:
     # pixel2-05:
     # pixel2-06:
     # pixel2-07:
-    # pixel2-08:
+    pixel2-08:
     # pixel2-09:
     # pixel2-10:
     # pixel2-11:  # disabled, bad device
     pixel2-12:
-    # pixel2-13:  # disabled due to 2021 contract (and battery bloat)
+    pixel2-13:
     # pixel2-14:  # disabled due to 2021 contract (and battery bloat)
     pixel2-15:
-    pixel2-16:
+    # pixel2-16:  # 7/14/22: failed device
     pixel2-17:
     pixel2-18:
-    pixel2-19:
+    # pixel2-19:  # 7/14/22: failed device
     pixel2-20:
     pixel2-21:
     pixel2-22:
