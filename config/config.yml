@@ -183,16 +183,16 @@ device_groups:
     # motog5-31:  # bad device
     # motog5-32:  # 7/13/22: disabled for a51
     # motog5-33:  # disabled due to 2021 contract (and battery bloat)
-    motog5-34:
-    motog5-35:
+    # motog5-34:  # disabled 8/9/22
+    # motog5-35:  # disabled 8/9/22
     motog5-36:
     motog5-37:
-    motog5-38:
     # motog5-39:  # bad device
   motog5-unit:
   motog5-unit-2:
   motog5-test:
   test-1:
+    motog5-38:
   test-2:
     # motog5-40:  # disabled due to a51 device increases (3/29/22)
   test-3:
