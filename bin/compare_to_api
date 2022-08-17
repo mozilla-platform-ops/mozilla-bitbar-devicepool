@@ -68,6 +68,6 @@ print(f"  count: {len(config_devices)}")
 
 print("")
 print("api - config: ")
-print(f"  {api_devices_set.difference(config_devices_set)}")
+print(f"  {sorted(api_devices_set.difference(config_devices_set))}")
 print("config - api: ")
-print(f"  {config_devices_set.difference(api_devices_set)}")
+print(f"  {sorted(config_devices_set.difference(api_devices_set))}")
