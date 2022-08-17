@@ -248,7 +248,7 @@ device_groups:
     pixel2-15:
     # pixel2-16:  # 7/14/22: failed device
     pixel2-17:
-    pixel2-18:
+    # pixel2-18:  # 7/17/22: failed device
     # pixel2-19:  # 7/14/22: failed device
     pixel2-20:
     pixel2-21:
@@ -261,7 +261,7 @@ device_groups:
     pixel2-29:
     pixel2-30:
     pixel2-31:
-    # pixel2-32:  # disabled due to 2021 contract (and battery bloat)
+    pixel2-32:
     pixel2-33:
   pixel2-perf:
   pixel2-perf-2:
@@ -280,7 +280,7 @@ device_groups:
     pixel2-45:
     pixel2-46:
     pixel2-47:
-    pixel2-48:
+    # pixel2-48:  # 7/17/22: failed device
     pixel2-49:
     pixel2-50:
     # pixel2-51: # removed from cluster due to flakiness (hangs, turns off)
@@ -292,6 +292,7 @@ device_groups:
     pixel2-57:
     pixel2-58:
     pixel2-59:
+    pixel2-60:
   pixel2-batt:
   pixel2-batt-2:
   s7-unit:
