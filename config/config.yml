@@ -187,12 +187,13 @@ device_groups:
     # motog5-35:  # disabled 8/9/22
     motog5-36:
     motog5-37:
+    motog5-38:
     # motog5-39:  # bad device
   motog5-unit:
   motog5-unit-2:
   motog5-test:
   test-1:
-    motog5-38:
+    pixel2-02:
   test-2:
     # motog5-40:  # disabled due to a51 device increases (3/29/22)
   test-3:
@@ -232,7 +233,6 @@ device_groups:
   pixel2-unit:
   pixel2-unit-2:
     # pixel2-01:
-    pixel2-02:
     # pixel2-03:
     # pixel2-04:
     # pixel2-05:
