@@ -122,7 +122,7 @@ projects:
       TASKCLUSTER_CLIENT_ID: project/autophone/bitbar-x-test-2
       TC_WORKER_TYPE: gecko-t-bitbar-gw-test-2
       # replace with version to test
-      DOCKER_IMAGE_VERSION: 20211130T120953
+      DOCKER_IMAGE_VERSION: 20220902T165809
   mozilla-gw-test-3:
     device_group_name: test-3
     framework_name: mozilla-usb
