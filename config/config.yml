@@ -231,7 +231,7 @@ device_groups:
   motog5-batt-2:
   pixel2-unit:
   pixel2-unit-2:
-    # pixel2-01:
+    pixel2-01:
     pixel2-02:
     # pixel2-03:
     # pixel2-04:
@@ -261,9 +261,9 @@ device_groups:
     pixel2-29:
     pixel2-30:
     pixel2-31:
-    pixel2-32:
   pixel2-perf:
   pixel2-perf-2:
+    pixel2-32:
     # pixel2-27:  # 7/14/22: failed device
     pixel2-33:
     pixel2-34:
@@ -272,7 +272,7 @@ device_groups:
     pixel2-37:
     pixel2-38:
     pixel2-39:
-    pixel2-40:
+    # pixel2-40:  # 9/15/22: bad device
     pixel2-41:
     pixel2-42:
     pixel2-43:
