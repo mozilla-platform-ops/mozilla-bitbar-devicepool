@@ -241,7 +241,7 @@ device_groups:
     pixel2-08:
     # pixel2-09:
     # pixel2-10:
-    # pixel2-11:  # disabled, bad device
+    pixel2-11:
     pixel2-12:
     pixel2-13:
     pixel2-14:
@@ -260,16 +260,16 @@ device_groups:
     pixel2-28:
     pixel2-29:
     pixel2-30:
-    pixel2-31:
   pixel2-perf:
   pixel2-perf-2:
+    pixel2-31:
     pixel2-32:
     # pixel2-27:  # 7/14/22: failed device
     pixel2-33:
     pixel2-34:
     pixel2-35:
     pixel2-36:
-    pixel2-37:
+    # pixel2-37:  # 10/7/22: bad device / battery issues
     pixel2-38:
     pixel2-39:
     # pixel2-40:  # 9/15/22: bad device
