@@ -269,7 +269,7 @@ device_groups:
     pixel2-34:
     pixel2-35:
     pixel2-36:
-    # pixel2-37:
+    # pixel2-37:  # 10/7/22: bad device / battery issues
     pixel2-38:
     pixel2-39:
     # pixel2-40:  # 9/15/22: bad device
