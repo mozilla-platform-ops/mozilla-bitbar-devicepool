@@ -247,9 +247,9 @@ device_groups:
       pixel5-01:
       pixel5-02:
   pixel5-perf:
-      pixel2-03:
-      pixel2-04:
-      pixel2-05:
+      pixel5-03:
+      pixel5-04:
+      pixel5-05:
   motog5-batt:
   motog5-batt-2:
   pixel2-unit:
