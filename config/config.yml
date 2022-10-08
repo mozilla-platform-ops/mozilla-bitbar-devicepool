@@ -38,6 +38,8 @@ projects:
     additional_parameters:
       TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-p5
       TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-p5
+      # TESTING
+      DOCKER_IMAGE_VERSION: 20221007T181143
   mozilla-gw-perftest-p5:
     device_group_name: pixel5-perf
     device_model: pixel5
@@ -46,6 +48,8 @@ projects:
     additional_parameters:
       TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-p5
       TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-p5
+      # TESTING
+      DOCKER_IMAGE_VERSION: 20221007T181143
   mozilla-gw-perftest-g5:
     device_group_name: motog5-perf-2
     device_model: motog5
