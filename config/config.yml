@@ -250,9 +250,9 @@ device_groups:
   pixel5-unit:
       pixel5-01:
       pixel5-02:
-  pixel5-perf:
       pixel5-03:
       pixel5-04:
+  pixel5-perf:
       pixel5-05:
   motog5-batt:
   motog5-batt-2:
