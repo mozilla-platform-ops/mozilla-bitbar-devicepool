@@ -39,7 +39,7 @@ projects:
       TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-p5
       TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-p5
       # TESTING
-      DOCKER_IMAGE_VERSION: 20221007T181143
+      DOCKER_IMAGE_VERSION: 20221010T124603
   mozilla-gw-perftest-p5:
     device_group_name: pixel5-perf
     device_model: pixel5
@@ -49,7 +49,7 @@ projects:
       TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-p5
       TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-p5
       # TESTING
-      DOCKER_IMAGE_VERSION: 20221007T181143
+      DOCKER_IMAGE_VERSION: 20221010T124603
   mozilla-gw-perftest-g5:
     device_group_name: motog5-perf-2
     device_model: motog5
@@ -115,15 +115,15 @@ projects:
       TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-a51
       TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-a51
   # used for building new docker images
-  # mozilla-docker-build:
-  #   device_group_name: motog4-docker-builder-2
-  #   device_model: motog4
-  #   framework_name: Docker image build
-  #   description: Mozilla Docker image build
-  #   test_file: mozilla-docker-20201102T161546.zip
-  #   # app file is defaulted
-  #   additional_parameters:
-  #     DOCKER_IMAGE_VERSION: 20201102T161546
+  mozilla-docker-build:
+    device_group_name: motog4-docker-builder-2
+    device_model: motog4
+    framework_name: Docker image build
+    description: Mozilla Docker image build
+    test_file: mozilla-docker-20221010T124603.zip
+    # app file is defaulted
+    additional_parameters:
+      DOCKER_IMAGE_VERSION: 20221010T124603
   # used for testing new docker images
   mozilla-gw-test-1:
     device_group_name: test-1
