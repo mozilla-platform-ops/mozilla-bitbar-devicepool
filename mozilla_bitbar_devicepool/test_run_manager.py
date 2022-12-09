@@ -36,6 +36,7 @@ PROJECT_DOES_NOT_EXIST_REGEX = r"Project with id [\d]* does not exist"
 def unhandled_exception_hook(args):
     # report the failure
     print(f"Thread exception: {args.exc_value}")
+    # continue execution
 
 
 # override threading.excepthook
