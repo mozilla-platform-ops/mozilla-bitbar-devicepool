@@ -32,6 +32,16 @@ ARCHIVED_FILE_REGEX = r"FileEntity with id [\d]* does not exist"
 PROJECT_DOES_NOT_EXIST_REGEX = r"Project with id [\d]* does not exist"
 
 
+# custom exception hook
+def unhandled_exception_hook(args):
+    # report the failure
+    print(f"Thread exception: {args.exc_value}")
+
+
+# override threading.excepthook
+threading.excepthook = unhandled_exception_hook
+
+
 class TestRunManager(object):
     """Model state and control from Apache's example:
     https://httpd.apache.org/docs/2.4/stopping.html
