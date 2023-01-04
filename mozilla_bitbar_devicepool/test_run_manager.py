@@ -9,6 +9,7 @@ import threading
 import time
 
 import requests
+import sentry_sdk
 from testdroid import RequestResponseError
 
 from mozilla_bitbar_devicepool import configuration, logger
@@ -30,6 +31,14 @@ CACHE = None
 CONFIG = None
 ARCHIVED_FILE_REGEX = r"FileEntity with id [\d]* does not exist"
 PROJECT_DOES_NOT_EXIST_REGEX = r"Project with id [\d]* does not exist"
+
+sentry_sdk.init(
+    dsn="https://6219c1b8ecb6484b82586c55ad99a87e@o1069899.ingest.sentry.io/4504301875691520",
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    # We recommend adjusting this value in production.
+    traces_sample_rate=1.0,
+)
 
 
 class TestRunManager(object):
