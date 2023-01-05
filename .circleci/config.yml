@@ -18,6 +18,7 @@ jobs:
       - run: pip3 install -r requirements-dev.txt
       - run: pip3 install -e .
       - run: pytest -v mozilla_bitbar_devicepool
+      - run: pytest --cov=mozilla_bitbar_devicepool
 
 workflows:
   main_test:
