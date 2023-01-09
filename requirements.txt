@@ -3,6 +3,9 @@
 
 PyYAML==6.0
 requests==2.28.1
-testdroid==2.100.0
+#testdroid==2.100.0
+# use aerickson's fork of testdroid
+#   - includes https://github.com/bitbar/testdroid-api-client-python/issues/141
+testdroid @ git+https://github.com/aerickson/testdroid-api-client-python@378d1d5f2e7ac6b07dbcc2954219c17d0f455fe7
 
 sentry-sdk
