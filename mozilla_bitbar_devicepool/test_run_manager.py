@@ -210,7 +210,7 @@ class TestRunManager(object):
             logger.info("getting active runs")
             try:
                 self.process_active_runs()
-            except requests.exceptions.ConnectionError as e:
+            except (requests.exceptions.ConnectionError, requests.Timeout) as e:
                 logger.warning("exception raised when calling process_active_runs.")
                 logger.warning(e)
                 # TODO: if we see this a lot, add exponential backoff?
@@ -326,7 +326,7 @@ class TestRunManager(object):
                         self.get_bitbar_test_stats(
                             project_name, projects_config[project_name]
                         )
-                    except requests.exceptions.ConnectionError as e:
+                    except (requests.exceptions.ConnectionError, requests.Timeout) as e:
                         logger.warning(
                             "exception raised when calling get_bitbar_test_stats."
                         )
