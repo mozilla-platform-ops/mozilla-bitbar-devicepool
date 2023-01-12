@@ -268,21 +268,21 @@ device_groups:
   motog5-batt-2:
   pixel2-unit:
   pixel2-unit-2:
-    pixel2-01:
-    pixel2-02:
+    # pixel2-01:  # 1/10/23: p2 drawdown
+    # pixel2-02:  # 1/10/23: p2 drawdown
     # pixel2-03:
     # pixel2-04:
     # pixel2-05:
     # pixel2-06:
     # pixel2-07:
-    pixel2-08:
+    # pixel2-08:  # 1/10/23: p2 drawdown
     # pixel2-09:
     # pixel2-10:
-    pixel2-11:
-    pixel2-12:
-    pixel2-13:
-    pixel2-14:
-    pixel2-15:
+    # pixel2-11:  # 1/10/23: p2 drawdown
+    # pixel2-12:  # 1/10/23: p2 drawdown
+    # pixel2-13:  # 1/10/23: p2 drawdown
+    # pixel2-14:  # 1/10/23: p2 drawdown
+    # pixel2-15:  # 1/10/23: p2 drawdown
     # pixel2-16:  # 7/14/22: failed device
     pixel2-17:
     # pixel2-18:  # 7/17/22: failed device
