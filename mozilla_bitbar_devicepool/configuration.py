@@ -121,14 +121,14 @@ def configure(bitbar_configpath, filespath=None, update_bitbar=False):
     try:
         ensure_filenames_are_unique(CONFIG)
     except (ConfigurationFileException) as e:
-        logger.error(e.message)
+        logger.warning(e.message)
         sys.exit(1)
     expand_configuration()
     try:
         configuration_preflight()
     except ConfigurationFileException as e:
-        logger.error(e)
-        logger.error(
+        logger.warning(e)
+        logger.warning(
             "Configuration files seem to be missing! Please place and restart. Exiting..."
         )
         sys.exit(1)
@@ -408,19 +408,19 @@ def configure_projects(update_bitbar=False):
                     description=project_config["description"],
                 )
             else:
-                logger.error(
+                logger.warning(
                     'archivingStrategy: pc: "{}" bb: "{}"'.format(
                         project_config["archivingStrategy"],
                         bitbar_project["archivingStrategy"],
                     )
                 )
-                logger.error(
+                logger.warning(
                     'archivingItemCount: pc: "{}" bb: "{}"'.format(
                         project_config["archivingItemCount"],
                         bitbar_project["archivingItemCount"],
                     )
                 )
-                logger.error(
+                logger.warning(
                     'description: pc: "{}" bb: "{}"'.format(
                         project_config["description"], bitbar_project["description"]
                     )
