@@ -26,7 +26,7 @@ from mozilla_bitbar_devicepool.taskcluster import get_taskcluster_pending_tasks
 # WARNING: not used everywhere yet!!!
 #
 # don't fire calls at bitbar, just mention you would
-TESTING = False
+TESTING = True
 
 CACHE = None
 CONFIG = None
@@ -40,7 +40,8 @@ sentry_sdk.init(
     # We recommend adjusting this value in production.
     traces_sample_rate=1.0,
 )
-# will dump a stack trace for all threads to sys.stderr on SIGSEGV, SIGFPE, SIGABRT, SIGBUS and SIGILL
+# will dump a stack trace for all threads to sys.stderr on SIGSEGV, SIGFPE, SIGABRT, SIGBUS and SIGILL and exit
+#   - USAGE: `kill -s SIGABRT <PID OF TEST_RUN_MANAGER>`
 faulthandler.enable()
 
 
