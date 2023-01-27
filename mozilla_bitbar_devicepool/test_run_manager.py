@@ -26,7 +26,7 @@ from mozilla_bitbar_devicepool.taskcluster import get_taskcluster_pending_tasks
 # WARNING: not used everywhere yet!!!
 #
 # don't fire calls at bitbar, just mention you would
-TESTING = True
+TESTING = False
 
 CACHE = None
 CONFIG = None
