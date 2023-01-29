@@ -7,6 +7,7 @@ import re
 import signal
 import threading
 import time
+import faulthandler
 
 import requests
 import sentry_sdk
@@ -39,6 +40,9 @@ sentry_sdk.init(
     # We recommend adjusting this value in production.
     traces_sample_rate=1.0,
 )
+# will dump a stack trace for all threads to sys.stderr on SIGSEGV, SIGFPE, SIGABRT, SIGBUS and SIGILL and exit
+#   - USAGE: `kill -s SIGABRT <PID OF TEST_RUN_MANAGER>`
+faulthandler.enable()
 
 
 class TestRunManager(object):
