@@ -41,7 +41,7 @@ def empty_test_zip(args):
 
 def test_run_manager(args):
     if not TESTDROID:
-        logger.error(
+        logger.warning(
             "The environment variabels TESTDROID_URL, TESTDROID_APIKEY both need to be set."
         )
         sys.exit(1)
@@ -56,10 +56,10 @@ def test_run_manager(args):
             bitbar_configpath, filespath=args.files, update_bitbar=args.update_bitbar
         )
     except configuration.DuplicateProjectException as e:
-        logger.error(
+        logger.warning(
             "Duplicate project found! Please archive all but one and restart. Exiting..."
         )
-        logger.error(e)
+        logger.warning(e)
         sys.exit(1)
 
     manager = TestRunManager(wait=args.wait)
@@ -68,7 +68,7 @@ def test_run_manager(args):
 
 def run_test(args):
     if not TESTDROID:
-        logger.error(
+        logger.warning(
             "The environment variabels TESTDROID_URL, TESTDROID_APIKEY both need to be set."
         )
         sys.exit(1)

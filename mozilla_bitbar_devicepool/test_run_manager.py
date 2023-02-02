@@ -183,23 +183,23 @@ class TestRunManager(object):
                             logger.info("test run {} started".format(test_run["id"]))
                 except RequestResponseError as e:
                     if e.status_code == 404 and re.search(ARCHIVED_FILE_REGEX, str(e)):
-                        logger.error(
+                        logger.warning(
                             "Test files have been archived. Exiting so configuration is rerun..."
                         )
-                        logger.error("%s: %s" % (e.__class__.__name__, e))
+                        logger.warning("%s: %s" % (e.__class__.__name__, e))
                         self.state = "STOP"
                     elif e.status_code == 404 and re.search(
                         PROJECT_DOES_NOT_EXIST_REGEX, str(e)
                     ):
-                        logger.error(
+                        logger.warning(
                             "Project does not exist!. Exiting so configuration is rerun..."
                         )
-                        logger.error("%s: %s" % (e.__class__.__name__, e))
+                        logger.warning("%s: %s" % (e.__class__.__name__, e))
                         self.state = "STOP"
                     else:
-                        logger.error("%s: %s" % (e.__class__.__name__, e))
+                        logger.warning("%s: %s" % (e.__class__.__name__, e))
                 except Exception as e:
-                    logger.error(
+                    logger.warning(
                         "Failed to create test run for group %s (%s: %s)."
                         % (device_group_name, e.__class__.__name__, e),
                         exc_info=True,
@@ -234,8 +234,8 @@ class TestRunManager(object):
             # gather all runs per project
             result = get_active_test_runs()
         except RequestResponseError as e:
-            logger.error("process_active_runs: RequestResponseError received")
-            logger.error(e)
+            logger.warning("process_active_runs: RequestResponseError received")
+            logger.warning(e)
             return
 
         for item in result:
