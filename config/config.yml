@@ -46,54 +46,54 @@ projects:
     additional_parameters:
       TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-p5
       TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-p5
-  mozilla-gw-perftest-g5:
-    device_group_name: motog5-perf-2
-    device_model: motog5
-    framework_name: mozilla-usb
-    description: Mozilla Performance tests for MotoG5 (using generic-worker)
-    additional_parameters:
-      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-g5
-      TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-g5
-  mozilla-gw-batttest-p2:
-    device_group_name: pixel2-batt-2
-    device_model: pixel2
-    framework_name: mozilla-tcp
-    description: Mozilla Battery tests for Pixel2 (using generic-worker)
-    additional_parameters:
-      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-batt-p2
-      TC_WORKER_TYPE: gecko-t-bitbar-gw-batt-p2
-  mozilla-gw-batttest-g5:
-    device_group_name: motog5-batt-2
-    device_model: motog5
-    framework_name: mozilla-tcp
-    description: Mozilla Battery tests for MotoG5 (using generic-worker)
-    additional_parameters:
-      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-batt-g5
-      TC_WORKER_TYPE: gecko-t-bitbar-gw-batt-g5
-  mozilla-gw-unittest-g5:
-    device_group_name: motog5-unit-2
-    device_model: motog5
-    framework_name: mozilla-usb
-    description: Mozilla Unit tests for MotoG5 (using generic-worker)
-    additional_parameters:
-      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-g5
-      TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-g5
-  mozilla-gw-unittest-s7:
-    device_group_name: s7-unit
-    device_model: s7
-    framework_name: mozilla-usb
-    description: Mozilla Unit tests for S7Galaxy (using generic-worker)
-    additional_parameters:
-      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-s7
-      TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-s7
-  mozilla-gw-perftest-s7:
-    device_group_name: s7-perf
-    device_model: s7
-    framework_name: mozilla-usb
-    description: Mozilla Performance tests for S7Galaxy (using generic-worker)
-    additional_parameters:
-      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-s7
-      TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-s7
+  # mozilla-gw-perftest-g5:
+  #   device_group_name: motog5-perf-2
+  #   device_model: motog5
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Performance tests for MotoG5 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-g5
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-g5
+  # mozilla-gw-batttest-p2:
+  #   device_group_name: pixel2-batt-2
+  #   device_model: pixel2
+  #   framework_name: mozilla-tcp
+  #   description: Mozilla Battery tests for Pixel2 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-batt-p2
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-batt-p2
+  # mozilla-gw-batttest-g5:
+  #   device_group_name: motog5-batt-2
+  #   device_model: motog5
+  #   framework_name: mozilla-tcp
+  #   description: Mozilla Battery tests for MotoG5 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-batt-g5
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-batt-g5
+  # mozilla-gw-unittest-g5:
+  #   device_group_name: motog5-unit-2
+  #   device_model: motog5
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Unit tests for MotoG5 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-g5
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-g5
+  # mozilla-gw-unittest-s7:
+  #   device_group_name: s7-unit
+  #   device_model: s7
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Unit tests for S7Galaxy (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-s7
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-s7
+  # mozilla-gw-perftest-s7:
+  #   device_group_name: s7-perf
+  #   device_model: s7
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Performance tests for S7Galaxy (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-s7
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-s7
   mozilla-gw-unittest-a51:
     device_group_name: a51-unit
     device_model: a51
