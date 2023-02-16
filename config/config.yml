@@ -284,16 +284,16 @@ device_groups:
     # pixel2-14:  # 1/10/23: p2 drawdown
     # pixel2-15:  # 1/10/23: p2 drawdown
     # pixel2-16:  # 7/14/22: failed device
-    pixel2-17:
+    # pixel2-17:  # 2/15/23: RELOPS-410: remove most p2
     # pixel2-18:  # 7/17/22: failed device
     # pixel2-19:  # 7/14/22: failed device
-    pixel2-20:
-    pixel2-21:
-    pixel2-22:
+    # pixel2-20:  # 2/15/23: RELOPS-410: remove most p2
+    # pixel2-21:  # 2/15/23: RELOPS-410: remove most p2
+    # pixel2-22:  # 2/15/23: RELOPS-410: remove most p2
     # pixel2-23:  # disabled due to 2021 contract (and battery bloat)
     # pixel2-24:  # disabled due to 2021 contract (and battery bloat)
     # pixel2-25:  # disabled due to 2021 contract (and battery bloat)
-    pixel2-26:
+    # pixel2-26:  # 2/15/23: RELOPS-410: remove most p2
     pixel2-28:
     pixel2-29:
     pixel2-30:
@@ -316,19 +316,19 @@ device_groups:
     # pixel2-44:  # 11/30/22: deactivated for phase 2 of p5
     # pixel2-45:  # 11/30/22: deactivated for phase 2 of p5
     # pixel2-46:  # 11/30/22: deactivated for phase 2 of p5
-    pixel2-47:
+    # pixel2-47:  # 2/15/23: RELOPS-410: remove most p2
     # pixel2-48:  # 7/17/22: failed device
-    pixel2-49:
-    pixel2-50:
+    # pixel2-49:  # 2/15/23: RELOPS-410: remove most p2
+    # pixel2-50:  # 2/15/23: RELOPS-410: remove most p2
     # pixel2-51: # removed from cluster due to flakiness (hangs, turns off)
     # pixel2-52: # removed from cluster due to battery bloat
     # pixel2-53: # removed due to having issues
-    pixel2-54:
-    pixel2-55:
-    pixel2-56:
-    pixel2-57:
-    pixel2-58:
-    pixel2-59:
+    # pixel2-54:  # 2/15/23: RELOPS-410: remove most p2
+    # pixel2-55:  # 2/15/23: RELOPS-410: remove most p2
+    # pixel2-56:  # 2/15/23: RELOPS-410: remove most p2
+    # pixel2-57:  # 2/15/23: RELOPS-410: remove most p2
+    # pixel2-58:  # 2/15/23: RELOPS-410: remove most p2
+    # pixel2-59:  # 2/15/23: RELOPS-410: remove most p2
     # pixel2-60:  # lots of failures and on android 9 (vs 8)
   pixel2-batt:
   pixel2-batt-2:
