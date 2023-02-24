@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "mozilla-bitbar-devicepool"
+version = "0.1.0"
+description = ""
+authors = ["Bob Clary <blary@mozilla.com>", "Andrew Erickson <aerickson@mozilla.com>"]
+license = "MPL 2.0"
+readme = "README.md"
+packages = [{include = "mozilla_bitbar_devicepool"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pyyaml = "^6.0"
+requests = "^2.28.2"
+testdroid = {git = "https://github.com/bitbar/testdroid-api-client-python", rev = "4f341bc6fe12205a107381ed59f302ba0e19a904"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
