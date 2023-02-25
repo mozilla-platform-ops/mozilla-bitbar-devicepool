@@ -2,7 +2,7 @@
 name = "mozilla-bitbar-devicepool"
 version = "0.1.0"
 description = ""
-authors = ["Bob Clary <blary@mozilla.com>", "Andrew Erickson <aerickson@mozilla.com>"]
+authors = ["Bob Clary <bclary@mozilla.com>", "Andrew Erickson <aerickson@mozilla.com>"]
 license = "MPL 2.0"
 readme = "README.md"
 packages = [{include = "mozilla_bitbar_devicepool"}]
