@@ -10,6 +10,7 @@ jobs:
           name: Install the latest version of Poetry
           command: |
             curl -sSL https://install.python-poetry.org | python3 -
+            poetry --version
       - run: poetry install --with=dev
       - run: poetry run pre-commit run --all-files --verbose
   pytest:
@@ -21,6 +22,7 @@ jobs:
           name: Install the latest version of Poetry
           command: |
             curl -sSL https://install.python-poetry.org | python3 -
+            poetry --version
       - run: poetry install --with=dev
       - run: pytest -v mozilla_bitbar_devicepool
       - run: pytest --cov=mozilla_bitbar_devicepool
