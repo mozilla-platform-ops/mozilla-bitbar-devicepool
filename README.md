@@ -17,8 +17,8 @@ Bitbar Frameworks must be managed via the Testdroid user interface.
 git clone https://github.com/bclary/mozilla-bitbar-devicepool.git
 cd mozilla-bitbar-devicepool
 
-# install poetry
-#   - see https://python-poetry.org/docs/
+# if needed, install poetry
+#   - see https://python-poetry.org/docs/ for more options and info
 curl -sSL https://install.python-poetry.org | python3 -
 
 # activate the virtual environment
