@@ -3,6 +3,7 @@ name = "mozilla-bitbar-devicepool"
 version = "2.0.0"
 description = "Manage Mozilla Android Hardware testing at Bitbar"
 authors = ["Bob Clary <bclary@mozilla.com>", "Andrew Erickson <aerickson@mozilla.com>"]
+maintainers = ["Andrew Erickson <aerickson@mozilla.com>"]
 license = "MPL-2.0"
 readme = "README.md"
 repository = "https://github.com/mozilla-platform-ops/mozilla-bitbar-devicepool"
