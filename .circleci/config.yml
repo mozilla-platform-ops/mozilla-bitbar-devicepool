@@ -4,6 +4,8 @@ orbs:
 
 jobs:
   pre_commit:
+    docker:
+      - image: cimg/python:3.11
     executor: python/default
     steps:
       - checkout
@@ -12,6 +14,8 @@ jobs:
           args: --with=dev
       - run: poetry run pre-commit run --all-files --verbose
   pytest:
+    docker:
+      - image: cimg/python:3.11
     executor: python/default
     steps:
       - checkout
