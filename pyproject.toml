@@ -16,7 +16,8 @@ classifiers = [
 python = "^3.9"
 pyyaml = "^6.0"
 requests = "^2.28.2"
-# use an unreleased version, 2.100.0+
+# use an unreleased version on master, v2.100.0+
+#   - includes https://github.com/bitbar/testdroid-api-client-python/issues/141
 testdroid = {git = "https://github.com/bitbar/testdroid-api-client-python", rev = "4f341bc6fe12205a107381ed59f302ba0e19a904"}
 sentry-sdk = "^1.15.0"
 
