@@ -1,10 +1,11 @@
 [tool.poetry]
 name = "mozilla-bitbar-devicepool"
-version = "0.1.0"
-description = ""
+version = "2.0.0"
+description = "Manage Mozilla Android Hardware testing at Bitbar"
 authors = ["Bob Clary <bclary@mozilla.com>", "Andrew Erickson <aerickson@mozilla.com>"]
-license = "MPL 2.0"
+license = "MPL-2.0"
 readme = "README.md"
+repository = "https://github.com/mozilla-platform-ops/mozilla-bitbar-devicepool"
 packages = [{include = "mozilla_bitbar_devicepool"}]
 
 [tool.poetry.dependencies]
