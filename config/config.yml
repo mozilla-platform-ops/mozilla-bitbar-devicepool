@@ -14,22 +14,22 @@ projects:
       DOCKER_IMAGE_VERSION: 20221010T124603
       TC_WORKER_CONF: gecko-t-ap
   # generic-worker
-  mozilla-gw-unittest-p2:
-    device_group_name: pixel2-unit-2
-    device_model: pixel2
-    framework_name: mozilla-usb
-    description: Mozilla Unit tests for Pixel2 (using generic-worker)
-    additional_parameters:
-      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-p2
-      TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-p2
-  mozilla-gw-perftest-p2:
-    device_group_name: pixel2-perf-2
-    device_model: pixel2
-    framework_name: mozilla-usb
-    description: Mozilla Performance tests for Pixel2 (using generic-worker)
-    additional_parameters:
-      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-p2
-      TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-p2
+  # mozilla-gw-unittest-p2:
+  #   device_group_name: pixel2-unit-2
+  #   device_model: pixel2
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Unit tests for Pixel2 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-p2
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-p2
+  # mozilla-gw-perftest-p2:
+  #   device_group_name: pixel2-perf-2
+  #   device_model: pixel2
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Performance tests for Pixel2 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-p2
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-p2
   mozilla-gw-unittest-p5:
     device_group_name: pixel5-unit
     device_model: pixel5
