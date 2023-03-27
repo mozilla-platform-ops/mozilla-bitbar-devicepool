@@ -288,7 +288,7 @@ device_groups:
     # pixel2-08:  # 1/10/23: p2 drawdown
     # pixel2-09:
     # pixel2-10:
-    pixel2-11:  # 1/10/23: p2 drawdown, 3/15/23: re-enabled due to 28's failure
+    # pixel2-11:  # 1/10/23: p2 drawdown, 3/15/23: re-enabled due to 28's failure
     # pixel2-12:  # 1/10/23: p2 drawdown
     # pixel2-13:  # 1/10/23: p2 drawdown
     # pixel2-14:  # 1/10/23: p2 drawdown
@@ -305,8 +305,8 @@ device_groups:
     # pixel2-25:  # disabled due to 2021 contract (and battery bloat)
     # pixel2-26:  # 2/15/23: RELOPS-410: remove most p2
     # pixel2-28:  # 3/15/23: hardware failure
-    pixel2-29:
-    pixel2-30:
+    # pixel2-29:
+    # pixel2-30:
   pixel2-perf:
   pixel2-perf-2:
     # pixel2-31:  # 11/30/22: deactivated for phase 2 of p5
