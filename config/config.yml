@@ -14,22 +14,22 @@ projects:
       DOCKER_IMAGE_VERSION: 20221010T124603
       TC_WORKER_CONF: gecko-t-ap
   # generic-worker
-  mozilla-gw-unittest-p2:
-    device_group_name: pixel2-unit-2
-    device_model: pixel2
-    framework_name: mozilla-usb
-    description: Mozilla Unit tests for Pixel2 (using generic-worker)
-    additional_parameters:
-      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-p2
-      TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-p2
-  mozilla-gw-perftest-p2:
-    device_group_name: pixel2-perf-2
-    device_model: pixel2
-    framework_name: mozilla-usb
-    description: Mozilla Performance tests for Pixel2 (using generic-worker)
-    additional_parameters:
-      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-p2
-      TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-p2
+  # mozilla-gw-unittest-p2:
+  #   device_group_name: pixel2-unit-2
+  #   device_model: pixel2
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Unit tests for Pixel2 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-p2
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-p2
+  # mozilla-gw-perftest-p2:
+  #   device_group_name: pixel2-perf-2
+  #   device_model: pixel2
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Performance tests for Pixel2 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-p2
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-p2
   mozilla-gw-unittest-p5:
     device_group_name: pixel5-unit
     device_model: pixel5
@@ -253,6 +253,9 @@ device_groups:
       a51-35:
       a51-36:
       a51-37:
+      a51-38:
+      a51-39:
+      a51-40:
   pixel5-unit:
       pixel5-01:
       pixel5-02:
@@ -288,7 +291,7 @@ device_groups:
     # pixel2-08:  # 1/10/23: p2 drawdown
     # pixel2-09:
     # pixel2-10:
-    pixel2-11:  # 1/10/23: p2 drawdown, 3/15/23: re-enabled due to 28's failure
+    # pixel2-11:  # 1/10/23: p2 drawdown, 3/15/23: re-enabled due to 28's failure
     # pixel2-12:  # 1/10/23: p2 drawdown
     # pixel2-13:  # 1/10/23: p2 drawdown
     # pixel2-14:  # 1/10/23: p2 drawdown
@@ -305,8 +308,8 @@ device_groups:
     # pixel2-25:  # disabled due to 2021 contract (and battery bloat)
     # pixel2-26:  # 2/15/23: RELOPS-410: remove most p2
     # pixel2-28:  # 3/15/23: hardware failure
-    pixel2-29:
-    pixel2-30:
+    # pixel2-29:
+    # pixel2-30:
   pixel2-perf:
   pixel2-perf-2:
     # pixel2-31:  # 11/30/22: deactivated for phase 2 of p5
