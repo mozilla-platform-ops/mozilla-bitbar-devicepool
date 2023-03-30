@@ -17,14 +17,16 @@ Bitbar Frameworks must be managed via the Testdroid user interface.
 git clone https://github.com/bclary/mozilla-bitbar-devicepool.git
 cd mozilla-bitbar-devicepool
 
-# Create a Python virtual environment
-python -m virtualenv venv
+# if needed, install poetry
+#   - see https://python-poetry.org/docs/ for more options and info
+curl -sSL https://install.python-poetry.org | python3 -
 
-# Activate the virtual environment
-. venv/bin/activate
+# activate the virtual environment
+poetry shell
 
-# Install the requirements
-pip install -r requirements.txt
+# install dependencies (with dev deps)
+poetry install --with=dev
+
 ```
 
 ## Updates
@@ -34,11 +36,11 @@ pip install -r requirements.txt
 cd mozilla-bitbar-devicepool
 git pull --rebase
 
-# Activate the virtual environment
-. venv/bin/activate
+# activate the virtual environment
+poetry shell
 
-# Install any updated requirements
-pip install -r requirements.txt
+# install any updated dependencies
+poetry install
 
 # Restart the service
 ```

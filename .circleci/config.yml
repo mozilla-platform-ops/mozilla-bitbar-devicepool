@@ -1,24 +1,29 @@
 version: 2.1
+orbs:
+  python: circleci/python@2.1.1
 
 jobs:
   pre_commit:
     docker:
-      - image: cimg/python:3.9.1
+      - image: cimg/python:3.10
+    executor: python/default
     steps:
       - checkout
-      - run: pip3 install -r requirements.txt
-      - run: pip3 install -r requirements-dev.txt
-      - run: pre-commit run --all-files --verbose
+      - python/install-packages:
+          pkg-manager: poetry
+          args: --with=dev
+      - run: poetry run pre-commit run --all-files --verbose
   pytest:
     docker:
-      - image: cimg/python:3.9.1
+      - image: cimg/python:3.10
+    executor: python/default
     steps:
       - checkout
-      - run: pip3 install -r requirements.txt
-      - run: pip3 install -r requirements-dev.txt
-      - run: pip3 install -e .
-      - run: pytest -v mozilla_bitbar_devicepool
-      - run: pytest --cov=mozilla_bitbar_devicepool
+      - python/install-packages:
+          pkg-manager: poetry
+          args: --with=dev
+      - run: poetry run pytest -v mozilla_bitbar_devicepool
+      - run: poetry run pytest --cov=mozilla_bitbar_devicepool
 
 workflows:
   main_test:
