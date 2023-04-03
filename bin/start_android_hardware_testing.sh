@@ -11,4 +11,4 @@
 # new: poetry
 #
 cd /home/bitbar/mozilla-bitbar-devicepool
-poetry run mbd start-test-run-manager --update-bitbar
+/home/bitbar/.local/bin/poetry run mbd start-test-run-manager --update-bitbar
