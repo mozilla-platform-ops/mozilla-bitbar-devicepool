@@ -28,3 +28,8 @@ repos:
         language: system
         types: [python]
         args: [-E]  # only look for errors
+- repo: https://github.com/fpgmaas/deptry.git
+  rev: "0.11.0"
+  hooks:
+    - id: deptry
+      args: ["--skip-missing"]
