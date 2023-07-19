@@ -330,7 +330,11 @@ class TestRunManager(object):
                         self.get_bitbar_test_stats(
                             project_name, projects_config[project_name]
                         )
-                    except (requests.exceptions.ConnectionError, requests.Timeout) as e:
+                    except (
+                        requests.exceptions.ConnectionError,
+                        requests.Timeout,
+                        RequestResponseError,
+                    ) as e:
                         logger.warning(
                             "exception raised when calling get_bitbar_test_stats."
                         )
