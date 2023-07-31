@@ -6,7 +6,7 @@ import sys
 try:
     from mozilla_bitbar_devicepool.device_group_report import DeviceGroupReport
 except ImportError:
-    print("ERROR: Please install dependencies (`pip install -r requirements.txt`)!")
+    print("ERROR: Please install dependencies (`poetry install`)!")
     sys.exit(1)
 
 parser = argparse.ArgumentParser()
