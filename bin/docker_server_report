@@ -5,7 +5,7 @@
 #       among Bitbar's Docker hosts.
 #
 
-# import argparse
+import argparse
 import sys
 
 try:
@@ -14,12 +14,20 @@ except ImportError:
     print("ERROR: Please install dependencies (`poetry install`)!")
     sys.exit(1)
 #
-# parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser()
 # parser.add_argument("-c", "--config-file", help="config file to inspect")
-# args = parser.parse_args()
+parser.add_argument(
+    "-v",
+    "--verbose",
+    action="store_true",
+    dest="verbose",
+    default=False,
+    help="verbose mode",
+)
+args = parser.parse_args()
 #
 # dsr = DockerServerReport(config_path=args.config_file)
 #
 
 dsr = DockerServerReport()
-dsr.main()
+dsr.main(args)

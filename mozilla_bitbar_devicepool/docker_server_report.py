@@ -8,7 +8,7 @@ from mozilla_bitbar_devicepool.bitbar.admin_devices import get_device_statuses
 
 
 class DockerServerReport:
-    def do_report(self):
+    def do_report(self, verbose=False):
         try:
             results = get_device_statuses()
         except AttributeError as e:
@@ -51,7 +51,8 @@ class DockerServerReport:
         my_dict = histogram_dict
 
         sorted_dict = dict(sorted(my_dict.items()))
-        # print(sorted_dict)
+        if verbose:
+            print(sorted_dict)
 
         data = sorted_dict
 
@@ -62,5 +63,5 @@ class DockerServerReport:
         fig.barh(counts, labels, force_ascii=True)
         fig.show()
 
-    def main(self):
-        self.do_report()
+    def main(self, args):
+        self.do_report(verbose=args.verbose)
