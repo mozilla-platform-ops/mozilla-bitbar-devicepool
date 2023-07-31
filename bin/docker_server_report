@@ -15,7 +15,9 @@ except ImportError:
     print("ERROR: Please install dependencies (`poetry install`)!")
     sys.exit(1)
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(
+    description="presents a report on phones/devices per Bitbar Docker host"
+)
 parser.add_argument(
     "-v",
     "--verbose",
