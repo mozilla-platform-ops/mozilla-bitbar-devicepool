@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+import pprint
 
 import termplotlib as tpl
 
@@ -25,8 +26,6 @@ class DockerServerReport:
                 "clusterName"
             ]
         if self.verbose:
-            import pprint
-
             pprint.pprint(device_to_docker_host_dict)
             print("")
 
