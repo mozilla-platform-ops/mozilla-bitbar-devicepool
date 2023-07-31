@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
 #
-# goal: find out if our devices are distributed evenly
-#       among Bitbar's Docker hosts.
+# goal: Find out if our devices are distributed evenly
+#       among Bitbar's Docker hosts. If docker hosts have
+#       too many, performance and test success suffers.
 #
 
 import argparse
@@ -13,9 +14,8 @@ try:
 except ImportError:
     print("ERROR: Please install dependencies (`poetry install`)!")
     sys.exit(1)
-#
+
 parser = argparse.ArgumentParser()
-# parser.add_argument("-c", "--config-file", help="config file to inspect")
 parser.add_argument(
     "-v",
     "--verbose",
@@ -25,9 +25,6 @@ parser.add_argument(
     help="verbose mode",
 )
 args = parser.parse_args()
-#
-# dsr = DockerServerReport(config_path=args.config_file)
-#
 
 dsr = DockerServerReport(verbose=args.verbose)
 dsr.main()
