@@ -11,7 +11,7 @@ class DockerServerReport:
     def __init__(self, verbose=False):
         self.verbose = verbose
 
-    def do_report(self, verbose=False):
+    def do_report(self):
         try:
             results = get_device_statuses()
         except AttributeError as e:
@@ -24,6 +24,11 @@ class DockerServerReport:
             device_to_docker_host_dict[result_device["deviceName"]] = result_device[
                 "clusterName"
             ]
+        if self.verbose:
+            import pprint
+
+            pprint.pprint(device_to_docker_host_dict)
+            print("")
 
         histogram_dict = {}
         for k, v in device_to_docker_host_dict.items():
@@ -34,8 +39,6 @@ class DockerServerReport:
                 histogram_dict[shortened_v] = 1
 
         sorted_dict = dict(sorted(histogram_dict.items()))
-        if self.verbose:
-            print(sorted_dict)
 
         counts = list(sorted_dict.values())
         labels = list(sorted_dict.keys())
