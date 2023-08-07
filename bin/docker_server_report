@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+
+#
+# goal: Find out if our devices are distributed evenly
+#       among Bitbar's Docker hosts. If docker hosts have
+#       too many, performance and test success suffers.
+#
+
+import argparse
+import sys
+
+try:
+    from mozilla_bitbar_devicepool.docker_server_report import DockerServerReport
+except ImportError:
+    print("ERROR: Please install dependencies (`poetry install`)!")
+    sys.exit(1)
+
+parser = argparse.ArgumentParser(
+    description="presents a report on phones/devices per Bitbar Docker host"
+)
+parser.add_argument(
+    "-v",
+    "--verbose",
+    action="store_true",
+    dest="verbose",
+    default=False,
+    help="verbose mode",
+)
+args = parser.parse_args()
+
+dsr = DockerServerReport(verbose=args.verbose)
+dsr.main()
