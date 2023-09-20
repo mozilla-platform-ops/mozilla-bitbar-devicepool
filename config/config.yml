@@ -46,6 +46,22 @@ projects:
     additional_parameters:
       TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-p5
       TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-p5
+  mozilla-gw-unittest-p6:
+    device_group_name: pixel6-unit
+    device_model: pixel6
+    framework_name: mozilla-usb
+    description: Mozilla Unit tests for Pixel6 (using generic-worker)
+    additional_parameters:
+      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-p6
+      TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-p6
+  mozilla-gw-perftest-p6:
+    device_group_name: pixel6-perf
+    device_model: pixel6
+    framework_name: mozilla-usb
+    description: Mozilla Performance tests for Pixel6 (using generic-worker)
+    additional_parameters:
+      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-p6
+      TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-p6
   # mozilla-gw-perftest-g5:
   #   device_group_name: motog5-perf-2
   #   device_model: motog5
@@ -232,3 +248,9 @@ device_groups:
   pixel5-perf:
       pixel5-18:
       pixel5-19:
+  pixel6-unit:
+  pixel6-perf:
+      pixel6-01:
+      pixel6-02:
+      pixel6-03:
+      pixel6-04:
