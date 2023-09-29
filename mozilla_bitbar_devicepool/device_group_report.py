@@ -66,6 +66,7 @@ class DeviceGroupReport:
                     or group.startswith("s7")
                     or group.startswith("a51")
                     or group.startswith("pixel5")
+                    or group.startswith("pixel6")
                 ):
                     self.gw_result_dict[group] = get_len(the_item)
                 else:
@@ -80,6 +81,8 @@ class DeviceGroupReport:
                         self.device_dict["a51"] = self.device_dict.get("a51", 0) + 1
                     if "pixel5" in device:
                         self.device_dict["p5"] = self.device_dict.get("p5", 0) + 1
+                    if "pixel6" in device:
+                        self.device_dict["p6"] = self.device_dict.get("p6", 0) + 1
                     if "s7" in device:
                         self.device_dict["s7"] = self.device_dict.get("s7", 0) + 1
                     if "pixel2" in device:
