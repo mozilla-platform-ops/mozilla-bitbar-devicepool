@@ -270,3 +270,6 @@ device_groups:
       pixel6-02:
       pixel6-03:
       pixel6-04:
+  s21-unit:
+  s21-perf:
+      s21-01:
