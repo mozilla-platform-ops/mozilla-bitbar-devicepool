@@ -48,6 +48,45 @@ class DeviceGroupReport:
                     device_names[device] = True
         return sorted(device_names.keys())
 
+    def get_report_dict_v2(self, injected_data=None):
+        total_devices = 0
+
+        if injected_data:
+            parsed_data = yaml.safe_load(injected_data)
+            device_groups = parsed_data.get("device_groups", {})
+        else:
+            with open(self.config_path, "r") as stream:
+                try:
+                    parsed_data = yaml.safe_load(stream)
+                    device_groups = parsed_data.get("device_groups", {})
+                except yaml.YAMLError as exc:
+                    print(exc)
+
+        pool_counts = {}
+        for group, devices in device_groups.items():
+            if isinstance(devices, dict):
+                if "-builder" not in group:
+                    pool_counts[group] = len(devices)
+
+        device_counts = {}
+        for group, devices in device_groups.items():
+            if isinstance(devices, dict):
+                if "-builder" not in group:
+                    modified_group = group.replace("-perf", "").replace("-unit", "")
+                    if modified_group not in device_counts:
+                        device_counts[modified_group] = 0
+                    device_counts[modified_group] += len(devices)
+                    total_devices += len(devices)
+
+        # import pprint
+        # pprint.pprint(pool_counts)
+        # pprint.pprint(device_counts)
+        return {
+            "pool_counts": pool_counts,
+            "device_counts": device_counts,
+            "total_devices": total_devices,
+        }
+
     def get_report_dict(self):
         with open(self.config_path, "r") as stream:
             try:
@@ -93,18 +132,35 @@ class DeviceGroupReport:
     def main(self):
         self.get_report_dict()
 
-        # print("/// tc-w  workers ///")
-        # for key in sorted(self.tcw_result_dict.keys()):
-        #     print("%s: %s" % (key, self.tcw_result_dict[key]))
-        print("/// g-w workers ///")
-        for key in sorted(self.gw_result_dict.keys()):
-            print("%s: %s" % (key, self.gw_result_dict[key]))
-        print("/// test workers ///")
-        for key in sorted(self.test_result_dict.keys()):
-            print("%s: %s" % (key, self.test_result_dict[key]))
+        v1_enabled = False
+        if v1_enabled:
+
+            print("/// tc-w  workers ///")
+            for key in sorted(self.tcw_result_dict.keys()):
+                print("%s: %s" % (key, self.tcw_result_dict[key]))
+            print("/// g-w workers ///")
+            for key in sorted(self.gw_result_dict.keys()):
+                print("%s: %s" % (key, self.gw_result_dict[key]))
+            print("/// test workers ///")
+            for key in sorted(self.test_result_dict.keys()):
+                print("%s: %s" % (key, self.test_result_dict[key]))
+            print("/// device summary ///")
+            total_count = 0
+            for item in self.device_dict:
+                total_count += int(self.device_dict[item])
+                print("%s: %s" % (item, self.device_dict[item]))
+            print("total: %s" % total_count)
+
+            print("")
+            print("v2:")
+
+        result = self.get_report_dict_v2()
+        import pprint
+
+        print("/// pool summary ///")
+        pprint.pprint(result["pool_counts"])
+
         print("/// device summary ///")
-        total_count = 0
-        for item in self.device_dict:
-            total_count += int(self.device_dict[item])
-            print("%s: %s" % (item, self.device_dict[item]))
-        print("total: %s" % total_count)
+        pprint.pprint(result["device_counts"])
+
+        print("total devices: %s" % result["total_devices"])
