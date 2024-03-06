@@ -10,7 +10,10 @@ device_groups:
   motog4-docker-builder-2:
     Docker Builder:
   test-1:
+    z99-01:
   test-2:
+    z91-05:
+    z91-06:
   test-3:
   a51-unit:
   a51-perf:
@@ -99,6 +102,8 @@ def test_device_group_report_v2():
             "pixel5-unit": 17,
             "pixel6-perf": 4,
             "s21-perf": 1,
+            "z91": 2,
+            "z99": 1,
         },
-        "total_devices": 64,
+        "total_devices": 67,
     }
