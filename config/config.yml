@@ -148,10 +148,10 @@ projects:
   #   device_model: motog4
   #   framework_name: Docker image build
   #   description: Mozilla Docker image build
-  #   test_file: mozilla-docker-20201102T161546.zip
+  #   test_file: mozilla-docker-20240305T164354.zip
   #   # app file is defaulted
   #   additional_parameters:
-  #     DOCKER_IMAGE_VERSION: 20201102T161546
+  #     DOCKER_IMAGE_VERSION: 20240305T164354
   # used for testing new docker images
   mozilla-gw-test-1:
     device_group_name: test-1
@@ -170,7 +170,7 @@ projects:
       TASKCLUSTER_CLIENT_ID: project/autophone/bitbar-x-test-2
       TC_WORKER_TYPE: gecko-t-bitbar-gw-test-2
       # replace with version to test
-      DOCKER_IMAGE_VERSION: 20231106T174322
+      DOCKER_IMAGE_VERSION: 20240305T164354
   mozilla-gw-test-3:
     device_group_name: test-3
     framework_name: mozilla-usb
@@ -196,15 +196,18 @@ device_groups:
     Docker Builder:
   test-1:
     # motog5-38:  # 11/30/22: disabling all g5, not used any longer
+    #
+    # testing android 13
+    a51-02:  # running android 13
   test-2:
     # motog5-40:  # disabled due to a51 device increases (3/29/22)
+    # testing new image 20240305T164354
+    a51-01:
   test-3:
     # pixel2-60 has android 9.0 on it
     #pixel2-60: ## pulled 4/26/22
   a51-unit:
   a51-perf:
-      a51-01:
-      a51-02:
       a51-03:
       a51-04:
       a51-05:
