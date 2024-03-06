@@ -196,15 +196,18 @@ device_groups:
     Docker Builder:
   test-1:
     # motog5-38:  # 11/30/22: disabling all g5, not used any longer
+    #
+    # testing android 13
+    a51-02:  # running android 13
   test-2:
     # motog5-40:  # disabled due to a51 device increases (3/29/22)
+    # testing new image 20240305T164354
+    a51-01:
   test-3:
     # pixel2-60 has android 9.0 on it
     #pixel2-60: ## pulled 4/26/22
   a51-unit:
   a51-perf:
-      a51-01:
-      a51-02:
       a51-03:
       a51-04:
       a51-05:
