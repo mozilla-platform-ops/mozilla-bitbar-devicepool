@@ -69,23 +69,23 @@ class DeviceGroupReport:
                     pool_counts[group] = len(devices)
 
         device_counts = {}
-        for group, devices in device_groups.items():
-            if isinstance(devices, dict):
-                if "-builder" not in group:
-                    modified_group = group.replace("-perf", "").replace("-unit", "")
-                    if modified_group not in device_counts:
-                        device_counts[modified_group] = 0
-                    device_counts[modified_group] += len(devices)
-                    total_devices += len(devices)
+        for group, devices_h in device_groups.items():
+            if devices_h and "-builder" not in group:
+                devices = devices_h.keys()
+                print(f"devices {devices}")
+                for device_name in devices:
+                    device_type = device_name.split("-")[0]
+                    device_counts[device_type] = device_counts.get(device_type, 0) + 1
+                    total_devices += 1
 
-        # import pprint
-        # pprint.pprint(pool_counts)
-        # pprint.pprint(device_counts)
-        return {
+        return_ds = {
             "pool_counts": pool_counts,
             "device_counts": device_counts,
             "total_devices": total_devices,
         }
+        # import pprint
+        # pprint.pprint(return_ds)
+        return return_ds
 
     def get_report_dict(self):
         with open(self.config_path, "r") as stream:
