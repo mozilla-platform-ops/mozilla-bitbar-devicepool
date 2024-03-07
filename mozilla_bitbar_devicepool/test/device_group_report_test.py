@@ -10,7 +10,10 @@ device_groups:
   motog4-docker-builder-2:
     Docker Builder:
   test-1:
+    z99-01:
   test-2:
+    z91-05:
+    z91-06:
   test-3:
   a51-unit:
   a51-perf:
@@ -92,13 +95,22 @@ def test_device_group_report_v2():
     dgr.get_report_dict_v2(injected_data=data)
 
     assert dgr.get_report_dict_v2(injected_data=data) == {
-        "device_counts": {"a51": 40, "pixel5": 19, "pixel6": 4, "s21": 1},
+        "device_counts": {
+            "a51": 40,
+            "pixel5": 19,
+            "pixel6": 4,
+            "s21": 1,
+            "z91": 2,
+            "z99": 1,
+        },
         "pool_counts": {
             "a51-perf": 40,
             "pixel5-perf": 2,
             "pixel5-unit": 17,
             "pixel6-perf": 4,
             "s21-perf": 1,
+            "test-1": 1,
+            "test-2": 2,
         },
-        "total_devices": 64,
+        "total_devices": 67,
     }
