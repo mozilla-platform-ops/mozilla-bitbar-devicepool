@@ -5,6 +5,8 @@ import sys
 
 import yaml
 
+from mozilla_bitbar_devicepool.util import misc
+
 
 def get_len(an_object):
     if an_object:
@@ -24,7 +26,7 @@ class DeviceGroupReport:
             root_dir = os.path.abspath(os.path.join(pathname, ".."))
             self.config_path = os.path.join(root_dir, "config", "config.yml")
             if not quiet:
-                print("Using config file at '%s'." % self.config_path)
+                print("INFO: Using config file at '%s'." % self.config_path)
         else:
             self.config_path = config_path
 
@@ -72,7 +74,6 @@ class DeviceGroupReport:
         for group, devices_h in device_groups.items():
             if devices_h and "-builder" not in group:
                 devices = devices_h.keys()
-                print(f"devices {devices}")
                 for device_name in devices:
                     device_type = device_name.split("-")[0]
                     device_counts[device_type] = device_counts.get(device_type, 0) + 1
@@ -132,6 +133,17 @@ class DeviceGroupReport:
     def main(self):
         self.get_report_dict()
 
+        banner = """
+   __   _ __  __                 __
+  / /  (_) /_/ /  ___ _____  ___/ /__ _____
+ / _ \/ / __/ _ \/ _ `/ __/ / _  / _ `/ __/
+/_.__/_/\__/_.__/\_,_/_/    \_,_/\_, /_/
+                                /___/
+"""  # noqa: W605
+        print(banner.lstrip("\n"))
+        print(f"  generated on {misc.get_utc_date_string()} ({misc.get_git_info()})")
+        print()
+
         v1_enabled = False
         if v1_enabled:
 
@@ -157,10 +169,15 @@ class DeviceGroupReport:
         result = self.get_report_dict_v2()
         import pprint
 
-        print("/// pool summary ///")
-        pprint.pprint(result["pool_counts"])
+        print("pool summary")
+        pprint.pprint(result["pool_counts"], indent=2)
 
-        print("/// device summary ///")
-        pprint.pprint(result["device_counts"])
+        print()
+
+        # print(f'device types ({result["total_devices"]} total)')
+        print("device types")
+        pprint.pprint(result["device_counts"], indent=2)
+
+        print()
 
         print("total devices: %s" % result["total_devices"])
