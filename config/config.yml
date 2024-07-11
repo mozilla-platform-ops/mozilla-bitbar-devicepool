@@ -208,13 +208,13 @@ device_groups:
     #pixel2-60: ## pulled 4/26/22
   a51-unit:
   a51-perf:
-      a51-01:
-      a51-03:
-      a51-04:
+      # a51-01: 7/11/24: disabled as bad
+      # a51-03: 7/11/24: disabled as bad
+      # a51-04: 7/11/24: disabled as bad
       a51-05:
       a51-06:
       a51-07:
-      a51-08:
+      # a51-08: 7/11/24: disabled as bad
       a51-09:
       a51-10:
       a51-11:
@@ -223,7 +223,7 @@ device_groups:
       a51-14:
       a51-15:
       a51-16:
-      a51-17:
+      # a51-17: 7/11/24: disabled as bad
       a51-18:
       a51-19:
       a51-20:
@@ -232,7 +232,7 @@ device_groups:
       a51-23:
       a51-24:
       a51-25:
-      a51-26:
+      # a51-26: 7/11/24: disabled as bad
       a51-27:
       a51-28:
       a51-29:
@@ -246,6 +246,16 @@ device_groups:
       a51-37:
       a51-38:
       a51-39:
+  a55-unit:
+  a55-perf:
+      a55-01:
+      a55-02:
+  s24-unit:
+  s24-perf:
+      s24-01:
+      s24-02:
+      s24-03:
+      s24-04:
   pixel5-unit:
       pixel5-01:
       pixel5-02:
