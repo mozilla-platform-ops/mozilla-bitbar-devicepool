@@ -142,6 +142,38 @@ projects:
     additional_parameters:
       TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-a51
       TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-a51
+  mozilla-gw-unittest-a55:
+    device_group_name: a55-unit
+    device_model: a55
+    framework_name: mozilla-usb
+    description: Mozilla Unit tests for A55 (using generic-worker)
+    additional_parameters:
+      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-a55
+      TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-a55
+  mozilla-gw-perftest-a55:
+    device_group_name: a55-perf
+    device_model: a55
+    framework_name: mozilla-usb
+    description: Mozilla Performance tests for A55 (using generic-worker)
+    additional_parameters:
+      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-a55
+      TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-a55
+  mozilla-gw-unittest-s24:
+    device_group_name: s24-unit
+    device_model: s24
+    framework_name: mozilla-usb
+    description: Mozilla Unit tests for S24 (using generic-worker)
+    additional_parameters:
+      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-s24
+      TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-s24
+  mozilla-gw-perftest-s24:
+    device_group_name: s24-perf
+    device_model: s24
+    framework_name: mozilla-usb
+    description: Mozilla Performance tests for S24 (using generic-worker)
+    additional_parameters:
+      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-s24
+      TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-s24
   # used for building new docker images
   # mozilla-docker-build:
   #   device_group_name: motog4-docker-builder-2
