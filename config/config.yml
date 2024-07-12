@@ -249,7 +249,7 @@ device_groups:
       # a51-08: 7/11/24: disabled as bad
       a51-09:
       a51-10:
-      a51-11:
+      # a51-11: 7/12/24: disabled as bad
       a51-12:
       a51-13:
       a51-14:
@@ -260,8 +260,8 @@ device_groups:
       a51-19:
       a51-20:
       a51-21:
-      a51-22:
-      a51-23:
+      # a51-22: 7/12/24: disabled as bad
+      # a51-23: 7/12/24: disabled as bad
       a51-24:
       a51-25:
       # a51-26: 7/11/24: disabled as bad
@@ -271,17 +271,40 @@ device_groups:
       a51-30:
       a51-31:
       a51-32:
-      a51-33:
-      a51-34:
+      # a51-33: 7/12/24: disabled as bad
+      # a51-34: 7/12/24: disabled as bad
       a51-35:
-      a51-36:
-      a51-37:
-      a51-38:
-      a51-39:
+      # a51-36: 7/12/24: disabled as bad
+      # a51-37: 7/12/24: disabled as bad
+      # a51-38: 7/12/24: disabled as bad
+      # a51-39: 7/12/24: disabled as bad
   a55-unit:
   a55-perf:
       a55-01:
       a55-02:
+      a55-03:
+      a55-04:
+      a55-05:
+      a55-06:
+      a55-07:
+      a55-08:
+      a55-09:
+      a55-10:
+      a55-11:
+      a55-12:
+      a55-13:
+      a55-14:
+      a55-15:
+      a55-16:
+      a55-17:
+      a55-18:
+      a55-19:
+      a55-20:
+      a55-21:
+      a55-22:
+      a55-23:
+      a55-24:
+      a55-25:
   s24-unit:
   s24-perf:
       s24-01:
