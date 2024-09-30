@@ -331,6 +331,7 @@ device_groups:
       a55-49:
       a55-50:
       a55-51:
+      a55-52:
   s24-unit:
   s24-perf:
       s24-01:
