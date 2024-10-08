@@ -234,7 +234,6 @@ device_groups:
   test-2:
     # motog5-40:  # disabled due to a51 device increases (3/29/22)
     # testing new image 20240307T112108
-    a51-40:
   test-3:
     # pixel2-60 has android 9.0 on it
     #pixel2-60: ## pulled 4/26/22
@@ -278,6 +277,7 @@ device_groups:
       # a51-37: 7/12/24: disabled as bad
       # a51-38: 7/12/24: disabled as bad
       # a51-39: 7/12/24: disabled as bad
+      a51-40:
   a55-unit:
   a55-perf:
       a55-01:
