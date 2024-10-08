@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 #
+# generates a python array for use in function.py at
+#   https://github.com/mozilla-platform-ops/relops_infra_as_code/tree/master/terraform/taskqueue-influxdb-metrics
+#
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
