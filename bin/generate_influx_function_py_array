@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+#
+# generates a python array for use in function.py at
+#   https://github.com/mozilla-platform-ops/relops_infra_as_code/tree/master/terraform/taskqueue-influxdb-metrics
+#
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+cd $script_dir/../config/
+
+output=$(grep -r TC_WORKER_TYPE | grep -v '#' | cut -f 3 -d ':')
+#echo $output
+
+echo "["
+echo "$output" | while read -r worker_type; do
+    echo "  'https://firefox-ci-tc.services.mozilla.com/api/queue/v1/pending/proj-autophone/$worker_type',"
+done
+echo "]"
