@@ -252,7 +252,7 @@ device_groups:
       a51-12:
       a51-13:
       a51-14:
-      a51-15:
+      # a51-15: 10/11/24: removed, won't power on
       a51-16:
       # a51-17: 7/11/24: disabled as bad
       a51-18:
@@ -332,6 +332,11 @@ device_groups:
       a55-50:
       a55-51:
       a55-52:
+      a55-53:
+      a55-54:
+      a55-55:
+      a55-56:
+      a55-57:
   s24-unit:
   s24-perf:
       s24-01:
