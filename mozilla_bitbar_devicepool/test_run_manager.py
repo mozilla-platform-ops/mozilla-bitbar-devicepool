@@ -149,7 +149,7 @@ class TestRunManager(object):
                 if stats["WAITING"] >= 5 or pending_tasks == 0:
                     jobs_to_start = 0
                 else:
-                    jobs_to_start = 1
+                    jobs_to_start = max(1, 5 - stats["WAITING"])
                 # logger.info(f"post-hack: jobs to start: {jobs_to_start}")
 
                 if jobs_to_start < 0:
