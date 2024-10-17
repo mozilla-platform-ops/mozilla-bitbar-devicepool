@@ -135,6 +135,10 @@ class TestRunManager(object):
                     )
                     logger.warning(e)
                     pending_tasks = 0
+
+                # 'jobs to start' algorithm v1
+                #   - basically start up to the number of devices in a group
+                #
                 # warning: only take the log of positive non-zero numbers, or a
                 # "ValueError: math domain error" will be raised
                 jobs_to_start = min(
@@ -144,12 +148,21 @@ class TestRunManager(object):
                     + 1
                     + int(math.log10(1 + pending_tasks)),
                 )
+
+                # 'jobs to start' algorithm v2
+                #  - start up to max_jobs_to_have_waiting jobs
+                #    - avoids overloading Bitbar with too many waiting jobs
+                #
+                # TODO: vary this based on how many devices out of total this queue has
+                #   - set a global limit and then give each queue a fraction of that
+                max_jobs_to_have_waiting = 5
+                #
                 # logger.info(f"pre-hack: jobs to start: {jobs_to_start}")
                 # aje hack to see if fewer waiting jobs helps
-                if stats["WAITING"] >= 5 or pending_tasks == 0:
+                if stats["WAITING"] >= max_jobs_to_have_waiting or pending_tasks == 0:
                     jobs_to_start = 0
                 else:
-                    jobs_to_start = max(1, 5 - stats["WAITING"])
+                    jobs_to_start = max(1, max_jobs_to_have_waiting - stats["WAITING"])
                 # logger.info(f"post-hack: jobs to start: {jobs_to_start}")
 
                 if jobs_to_start < 0:
