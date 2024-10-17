@@ -144,6 +144,14 @@ class TestRunManager(object):
                     + 1
                     + int(math.log10(1 + pending_tasks)),
                 )
+                # logger.info(f"pre-hack: jobs to start: {jobs_to_start}")
+                # aje hack to see if fewer waiting jobs helps
+                if stats["WAITING"] >= 5 or pending_tasks == 0:
+                    jobs_to_start = 0
+                else:
+                    jobs_to_start = 1
+                # logger.info(f"post-hack: jobs to start: {jobs_to_start}")
+
                 if jobs_to_start < 0:
                     jobs_to_start = 0
 
