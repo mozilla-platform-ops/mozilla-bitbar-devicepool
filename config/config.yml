@@ -230,7 +230,7 @@ device_groups:
     # motog5-38:  # 11/30/22: disabling all g5, not used any longer
     #
     # testing android 13
-    a51-02:  # running android 13
+    # a51-02: # running android 13, 2/26/25: removed
   test-2:
     # motog5-40:  # disabled due to a51 device increases (3/29/22)
     # testing new image 20240307T112108
@@ -239,158 +239,158 @@ device_groups:
     #pixel2-60: ## pulled 4/26/22
   a51-unit:
   a51-perf:
-      # a51-01: 7/11/24: disabled as bad
-      # a51-03: 7/11/24: disabled as bad
-      # a51-04: 7/11/24: disabled as bad
-      a51-05:
-      a51-06:
-      a51-07:
-      # a51-08: 7/11/24: disabled as bad
-      a51-09:
-      # a51-10: 9/13/24: removed
-      # a51-11: 7/12/24: disabled as bad
-      a51-12:
-      # a51-13: 11/26/24: disabled as bad
-      a51-14:
-      # a51-15: 10/11/24: removed, won't power on
-      # a51-16: 11/26/24: disabled as bad
-      # a51-17: 7/11/24: disabled as bad
-      a51-18:
-      a51-19:
-      # a51-20: 9/13/24: removed
-      # a51-21: 9/13/24: removed
-      # a51-22: 7/12/24: disabled as bad
-      # a51-23: 7/12/24: disabled as bad
-      a51-24:
-      a51-25:
-      # a51-26: 7/11/24: disabled as bad
-      # a51-27: 9/13/24: removed
-      a51-28:
-      # a51-29: 9/13/24: removed
-      a51-30:
-      a51-31:
-      a51-32:
-      # a51-33: 7/12/24: disabled as bad
-      # a51-34: 7/12/24: disabled as bad
-      a51-35:
-      # a51-36: 7/12/24: disabled as bad
-      # a51-37: 7/12/24: disabled as bad
-      # a51-38: 7/12/24: disabled as bad
-      # a51-39: 7/12/24: disabled as bad
-      a51-40:
+    # a51-01: 7/11/24: disabled as bad
+    # a51-03: 7/11/24: disabled as bad
+    # a51-04: 7/11/24: disabled as bad
+    # a51-05: 2/26/25: removed
+    # a51-06: 2/26/25: removed
+    # a51-07: 2/26/25: removed
+    # a51-08: 7/11/24: disabled as bad
+    # a51-09: 2/26/25: removed
+    # a51-10: 9/13/24: removed
+    # a51-11: 7/12/24: disabled as bad
+    # a51-12: 2/26/25: removed
+    # a51-13: 11/26/24: disabled as bad
+    # a51-14: 2/26/25: removed
+    # a51-15: 10/11/24: removed, won't power on
+    # a51-16: 11/26/24: disabled as bad
+    # a51-17: 7/11/24: disabled as bad
+    # a51-18: 2/26/25: removed
+    # a51-19: 2/26/25: removed
+    # a51-20: 9/13/24: removed
+    # a51-21: 9/13/24: removed
+    # a51-22: 7/12/24: disabled as bad
+    # a51-23: 7/12/24: disabled as bad
+    # a51-24: 2/26/25: removed
+    # a51-25: 2/26/25: removed
+    # a51-26: 7/11/24: disabled as bad
+    # a51-27: 9/13/24: removed
+    # a51-28: 2/26/25: removed
+    # a51-29: 9/13/24: removed
+    # a51-30: 2/26/25: removed
+    # a51-31: 2/26/25: removed
+    # a51-32: 2/26/25: removed
+    # a51-33: 7/12/24: disabled as bad
+    # a51-34: 7/12/24: disabled as bad
+    # a51-35: 2/26/25: removed
+    # a51-36: 7/12/24: disabled as bad
+    # a51-37: 7/12/24: disabled as bad
+    # a51-38: 7/12/24: disabled as bad
+    # a51-39: 7/12/24: disabled as bad
+    # a51-40: 2/26/25: removed
   a55-unit:
   a55-perf:
-      a55-01:
-      a55-02:
-      a55-03:
-      a55-04:
-      a55-05:
-      a55-06:
-      a55-07:
-      a55-08:
-      a55-09:
-      a55-10:
-      a55-11:
-      a55-12:
-      a55-13:
-      a55-14:
-      a55-15:
-      a55-16:
-      a55-17:
-      a55-18:
-      a55-19:
-      a55-20:
-      a55-21:
-      a55-22:
-      a55-23:
-      a55-24:
-      a55-25:
-      a55-26:
-      a55-27:
-      a55-28:
-      a55-29:
-      a55-30:
-      a55-31:
-      a55-32:
-      a55-33:
-      a55-34:
-      a55-35:
-      a55-36:
-      a55-37:
-      a55-38:
-      a55-39:
-      a55-40:
-      a55-41:
-      a55-42:
-      a55-43:
-      a55-44:
-      a55-45:
-      a55-46:
-      a55-47:
-      a55-48:
-      a55-49:
-      a55-50:
-      a55-51:
-      a55-52:
-      a55-53:
-      a55-54:
-      a55-55:
-      a55-56:
-      a55-57:
-      a55-58:
-      a55-59:
-      a55-60:
-      a55-61:
-      a55-62:
-      a55-63:
-      a55-64:
-      a55-65:
-      a55-66:
-      a55-67:
-      a55-68:
-      a55-69:
-      a55-70:
-      a55-71:
-      a55-72:
-      a55-73:
-      a55-74:
-      a55-75:
-      a55-76:
-      a55-77:
-      a55-78:
+    a55-01:
+    a55-02:
+    a55-03:
+    a55-04:
+    a55-05:
+    a55-06:
+    a55-07:
+    a55-08:
+    a55-09:
+    a55-10:
+    a55-11:
+    a55-12:
+    a55-13:
+    a55-14:
+    a55-15:
+    a55-16:
+    a55-17:
+    a55-18:
+    a55-19:
+    a55-20:
+    a55-21:
+    a55-22:
+    a55-23:
+    a55-24:
+    a55-25:
+    a55-26:
+    a55-27:
+    a55-28:
+    a55-29:
+    a55-30:
+    a55-31:
+    a55-32:
+    a55-33:
+    a55-34:
+    a55-35:
+    a55-36:
+    a55-37:
+    a55-38:
+    a55-39:
+    a55-40:
+    a55-41:
+    a55-42:
+    a55-43:
+    a55-44:
+    a55-45:
+    a55-46:
+    a55-47:
+    a55-48:
+    a55-49:
+    a55-50:
+    a55-51:
+    a55-52:
+    a55-53:
+    a55-54:
+    a55-55:
+    a55-56:
+    a55-57:
+    a55-58:
+    a55-59:
+    a55-60:
+    a55-61:
+    a55-62:
+    a55-63:
+    a55-64:
+    a55-65:
+    a55-66:
+    a55-67:
+    a55-68:
+    a55-69:
+    a55-70:
+    a55-71:
+    a55-72:
+    a55-73:
+    a55-74:
+    a55-75:
+    a55-76:
+    a55-77:
+    a55-78:
   s24-unit:
   s24-perf:
-      s24-01:
-      s24-02:
-      s24-03:
-      s24-04:
+    s24-01:
+    s24-02:
+    s24-03:
+    s24-04:
   pixel5-unit:
-      pixel5-01:
-      pixel5-02:
-      pixel5-03:
-      pixel5-04:
-      pixel5-05:
-      pixel5-06:
-      pixel5-07:
-      pixel5-08:
-      pixel5-09:
-      pixel5-10:
-      pixel5-11:
-      pixel5-12:
-      pixel5-13:
-      pixel5-14:
-      pixel5-15:
-      pixel5-16:
-      pixel5-17:
+    pixel5-01:
+    pixel5-02:
+    pixel5-03:
+    pixel5-04:
+    pixel5-05:
+    pixel5-06:
+    pixel5-07:
+    pixel5-08:
+    pixel5-09:
+    pixel5-10:
+    pixel5-11:
+    pixel5-12:
+    pixel5-13:
+    pixel5-14:
+    pixel5-15:
+    pixel5-16:
+    pixel5-17:
   pixel5-perf:
-      pixel5-18:
-      pixel5-19:
+    pixel5-18:
+    pixel5-19:
   pixel6-unit:
   pixel6-perf:
-      pixel6-01:
-      pixel6-02:
-      pixel6-03:
-      pixel6-04:
+    pixel6-01:
+    pixel6-02:
+    pixel6-03:
+    pixel6-04:
   s21-unit:
   s21-perf:
-      s21-01:
+    s21-01:
