@@ -63,21 +63,21 @@ projects:
       TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-p6
       TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-p6
   mozilla-gw-unittest-s21:
-      device_group_name: s21-unit
-      device_model: s21
-      framework_name: mozilla-usb
-      description: Mozilla Unit tests for Samsung Galaxy S21 (using generic-worker)
-      additional_parameters:
-        TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-s21
-        TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-s21
+    device_group_name: s21-unit
+    device_model: s21
+    framework_name: mozilla-usb
+    description: Mozilla Unit tests for Samsung Galaxy S21 (using generic-worker)
+    additional_parameters:
+      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-s21
+      TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-s21
   mozilla-gw-perftest-s21:
-      device_group_name: s21-perf
-      device_model: s21
-      framework_name: mozilla-usb
-      description: Mozilla Performance tests for Samsung Galaxy S21 (using generic-worker)
-      additional_parameters:
-        TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-s21
-        TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-s21
+    device_group_name: s21-perf
+    device_model: s21
+    framework_name: mozilla-usb
+    description: Mozilla Performance tests for Samsung Galaxy S21 (using generic-worker)
+    additional_parameters:
+      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-s21
+      TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-s21
   # mozilla-gw-perftest-g5:
   #   device_group_name: motog5-perf-2
   #   device_model: motog5
