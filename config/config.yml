@@ -193,7 +193,7 @@ projects:
       TASKCLUSTER_CLIENT_ID: project/autophone/bitbar-x-test-1
       TC_WORKER_TYPE: gecko-t-bitbar-gw-test-1
       # replace with version to test
-      DOCKER_IMAGE_VERSION: 20231106T174322
+      DOCKER_IMAGE_VERSION: 20250228T135704
   mozilla-gw-test-2:
     device_group_name: test-2
     framework_name: mozilla-usb
@@ -231,6 +231,7 @@ device_groups:
     #
     # testing android 13
     # a51-02: # running android 13, 2/26/25: removed
+    s21-01:
   test-2:
     # motog5-40:  # disabled due to a51 device increases (3/29/22)
     # testing new image 20240307T112108
@@ -393,4 +394,3 @@ device_groups:
     pixel6-04:
   s21-unit:
   s21-perf:
-    s21-01:
