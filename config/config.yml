@@ -232,6 +232,8 @@ device_groups:
     # testing android 13
     # a51-02: # running android 13, 2/26/25: removed
     s21-01:
+    a55-77:
+    a55-78:
   test-2:
     # motog5-40:  # disabled due to a51 device increases (3/29/22)
     # testing new image 20240307T112108
@@ -357,8 +359,6 @@ device_groups:
     a55-74:
     a55-75:
     a55-76:
-    a55-77:
-    a55-78:
   s24-unit:
   s24-perf:
     s24-01:
