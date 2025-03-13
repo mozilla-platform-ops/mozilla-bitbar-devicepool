@@ -9,7 +9,7 @@ import yaml
 def get_config(config_path="config/lambdatest.yml"):
     # get this file's directory path
     this_dir = os.path.dirname(os.path.realpath(__file__))
-    # get the absolute path of the config file at ../config/lambdatest.yml
+    # get the absolute path
     full_config_path = os.path.join(this_dir, "..", config_path)
 
     with open(full_config_path) as lt_configfile:
