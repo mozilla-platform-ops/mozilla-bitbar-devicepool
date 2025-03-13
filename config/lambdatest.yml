@@ -1,0 +1,16 @@
+projects:
+  defaults:
+    SCRIPT_REPO_COMMIT: master
+  mozilla-gw-perftest-a55:
+    device_group_name: a55-perf
+    # TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-p5
+    # TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-p5
+  mozilla-gw-test-1:
+      SCRIPT_REPO_COMMIT: future_commit
+      device_group_name: test-1
+device_groups:
+  a55-perf:
+    a55-01:
+    a55-02:
+  test-1:
+    # a55-99:
