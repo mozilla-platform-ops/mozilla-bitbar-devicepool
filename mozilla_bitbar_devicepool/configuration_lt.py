@@ -13,11 +13,11 @@ def get_config(config_path="config/lambdatest.yml"):
     full_config_path = os.path.join(this_dir, "..", config_path)
 
     with open(full_config_path) as lt_configfile:
-        config = yaml.load(lt_configfile.read(), Loader=yaml.SafeLoader)
-    return config
+        loaded_config = yaml.load(lt_configfile.read(), Loader=yaml.SafeLoader)
+    return loaded_config
 
 
-def configure(config_path="config/lambdatest.yml"):
+def configure():
     # TODO: add filespath?
 
     # copied from configuration:configure
