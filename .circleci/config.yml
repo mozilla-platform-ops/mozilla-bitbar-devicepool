@@ -40,3 +40,4 @@ workflows:
     jobs:
       - pre_commit
       - pytest
+      - device_group_report
