@@ -4,6 +4,8 @@
 
 import os
 import yaml
+import subprocess
+import sys
 
 
 def get_config(config_path="config/lambdatest.yml"):
@@ -19,6 +21,15 @@ def get_config(config_path="config/lambdatest.yml"):
 
 def configure():
     # TODO: add filespath?
+
+    # Check for hyperexecute binary on path using a shell command
+    cmd = "where" if sys.platform == "win32" else "which"
+    try:
+        subprocess.check_call(
+            [cmd, "hyperexecute"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
+    except subprocess.CalledProcessError:
+        raise FileNotFoundError("hyperexecute binary not found on the system PATH")
 
     # copied from configuration:configure
     #
@@ -60,5 +71,6 @@ def configure():
 
 
 if __name__ == "__main__":
+    configure()
     config = get_config()
     print(config)
