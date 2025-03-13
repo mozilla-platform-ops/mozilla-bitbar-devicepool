@@ -3,8 +3,8 @@ projects:
     SCRIPT_REPO_COMMIT: master
   mozilla-gw-perftest-a55:
     device_group_name: a55-perf
-    # TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-p5
-    # TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-p5
+    TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-a55
+    TC_WORKER_TYPE: gecko-t-lambda-gw-perf-a55
   mozilla-gw-test-1:
       SCRIPT_REPO_COMMIT: future_commit
       device_group_name: test-1
