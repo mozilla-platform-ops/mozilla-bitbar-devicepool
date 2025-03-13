@@ -24,6 +24,16 @@ jobs:
           args: --with=dev
       - run: poetry run pytest -v mozilla_bitbar_devicepool
       - run: poetry run pytest --cov=mozilla_bitbar_devicepool
+  device_group_report:
+    docker:
+      - image: cimg/python:3.10
+    executor: python/default
+    steps:
+      - checkout
+      - python/install-packages:
+          pkg-manager: poetry
+          args: --with=dev
+      - run: .ci_scripts/device_group_report.sh
 
 workflows:
   main_test:
