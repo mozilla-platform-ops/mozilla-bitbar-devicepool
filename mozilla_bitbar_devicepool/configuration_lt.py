@@ -11,9 +11,10 @@ import sys
 class ConfigurationLt(object):
 
     def __init__(self):
+        # TODO: mash all values into 'config'?
         self.lt_api_key = None
         self.lt_username = None
-        self.config = None
+        self.config = {}
         pass
 
     def load_file_config(self, config_path="config/lambdatest.yml"):
@@ -34,12 +35,14 @@ class ConfigurationLt(object):
         if "LT_API_KEY" not in os.environ:
             raise ValueError("LT_API_KEY not found in environment variables")
         self.lt_api_key = os.environ.get("LT_API_KEY")
+        self.config["lt_api_key"] = self.lt_api_key
 
     def set_lt_username(self):
         # load from os environment
         if "LT_USERNAME" not in os.environ:
             raise ValueError("LT_USERNAME not found in environment variables")
         self.lt_username = os.environ.get("LT_USERNAME")
+        self.config["lt_username"] = self.lt_username
 
     def configure(self):
         # TODO: add filespath?
