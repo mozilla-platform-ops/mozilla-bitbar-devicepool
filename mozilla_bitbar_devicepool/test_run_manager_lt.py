@@ -7,6 +7,7 @@ import logging
 import time
 
 from mozilla_bitbar_devicepool import configuration_lt
+from mozilla_bitbar_devicepool.lambdatest import job_config
 
 # state constants
 STOP = "000000001"
@@ -53,11 +54,22 @@ class TestRunManagerLT(object):
 
             print("Running...")
 
+            # only a single project for now, so load that up
+            current_project = self.config_object.config["projects"]["a55-perf"]
+            # tc_worker_type = current_project["TC_WORKER_TYPE"]
+            tc_client_id = current_project["TASKCLUSTER_CLIENT_ID"]
+            tc_client_key = current_project["TASKCLUSTER_ACCESS_TOKEN"]
+
             # TODO: create hyperexecute.yaml specific to each queue
             # self.generate_hyperexecute_yaml(workerType="blah")
+            config_file_path = job_config.write_config(
+                tc_client_id,
+                tc_client_key,
+                concurrency=1,
+            )
 
             # TODO: loop the number of jobs we need
-            command_string = f"./hyperexecute --user '{self.config_object.lt_username}' --key '{self.config_object.lt_username}' –-config hyperexecute.yaml"
+            command_string = f"./hyperexecute --user '{self.config_object.lt_username}' --key '{self.config_object.lt_api_key}' –-config {config_file_path}"
             print(f"woulld be running command: {command_string}")
 
             if self.state == STOP:

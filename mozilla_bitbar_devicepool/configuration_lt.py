@@ -47,6 +47,19 @@ class ConfigurationLt(object):
         self.lt_username = os.environ.get("LT_USERNAME")
         # self.config["lt_username"] = self.lt_username
 
+    def load_tc_env_vars(self):
+        for project_name in self.config["projects"]:
+            if project_name == "defaults":
+                continue
+            data = self.config["projects"][project_name]
+            taskcluster_access_token_name = data["TC_WORKER_TYPE"].replace("-", "_")
+            # ensure the environment variable is set
+            if taskcluster_access_token_name not in os.environ:
+                raise ValueError(
+                    f"Environment variable {taskcluster_access_token_name} not found"
+                )
+            data["TASKCLUSTER_ACCESS_TOKEN"] = os.environ[taskcluster_access_token_name]
+
     def expand_configuration(self):
         """Materializes the configuration. Sets default values when none are specified."""
         projects_config = self.config["projects"]
@@ -79,6 +92,7 @@ class ConfigurationLt(object):
 
         # load the data we need
         self.load_file_config()
+        self.load_tc_env_vars()
         self.set_lt_api_key()
         self.set_lt_username()
 
