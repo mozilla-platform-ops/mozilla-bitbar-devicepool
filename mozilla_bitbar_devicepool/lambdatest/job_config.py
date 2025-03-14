@@ -1,15 +1,26 @@
-def write_config(tc_client_id, tc_access_token, concurrency=1):
-    config = return_config(tc_client_id, tc_access_token, concurrency)
-    with open("/tmp/hyperexecute.yaml", "w") as f:
+def write_config(
+    tc_client_id,
+    tc_access_token,
+    lt_app_url,
+    path="/tmp/mozilla-lt-devicepool-job-dir/hyperexecute.yaml",
+    concurrency=1,
+):
+    config = return_config(tc_client_id, tc_access_token, lt_app_url, concurrency)
+    with open(path, "w") as f:
         f.write(config)
-    return "/tmp/hyperexecute.yaml"
+    return path
 
 
 # TODO: take devices, workerType
-def return_config(tc_client_id, tc_access_token, concurrency=1):
+def return_config(tc_client_id, tc_access_token, lt_app_url, concurrency=1):
+
+    # TODO: document decision to inject secrets here vs using lt's built-in secret storage
+    #   thinking:
+    #   - they already have the secrets in their systems
+    #   - why store it in another spot that we have to maintain?
 
     # here doc with the config, we need string interpolation
-    config = """
+    config = f"""
 # Define the version of the configuration file
 version: "0.2"
 
@@ -31,9 +42,17 @@ testDiscovery:
   type: raw
 
 env:
-  TASKCLUSTER_CLIENT_ID: {tc_client_id}
-  TASKCLUSTER_ACCESS_TOKEN: {tc_access_token}
-
+    # inject our own secrets
+    TASKCLUSTER_CLIENT_ID: {tc_client_id}
+    TASKCLUSTER_ACCESS_TOKEN: {tc_access_token}
+    #
+"""
+    config += """
+    # use lt's built-in secret storage
+    #TASKCLUSTER_ACCESS_TOKEN: ${{.secrets.TC_ACCESS_TOKEN}}
+    #TASKCLUSTER_CLIENT_ID: ${{.secrets.TC_CLIENT_ID}}
+"""
+    config += f"""
 # Command to run the tests using the testRunnerCommand
 testRunnerCommand: python3 /home/ltuser/taskcluster/run_gw.py
 
@@ -71,7 +90,7 @@ framework:
     # Enable or disable device log support
     deviceLogs: true
     # App ID to be installed (mandatory field, using <app_id>)
-    appId: lt://APP10160501071738874437060712
+    appId: {lt_app_url}
     # Build name for identification on the automation dashboard
     buildName: geckoview_example.apk
     # All devices are in a private cloud

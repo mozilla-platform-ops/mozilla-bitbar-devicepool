@@ -2,9 +2,13 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import shutil
 import signal
 import logging
 import time
+import os
+import subprocess
+import sys
 
 # configure logging
 logging.basicConfig(
@@ -38,14 +42,22 @@ class TestRunManagerLT(object):
 
         if signalnum == signal.SIGINT or signalnum == signal.SIGUSR2:
             self.state = STOP
+            sys.exit(0)
             logging.info(
-                f" handle_signal: set state to stop, exiting in {self.exit_wait} seconds or less"
+                # f" handle_signal: set state to stop, exiting in {self.exit_wait} seconds or less"
+                " handle_signal: set state to stop"
             )
 
-    def generate_hyperexecute_yaml(self):
-        pass
-
     def run(self):
+        # base on __file__ to get the project root dir
+        project_source_dir = os.path.dirname(os.path.realpath(__file__))
+        project_root_dir = os.path.abspath(os.path.join(project_source_dir, ".."))
+        user_script_golden_dir = os.path.join(
+            project_source_dir, "lambdatest", "user_script"
+        )
+
+        test_run_dir = "/tmp/mozilla-lt-devicepool-job-dir"
+        test_run_file = os.path.join(test_run_dir, "hyperexecute.yaml")
 
         # overview:
         #   1. do configuration / load config data
@@ -66,23 +78,45 @@ class TestRunManagerLT(object):
             # print(f"tc_client_id: {tc_client_id}")
             # print(f"tc_client_key: {tc_client_key}")
 
+            # TODO: verify this apk is ok, update the apk if needed, and store/use it's app_id
+            lt_app_url = "lt://APP1016023521741987818221818"
+
+            # remove /tmp/user_script dir
+            shutil.rmtree(test_run_dir, ignore_errors=True)
+            # create /tmp/mozilla-lt-devicepool-job-dir dir
+            os.makedirs(test_run_dir, exist_ok=True)
+
             # TODO: create hyperexecute.yaml specific to each queue
-            # self.generate_hyperexecute_yaml(workerType="blah")
-            config_file_path = job_config.write_config(
+            job_config.write_config(
                 tc_client_id,
                 tc_client_key,
+                lt_app_url,
+                test_run_file,
                 concurrency=1,
             )
 
             # TODO: copy user-script dir to correct dir (use basename on config_file_path?)
+            # copy user_script_golden_dir to correct path using python shutil
+            shutil.copytree(
+                user_script_golden_dir, os.path.join(test_run_dir, "user_script")
+            )
 
             # TODO: loop the number of jobs we need
-            command_string = f"./hyperexecute --user '{self.config_object.lt_username}' --key '{self.config_object.lt_api_key}' –-config {config_file_path}"
-            logging.info(f"woulld be running command: {command_string}")
+            # TODO: use env vars for setting user and key
+            command_string = f"{project_root_dir}/hyperexecute --user '{self.config_object.lt_username}' --key '{self.config_object.lt_api_key}'"
+
+            DEBUG = True
+            if DEBUG:
+                logging.info(
+                    f"would be running command: '{command_string}' in path '{test_run_dir}'..."
+                )
+            else:
+                logging.info(f"running: '{command_string}' in path '{test_run_dir}'...")
+                subprocess.run(command_string, shell=True, cwd=test_run_dir)
 
             if self.state == STOP:
                 break
-            time.sleep(self.exit_wait)
+            time.sleep(60)
             if self.state == STOP:
                 break
 
