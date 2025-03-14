@@ -6,6 +6,13 @@ import signal
 import logging
 import time
 
+# configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+
 from mozilla_bitbar_devicepool import configuration_lt
 from mozilla_bitbar_devicepool.lambdatest import job_config
 
@@ -31,8 +38,7 @@ class TestRunManagerLT(object):
 
         if signalnum == signal.SIGINT or signalnum == signal.SIGUSR2:
             self.state = STOP
-            # logging.info doesn't work in signal handlers
-            print(
+            logging.info(
                 f" handle_signal: set state to stop, exiting in {self.exit_wait} seconds or less"
             )
 
@@ -48,14 +54,11 @@ class TestRunManagerLT(object):
         #     b. update lt job status (how many running per each 'queue')
         #     c. start jobs for the tc queue with the appropriate devices
 
+        logging.info("entering run loop...")
         while self.state == RUNNING:
-            # use logging to print 'running' with a datetime
-            logging.info("Running...")
-
-            print("Running 2...")
-
             # only a single project for now, so load that up
             current_project = self.config_object.config["projects"]["a55-perf"]
+
             # tc_worker_type = current_project["TC_WORKER_TYPE"]
             tc_client_id = current_project["TASKCLUSTER_CLIENT_ID"]
             tc_client_key = current_project["TASKCLUSTER_ACCESS_TOKEN"]
@@ -75,7 +78,7 @@ class TestRunManagerLT(object):
 
             # TODO: loop the number of jobs we need
             command_string = f"./hyperexecute --user '{self.config_object.lt_username}' --key '{self.config_object.lt_api_key}' –-config {config_file_path}"
-            print(f"woulld be running command: {command_string}")
+            logging.info(f"woulld be running command: {command_string}")
 
             if self.state == STOP:
                 break
@@ -85,8 +88,7 @@ class TestRunManagerLT(object):
 
 
 if __name__ == "__main__":
-    # set logging levvel to info
-    logging.basicConfig(level=logging.INFO)
+    # logging is already configured at the module level
     trmlt = TestRunManagerLT()
 
     # debugging
