@@ -1,4 +1,8 @@
 #!/bin/bash
+
+set -e
+set -x
+
 sudo apt update -y
 sudo apt-get install gettext-base
 sudo apt-get install libgtk-3-0 -y
@@ -11,12 +15,15 @@ sudo rm -rf /usr/lib/android-sdk/platform-tools
 
 sudo mkdir -p /usr/local/android-sdk
 
-cd /usr/local/android-sdk/
-sudo curl -OL https://dl.google.com/android/repository/platform-tools-latest-linux.zip
-sudo unzip platform-tools-latest-linux.zip
-sudo rm -f platform-tools-latest-linux.zip
-sudo ln -s /usr/local/android-sdk/platform-tools/adb /usr/bin/adb
-sudo cp -r /usr/local/android-sdk/platform-tools /usr/lib/android-sdk/
+# if /usr/local/android-sdk/ doesn't exist, we need to install it
+if [ ! -d "/usr/local/android-sdk" ]; then
+    cd /usr/local/android-sdk/
+    sudo curl -OL https://dl.google.com/android/repository/platform-tools-latest-linux.zip
+    sudo unzip platform-tools-latest-linux.zip
+    sudo rm -f platform-tools-latest-linux.zip
+    sudo ln -s /usr/local/android-sdk/platform-tools/adb /usr/bin/adb
+    sudo cp -r /usr/local/android-sdk/platform-tools /usr/lib/android-sdk/
+fi
 
 rm -Rf taskcluster/
 
@@ -34,11 +41,12 @@ wget -O start-worker https://github.com/taskcluster/taskcluster/releases/downloa
 # mozilla-bitbar-docker bits
 # mozilla_platform_ops_git_commit=master
 mozilla_platform_ops_git_commit=b13c723154cebebc48e71566eede9b5129b675ea # right before jdk 17 upgrade
-wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/refs/heads/${mozilla_platform_ops_git_commit}/taskcluster/worker-runner-config.yml.template
-wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/refs/heads/${mozilla_platform_ops_git_commit}/scripts/entrypoint.sh
-wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/refs/heads/${mozilla_platform_ops_git_commit}/scripts/entrypoint.py
-wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/refs/heads/${mozilla_platform_ops_git_commit}/scripts/run_gw.py
-wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/refs/heads/${mozilla_platform_ops_git_commit}/taskcluster/script.py
+# https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/b13c723154cebebc48e71566eede9b5129b675ea/taskcluster/worker-runner-config.yml.template
+wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/${mozilla_platform_ops_git_commit}/taskcluster/worker-runner-config.yml.template
+wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/${mozilla_platform_ops_git_commit}/scripts/entrypoint.sh
+wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/${mozilla_platform_ops_git_commit}/scripts/entrypoint.py
+wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/${mozilla_platform_ops_git_commit}/scripts/run_gw.py
+wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/${mozilla_platform_ops_git_commit}/taskcluster/script.py
 
 chmod +x generic-worker
 chmod +x livelog

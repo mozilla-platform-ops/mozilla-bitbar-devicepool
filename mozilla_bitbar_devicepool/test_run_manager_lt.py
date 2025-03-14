@@ -112,6 +112,7 @@ class TestRunManagerLT(object):
                 )
             else:
                 logging.info(f"running: '{command_string}' in path '{test_run_dir}'...")
+                # TODO: use --no-track or figure out how to make subprocess interactive so it doesn't die
                 subprocess.run(command_string, shell=True, cwd=test_run_dir)
 
             if self.state == STOP:
