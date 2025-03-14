@@ -81,12 +81,30 @@ echo '80.0.0' > /home/ltuser/taskcluster/version
 
 # we want entrypoint.sh to setup everything in the "pre-step", but the scenario needs to run "run_gw.py"
 sed -i 's/run_gw.py/# run_gw.py/g' entrypoint.sh
-sed -i s/run_gw.py/# run_gw.py/g entrypoint.sh
+# aje: busted, getting `sed: -e expression #1, char 13: unterminated `s' command`
+# sed -i s/run_gw.py/# run_gw.py/g entrypoint.sh
 
 
 # adjust defaults for taskIdleTimeout and cleanuptasksdir
 #sed -i 's/5400/5/g' worker-runner-config.yml.template  # I assume we can use an exit code
 echo "disableReboots:   true" >> worker-runner-config.yml.template  # this ensures that the docker container can be managed on it's own
+
+echo "********"
+printenv
+echo "********"
+
+# debugging: output all scripts so i can store their mods
+echo "********"
+cat entrypoint.sh
+echo "********"
+cat entrypoint.py
+echo "********"
+cat run_gw.py
+echo "********"
+cat script.py
+echo "********"
+cat worker-runner-config.yml.template
+echo "********"
 
 cd /home/ltuser
 # robust checkout plugin: update sha1 to latest when building a new image
