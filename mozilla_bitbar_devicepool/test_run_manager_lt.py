@@ -52,13 +52,16 @@ class TestRunManagerLT(object):
             # use logging to print 'running' with a datetime
             logging.info("Running...")
 
-            print("Running...")
+            print("Running 2...")
 
             # only a single project for now, so load that up
             current_project = self.config_object.config["projects"]["a55-perf"]
             # tc_worker_type = current_project["TC_WORKER_TYPE"]
             tc_client_id = current_project["TASKCLUSTER_CLIENT_ID"]
             tc_client_key = current_project["TASKCLUSTER_ACCESS_TOKEN"]
+            # debug
+            # print(f"tc_client_id: {tc_client_id}")
+            # print(f"tc_client_key: {tc_client_key}")
 
             # TODO: create hyperexecute.yaml specific to each queue
             # self.generate_hyperexecute_yaml(workerType="blah")
@@ -85,4 +88,10 @@ if __name__ == "__main__":
     # set logging levvel to info
     logging.basicConfig(level=logging.INFO)
     trmlt = TestRunManagerLT()
+
+    # debugging
+    # import pprint
+    # pprint.pprint(trmlt.config_object.config)
+
+    # start the main run loop
     trmlt.run()

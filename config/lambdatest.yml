@@ -6,6 +6,7 @@ projects:
   a55-perf:
     device_group_name: a55-perf
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-a55
+    # setting env var: gecko_t_lambda_gw_perf_a55, lgtm
     TC_WORKER_TYPE: gecko-t-lambda-gw-perf-a55
   test-1:
       device_group_name: test-1
