@@ -35,6 +35,9 @@ class TestRunManagerLT(object):
                 f" handle_signal: set state to stop, exiting in {self.exit_wait} seconds or less"
             )
 
+    def generate_hyperexecute_yaml(self):
+        pass
+
     def run(self):
 
         # overview:
@@ -50,7 +53,12 @@ class TestRunManagerLT(object):
 
             print("Running...")
 
-            # `./hyperexecute –config hyperexecute.yaml
+            # TODO: create hyperexecute.yaml specific to each queue
+            # self.generate_hyperexecute_yaml(workerType="blah")
+
+            # TODO: loop the number of jobs we need
+            command_string = f"./hyperexecute --user '{self.config_object.lt_username}' --key '{self.config_object.lt_username}' –-config hyperexecute.yaml"
+            print(f"woulld be running command: {command_string}")
 
             if self.state == STOP:
                 break

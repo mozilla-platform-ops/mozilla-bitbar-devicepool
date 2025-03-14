@@ -6,6 +6,9 @@ import os
 import yaml
 import subprocess
 import sys
+import pprint
+
+from mozilla_bitbar_devicepool.util.template import apply_dict_defaults
 
 
 class ConfigurationLt(object):
@@ -35,14 +38,32 @@ class ConfigurationLt(object):
         if "LT_API_KEY" not in os.environ:
             raise ValueError("LT_API_KEY not found in environment variables")
         self.lt_api_key = os.environ.get("LT_API_KEY")
-        self.config["lt_api_key"] = self.lt_api_key
+        # self.config["lt_api_key"] = self.lt_api_key
 
     def set_lt_username(self):
         # load from os environment
         if "LT_USERNAME" not in os.environ:
             raise ValueError("LT_USERNAME not found in environment variables")
         self.lt_username = os.environ.get("LT_USERNAME")
-        self.config["lt_username"] = self.lt_username
+        # self.config["lt_username"] = self.lt_username
+
+    def expand_configuration(self):
+        """Materializes the configuration. Sets default values when none are specified."""
+        projects_config = self.config["projects"]
+        project_defaults = projects_config["defaults"]
+
+        for project_name in projects_config:
+            if project_name == "defaults":
+                continue
+
+            project_config = projects_config[project_name]
+            # Set the default project values.
+            projects_config[project_name] = apply_dict_defaults(
+                project_config, project_defaults
+            )
+
+        # TODO: remove 'defaults' from CONFIG['projects']?
+        #   - would save later code from having to exclude it
 
     def configure(self):
         # TODO: add filespath?
@@ -60,6 +81,12 @@ class ConfigurationLt(object):
         self.load_file_config()
         self.set_lt_api_key()
         self.set_lt_username()
+
+        # debug print
+        # print(self.get_config())
+
+        # expand the configuration
+        self.expand_configuration()
 
         # copied from configuration:configure
         #
@@ -103,4 +130,4 @@ class ConfigurationLt(object):
 if __name__ == "__main__":
     clt = ConfigurationLt()
     clt.configure()
-    print(clt.get_config())
+    pprint.pprint(clt.get_config())
