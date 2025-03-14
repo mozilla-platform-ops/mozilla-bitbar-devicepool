@@ -8,6 +8,7 @@ import time
 
 from mozilla_bitbar_devicepool import configuration_lt
 
+# state constants
 STOP = "000000001"
 RUNNING = "000000002"
 
