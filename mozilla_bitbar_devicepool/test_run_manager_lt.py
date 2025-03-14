@@ -27,6 +27,9 @@ class TestRunManagerLT(object):
         while self.state == "RUNNING":
             print("Running...")
             # do something
+
+            # `./hyperexecute –config hyperexecute.yaml
+
             pass
 
 

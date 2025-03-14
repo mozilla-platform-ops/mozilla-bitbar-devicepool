@@ -8,69 +8,96 @@ import subprocess
 import sys
 
 
-def get_config(config_path="config/lambdatest.yml"):
-    # get this file's directory path
-    this_dir = os.path.dirname(os.path.realpath(__file__))
-    # get the absolute path
-    full_config_path = os.path.join(this_dir, "..", config_path)
+class ConfigurationLt(object):
 
-    with open(full_config_path) as lt_configfile:
-        loaded_config = yaml.load(lt_configfile.read(), Loader=yaml.SafeLoader)
-    return loaded_config
+    def __init__(self):
+        self.lt_api_key = None
+        self.lt_username = None
+        self.config = None
+        pass
 
+    def load_file_config(self, config_path="config/lambdatest.yml"):
+        # get this file's directory path
+        this_dir = os.path.dirname(os.path.realpath(__file__))
+        # get the absolute path
+        full_config_path = os.path.join(this_dir, "..", config_path)
 
-def configure():
-    # TODO: add filespath?
+        with open(full_config_path) as lt_configfile:
+            loaded_config = yaml.load(lt_configfile.read(), Loader=yaml.SafeLoader)
+        self.config = loaded_config
 
-    # Check for hyperexecute binary on path using a shell command
-    cmd = "where" if sys.platform == "win32" else "which"
-    try:
-        subprocess.check_call(
-            [cmd, "hyperexecute"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
-    except subprocess.CalledProcessError:
-        raise FileNotFoundError("hyperexecute binary not found on the system PATH")
+    def get_config(self):
+        return self.config
 
-    # copied from configuration:configure
-    #
-    # with open(bitbar_configpath) as bitbar_configfile:
-    #     CONFIG = yaml.load(bitbar_configfile.read(), Loader=yaml.SafeLoader)
+    def set_lt_api_key(self):
+        # load from os environment
+        if "LT_API_KEY" not in os.environ:
+            raise ValueError("LT_API_KEY not found in environment variables")
+        self.lt_api_key = os.environ.get("LT_API_KEY")
 
-    # global CONFIG, FILESPATH
+    def set_lt_username(self):
+        # load from os environment
+        if "LT_USERNAME" not in os.environ:
+            raise ValueError("LT_USERNAME not found in environment variables")
+        self.lt_username = os.environ.get("LT_USERNAME")
 
-    # FILESPATH = filespath
+    def configure(self):
+        # TODO: add filespath?
 
-    # logger.info("configure: starting configuration")
-    # start = time.time()
+        # Check for hyperexecute binary on path using a shell command
+        cmd = "where" if sys.platform == "win32" else "which"
+        try:
+            subprocess.check_call(
+                [cmd, "hyperexecute"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            )
+        except subprocess.CalledProcessError:
+            raise FileNotFoundError("hyperexecute binary not found on the system PATH")
 
-    # with open(bitbar_configpath) as bitbar_configfile:
-    #     CONFIG = yaml.load(bitbar_configfile.read(), Loader=yaml.SafeLoader)
-    # logger.info("configure: performing checks")
-    # try:
-    #     ensure_filenames_are_unique(CONFIG)
-    # except ConfigurationFileException as e:
-    #     logger.warning(e.message)
-    #     sys.exit(1)
-    # expand_configuration()
-    # try:
-    #     configuration_preflight()
-    # except ConfigurationFileException as e:
-    #     logger.warning(e)
-    #     logger.warning(
-    #         "Configuration files seem to be missing! Please place and restart. Exiting..."
-    #     )
-    #     sys.exit(1)
-    # configure_device_groups(update_bitbar=update_bitbar)
-    # configure_projects(update_bitbar=update_bitbar)
+        # load the data we need
+        self.load_file_config()
+        self.set_lt_api_key()
+        self.set_lt_username()
 
-    # end = time.time()
-    # diff = end - start
-    # logger.info("configure: configuration took {} seconds".format(diff))
+        # copied from configuration:configure
+        #
+        # with open(bitbar_configpath) as bitbar_configfile:
+        #     CONFIG = yaml.load(bitbar_configfile.read(), Loader=yaml.SafeLoader)
 
-    pass
+        # global CONFIG, FILESPATH
+
+        # FILESPATH = filespath
+
+        # logger.info("configure: starting configuration")
+        # start = time.time()
+
+        # with open(bitbar_configpath) as bitbar_configfile:
+        #     CONFIG = yaml.load(bitbar_configfile.read(), Loader=yaml.SafeLoader)
+        # logger.info("configure: performing checks")
+        # try:
+        #     ensure_filenames_are_unique(CONFIG)
+        # except ConfigurationFileException as e:
+        #     logger.warning(e.message)
+        #     sys.exit(1)
+        # expand_configuration()
+        # try:
+        #     configuration_preflight()
+        # except ConfigurationFileException as e:
+        #     logger.warning(e)
+        #     logger.warning(
+        #         "Configuration files seem to be missing! Please place and restart. Exiting..."
+        #     )
+        #     sys.exit(1)
+        # configure_device_groups(update_bitbar=update_bitbar)
+        # configure_projects(update_bitbar=update_bitbar)
+
+        # end = time.time()
+        # diff = end - start
+        # logger.info("configure: configuration took {} seconds".format(diff))
+
+        pass
 
 
 if __name__ == "__main__":
-    configure()
-    config = get_config()
-    print(config)
+    clt = ConfigurationLt()
+    clt.configure()
+    print(clt.get_config())

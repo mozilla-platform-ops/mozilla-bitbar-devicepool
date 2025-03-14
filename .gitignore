@@ -6,3 +6,5 @@ venv
 .vscode
 .coverage
 bitbar_env*
+lt_env*
+hyperexecute*
