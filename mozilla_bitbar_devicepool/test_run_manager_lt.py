@@ -68,6 +68,8 @@ class TestRunManagerLT(object):
                 concurrency=1,
             )
 
+            # TODO: copy user-script dir to correct dir (use basename on config_file_path?)
+
             # TODO: loop the number of jobs we need
             command_string = f"./hyperexecute --user '{self.config_object.lt_username}' --key '{self.config_object.lt_api_key}' –-config {config_file_path}"
             print(f"woulld be running command: {command_string}")
