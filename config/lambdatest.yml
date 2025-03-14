@@ -1,13 +1,18 @@
 projects:
   defaults:
     SCRIPT_REPO_COMMIT: master
-  mozilla-gw-perftest-a55:
+    TASKCLUSTER_CLIENT_ID: tc-client-id-set-me
+    TC_WORKER_TYPE: tc-worker-type-set-me
+  a55-perf:
     device_group_name: a55-perf
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-a55
     TC_WORKER_TYPE: gecko-t-lambda-gw-perf-a55
-  mozilla-gw-test-1:
-      SCRIPT_REPO_COMMIT: future_commit
+  test-1:
       device_group_name: test-1
+      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1
+      TC_WORKER_TYPE: gecko-t-lambda-gw-test-1
+      # override SCRIPT_REPO_COMMIT with a test commit
+      SCRIPT_REPO_COMMIT: future_commit
 device_groups:
   a55-perf:
     a55-01:
