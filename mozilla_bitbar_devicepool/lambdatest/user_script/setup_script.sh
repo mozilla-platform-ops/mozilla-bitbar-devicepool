@@ -30,11 +30,15 @@ wget -O generic-worker https://github.com/taskcluster/taskcluster/releases/downl
 wget -O livelog https://github.com/taskcluster/taskcluster/releases/download/v80.0.0/livelog-linux-amd64
 wget -O taskcluster-proxy https://github.com/taskcluster/taskcluster/releases/download/v80.0.0/taskcluster-proxy-linux-amd64
 wget -O start-worker https://github.com/taskcluster/taskcluster/releases/download/v80.0.0/start-worker-linux-amd64
-wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/refs/heads/master/taskcluster/worker-runner-config.yml.template
-wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/refs/heads/master/scripts/entrypoint.sh
-wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/refs/heads/master/scripts/entrypoint.py
-wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/refs/heads/master/scripts/run_gw.py
-wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/refs/heads/master/taskcluster/script.py
+
+# mozilla-bitbar-docker bits
+# mozilla_platform_ops_git_commit=master
+mozilla_platform_ops_git_commit=b13c723154cebebc48e71566eede9b5129b675ea # right before jdk 17 upgrade
+wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/refs/heads/${mozilla_platform_ops_git_commit}/taskcluster/worker-runner-config.yml.template
+wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/refs/heads/${mozilla_platform_ops_git_commit}/scripts/entrypoint.sh
+wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/refs/heads/${mozilla_platform_ops_git_commit}/scripts/entrypoint.py
+wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/refs/heads/${mozilla_platform_ops_git_commit}/scripts/run_gw.py
+wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/refs/heads/${mozilla_platform_ops_git_commit}/taskcluster/script.py
 
 chmod +x generic-worker
 chmod +x livelog
