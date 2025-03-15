@@ -3,6 +3,9 @@
 set -e
 set -x
 
+starting_dir=$(pwd)
+echo "starting_dir: $starting_dir"
+
 sudo apt update -y
 sudo apt-get install gettext-base
 sudo apt-get install libgtk-3-0 -y
@@ -38,15 +41,86 @@ wget -O livelog https://github.com/taskcluster/taskcluster/releases/download/v80
 wget -O taskcluster-proxy https://github.com/taskcluster/taskcluster/releases/download/v80.0.0/taskcluster-proxy-linux-amd64
 wget -O start-worker https://github.com/taskcluster/taskcluster/releases/download/v80.0.0/start-worker-linux-amd64
 
+
+
+
+
 # mozilla-bitbar-docker bits
-# mozilla_platform_ops_git_commit=master
-mozilla_platform_ops_git_commit=b13c723154cebebc48e71566eede9b5129b675ea # right before jdk 17 upgrade
-# https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/b13c723154cebebc48e71566eede9b5129b675ea/taskcluster/worker-runner-config.yml.template
-wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/${mozilla_platform_ops_git_commit}/taskcluster/worker-runner-config.yml.template
-wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/${mozilla_platform_ops_git_commit}/scripts/entrypoint.sh
-wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/${mozilla_platform_ops_git_commit}/scripts/entrypoint.py
-wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/${mozilla_platform_ops_git_commit}/scripts/run_gw.py
-wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/${mozilla_platform_ops_git_commit}/taskcluster/script.py
+
+
+
+
+#
+# jmaher sed method
+#
+
+# # mozilla_platform_ops_git_commit=master
+# mozilla_platform_ops_git_commit=b13c723154cebebc48e71566eede9b5129b675ea # right before jdk 17 upgrade
+# # https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/b13c723154cebebc48e71566eede9b5129b675ea/taskcluster/worker-runner-config.yml.template
+# wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/${mozilla_platform_ops_git_commit}/taskcluster/worker-runner-config.yml.template
+# wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/${mozilla_platform_ops_git_commit}/scripts/entrypoint.sh
+# wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/${mozilla_platform_ops_git_commit}/scripts/entrypoint.py
+# wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/${mozilla_platform_ops_git_commit}/scripts/run_gw.py
+# wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/${mozilla_platform_ops_git_commit}/taskcluster/script.py
+
+# # edit paths in entrypoint.*, run_gw.py, and maybe others /builds/taskcluster & /usr/local/bin -> /home/ltuser/taskcluster
+# sed -i 's/builds\/taskcluster/home\/ltuser\/taskcluster/g' entrypoint.sh
+# sed -i 's/builds\/taskcluster/home\/ltuser\/taskcluster/g' entrypoint.py
+# sed -i 's/builds\/taskcluster/home\/ltuser\/taskcluster/g' run_gw.py
+# sed -i 's/builds\/taskcluster/home\/ltuser\/taskcluster/g' worker-runner-config.yml.template
+# sed -i 's/usr\/local\/bin/home\/ltuser\/taskcluster/g' worker-runner-config.yml.template
+# sed -i 's/builds\/worker/home\/ltuser\/taskcluster/g' entrypoint.sh
+# sed -i 's/chown/# chown/g' entrypoint.sh # avoid chown worker
+
+# # hack to get android_serial to be added to the environment - important as we have usb+tcp listed with `adb devices`
+# sed -i 's/"TC_WORKER_GROUP",/"TC_WORKER_GROUP","ANDROID_SERIAL","UserPorts",/g' entrypoint.py
+
+# # hack on script.py - ideally fix this in the script.py itself
+# sed -i 's/builds\/worker/home\/ltuser\/taskcluster/g' script.py
+# sed -i 's/builds\/taskcluster/home\/ltuser\/taskcluster/g' script.py
+
+# # ignore error about >1 device, we have adb + tcp_ip connections for our current device.
+# sed -i s/sys.exit\(exit_code\)/#pass/g script.py
+
+# # need to figure out how to set this - scripts depend on this file existing
+# echo '80.0.0' > /home/ltuser/taskcluster/version
+
+# # we want entrypoint.sh to setup everything in the "pre-step", but the scenario needs to run "run_gw.py"
+# sed -i 's/run_gw.py/# run_gw.py/g' entrypoint.sh
+# # aje: busted, getting `sed: -e expression #1, char 13: unterminated `s' command`
+# # sed -i s/run_gw.py/# run_gw.py/g entrypoint.sh
+
+# # adjust defaults for taskIdleTimeout and cleanuptasksdir
+# #sed -i 's/5400/5/g' worker-runner-config.yml.template  # I assume we can use an exit code
+# echo "disableReboots:   true" >> worker-runner-config.yml.template  # this ensures that the docker container can be managed on it's own
+
+
+
+
+#
+# inline files
+#
+
+# TODO: eventually move these to their own repo like mozilla-bitbar-docker?
+
+ls -la
+find .
+
+script_dir=$(dirname $0)
+echo "script_dir: $script_dir"
+
+# TODO: figure out the path to use
+cp $starting_dir/$script_dir/files/worker-runner-config.yml.template .
+cp $starting_dir/$script_dir/files/entrypoint.sh .
+cp $starting_dir/$script_dir/files/entrypoint.py .
+cp $starting_dir/$script_dir/files/run_gw.py .
+cp $starting_dir/$script_dir/files/script.py .
+
+
+
+
+
+
 
 chmod +x generic-worker
 chmod +x livelog
@@ -57,37 +131,7 @@ chmod +x entrypoint.py
 chmod +x run_gw.py
 chmod +x script.py
 
-# edit paths in entrypoint.*, run_gw.py, and maybe others /builds/taskcluster & /usr/local/bin -> /home/ltuser/taskcluster
-sed -i 's/builds\/taskcluster/home\/ltuser\/taskcluster/g' entrypoint.sh
-sed -i 's/builds\/taskcluster/home\/ltuser\/taskcluster/g' entrypoint.py
-sed -i 's/builds\/taskcluster/home\/ltuser\/taskcluster/g' run_gw.py
-sed -i 's/builds\/taskcluster/home\/ltuser\/taskcluster/g' worker-runner-config.yml.template
-sed -i 's/usr\/local\/bin/home\/ltuser\/taskcluster/g' worker-runner-config.yml.template
-sed -i 's/builds\/worker/home\/ltuser\/taskcluster/g' entrypoint.sh
-sed -i 's/chown/# chown/g' entrypoint.sh # avoid chown worker
-
-# hack to get android_serial to be added to the environment - important as we have usb+tcp listed with `adb devices`
-sed -i 's/"TC_WORKER_GROUP",/"TC_WORKER_GROUP","ANDROID_SERIAL","UserPorts",/g' entrypoint.py
-
-# hack on script.py - ideally fix this in the script.py itself
-sed -i 's/builds\/worker/home\/ltuser\/taskcluster/g' script.py
-sed -i 's/builds\/taskcluster/home\/ltuser\/taskcluster/g' script.py
-
-# ignore error about >1 device, we have adb + tcp_ip connections for our current device.
-sed -i s/sys.exit\(exit_code\)/#pass/g script.py
-
-# need to figure out how to set this - scripts depend on this file existing
-echo '80.0.0' > /home/ltuser/taskcluster/version
-
-# we want entrypoint.sh to setup everything in the "pre-step", but the scenario needs to run "run_gw.py"
-sed -i 's/run_gw.py/# run_gw.py/g' entrypoint.sh
-# aje: busted, getting `sed: -e expression #1, char 13: unterminated `s' command`
-# sed -i s/run_gw.py/# run_gw.py/g entrypoint.sh
-
-
-# adjust defaults for taskIdleTimeout and cleanuptasksdir
-#sed -i 's/5400/5/g' worker-runner-config.yml.template  # I assume we can use an exit code
-echo "disableReboots:   true" >> worker-runner-config.yml.template  # this ensures that the docker container can be managed on it's own
+set +x
 
 echo "********"
 printenv
@@ -105,6 +149,8 @@ cat script.py
 echo "********"
 cat worker-runner-config.yml.template
 echo "********"
+
+set -x
 
 cd /home/ltuser
 # robust checkout plugin: update sha1 to latest when building a new image
