@@ -121,7 +121,7 @@ cp $starting_dir/$script_dir/files/script.py .
 
 
 
-
+# fix up perms
 chmod +x generic-worker
 chmod +x livelog
 chmod +x start-worker
@@ -131,26 +131,26 @@ chmod +x entrypoint.py
 chmod +x run_gw.py
 chmod +x script.py
 
-set +x
+# # debugging: output all scripts so i can store their mods
 
-echo "********"
-printenv
-echo "********"
+# set +x
 
-# debugging: output all scripts so i can store their mods
-echo "********"
-cat entrypoint.sh
-echo "********"
-cat entrypoint.py
-echo "********"
-cat run_gw.py
-echo "********"
-cat script.py
-echo "********"
-cat worker-runner-config.yml.template
-echo "********"
+# echo "********"
+# printenv
+# echo "********"
 
-set -x
+# echo "********"
+# cat entrypoint.sh
+# echo "********"
+# cat entrypoint.py
+# echo "********"
+# cat run_gw.py
+# echo "********"
+# cat script.py
+# echo "********"
+# cat worker-runner-config.yml.template
+# echo "********"
+# set -x
 
 cd /home/ltuser
 # robust checkout plugin: update sha1 to latest when building a new image
@@ -163,7 +163,7 @@ export PATH=/home/ltuser/taskcluster:$PATH
 
 # TODO: figure out how to set these env vars securely
 export TC_WORKER_GROUP=lambda
-export DEVICE_NAME=a55-01 # TODO: no spaces- need to find a way to make this unique
+export DEVICE_NAME=${HOSTNAME} # TODO: no spaces- need to find a way to make this unique
 export TC_WORKER_TYPE=gecko-t-lambda-alpha-a55
 
 # hacks to prepare lambda environment (serial is super hacky right now):

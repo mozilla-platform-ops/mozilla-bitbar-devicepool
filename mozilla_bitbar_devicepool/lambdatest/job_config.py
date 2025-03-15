@@ -54,7 +54,8 @@ env:
 """
     config += f"""
 # Command to run the tests using the testRunnerCommand
-testRunnerCommand: python3 /home/ltuser/taskcluster/run_gw.py
+# testRunnerCommand: python3 /home/ltuser/taskcluster/run_gw.py
+testRunnerCommand: start-worker /home/ltuser/taskcluster/worker-runner-config.yml
 
 # Only report the status of the test framework
 frameworkStatusOnly: true
