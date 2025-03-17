@@ -12,7 +12,6 @@ from mozilla_bitbar_devicepool.util.template import apply_dict_defaults
 
 
 class ConfigurationLt(object):
-
     def __init__(self):
         # TODO: mash all values into 'config'?
         self.lt_api_key = None

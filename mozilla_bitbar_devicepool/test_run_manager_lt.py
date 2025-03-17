@@ -10,6 +10,9 @@ import os
 import subprocess
 import sys
 
+from mozilla_bitbar_devicepool import configuration_lt
+from mozilla_bitbar_devicepool.lambdatest import job_config
+
 # configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -17,16 +20,12 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 
-from mozilla_bitbar_devicepool import configuration_lt
-from mozilla_bitbar_devicepool.lambdatest import job_config
-
 # state constants
 STOP = "000000001"
 RUNNING = "000000002"
 
 
 class TestRunManagerLT(object):
-
     def __init__(self, exit_wait=5):
         self.exit_wait = exit_wait
         self.state = RUNNING

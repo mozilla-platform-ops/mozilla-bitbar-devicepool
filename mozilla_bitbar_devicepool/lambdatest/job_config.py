@@ -13,7 +13,6 @@ def write_config(
 
 # TODO: take devices, workerType
 def return_config(tc_client_id, tc_access_token, lt_app_url, concurrency=1):
-
     # TODO: document decision to inject secrets here vs using lt's built-in secret storage
     #   thinking:
     #   - they already have the secrets in their systems
