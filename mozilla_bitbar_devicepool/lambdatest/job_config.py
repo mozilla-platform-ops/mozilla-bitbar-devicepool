@@ -55,13 +55,18 @@ env:
     config += f"""
 # Command to run the tests using the testRunnerCommand
 # testRunnerCommand: python3 /home/ltuser/taskcluster/run_gw.py
-testRunnerCommand: start-worker /home/ltuser/taskcluster/worker-runner-config.yml
+# testRunnerCommand: start-worker /home/ltuser/taskcluster/worker-runner-config.yml
+# testRunnerCommand: /home/ltuser/taskcluster/start-worker /home/ltuser/taskcluster/worker-runner-config.yml
+# testRunnerCommand: ls -la
+testRunnerCommand: cat /home/ltuser/taskcluster/worker-runner-config.yml
 
 # Only report the status of the test framework
 frameworkStatusOnly: true
 
 # Enable dynamic allocation of resources
 dynamicAllocation: true
+
+shell: bash
 
 # Pre-install required dependencies using pip
 pre:

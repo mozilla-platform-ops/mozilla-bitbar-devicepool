@@ -3,11 +3,16 @@ projects:
     SCRIPT_REPO_COMMIT: master
     TASKCLUSTER_CLIENT_ID: tc-client-id-set-me
     TC_WORKER_TYPE: tc-worker-type-set-me
-  a55-perf:
-    device_group_name: a55-perf
-    TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-a55
-    # setting env var: gecko_t_lambda_gw_perf_a55, lgtm
-    TC_WORKER_TYPE: gecko-t-lambda-gw-perf-a55
+  a55-alpha:
+    device_group_name: a55-alpha
+    TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-alpha-a55
+    # gecko-t-lambda-alpha-a55, env var: gecko_t_lambda_alpha_a55
+    TC_WORKER_TYPE: gecko-t-lambda-alpha-a55
+  # a55-perf:
+  #   device_group_name: a55-perf
+  #   TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-a55
+  #   # setting env var: gecko_t_lambda_gw_perf_a55, lgtm
+  #   TC_WORKER_TYPE: gecko-t-lambda-gw-perf-a55
   test-1:
       device_group_name: test-1
       TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1
@@ -15,7 +20,7 @@ projects:
       # override SCRIPT_REPO_COMMIT with a test commit
       SCRIPT_REPO_COMMIT: future_commit
 device_groups:
-  a55-perf:
+  a55-alpha:
     a55-01:
     a55-02:
   test-1:
