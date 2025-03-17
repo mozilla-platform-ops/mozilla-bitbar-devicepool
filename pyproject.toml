@@ -39,11 +39,9 @@ mbd = 'mozilla_bitbar_devicepool.main:main'
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-
 [tool.deptry]
 #ignore = ["DEP001", "DEP002"]
 
 [tool.deptry.per_rule_ignores]
-#DEP001 = ["matplotlib"]
-#DEP002 = ["pandas", "numpy"]
+DEP001 = ["google", "mozdevice"]
 DEP003 = ["google", "mozdevice"]
