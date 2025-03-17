@@ -69,7 +69,7 @@ class TestRunManagerLT(object):
         logging.info("entering run loop...")
         while self.state == RUNNING:
             # only a single project for now, so load that up
-            current_project = self.config_object.config["projects"]["a55-perf"]
+            current_project = self.config_object.config["projects"]["a55-alpha"]
 
             # tc_worker_type = current_project["TC_WORKER_TYPE"]
             tc_client_id = current_project["TASKCLUSTER_CLIENT_ID"]

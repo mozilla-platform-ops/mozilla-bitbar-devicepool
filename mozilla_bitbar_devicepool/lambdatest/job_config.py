@@ -58,7 +58,8 @@ env:
 # testRunnerCommand: start-worker /home/ltuser/taskcluster/worker-runner-config.yml
 # testRunnerCommand: /home/ltuser/taskcluster/start-worker /home/ltuser/taskcluster/worker-runner-config.yml
 # testRunnerCommand: ls -la
-testRunnerCommand: cat /home/ltuser/taskcluster/worker-runner-config.yml
+# testRunnerCommand: cat /home/ltuser/taskcluster/worker-runner-config.yml
+testRunnerCommand: bash ./user_script/setup_and_run_gw.sh
 
 # Only report the status of the test framework
 frameworkStatusOnly: true
@@ -68,10 +69,12 @@ dynamicAllocation: true
 
 shell: bash
 
+# aje: moved all to test command as something we're doing in pre is disconnecting the device per LT
+#
 # Pre-install required dependencies using pip
-pre:
-  - pip3 install mozdevice
-  - bash ./user_script/setup_script.sh
+# pre:
+#   - pip3 install mozdevice
+#   - bash ./user_script/setup_script.sh
 
 # reboot and wait for device to come online
 post:
