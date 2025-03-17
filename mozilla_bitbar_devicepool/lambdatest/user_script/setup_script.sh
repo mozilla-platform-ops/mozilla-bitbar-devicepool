@@ -11,22 +11,24 @@ sudo apt-get install gettext-base
 sudo apt-get install libgtk-3-0 -y
 
 pip install zstandard
-sudo rm -f /usr/bin/adb
 
-sudo rm -f /home/ltuser/adb-original/adb
-sudo rm -rf /usr/lib/android-sdk/platform-tools
-
-sudo mkdir -p /usr/local/android-sdk
-
-# if /usr/local/android-sdk/ doesn't exist, we need to install it
-if [ ! -d "/usr/local/android-sdk" ]; then
-    cd /usr/local/android-sdk/
-    sudo curl -OL https://dl.google.com/android/repository/platform-tools-latest-linux.zip
-    sudo unzip platform-tools-latest-linux.zip
-    sudo rm -f platform-tools-latest-linux.zip
-    sudo ln -s /usr/local/android-sdk/platform-tools/adb /usr/bin/adb
-    sudo cp -r /usr/local/android-sdk/platform-tools /usr/lib/android-sdk/
-fi
+# aje 3/17/25: not needed per LT.
+#   - was interfering with their monitoring and made the main testRunCommand not work.
+#
+# install adb
+# sudo rm -f /usr/bin/adb
+# sudo rm -f /home/ltuser/adb-original/adb
+# sudo rm -rf /usr/lib/android-sdk/platform-tools
+# sudo mkdir -p /usr/local/android-sdk
+# # if /usr/local/android-sdk/ doesn't exist, we need to install it
+# if [ ! -d "/usr/local/android-sdk" ]; then
+#     cd /usr/local/android-sdk/
+#     sudo curl -OL https://dl.google.com/android/repository/platform-tools-latest-linux.zip
+#     sudo unzip platform-tools-latest-linux.zip
+#     sudo rm -f platform-tools-latest-linux.zip
+#     sudo ln -s /usr/local/android-sdk/platform-tools/adb /usr/bin/adb
+#     sudo cp -r /usr/local/android-sdk/platform-tools /usr/lib/android-sdk/
+# fi
 
 rm -Rf taskcluster/
 
@@ -163,13 +165,19 @@ export PATH=/home/ltuser/taskcluster:$PATH
 
 # TODO: figure out how to set these env vars securely
 export TC_WORKER_GROUP=lambda
-export DEVICE_NAME=${HOSTNAME} # TODO: no spaces- need to find a way to make this unique
+
+# DEBUG
+/usr/bin/adb devices
+/usr/bin/adb devices -l
+
+# export DEVICE_NAME=${HOSTNAME} # TODO: no spaces- need to find a way to make this unique
+export DEVICE_NAME=$(/usr/bin/adb devices -l | grep usb | grep -v 'List of devices attached' | sed '/^[[:space:]]*$/d' | cut -f 1 -d ' ')
 export TC_WORKER_TYPE=gecko-t-lambda-alpha-a55
 
 # hacks to prepare lambda environment (serial is super hacky right now):
 export HOST_IP=$HostIP
-export DEVICE_SERIAL=RZCXA0H3T9P
-export ANDROID_SERIAL=RZCXA0H3T9P # mozdevice uses this if it exists, avoids issue with >1 device
+export DEVICE_SERIAL=$DEVICE_NAME
+export ANDROID_SERIAL=$DEVICE_NAME # mozdevice uses this if it exists, avoids issue with >1 device
 
 
 ss -np
