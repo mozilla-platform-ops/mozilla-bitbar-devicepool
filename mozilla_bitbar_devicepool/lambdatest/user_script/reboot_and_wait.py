@@ -32,6 +32,11 @@ def run(command):
     print(result.stdout)
 
 
+def run_silent(command):
+    result = subprocess.run(command, capture_output=True, text=True, check=True)
+    return result.stdout
+
+
 # flush userPorts
 import os
 
@@ -41,9 +46,37 @@ for port in ports:
     command = ["sudo", "ss", "--kill", "state", "listening", "src", f":{port}"]
     run(command)
 
+
+# + /usr/bin/adb devices -l
+# List of devices attached
+# R5CY128X71B            device usb:1-6.1 product:a55xnsxx model:SM_A556E device:a55x transport_id:1
+# 10.146.5.140:5555      device product:a55xnsxx model:SM_A556E device:a55x transport_id:2
+
+
+# cmd = "adb devices -l | grep -v 'List of devices attached' | sed '/^[[:space:]]*$/d' | cut -f 1 -d ' '"
+
+#
+cmd = ["/usr/bin/adb", "devices", "-l"]
+#
+run(cmd)
+#
+output = run_silent(cmd)
+#
+for output_line in output.split("\n"):
+    if "device usb" in output_line:
+        device_name = output_line.split()[0]
+        break
+    else:
+        device_name = None
+
+if not device_name:
+    print("device_name is empty")
+    sys.exit(1)
+print(f"device_name: {device_name}")
+
 # adb reboot
 print("Sending reboot command...")
-command = ["/usr/bin/adb", "-s", "RZCXA0H3T9P", "reboot"]
+command = ["/usr/bin/adb", "-s", device_name, "reboot"]
 run(command)
 
 # restart adb server
