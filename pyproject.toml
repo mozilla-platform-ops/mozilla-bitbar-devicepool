@@ -30,7 +30,7 @@ pylint = "^2.16.2"
 pytest = "^7.2.1"
 pytest-watch = "^4.2.0"
 pytest-cov = "^4.0.0"
-deptry = "^0.11.0"
+deptry = "^0.23.0"
 
 [tool.poetry.scripts]
 mbd = 'mozilla_bitbar_devicepool.main:main'
@@ -39,5 +39,11 @@ mbd = 'mozilla_bitbar_devicepool.main:main'
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+
 [tool.deptry]
-ignore = ["DEP001", "DEP002"]
+#ignore = ["DEP001", "DEP002"]
+
+[tool.deptry.per_rule_ignores]
+#DEP001 = ["matplotlib"]
+#DEP002 = ["pandas", "numpy"]
+DEP003 = ["google", "mozdevice"]

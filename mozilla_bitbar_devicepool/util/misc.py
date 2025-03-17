@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+import git
 
 
 # Get the current date in UTC in an ISO formatted string
@@ -6,10 +7,6 @@ def get_utc_date_string():
     utc_now = datetime.now(timezone.utc)
     utc_date_iso = utc_now.isoformat(timespec="seconds")
     return utc_date_iso
-
-
-# pip install GitPython
-import git
 
 
 def get_git_info():

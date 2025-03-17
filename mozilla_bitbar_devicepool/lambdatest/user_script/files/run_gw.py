@@ -80,7 +80,7 @@ while True:
         stderr=subprocess.STDOUT,
     )
 
-    while rc == None:
+    while rc is None:
         line = proc.stdout.readline().decode("UTF-8")
         stripped_line = line.rstrip()
         log_to_pt(stripped_line)

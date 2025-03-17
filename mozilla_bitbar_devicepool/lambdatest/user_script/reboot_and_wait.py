@@ -1,6 +1,8 @@
 import subprocess
 import time
 import sys
+import os
+
 
 MAX_WAIT_TIME = 120
 
@@ -38,7 +40,6 @@ def run_silent(command):
 
 
 # flush userPorts
-import os
 
 ports = [p.split("/")[-1] for p in os.environ.get("UserPorts", "").split(",")]
 ports.extend(["2828", "8888", "8854", "4443", "4444"])

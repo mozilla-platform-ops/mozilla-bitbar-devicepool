@@ -38,14 +38,14 @@ def get_filter(fields, **kwargs):
                 )
             )
         fieldflag = ""
-        if fieldtype == int:
+        if fieldtype is int:
             if "time" in fieldname:
                 fieldflag = "d"
             else:
                 fieldflag = "n"
-        elif fieldtype == str:
+        elif fieldtype is str:
             fieldflag = "s"
-        elif fieldtype == bool:
+        elif fieldtype is bool:
             fieldflag = "b"
         else:
             raise ValueError("Unknown filter field type %s" % fieldtype)

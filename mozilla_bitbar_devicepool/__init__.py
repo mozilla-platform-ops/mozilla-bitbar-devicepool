@@ -12,7 +12,7 @@ import os
 # TODO: put %(asctime)s back in?
 logging.basicConfig(format="%(threadName)26s %(levelname)-8s %(message)s")
 
-from testdroid import Testdroid
+from testdroid import Testdroid  # noqa: E402
 
 logger = logging.getLogger()
 
