@@ -28,6 +28,12 @@ def return_config(tc_client_id, tc_access_token, lt_app_url, concurrency=1):
     # TASKCLUSTER_ACCESS_TOKEN: ${{.secrets.TC_ACCESS_TOKEN}}
     # TASKCLUSTER_CLIENT_ID: ${{.secrets.TC_CLIENT_ID}}
 
+    test_discover_cmd = ""
+    for i in range(concurrency):
+        test_discover_cmd += f'echo "taskcluster generic-worker {i}"; '
+
+    print(test_discover_cmd)
+
     # here doc with the config, we need string interpolation
     config = f"""
 # Define the version of the configuration file
@@ -44,7 +50,7 @@ concurrency: {concurrency}
 
 # Test discovery configuration
 testDiscovery:
-  command: echo "taskcluster generic-worker"
+  command: {test_discover_cmd}
   # Test discovery mode is static
   mode: static
   # Test type is raw (custom test implementation)

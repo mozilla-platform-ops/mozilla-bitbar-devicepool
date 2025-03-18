@@ -135,65 +135,71 @@ class TestRunManagerLT(object):
                     concurrency=jobs_to_start,
                 )
 
-                # MODE 2:
-                # start the desired number of jobs (concurrency: jobs_to_start)
-                logging.info(f"starting job with concurrency {jobs_to_start}...")
-                # Use test_mode instead of hardcoded DEBUG
-                if self.test_mode:
-                    logging.info(
-                        f"would be running command: '{command_string}' in path '{test_run_dir}'..."
-                    )
-                else:
-                    logging.info(
-                        f"running: '{command_string}' in path '{test_run_dir}'..."
-                    )
-                    start_time = time.time()
-                    # TODO: background so we can do this faster or set concurrencty in the YAML?
-                    #   - can only get 1-2 jobs going in parallel with trivial tasks
-                    #   - for concurrency to work, would we need to emit multiple test targets (1:1 with concurrency?)
-                    # start_new_session=True ensures process ignores ctrl-c sent to this process (so it cleans up)
-                    subprocess.run(
-                        command_string,
-                        shell=True,
-                        env=cmd_env,
-                        cwd=test_run_dir,
-                        start_new_session=True,
-                    )
-                    end_time = time.time()
-                    logging.info(
-                        f"starting job took {round(end_time - start_time, 2)} seconds"
-                    )
+                mode = 1
 
-                # MODE 1:
-                # start the desired number of jobs (concurrency: 1)
-                #
-                # for i in range(jobs_to_start):
-                #     logging.info(f"starting job {i + 1} of {jobs_to_start}...")
-                #     # Use test_mode instead of hardcoded DEBUG
-                #     if self.test_mode:
-                #         logging.info(
-                #             f"would be running command: '{command_string}' in path '{test_run_dir}'..."
-                #         )
-                #     else:
-                #         logging.info(
-                #             f"running: '{command_string}' in path '{test_run_dir}'..."
-                #         )
-                #         start_time = time.time()
-                #         # TODO: background so we can do this faster or set concurrencty in the YAML?
-                #         #   - can only get 1-2 jobs going in parallel with trivial tasks
-                #         #   - for concurrency to work, would we need to emit multiple test targets (1:1 with concurrency?)
-                #         # start_new_session=True ensures process ignores ctrl-c sent to this process (so it cleans up)
-                #         subprocess.run(
-                #             command_string,
-                #             shell=True,
-                #             env=cmd_env,
-                #             cwd=test_run_dir,
-                #             start_new_session=True,
-                #         )
-                #         end_time = time.time()
-                #         logging.info(
-                #             f"starting job {i + 1} of {jobs_to_start} took {round(end_time - start_time, 2)} seconds"
-                #         )
+                if mode == 1:
+                    # MODE 1:
+                    # start the desired number of jobs (concurrency: 1)
+                    for i in range(jobs_to_start):
+                        logging.info(f"starting job {i + 1} of {jobs_to_start}...")
+                        # Use test_mode instead of hardcoded DEBUG
+                        if self.test_mode:
+                            logging.info(
+                                f"would be running command: '{command_string}' in path '{test_run_dir}'..."
+                            )
+                        else:
+                            logging.info(
+                                f"running: '{command_string}' in path '{test_run_dir}'..."
+                            )
+                            start_time = time.time()
+                            # TODO: background so we can do this faster or set concurrencty in the YAML?
+                            #   - can only get 1-2 jobs going in parallel with trivial tasks
+                            #   - for concurrency to work, would we need to emit multiple test targets (1:1 with concurrency?)
+                            # start_new_session=True ensures process ignores ctrl-c sent to this process (so it cleans up)
+                            subprocess.run(
+                                command_string,
+                                shell=True,
+                                env=cmd_env,
+                                cwd=test_run_dir,
+                                start_new_session=True,
+                            )
+                            end_time = time.time()
+                            logging.info(
+                                f"starting job {i + 1} of {jobs_to_start} took {round(end_time - start_time, 2)} seconds"
+                            )
+                elif mode == 2:
+                    # MODE 2:
+                    # start the desired number of jobs (concurrency: jobs_to_start)
+                    # issues:
+                    #   - doesn't work
+                    logging.info(f"starting job with concurrency {jobs_to_start}...")
+                    # Use test_mode instead of hardcoded DEBUG
+                    if self.test_mode:
+                        logging.info(
+                            f"would be running command: '{command_string}' in path '{test_run_dir}'..."
+                        )
+                    else:
+                        logging.info(
+                            f"running: '{command_string}' in path '{test_run_dir}'..."
+                        )
+                        start_time = time.time()
+                        # TODO: background so we can do this faster or set concurrencty in the YAML?
+                        #   - can only get 1-2 jobs going in parallel with trivial tasks
+                        #   - for concurrency to work, would we need to emit multiple test targets (1:1 with concurrency?)
+                        # start_new_session=True ensures process ignores ctrl-c sent to this process (so it cleans up)
+                        subprocess.run(
+                            command_string,
+                            shell=True,
+                            env=cmd_env,
+                            cwd=test_run_dir,
+                            start_new_session=True,
+                        )
+                        end_time = time.time()
+                        logging.info(
+                            f"starting job took {round(end_time - start_time, 2)} seconds"
+                        )
+                else:
+                    raise ValueError(f"unknown mode: {mode}")
 
             if self.state == STOP:
                 break
