@@ -29,8 +29,8 @@ class TestRunManagerLT(object):
         self.config_object = configuration_lt.ConfigurationLt()
         self.config_object.configure()
 
-        # signal.signal(signal.SIGUSR2, self.handle_signal)
-        # signal.signal(signal.SIGINT, self.handle_signal)
+        signal.signal(signal.SIGUSR2, self.handle_signal)
+        signal.signal(signal.SIGINT, self.handle_signal)
 
     def handle_signal(self, signalnum, frame):
         if self.state != RUNNING:
@@ -41,7 +41,7 @@ class TestRunManagerLT(object):
             sys.exit(0)
             logging.info(
                 # f" handle_signal: set state to stop, exiting in {self.exit_wait} seconds or less"
-                " handle_signal: set state to stop"
+                " handle_signal: set state to stop, will exit after current job completes"
             )
 
     def run(self):
