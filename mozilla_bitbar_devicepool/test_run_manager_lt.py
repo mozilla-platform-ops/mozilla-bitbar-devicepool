@@ -64,6 +64,8 @@ class TestRunManagerLT(object):
         #     b. update lt job status (how many running per each 'queue')
         #     c. start jobs for the tc queue with the appropriate devices
 
+        # TODO: if we do multithreading, use messaging vs shared object with locks
+
         logging.info("entering run loop...")
         while self.state == RUNNING:
             # only a single project for now, so load that up
