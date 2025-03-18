@@ -18,6 +18,7 @@ def get_jobs(lt_username, lt_api_key, show_test_summary=False):
         "https://api.hyperexecute.cloud/v1.0/jobs"
         f"?show_test_summary={show_test_summary}"
         f"&is_cursor_base_pagination=true"
+        "&limit=100"
     )
 
     # do basic auth
@@ -62,8 +63,19 @@ if __name__ == "__main__":
     lt_username = os.environ["LT_USERNAME"]
     lt_api_key = os.environ["LT_API_KEY"]
 
-    # jobs = get_jobs(lt_username, lt_api_key)
-    # print(jobs)
+    jobs = get_jobs(lt_username, lt_api_key)
+    import pprint
 
-    output = get_devices()
-    print(output)
+    pprint.pprint(jobs)
+
+    # this code moved to status.py
+    # job_result_dict = {}
+    # for job in jobs['data']:
+    #     # pprint.pprint(job)
+    #     # print(f"{job["job_number"]} {job["status"]}")
+    #     job_result_dict[job["job_number"]] = job["status"]
+    # pprint.pprint(job_result_dict)
+
+    # not working yet
+    # output = get_devices()
+    # print(output)
