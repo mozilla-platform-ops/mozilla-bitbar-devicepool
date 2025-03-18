@@ -29,7 +29,7 @@ def get_jobs(lt_username, lt_api_key, show_test_summary=False):
     headers["Authorization"] = f"Basic {base64_auth_string}"
 
     response = requests.get(url, headers=headers)
-    print(response)
+    # print(response)
     return response.json()  # list of jobs
 
 

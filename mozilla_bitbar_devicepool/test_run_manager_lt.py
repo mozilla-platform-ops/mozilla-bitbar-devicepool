@@ -12,7 +12,7 @@ import subprocess
 import argparse
 
 from mozilla_bitbar_devicepool import configuration_lt, logging_setup
-from mozilla_bitbar_devicepool.lambdatest import job_config
+from mozilla_bitbar_devicepool.lambdatest import job_config, status
 from mozilla_bitbar_devicepool.taskcluster import get_taskcluster_pending_tasks
 
 
@@ -34,6 +34,9 @@ class TestRunManagerLT(object):
         self.test_mode = test_mode
         self.config_object = configuration_lt.ConfigurationLt()
         self.config_object.configure()
+        self.status_object = status.Status(
+            self.config_object.lt_username, self.config_object.lt_api_key
+        )
 
         signal.signal(signal.SIGUSR2, self.handle_signal)
         signal.signal(signal.SIGINT, self.handle_signal)
@@ -125,8 +128,16 @@ class TestRunManagerLT(object):
                 jobs_to_start = min(
                     tc_job_count, self.max_jobs_to_start, max_jobs_to_start
                 )
+                logging.info(f"jobs_to_start 1: {jobs_to_start}")
+                # subtract the number of jobs already initiated
+                jobs_to_start = jobs_to_start - self.status.get_initiated_job_count()
+                logging.info(f"jobs_to_start 2: {jobs_to_start}")
 
-                mode = 1
+                if jobs_to_start <= 0:
+                    logging.info("no jobs to start, setting mode 3...")
+                    mode = 3
+                else:
+                    mode = 1
 
                 if mode == 1:
                     # MODE 1:
@@ -213,6 +224,8 @@ class TestRunManagerLT(object):
                         )
                         if self.state == STOP:
                             break
+                elif mode == 3:
+                    logging.info("mode 3: no op mode")
                 else:
                     raise ValueError(f"unknown mode: {mode}")
 
