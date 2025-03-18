@@ -37,9 +37,6 @@ def dump_scriptvars():
         "ANDROID_SERIAL",
         "UserPorts",
         "TC_WORKER_TYPE",
-        "TESTDROID_BUILD_ID",
-        "TESTDROID_PROJECT_ID",
-        "TESTDROID_RUN_ID",
         "USER",
     )
     variables = dict((k, get_envvar(k)) for k in names)
