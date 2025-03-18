@@ -126,20 +126,21 @@ class TestRunManagerLT(object):
                     tc_job_count, self.max_jobs_to_start, max_jobs_to_start
                 )
 
-                # create hyperexecute.yaml specific to each queue
-                job_config.write_config(
-                    tc_client_id,
-                    tc_client_key,
-                    lt_app_url,
-                    test_run_file,
-                    concurrency=jobs_to_start,
-                )
-
                 mode = 1
 
                 if mode == 1:
                     # MODE 1:
                     # start the desired number of jobs (concurrency: 1)
+
+                    # create hyperexecute.yaml specific to each queue
+                    job_config.write_config(
+                        tc_client_id,
+                        tc_client_key,
+                        lt_app_url,
+                        test_run_file,
+                        concurrency=1,
+                    )
+
                     for i in range(jobs_to_start):
                         logging.info(f"starting job {i + 1} of {jobs_to_start}...")
                         # Use test_mode instead of hardcoded DEBUG
@@ -172,6 +173,16 @@ class TestRunManagerLT(object):
                     # start the desired number of jobs (concurrency: jobs_to_start)
                     # issues:
                     #   - doesn't work
+
+                    # create hyperexecute.yaml specific to each queue
+                    job_config.write_config(
+                        tc_client_id,
+                        tc_client_key,
+                        lt_app_url,
+                        test_run_file,
+                        concurrency=jobs_to_start,
+                    )
+
                     logging.info(f"starting job with concurrency {jobs_to_start}...")
                     # Use test_mode instead of hardcoded DEBUG
                     if self.test_mode:
