@@ -32,8 +32,6 @@ def return_config(tc_client_id, tc_access_token, lt_app_url, concurrency=1):
     for i in range(concurrency):
         test_discover_cmd += f'echo "taskcluster generic-worker {i}"; '
 
-    print(test_discover_cmd)
-
     # here doc with the config, we need string interpolation
     config = f"""
 # Define the version of the configuration file
