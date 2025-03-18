@@ -168,6 +168,8 @@ class TestRunManagerLT(object):
                             logging.info(
                                 f"starting job {i + 1} of {jobs_to_start} took {round(end_time - start_time, 2)} seconds"
                             )
+                            if self.state == STOP:
+                                break
                 elif mode == 2:
                     # MODE 2:
                     # start the desired number of jobs (concurrency: jobs_to_start)
@@ -209,6 +211,8 @@ class TestRunManagerLT(object):
                         logging.info(
                             f"starting job took {round(end_time - start_time, 2)} seconds"
                         )
+                        if self.state == STOP:
+                            break
                 else:
                     raise ValueError(f"unknown mode: {mode}")
 
