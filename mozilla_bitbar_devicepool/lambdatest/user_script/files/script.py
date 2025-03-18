@@ -288,7 +288,7 @@ def main():
     if taskcluster_debug:
         env["DEBUG"] = taskcluster_debug
 
-    print("environment = {}".format(json.dumps(env, indent=4)))
+    # print("environment = {}".format(json.dumps(env, indent=4)))
 
     # run the payload's command and ensure that:
     # - all output is printed
@@ -353,15 +353,15 @@ def main():
     except (ADBError, ADBTimeoutError) as e:
         print("{} attempting adb kill-server".format(e))
 
-    try:
-        print(
-            "\nnetstat -aop\n%s\n\n"
-            % subprocess.check_output(
-                ["netstat", "-aop"], stderr=subprocess.STDOUT
-            ).decode()
-        )
-    except subprocess.CalledProcessError as e:
-        print("{} attempting netstat".format(e))
+    # try:
+    #     print(
+    #         "\nnetstat -aop\n%s\n\n"
+    #         % subprocess.check_output(
+    #             ["netstat", "-aop"], stderr=subprocess.STDOUT
+    #         ).decode()
+    #     )
+    # except subprocess.CalledProcessError as e:
+    #     print("{} attempting netstat".format(e))
 
     show_df()
 
