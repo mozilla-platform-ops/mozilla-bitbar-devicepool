@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
+
 import shutil
 import signal
 import logging
@@ -10,15 +11,9 @@ import os
 import subprocess
 import sys
 
-from mozilla_bitbar_devicepool import configuration_lt
+from mozilla_bitbar_devicepool import configuration_lt, logging_setup
 from mozilla_bitbar_devicepool.lambdatest import job_config
 
-# configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
 
 # state constants
 STOP = "000000001"
@@ -32,8 +27,8 @@ class TestRunManagerLT(object):
         self.config_object = configuration_lt.ConfigurationLt()
         self.config_object.configure()
 
-        signal.signal(signal.SIGUSR2, self.handle_signal)
-        signal.signal(signal.SIGINT, self.handle_signal)
+        # signal.signal(signal.SIGUSR2, self.handle_signal)
+        # signal.signal(signal.SIGINT, self.handle_signal)
 
     def handle_signal(self, signalnum, frame):
         if self.state != RUNNING:
@@ -102,7 +97,9 @@ class TestRunManagerLT(object):
 
             # TODO: loop the number of jobs we need
             # TODO: use env vars for setting user and key
-            command_string = f"{project_root_dir}/hyperexecute --user '{self.config_object.lt_username}' --key '{self.config_object.lt_api_key}'"
+            # lt user and lt key are passsed in via env vars
+            # command_string = f"{project_root_dir}/hyperexecute --user '{self.config_object.lt_username}' --key '{self.config_object.lt_api_key}'"
+            command_string = f"{project_root_dir}/hyperexecute"
 
             DEBUG = True
             if DEBUG:
@@ -122,7 +119,10 @@ class TestRunManagerLT(object):
 
 
 if __name__ == "__main__":
-    # logging is already configured at the module level
+    # Configure logging explicitly
+    logging_setup.setup_logging()
+
+    # logging is now properly configured
     trmlt = TestRunManagerLT()
 
     # debugging
