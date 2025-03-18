@@ -3,29 +3,29 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import requests
+import base64
 
 # https://www.lambdatest.com/support/api-doc/
 
 
-# curl -X GET "https://api.hyperexecute.cloud/v1.0/jobs?show_test_summary=true&limit=2000&is_cursor_base_pagination=false" -H  "accept: application/json"
-
-# curl -X GET "https://api.hyperexecute.cloud/v1.0/jobs?show_test_summary=true&is_cursor_base_pagination=false" -H  "accept: application/json" -H  "Authorization: Basic BASE64_STRING"
-
-# curl from https://www.lambdatest.com/support/api-doc/?key=hyperexecute
-#
-# (mozilla-bitbar-devicepool-py3.12) powderdry  mozilla-bitbar-devicepool git:(lt_work) ✗  ➜  curl -X GET "https://api.hyperexecute.cloud/v1.0/jobs?show_test_summary=false&is_cursor_base_pagination=false" -H  "accept: application/json" -H  "Authorization: Basic REDACTED"
-# {"error":{"Number":1054,"Message":"Unknown column 'tj.team_id' in 'field list'"},"status":"failed"}%
-# (mozilla-bitbar-devicepool-py3.12) powderdry  mozilla-bitbar-devicepool git:(lt_work) ✗  ➜
-
-
+# WORKS
+#   - must use is_cursor_base_pagination=true
+#  curl -X GET "https://api.hyperexecute.cloud/v1.0/jobs?show_test_summary=false&is_cursor_base_pagination=true" -H  "accept: application/json" -H  "Authorization: Basic REDACTED" | jsonpp
 #
 # /v1.0/jobs
-def get_jobs(lt_username, lt_api_key):
-    url = "https://api.hyperexecute.cloud/v1.0/jobs"
+def get_jobs(lt_username, lt_api_key, show_test_summary=False):
+    url = (
+        "https://api.hyperexecute.cloud/v1.0/jobs"
+        f"?show_test_summary={show_test_summary}"
+        f"&is_cursor_base_pagination=true"
+    )
+
     # do basic auth
-    headers = {
-        "accept": "application/json",
-    }
+    headers = {}
+    # craft a header that does basic auth with username and api key
+    auth_string = f"{lt_username}:{lt_api_key}"
+    base64_auth_string = base64.b64encode(auth_string.encode("utf-8")).decode("utf-8")
+    headers["Authorization"] = f"Basic {base64_auth_string}"
 
     response = requests.get(url, headers=headers)
     print(response)
