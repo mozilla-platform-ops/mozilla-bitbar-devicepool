@@ -103,6 +103,10 @@ class TestRunManagerLT(object):
             # command_string = f"{project_root_dir}/hyperexecute --user '{self.config_object.lt_username}' --key '{self.config_object.lt_api_key}'"
             command_string = f"{project_root_dir}/hyperexecute"
 
+            cmd_env = os.environ.copy()
+            cmd_env["LT_USERNAME"] = self.config_object.lt_username
+            cmd_env["LT_ACCESS_KEY"] = self.config_object.lt_api_key
+
             # Use test_mode instead of hardcoded DEBUG
             if self.test_mode:
                 logging.info(
@@ -111,7 +115,9 @@ class TestRunManagerLT(object):
             else:
                 logging.info(f"running: '{command_string}' in path '{test_run_dir}'...")
                 # TODO: use --no-track or figure out how to make subprocess interactive so it doesn't die
-                subprocess.run(command_string, shell=True, cwd=test_run_dir)
+                subprocess.run(
+                    command_string, shell=True, env=cmd_env, cwd=test_run_dir
+                )
 
             if self.state == STOP:
                 break
