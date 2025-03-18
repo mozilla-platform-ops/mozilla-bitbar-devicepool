@@ -95,8 +95,6 @@ framework:
   name: raw
   args:
     # List of devices to run tests on (two Pixel 5 devices in this case)
-#    devices: ["pixel 5","pixel 5"]
-#    devices: ["Galaxy A51-11"]
     devices: ["Galaxy A55 5G-14"]
     # Enable or disable video recording support
     video: true
