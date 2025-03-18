@@ -22,6 +22,11 @@ def return_config(tc_client_id, tc_access_token, lt_app_url, concurrency=1):
     #   thinking:
     #   - they already have the secrets in their systems
     #   - why store it in another spot that we have to maintain?
+    #
+    # template code for using LT secrets:
+    # use lt's built-in secret storage
+    # TASKCLUSTER_ACCESS_TOKEN: ${{.secrets.TC_ACCESS_TOKEN}}
+    # TASKCLUSTER_CLIENT_ID: ${{.secrets.TC_CLIENT_ID}}
 
     # here doc with the config, we need string interpolation
     config = f"""
@@ -49,14 +54,7 @@ env:
     # inject our own secrets
     TASKCLUSTER_CLIENT_ID: {tc_client_id}
     TASKCLUSTER_ACCESS_TOKEN: {tc_access_token}
-    #
-"""
-    config += """
-    # use lt's built-in secret storage
-    #TASKCLUSTER_ACCESS_TOKEN: ${{.secrets.TC_ACCESS_TOKEN}}
-    #TASKCLUSTER_CLIENT_ID: ${{.secrets.TC_CLIENT_ID}}
-"""
-    config += f"""
+
 # Command to run the tests using the testRunnerCommand
 testRunnerCommand: python3 /home/ltuser/taskcluster/run_gw.py
 # testRunnerCommand: start-worker /home/ltuser/taskcluster/worker-runner-config.yml
