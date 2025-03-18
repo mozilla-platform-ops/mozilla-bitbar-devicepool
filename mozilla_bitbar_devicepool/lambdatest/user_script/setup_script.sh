@@ -38,10 +38,11 @@ rm -Rf taskcluster/
 cd /home/ltuser/
 mkdir taskcluster
 cd taskcluster
-wget -O generic-worker https://github.com/taskcluster/taskcluster/releases/download/v80.0.0/generic-worker-insecure-linux-amd64
-wget -O livelog https://github.com/taskcluster/taskcluster/releases/download/v80.0.0/livelog-linux-amd64
-wget -O taskcluster-proxy https://github.com/taskcluster/taskcluster/releases/download/v80.0.0/taskcluster-proxy-linux-amd64
-wget -O start-worker https://github.com/taskcluster/taskcluster/releases/download/v80.0.0/start-worker-linux-amd64
+TC_VERSION=83.3.0
+wget -O generic-worker https://github.com/taskcluster/taskcluster/releases/download/v${TC_VERSION}/generic-worker-insecure-linux-amd64
+wget -O livelog https://github.com/taskcluster/taskcluster/releases/download/v${TC_VERSION}/livelog-linux-amd64
+wget -O taskcluster-proxy https://github.com/taskcluster/taskcluster/releases/download/v${TC_VERSION}/taskcluster-proxy-linux-amd64
+wget -O start-worker https://github.com/taskcluster/taskcluster/releases/download/v${TC_VERSION}/start-worker-linux-amd64
 
 
 
@@ -100,7 +101,7 @@ wget -O start-worker https://github.com/taskcluster/taskcluster/releases/downloa
 
 
 #
-# inline files
+# inline files (snapshots of jmaher's files from above)
 #
 
 # TODO: eventually move these to their own repo like mozilla-bitbar-docker?
