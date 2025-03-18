@@ -102,20 +102,15 @@ class TestRunManagerLT(object):
                 # create /tmp/mozilla-lt-devicepool-job-dir dir
                 os.makedirs(test_run_dir, exist_ok=True)
 
-                # TODO: create hyperexecute.yaml specific to each queue
-                job_config.write_config(
-                    tc_client_id,
-                    tc_client_key,
-                    lt_app_url,
-                    test_run_file,
-                    concurrency=1,
-                )
-
                 # TODO: copy user-script dir to correct dir (use basename on config_file_path?)
                 # copy user_script_golden_dir to correct path using python shutil
                 shutil.copytree(
                     user_script_golden_dir, os.path.join(test_run_dir, "user_script")
                 )
+
+                cmd_env = os.environ.copy()
+                cmd_env["LT_USERNAME"] = self.config_object.lt_username
+                cmd_env["LT_ACCESS_KEY"] = self.config_object.lt_api_key
 
                 # TODO: loop the number of jobs we need
                 # TODO: use env vars for setting user and key
@@ -126,41 +121,79 @@ class TestRunManagerLT(object):
                 else:
                     command_string = f"{project_root_dir}/hyperexecute --no-track"
 
-                cmd_env = os.environ.copy()
-                cmd_env["LT_USERNAME"] = self.config_object.lt_username
-                cmd_env["LT_ACCESS_KEY"] = self.config_object.lt_api_key
-
                 #
                 jobs_to_start = min(
                     tc_job_count, self.max_jobs_to_start, max_jobs_to_start
                 )
-                for i in range(jobs_to_start):
-                    logging.info(f"starting job {i + 1} of {jobs_to_start}...")
-                    # Use test_mode instead of hardcoded DEBUG
-                    if self.test_mode:
-                        logging.info(
-                            f"would be running command: '{command_string}' in path '{test_run_dir}'..."
-                        )
-                    else:
-                        logging.info(
-                            f"running: '{command_string}' in path '{test_run_dir}'..."
-                        )
-                        start_time = time.time()
-                        # TODO: background so we can do this faster or set concurrencty in the YAML?
-                        #   - can only get 1-2 jobs going in parallel with trivial tasks
-                        #   - for concurrency to work, would we need to emit multiple test targets (1:1 with concurrency?)
-                        # start_new_session=True ensures process ignores ctrl-c sent to this process (so it cleans up)
-                        subprocess.run(
-                            command_string,
-                            shell=True,
-                            env=cmd_env,
-                            cwd=test_run_dir,
-                            start_new_session=True,
-                        )
-                        end_time = time.time()
-                        logging.info(
-                            f"starting job {i + 1} of {jobs_to_start} took {round(end_time - start_time, 2)} seconds"
-                        )
+
+                # create hyperexecute.yaml specific to each queue
+                job_config.write_config(
+                    tc_client_id,
+                    tc_client_key,
+                    lt_app_url,
+                    test_run_file,
+                    concurrency=jobs_to_start,
+                )
+
+                # MODE 2:
+                # start the desired number of jobs (concurrency: jobs_to_start)
+                logging.info(f"starting job with concurrency {jobs_to_start}...")
+                # Use test_mode instead of hardcoded DEBUG
+                if self.test_mode:
+                    logging.info(
+                        f"would be running command: '{command_string}' in path '{test_run_dir}'..."
+                    )
+                else:
+                    logging.info(
+                        f"running: '{command_string}' in path '{test_run_dir}'..."
+                    )
+                    start_time = time.time()
+                    # TODO: background so we can do this faster or set concurrencty in the YAML?
+                    #   - can only get 1-2 jobs going in parallel with trivial tasks
+                    #   - for concurrency to work, would we need to emit multiple test targets (1:1 with concurrency?)
+                    # start_new_session=True ensures process ignores ctrl-c sent to this process (so it cleans up)
+                    subprocess.run(
+                        command_string,
+                        shell=True,
+                        env=cmd_env,
+                        cwd=test_run_dir,
+                        start_new_session=True,
+                    )
+                    end_time = time.time()
+                    logging.info(
+                        f"starting job took {round(end_time - start_time, 2)} seconds"
+                    )
+
+                # MODE 1:
+                # start the desired number of jobs (concurrency: 1)
+                #
+                # for i in range(jobs_to_start):
+                #     logging.info(f"starting job {i + 1} of {jobs_to_start}...")
+                #     # Use test_mode instead of hardcoded DEBUG
+                #     if self.test_mode:
+                #         logging.info(
+                #             f"would be running command: '{command_string}' in path '{test_run_dir}'..."
+                #         )
+                #     else:
+                #         logging.info(
+                #             f"running: '{command_string}' in path '{test_run_dir}'..."
+                #         )
+                #         start_time = time.time()
+                #         # TODO: background so we can do this faster or set concurrencty in the YAML?
+                #         #   - can only get 1-2 jobs going in parallel with trivial tasks
+                #         #   - for concurrency to work, would we need to emit multiple test targets (1:1 with concurrency?)
+                #         # start_new_session=True ensures process ignores ctrl-c sent to this process (so it cleans up)
+                #         subprocess.run(
+                #             command_string,
+                #             shell=True,
+                #             env=cmd_env,
+                #             cwd=test_run_dir,
+                #             start_new_session=True,
+                #         )
+                #         end_time = time.time()
+                #         logging.info(
+                #             f"starting job {i + 1} of {jobs_to_start} took {round(end_time - start_time, 2)} seconds"
+                #         )
 
             if self.state == STOP:
                 break
@@ -194,7 +227,11 @@ if __name__ == "__main__":
     # pprint.pprint(trmlt.config_object.config)
 
     # start the main run loop
+
     # single job started at a time
     # trmlt.run_single_project_single_thread_multi_job(max_jobs_to_start=1, foreground=True)
+
     # multiple jobs started in background
+    #   problems:
+    #     - can start too many jobs since no get_pending_jobs lt call yet
     trmlt.run_single_project_single_thread_multi_job()  # max_jobs_to_start=5, foreground=False)
