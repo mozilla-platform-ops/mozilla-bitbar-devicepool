@@ -125,13 +125,17 @@ class TestRunManagerLT(object):
                     command_string = f"{project_root_dir}/hyperexecute --no-track"
 
                 #
+                initiated_job_count = self.status_object.get_initiated_job_count()
+                tc_jobs_not_handled = tc_job_count - initiated_job_count
+                logging.info(f"tc_jobs_not_handled: {tc_jobs_not_handled}")
                 jobs_to_start = min(
-                    tc_job_count, self.max_jobs_to_start, max_jobs_to_start
+                    tc_jobs_not_handled, self.max_jobs_to_start, max_jobs_to_start
                 )
                 logging.info(f"jobs_to_start 1: {jobs_to_start}")
                 # subtract the number of jobs already initiated
-                jobs_to_start = jobs_to_start - self.status.get_initiated_job_count()
-                logging.info(f"jobs_to_start 2: {jobs_to_start}")
+                # jobs_to_start = jobs_to_start - initiated_job_count
+                # logging.info(f"initiated_job_count: {initiated_job_count}")
+                # logging.info(f"jobs_to_start 2: {jobs_to_start}")
 
                 if jobs_to_start <= 0:
                     logging.info("no jobs to start, setting mode 3...")
