@@ -101,44 +101,6 @@ class ConfigurationLt(object):
         # expand the configuration
         self.expand_configuration()
 
-        # copied from configuration:configure
-        #
-        # with open(bitbar_configpath) as bitbar_configfile:
-        #     CONFIG = yaml.load(bitbar_configfile.read(), Loader=yaml.SafeLoader)
-
-        # global CONFIG, FILESPATH
-
-        # FILESPATH = filespath
-
-        # logger.info("configure: starting configuration")
-        # start = time.time()
-
-        # with open(bitbar_configpath) as bitbar_configfile:
-        #     CONFIG = yaml.load(bitbar_configfile.read(), Loader=yaml.SafeLoader)
-        # logger.info("configure: performing checks")
-        # try:
-        #     ensure_filenames_are_unique(CONFIG)
-        # except ConfigurationFileException as e:
-        #     logger.warning(e.message)
-        #     sys.exit(1)
-        # expand_configuration()
-        # try:
-        #     configuration_preflight()
-        # except ConfigurationFileException as e:
-        #     logger.warning(e)
-        #     logger.warning(
-        #         "Configuration files seem to be missing! Please place and restart. Exiting..."
-        #     )
-        #     sys.exit(1)
-        # configure_device_groups(update_bitbar=update_bitbar)
-        # configure_projects(update_bitbar=update_bitbar)
-
-        # end = time.time()
-        # diff = end - start
-        # logger.info("configure: configuration took {} seconds".format(diff))
-
-        pass
-
 
 if __name__ == "__main__":
     clt = ConfigurationLt()
