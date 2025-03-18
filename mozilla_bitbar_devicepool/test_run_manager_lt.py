@@ -10,6 +10,7 @@ import time
 import os
 import subprocess
 import sys
+import argparse
 
 from mozilla_bitbar_devicepool import configuration_lt, logging_setup
 from mozilla_bitbar_devicepool.lambdatest import job_config
@@ -21,9 +22,10 @@ RUNNING = "000000002"
 
 
 class TestRunManagerLT(object):
-    def __init__(self, exit_wait=5):
+    def __init__(self, exit_wait=5, test_mode=False):
         self.exit_wait = exit_wait
         self.state = RUNNING
+        self.test_mode = test_mode
         self.config_object = configuration_lt.ConfigurationLt()
         self.config_object.configure()
 
@@ -101,8 +103,8 @@ class TestRunManagerLT(object):
             # command_string = f"{project_root_dir}/hyperexecute --user '{self.config_object.lt_username}' --key '{self.config_object.lt_api_key}'"
             command_string = f"{project_root_dir}/hyperexecute"
 
-            DEBUG = True
-            if DEBUG:
+            # Use test_mode instead of hardcoded DEBUG
+            if self.test_mode:
                 logging.info(
                     f"would be running command: '{command_string}' in path '{test_run_dir}'..."
                 )
@@ -113,17 +115,30 @@ class TestRunManagerLT(object):
 
             if self.state == STOP:
                 break
-            time.sleep(60)
+            time.sleep(self.exit_wait)
             if self.state == STOP:
                 break
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(description="Test Run Manager for LambdaTest")
+    parser.add_argument(
+        "--test",
+        action="store_true",
+        help="Run in test mode without executing commands",
+    )
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
+    # Parse command line arguments
+    args = parse_args()
+
     # Configure logging explicitly
     logging_setup.setup_logging()
 
     # logging is now properly configured
-    trmlt = TestRunManagerLT()
+    trmlt = TestRunManagerLT(test_mode=args.test)
 
     # debugging
     # import pprint
