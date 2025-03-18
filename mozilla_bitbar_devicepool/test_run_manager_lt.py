@@ -159,7 +159,7 @@ class TestRunManagerLT(object):
                         )
                         end_time = time.time()
                         logging.info(
-                            f"starting job {i + 1} of {jobs_to_start} took {end_time - start_time} seconds"
+                            f"starting job {i + 1} of {jobs_to_start} took {round(end_time - start_time, 2)} seconds"
                         )
 
             if self.state == STOP:
