@@ -32,10 +32,38 @@ def get_jobs(lt_username, lt_api_key, show_test_summary=False):
     return response.json()  # list of jobs
 
 
+# not working yet
+def get_devices():
+    # https://beta-api.lambdatest.com/manual/v1.0/devices/private
+
+    # curl -X GET "https://mobile-api.lambdatest.com/list?region=us" -H  "accept: application/json" -H  "Authorization: Basic REDACTED"
+
+    url = (
+        "https://api.hyperexecute.cloud/list?region=us"
+        # f"?show_test_summary={show_test_summary}"
+        # f"&is_cursor_base_pagination=true"
+    )
+
+    # do basic auth
+    headers = {}
+    # craft a header that does basic auth with username and api key
+    auth_string = f"{lt_username}:{lt_api_key}"
+    base64_auth_string = base64.b64encode(auth_string.encode("utf-8")).decode("utf-8")
+    headers["Authorization"] = f"Basic {base64_auth_string}"
+
+    response = requests.get(url, headers=headers)
+    print(response)
+    return response.json()  # list of jobs
+
+
 if __name__ == "__main__":
     import os
 
     lt_username = os.environ["LT_USERNAME"]
     lt_api_key = os.environ["LT_API_KEY"]
-    jobs = get_jobs(lt_username, lt_api_key)
-    print(jobs)
+
+    # jobs = get_jobs(lt_username, lt_api_key)
+    # print(jobs)
+
+    output = get_devices()
+    print(output)
