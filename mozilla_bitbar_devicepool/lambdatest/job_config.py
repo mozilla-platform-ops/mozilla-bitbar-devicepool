@@ -1,6 +1,3 @@
-# from mozilla_bitbar_devicepool import logging_setup
-
-
 def write_config(
     tc_client_id,
     tc_access_token,

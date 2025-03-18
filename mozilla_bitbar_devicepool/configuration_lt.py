@@ -8,7 +8,6 @@ import subprocess
 import sys
 import pprint
 
-# from mozilla_bitbar_devicepool import logging_setup
 from mozilla_bitbar_devicepool.util.template import apply_dict_defaults
 
 
