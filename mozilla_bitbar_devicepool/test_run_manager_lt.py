@@ -9,7 +9,6 @@ import logging
 import time
 import os
 import subprocess
-import sys
 import argparse
 
 from mozilla_bitbar_devicepool import configuration_lt, logging_setup
@@ -40,11 +39,12 @@ class TestRunManagerLT(object):
 
         if signalnum == signal.SIGINT or signalnum == signal.SIGUSR2:
             self.state = STOP
-            sys.exit(0)
             logging.info(
                 # f" handle_signal: set state to stop, exiting in {self.exit_wait} seconds or less"
                 " handle_signal: set state to stop, will exit after current job completes"
             )
+            # for testing, exit immediately
+            # sys.exit(0)
 
     def run(self):
         # base on __file__ to get the project root dir
