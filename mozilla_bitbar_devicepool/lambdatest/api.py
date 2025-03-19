@@ -4,6 +4,8 @@
 
 import requests
 import base64
+import pprint
+import os
 
 # https://www.lambdatest.com/support/api-doc/
 
@@ -39,40 +41,35 @@ def get_jobs(lt_username, lt_api_key, jobs=100, show_test_summary=False):
     return response.json()  # list of jobs
 
 
-# not working yet
+# WORKS
 def get_devices():
-    # https://beta-api.lambdatest.com/manual/v1.0/devices/private
+    # curl --location --request GET 'https://mobile-api.lambdatest.com/mobile-automation/api/v1/privatecloud_devices' -H  "Authorization: Basic REDACTED"
 
-    # curl -X GET "https://mobile-api.lambdatest.com/list?region=us" -H  "accept: application/json" -H  "Authorization: Basic REDACTED"
-
-    url = (
-        "https://api.hyperexecute.cloud/list?region=us"
-        # f"?show_test_summary={show_test_summary}"
-        # f"&is_cursor_base_pagination=true"
-    )
+    url = "https://mobile-api.lambdatest.com/mobile-automation/api/v1/privatecloud_devices"
 
     # do basic auth
-    headers = {}
+    headers = {"accept": "application/json"}
     # craft a header that does basic auth with username and api key
     auth_string = f"{lt_username}:{lt_api_key}"
     base64_auth_string = base64.b64encode(auth_string.encode("utf-8")).decode("utf-8")
     headers["Authorization"] = f"Basic {base64_auth_string}"
 
     response = requests.get(url, headers=headers)
-    print(response)
+    # check the response code
+    if response.status_code != 200:
+        print(f"Error: {response.status_code}")
+        print(f"  while fetching {url}")
+        print(response.text)
+        return None
     return response.json()  # list of jobs
 
 
 if __name__ == "__main__":
-    import os
-
     lt_username = os.environ["LT_USERNAME"]
     lt_api_key = os.environ["LT_API_KEY"]
 
-    jobs = get_jobs(lt_username, lt_api_key)
-    import pprint
-
-    pprint.pprint(jobs)
+    # jobs = get_jobs(lt_username, lt_api_key)
+    # pprint.pprint(jobs)
 
     # this code moved to status.py
     # job_result_dict = {}
@@ -82,6 +79,5 @@ if __name__ == "__main__":
     #     job_result_dict[job["job_number"]] = job["status"]
     # pprint.pprint(job_result_dict)
 
-    # not working yet
-    # output = get_devices()
-    # print(output)
+    output = get_devices()
+    pprint.pprint(output)
