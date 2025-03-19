@@ -25,12 +25,12 @@ termplotlib = "^0.3.9"
 gitpython = "^3.1.42"
 
 [tool.poetry.group.dev.dependencies]
-pre-commit = "^3.1.0"
+pre-commit = "^4.1.0"
 pylint = "^2.16.2"
 pytest = "^7.2.1"
 pytest-watch = "^4.2.0"
 pytest-cov = "^4.0.0"
-deptry = "^0.11.0"
+deptry = "^0.23.0"
 
 [tool.poetry.scripts]
 mbd = 'mozilla_bitbar_devicepool.main:main'
@@ -40,4 +40,8 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.deptry]
-ignore = ["DEP001", "DEP002"]
+#ignore = ["DEP001", "DEP002"]
+
+[tool.deptry.per_rule_ignores]
+DEP001 = ["google", "mozdevice"]
+DEP003 = ["google", "mozdevice"]

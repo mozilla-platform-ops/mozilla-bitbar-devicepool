@@ -146,7 +146,6 @@ class DeviceGroupReport:
 
         v1_enabled = False
         if v1_enabled:
-
             print("/// tc-w  workers ///")
             for key in sorted(self.tcw_result_dict.keys()):
                 print("%s: %s" % (key, self.tcw_result_dict[key]))
