@@ -42,7 +42,7 @@ def get_jobs(lt_username, lt_api_key, jobs=100, show_test_summary=False):
 
 
 # WORKS
-def get_devices():
+def get_devices(lt_username, lt_api_key):
     # curl --location --request GET 'https://mobile-api.lambdatest.com/mobile-automation/api/v1/privatecloud_devices' -H  "Authorization: Basic REDACTED"
 
     url = "https://mobile-api.lambdatest.com/mobile-automation/api/v1/privatecloud_devices"
