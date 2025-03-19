@@ -13,12 +13,12 @@ import base64
 #  curl -X GET "https://api.hyperexecute.cloud/v1.0/jobs?show_test_summary=false&is_cursor_base_pagination=true" -H  "accept: application/json" -H  "Authorization: Basic REDACTED" | jsonpp
 #
 # /v1.0/jobs
-def get_jobs(lt_username, lt_api_key, show_test_summary=False):
+def get_jobs(lt_username, lt_api_key, jobs=100, show_test_summary=False):
     url = (
         "https://api.hyperexecute.cloud/v1.0/jobs"
         f"?show_test_summary={show_test_summary}"
         f"&is_cursor_base_pagination=true"
-        "&limit=100"
+        f"&limit={jobs}"
     )
 
     # do basic auth
@@ -29,6 +29,12 @@ def get_jobs(lt_username, lt_api_key, show_test_summary=False):
     headers["Authorization"] = f"Basic {base64_auth_string}"
 
     response = requests.get(url, headers=headers)
+    # check the response code
+    if response.status_code != 200:
+        print(f"Error: {response.status_code}")
+        print(f"  while fetching {url}")
+        print(response.text)
+        return None
     # print(response)
     return response.json()  # list of jobs
 

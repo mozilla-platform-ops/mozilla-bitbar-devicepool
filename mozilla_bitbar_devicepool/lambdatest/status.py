@@ -10,16 +10,17 @@ class Status:
         self.lt_username = lt_username
         self.lt_api_key = lt_api_key
 
-    def get_job_dict(self):
-        jobs = get_jobs(self.lt_username, self.lt_api_key)
+    def get_job_dict(self, jobs=100):
+        jobs = get_jobs(self.lt_username, self.lt_api_key, jobs=jobs)
+        # pprint.pprint(jobs)
         job_result_dict = {}
         for job in jobs["data"]:
             job_result_dict[job["job_number"]] = job["status"]
         # TODO: return sorted?
         return job_result_dict
 
-    def get_initiated_job_count(self):
-        jobs = get_jobs(self.lt_username, self.lt_api_key)
+    def get_initiated_job_count(self, jobs=100):
+        jobs = get_jobs(self.lt_username, self.lt_api_key, jobs=jobs)
         initiated_job_count = 0
         for job in jobs["data"]:
             if job["status"] == "initiated":
