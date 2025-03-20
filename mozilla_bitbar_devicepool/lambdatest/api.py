@@ -18,8 +18,6 @@ import os
 def get_jobs(
     lt_username, lt_api_key, label_filter_arr=None, jobs=100, show_test_summary=False
 ):
-    # TODO: make label_filter work
-
     url = (
         "https://api.hyperexecute.cloud/v1.0/jobs"
         f"?show_test_summary={show_test_summary}"
