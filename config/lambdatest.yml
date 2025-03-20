@@ -20,8 +20,12 @@ projects:
       # override SCRIPT_REPO_COMMIT with a test commit
       SCRIPT_REPO_COMMIT: future_commit
 device_groups:
+  a55-prod:
+    Galaxy A55 5G-14-R5CY128X71B
+    Galaxy A55 5G-14-RZCXA0H3T9P
   a55-alpha:
-    a55-01:
-    a55-02:
+    Galaxy A51-11-RZ8NB0WJ47H
+    # a55-01:
+    # a55-02:
   test-1:
     # a55-99:
