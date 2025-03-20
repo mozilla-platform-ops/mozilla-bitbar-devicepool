@@ -119,7 +119,7 @@ class TestRunManagerLT(object):
                 #
                 # for now we have a single pool of devices
                 device_type_and_os = "Galaxy A55 5G-14"
-                udid = None
+                # udid = None
                 # TODO: manage device state and specify UDID of exact device to target for each job
                 #               #
                 # DEBUG: jmaher is using the A55's right now
@@ -130,7 +130,8 @@ class TestRunManagerLT(object):
                 # indicate this is scheduled by this program
                 labels_csv = "mbd"
                 # add the workerType to the labels
-                labels_csv += f",{tc_worker_type}"
+                tc_wt_short = tc_worker_type.replace("gecko-t-lambda-", "")
+                labels_csv += f",{tc_wt_short}"
                 # add the device type to the labels
                 dtao_underscore = device_type_and_os.replace(" ", "_")
                 labels_csv += f",{dtao_underscore}"
@@ -187,7 +188,7 @@ class TestRunManagerLT(object):
                         lt_app_url,
                         test_run_file,
                         device_type_and_os,
-                        udid=udid,
+                        # udid
                         concurrency=1,
                     )
 
@@ -233,7 +234,7 @@ class TestRunManagerLT(object):
                         lt_app_url,
                         test_run_file,
                         device_type_and_os,
-                        udid=udid,
+                        # udid
                         concurrency=jobs_to_start,
                     )
 

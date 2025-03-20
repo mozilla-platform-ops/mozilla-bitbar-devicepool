@@ -42,8 +42,14 @@ class Status:
     #  - failed
     #  - timeout
     #
-    def get_job_summary(self, jobs=100):
-        gj_output = get_jobs(self.lt_username, self.lt_api_key, jobs=jobs)
+    def get_job_summary(self, label_filter_arr=None, jobs=100):
+        # TODO: make label_filter work
+        gj_output = get_jobs(
+            self.lt_username,
+            self.lt_api_key,
+            label_filter_arr=label_filter_arr,
+            jobs=jobs,
+        )
         result_dict = {}
         for job in gj_output["data"]:
             status = job["status"]
@@ -53,9 +59,14 @@ class Status:
                 result_dict[status] = 1
         return result_dict
 
-    def get_initiated_job_count(self, label_filter=None, jobs=100):
+    def get_initiated_job_count(self, label_filter_arr=None, jobs=100):
         # TODO: make label_filter work
-        gj_output = get_jobs(self.lt_username, self.lt_api_key, jobs=jobs)
+        gj_output = get_jobs(
+            self.lt_username,
+            self.lt_api_key,
+            label_filter_arr=label_filter_arr,
+            jobs=jobs,
+        )
         initiated_job_count = 0
         for job in gj_output["data"]:
             if job["status"] == "initiated":
