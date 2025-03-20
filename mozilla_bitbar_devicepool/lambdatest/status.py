@@ -53,7 +53,8 @@ class Status:
                 result_dict[status] = 1
         return result_dict
 
-    def get_initiated_job_count(self, jobs=100):
+    def get_initiated_job_count(self, label_filter=None, jobs=100):
+        # TODO: make label_filter work
         gj_output = get_jobs(self.lt_username, self.lt_api_key, jobs=jobs)
         initiated_job_count = 0
         for job in gj_output["data"]:
