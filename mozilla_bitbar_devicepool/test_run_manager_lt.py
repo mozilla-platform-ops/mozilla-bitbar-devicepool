@@ -90,7 +90,7 @@ class TestRunManagerLT(object):
                 logging.info(f"no jobs found, sleeping {self.no_job_sleep}s...")
                 time.sleep(self.no_job_sleep)
             else:
-                # tc_worker_type = current_project["TC_WORKER_TYPE"]
+                tc_worker_type = current_project["TC_WORKER_TYPE"]
                 tc_client_id = current_project["TASKCLUSTER_CLIENT_ID"]
                 tc_client_key = current_project["TASKCLUSTER_ACCESS_TOKEN"]
                 # debug
@@ -115,14 +115,39 @@ class TestRunManagerLT(object):
                 cmd_env["LT_USERNAME"] = self.config_object.lt_username
                 cmd_env["LT_ACCESS_KEY"] = self.config_object.lt_api_key
 
-                # TODO: loop the number of jobs we need
-                # TODO: use env vars for setting user and key
+                # set the device type, OS, and optionally UDID for this job
+                #
+                # for now we have a single pool of devices
+                device_type_and_os = "Galaxy A55 5G-14"
+                udid = None
+                # TODO: manage device state and specify UDID of exact device to target for each job
+                #               #
+                # DEBUG: jmaher is using the A55's right now
+                device_type_and_os = "Galaxy A51-11"
+
+                # hyperexecute labels
+                #
+                # indicate this is scheduled by this program
+                labels_csv = "mbd"
+                # add the workerType to the labels
+                labels_csv += f",{tc_worker_type}"
+                # add the device type to the labels
+                dtao_underscore = device_type_and_os.replace(" ", "_")
+                labels_csv += f",{dtao_underscore}"
+                # TODO: enable adding udid to the labels?
+                # if udid:
+                #     labels_csv += f",{udid}"
+
                 # lt user and lt key are passsed in via env vars
-                # command_string = f"{project_root_dir}/hyperexecute --user '{self.config_object.lt_username}' --key '{self.config_object.lt_api_key}'"
+                #   old: command_string = f"{project_root_dir}/hyperexecute --user \
+                #           '{self.config_object.lt_username}' --key '{self.config_object.lt_api_key}'"
+                labels_arg = f"--labels '{labels_csv}'"
                 if foreground:
-                    command_string = f"{project_root_dir}/hyperexecute"
+                    command_string = f"{project_root_dir}/hyperexecute {labels_arg}"
                 else:
-                    command_string = f"{project_root_dir}/hyperexecute --no-track"
+                    command_string = (
+                        f"{project_root_dir}/hyperexecute --no-track {labels_arg}"
+                    )
 
                 #
                 initiated_job_count = self.status_object.get_initiated_job_count()
@@ -150,14 +175,6 @@ class TestRunManagerLT(object):
                     # mode 2: use hyperexecute.yaml's concurrency
                     # status: currently broken / needs more work
                     # mode = 2
-
-                # for now we have a single pool of devices
-                device_type_and_os = "Galaxy A55 5G-14"
-                udid = None
-                # TODO: manage device state and specify UDID of exact device to target for each job
-
-                # DEBUG: jmaher is using the A55's right now
-                device_type_and_os = "Galaxy A51-11"
 
                 if mode == 1:
                     # MODE 1:
