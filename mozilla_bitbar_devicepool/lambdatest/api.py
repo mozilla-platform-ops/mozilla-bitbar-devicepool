@@ -15,7 +15,11 @@ import os
 #  curl -X GET "https://api.hyperexecute.cloud/v1.0/jobs?show_test_summary=false&is_cursor_base_pagination=true" -H  "accept: application/json" -H  "Authorization: Basic REDACTED" | jsonpp
 #
 # /v1.0/jobs
-def get_jobs(lt_username, lt_api_key, jobs=100, show_test_summary=False):
+def get_jobs(
+    lt_username, lt_api_key, label_filter_arr=None, jobs=100, show_test_summary=False
+):
+    # TODO: make label_filter work
+
     url = (
         "https://api.hyperexecute.cloud/v1.0/jobs"
         f"?show_test_summary={show_test_summary}"
@@ -37,8 +41,21 @@ def get_jobs(lt_username, lt_api_key, jobs=100, show_test_summary=False):
         print(f"  while fetching {url}")
         print(response.text)
         return None
-    # print(response)
-    return response.json()  # list of jobs
+    result = response.json()
+
+    if label_filter_arr:
+        current_data = result["data"]
+        result["data"] = []
+        for job in current_data:
+            job_label_data = job["job_label"]
+            if not job_label_data:
+                continue
+            job_labels = job["job_label"]
+            # if all labels are present in job_labels, add to result
+            if all(label in job_labels for label in label_filter_arr):
+                result["data"].append(job)
+
+    return result
 
 
 # WORKS
@@ -68,8 +85,10 @@ if __name__ == "__main__":
     lt_username = os.environ["LT_USERNAME"]
     lt_api_key = os.environ["LT_API_KEY"]
 
-    # jobs = get_jobs(lt_username, lt_api_key)
-    # pprint.pprint(jobs)
+    # jobs = get_jobs(lt_username, lt_api_key, ['aje_123', 'fun_fun_456'])
+    jobs = get_jobs(lt_username, lt_api_key, ["123", "456"])
+
+    pprint.pprint(jobs)
 
     # this code moved to status.py
     # job_result_dict = {}
@@ -79,5 +98,5 @@ if __name__ == "__main__":
     #     job_result_dict[job["job_number"]] = job["status"]
     # pprint.pprint(job_result_dict)
 
-    output = get_devices()
-    pprint.pprint(output)
+    # output = get_devices()
+    # pprint.pprint(output)
