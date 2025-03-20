@@ -96,8 +96,8 @@ if __name__ == "__main__":
     status = Status(lt_username, lt_api_key)
 
     pprint.pprint(status.get_job_dict())
-    print("")
-    sys.exit(0)
+    # print("")
+    # sys.exit(0)
     print(f"initiated job count: {status.get_initiated_job_count()}")
     print("job summary:")
     pprint.pprint(status.get_job_summary())
