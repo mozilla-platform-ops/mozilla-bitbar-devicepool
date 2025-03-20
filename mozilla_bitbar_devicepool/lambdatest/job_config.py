@@ -12,6 +12,22 @@ def write_config(
     path="/tmp/mozilla-lt-devicepool-job-dir/hyperexecute.yaml",
     concurrency=1,
 ):
+    """
+    Generate a LambdaTest HyperExecute configuration and write it to a file.
+
+    Args:
+        tc_client_id (str): Taskcluster client ID for authentication.
+        tc_access_token (str): Taskcluster access token for authentication.
+        lt_app_url (str): URL to the application under test on LambdaTest.
+        device_type_and_os (str): Device and OS combination (e.g., "Galaxy A55 5G-14", "Pixel 9-15").
+        udid (str, optional): The unique device identifier if targeting a specific device. Defaults to None.
+        path (str, optional): Destination path for the config file.
+                              Defaults to "/tmp/mozilla-lt-devicepool-job-dir/hyperexecute.yaml".
+        concurrency (int, optional): Number of parallel test executions. Defaults to 1.
+
+    Returns:
+        str: Path where the configuration file was written.
+    """
     config = return_config(
         tc_client_id, tc_access_token, lt_app_url, device_type_and_os, udid, concurrency
     )
@@ -20,9 +36,6 @@ def write_config(
     return path
 
 
-# args:
-#   - device_type_and_os: e.g. "Galaxy A55 5G-14", "Pixel 9-15"
-#   - udid: basically serial number, optional, e.g. "RZ8NB0WJ47H"
 def return_config(
     tc_client_id,
     tc_access_token,
@@ -31,6 +44,20 @@ def return_config(
     udid=None,
     concurrency=1,
 ):
+    """
+    Generate a LambdaTest HyperExecute configuration YAML as a string.
+
+    Args:
+        tc_client_id (str): Taskcluster client ID for authentication.
+        tc_access_token (str): Taskcluster access token for authentication.
+        lt_app_url (str): URL to the application under test on LambdaTest.
+        device_type_and_os (str): Device and OS combination (e.g., "Galaxy A55 5G-14", "Pixel 9-15").
+        udid (str, optional): The unique device identifier if targeting a specific device. Defaults to None.
+        concurrency (int, optional): Number of parallel test executions. Defaults to 1.
+
+    Returns:
+        str: Complete HyperExecute YAML configuration as a string.
+    """
     # TODO: document decision to inject secrets here vs using lt's built-in secret storage
     #   thinking:
     #   - they already have the secrets in their systems
