@@ -7,17 +7,30 @@ def write_config(
     tc_client_id,
     tc_access_token,
     lt_app_url,
+    device_type_and_os,
+    udid=None,
     path="/tmp/mozilla-lt-devicepool-job-dir/hyperexecute.yaml",
     concurrency=1,
 ):
-    config = return_config(tc_client_id, tc_access_token, lt_app_url, concurrency)
+    config = return_config(
+        tc_client_id, tc_access_token, lt_app_url, device_type_and_os, udid, concurrency
+    )
     with open(path, "w") as f:
         f.write(config)
     return path
 
 
-# TODO: take devices, workerType
-def return_config(tc_client_id, tc_access_token, lt_app_url, concurrency=1):
+# args:
+#   - device_type_and_os: e.g. "Galaxy A55 5G-14", "Pixel 9-15"
+#   - udid: basically serial number, optional, e.g. "RZ8NB0WJ47H"
+def return_config(
+    tc_client_id,
+    tc_access_token,
+    lt_app_url,
+    device_type_and_os,
+    udid=None,
+    concurrency=1,
+):
     # TODO: document decision to inject secrets here vs using lt's built-in secret storage
     #   thinking:
     #   - they already have the secrets in their systems
@@ -31,6 +44,12 @@ def return_config(tc_client_id, tc_access_token, lt_app_url, concurrency=1):
     test_discover_cmd = ""
     for i in range(concurrency):
         test_discover_cmd += f'echo "taskcluster generic-worker {i}"; '
+
+    fixed_ip_line = "#"
+    if udid:
+        fixed_ip_line = f'fixedIP: "{udid}"'
+
+    # TODO: sanity check device_type_and_os (includes hyphen, valid device type)
 
     # here doc with the config, we need string interpolation
     config = f"""
@@ -95,7 +114,10 @@ framework:
   name: raw
   args:
     # List of devices to run tests on (two Pixel 5 devices in this case)
-    devices: ["Galaxy A55 5G-14"]
+    devices: ["{device_type_and_os}"]
+    framework:
+    # fixedIP: can take the UDID a specific devices to run on
+    {fixed_ip_line}
     # Enable or disable video recording support
     video: true
     # Enable or disable device log support

@@ -141,7 +141,23 @@ class TestRunManagerLT(object):
                     logging.info("no jobs to start, setting mode 3...")
                     mode = 3
                 else:
+                    # mode 1: single job started at a time
                     mode = 1
+                    # issues with mode 1:
+                    #   - depending on job run time, with more than 30-60 devices,
+                    #       we can't keep enough jobs running to keep up
+
+                    # mode 2: use hyperexecute.yaml's concurrency
+                    # status: currently broken / needs more work
+                    # mode = 2
+
+                # for now we have a single pool of devices
+                device_type_and_os = "Galaxy A55 5G-14"
+                udid = None
+                # TODO: manage device state and specify UDID of exact device to target for each job
+
+                # DEBUG: jmaher is using the A55's right now
+                device_type_and_os = "Galaxy A51-11"
 
                 if mode == 1:
                     # MODE 1:
@@ -153,6 +169,8 @@ class TestRunManagerLT(object):
                         tc_client_key,
                         lt_app_url,
                         test_run_file,
+                        device_type_and_os,
+                        udid=udid,
                         concurrency=1,
                     )
 
@@ -197,6 +215,8 @@ class TestRunManagerLT(object):
                         tc_client_key,
                         lt_app_url,
                         test_run_file,
+                        device_type_and_os,
+                        udid=udid,
                         concurrency=jobs_to_start,
                     )
 
