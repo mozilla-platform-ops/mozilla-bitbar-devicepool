@@ -29,13 +29,13 @@ VERY_LARGE_NUMBER = 2000
 
 class TestRunManagerLT(object):
     def __init__(
-        self, max_jobs_to_start=5, exit_wait=5, no_job_sleep=60, test_mode=False
+        self, max_jobs_to_start=5, exit_wait=5, no_job_sleep=60, debug_mode=False
     ):
         self.exit_wait = exit_wait
         self.no_job_sleep = no_job_sleep
         self.max_jobs_to_start = max_jobs_to_start
         self.state = STATE_RUNNING
-        self.test_mode = test_mode
+        self.test_mode = debug_mode
         self.config_object = configuration_lt.ConfigurationLt()
         self.config_object.configure()
         self.status_object = status.Status(
@@ -125,7 +125,7 @@ class TestRunManagerLT(object):
                 device_type_and_os = "Galaxy A55 5G-14"
                 # udid = None
                 # TODO: manage device state and specify UDID of exact device to target for each job
-                #               #
+                #
                 # DEBUG: jmaher is using the A55's right now
                 device_type_and_os = "Galaxy A51-11"
 
@@ -286,9 +286,9 @@ class TestRunManagerLT(object):
 def parse_args():
     parser = argparse.ArgumentParser(description="Test Run Manager for LambdaTest")
     parser.add_argument(
-        "--test",
+        "--debug",
         action="store_true",
-        help="Run in test mode without executing commands",
+        help="Run in debug mode without executing commands",
     )
     return parser.parse_args()
 
@@ -301,7 +301,7 @@ if __name__ == "__main__":
     logging_setup.setup_logging()
 
     # logging is now properly configured
-    trmlt = TestRunManagerLT(test_mode=args.test)
+    trmlt = TestRunManagerLT(debug_mode=args.debug)
 
     # debugging
     # import pprint
