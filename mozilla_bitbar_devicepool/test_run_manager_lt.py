@@ -20,6 +20,10 @@ from mozilla_bitbar_devicepool.taskcluster import get_taskcluster_pending_tasks
 STOP = "000000001"
 RUNNING = "000000002"
 
+MODE_NO_OP = "aaa"
+MODE_SINGLE_JOB = "bbb"
+MODE_SINGLE_JOB_CONCURRENCY = "ccc"
+
 VERY_LARGE_NUMBER = 2000
 
 
@@ -165,21 +169,20 @@ class TestRunManagerLT(object):
                 # logging.info(f"jobs_to_start 2: {jobs_to_start}")
 
                 if jobs_to_start <= 0:
-                    logging.info("no jobs to start, setting mode 3...")
-                    mode = 3
+                    logging.info("no jobs to start, setting mode MODE_NO_OP...")
+                    mode = MODE_NO_OP
                 else:
-                    # mode 1: single job started at a time
-                    mode = 1
+                    # MODE_SINGLE_JOB: single job started at a time
+                    mode = MODE_SINGLE_JOB
                     # issues with mode 1:
                     #   - depending on job run time, with more than 30-60 devices,
                     #       we can't keep enough jobs running to keep up
 
-                    # mode 2: use hyperexecute.yaml's concurrency
+                    # MODE_SINGLE_JOB_CONCURRENCY: single task, but use hyperexecute.yaml's concurrency
                     # status: currently broken / needs more work
-                    # mode = 2
+                    # mode = MODE_SINGLE_JOB_CONCURRENCY
 
-                if mode == 1:
-                    # MODE 1:
+                if mode == MODE_SINGLE_JOB:
                     # start the desired number of jobs (concurrency: 1)
 
                     # create hyperexecute.yaml specific to each queue
@@ -222,9 +225,9 @@ class TestRunManagerLT(object):
                             )
                             if self.state == STOP:
                                 break
-                elif mode == 2:
-                    # MODE 2:
+                elif mode == MODE_SINGLE_JOB_CONCURRENCY:
                     # start the desired number of jobs (concurrency: jobs_to_start)
+                    #
                     # issues:
                     #   - doesn't work
 
@@ -267,7 +270,8 @@ class TestRunManagerLT(object):
                         )
                         if self.state == STOP:
                             break
-                elif mode == 3:
+                elif mode == MODE_NO_OP:
+                    # no op mode (used to get to the sleep)
                     logging.info("mode 3: no op mode")
                 else:
                     raise ValueError(f"unknown mode: {mode}")
