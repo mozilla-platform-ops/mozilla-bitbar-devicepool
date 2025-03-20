@@ -17,12 +17,12 @@ from mozilla_bitbar_devicepool.taskcluster import get_taskcluster_pending_tasks
 
 
 # state constants
-STOP = "000000001"
-RUNNING = "000000002"
-
-MODE_NO_OP = "aaa"
-MODE_SINGLE_JOB = "bbb"
-MODE_SINGLE_JOB_CONCURRENCY = "ccc"
+STOP = "Lequed5b"
+RUNNING = "ief2Eing"
+# mode constants
+MODE_NO_OP = "Ohwe1ooj"
+MODE_SINGLE_JOB = "oquei8Ch"
+MODE_SINGLE_JOB_CONCURRENCY = "Asohciu0"
 
 VERY_LARGE_NUMBER = 2000
 
