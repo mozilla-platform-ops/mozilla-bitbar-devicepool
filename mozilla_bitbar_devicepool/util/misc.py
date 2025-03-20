@@ -1,5 +1,7 @@
 from datetime import datetime, timezone
 import git
+import humanhash
+import uuid as uuidlib
 
 
 # Get the current date in UTC in an ISO formatted string
@@ -23,3 +25,13 @@ def get_git_info():
 
 
 # print(get_git_info())
+
+
+def humanhash_from_string(value, **params):
+    """
+    Generate a UUID with a human-readable representation from an input string.
+    Returns `human_repr`.  Accepts the same keyword arguments as :meth:`humanize`
+    """
+
+    digest = str(uuidlib.uuid3(uuidlib.NAMESPACE_DNS, value)).replace("-", "")
+    return humanhash.humanize(digest, **params)
