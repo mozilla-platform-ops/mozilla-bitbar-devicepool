@@ -17,8 +17,8 @@ from mozilla_bitbar_devicepool.taskcluster import get_taskcluster_pending_tasks
 
 
 # state constants
-STOP = "Lequed5b"
-RUNNING = "ief2Eing"
+STATE_STOP = "Lequed5b"
+STATE_RUNNING = "ief2Eing"
 # mode constants
 MODE_NO_OP = "Ohwe1ooj"
 MODE_SINGLE_JOB = "oquei8Ch"
@@ -34,7 +34,7 @@ class TestRunManagerLT(object):
         self.exit_wait = exit_wait
         self.no_job_sleep = no_job_sleep
         self.max_jobs_to_start = max_jobs_to_start
-        self.state = RUNNING
+        self.state = STATE_RUNNING
         self.test_mode = test_mode
         self.config_object = configuration_lt.ConfigurationLt()
         self.config_object.configure()
@@ -46,11 +46,11 @@ class TestRunManagerLT(object):
         signal.signal(signal.SIGINT, self.handle_signal)
 
     def handle_signal(self, signalnum, frame):
-        if self.state != RUNNING:
+        if self.state != STATE_RUNNING:
             return
 
         if signalnum == signal.SIGINT or signalnum == signal.SIGUSR2:
-            self.state = STOP
+            self.state = STATE_STOP
             logging.info(
                 # f" handle_signal: set state to stop, exiting in {self.exit_wait} seconds or less"
                 " handle_signal: set state to stop, will exit after current job completes"
@@ -81,7 +81,7 @@ class TestRunManagerLT(object):
         # TODO: if we do multithreading, use messaging vs shared object with locks
 
         logging.info("entering run loop...")
-        while self.state == RUNNING:
+        while self.state == STATE_RUNNING:
             # only a single project for now, so load that up
             current_project = self.config_object.config["projects"]["a55-alpha"]
 
@@ -223,7 +223,7 @@ class TestRunManagerLT(object):
                             logging.info(
                                 f"starting job {i + 1} of {jobs_to_start} took {round(end_time - start_time, 2)} seconds"
                             )
-                            if self.state == STOP:
+                            if self.state == STATE_STOP:
                                 break
                 elif mode == MODE_SINGLE_JOB_CONCURRENCY:
                     # start the desired number of jobs (concurrency: jobs_to_start)
@@ -268,7 +268,7 @@ class TestRunManagerLT(object):
                         logging.info(
                             f"starting job took {round(end_time - start_time, 2)} seconds"
                         )
-                        if self.state == STOP:
+                        if self.state == STATE_STOP:
                             break
                 elif mode == MODE_NO_OP:
                     # no op mode (used to get to the sleep)
@@ -276,10 +276,10 @@ class TestRunManagerLT(object):
                 else:
                     raise ValueError(f"unknown mode: {mode}")
 
-            if self.state == STOP:
+            if self.state == STATE_STOP:
                 break
             time.sleep(self.exit_wait)
-            if self.state == STOP:
+            if self.state == STATE_STOP:
                 break
 
 
