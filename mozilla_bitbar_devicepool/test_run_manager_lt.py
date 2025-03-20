@@ -128,7 +128,8 @@ class TestRunManagerLT(object):
                 # hyperexecute labels
                 #
                 # indicate this is scheduled by this program
-                labels_csv = "mbd"
+                #   - use new name 'mozilla-taskcluster-devicepool'
+                labels_csv = "tcdp"
                 # add the workerType to the labels
                 tc_wt_short = tc_worker_type.replace("gecko-t-lambda-", "")
                 labels_csv += f",{tc_wt_short}"
