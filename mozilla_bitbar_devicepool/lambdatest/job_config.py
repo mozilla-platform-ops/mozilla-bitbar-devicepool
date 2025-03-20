@@ -60,12 +60,10 @@ env:
     TASKCLUSTER_ACCESS_TOKEN: {tc_access_token}
 
 # Command to run the tests using the testRunnerCommand
-testRunnerCommand: python3 /home/ltuser/taskcluster/run_gw.py
-# testRunnerCommand: start-worker /home/ltuser/taskcluster/worker-runner-config.yml
-# testRunnerCommand: /home/ltuser/taskcluster/start-worker /home/ltuser/taskcluster/worker-runner-config.yml
 # testRunnerCommand: ls -la
 # testRunnerCommand: cat /home/ltuser/taskcluster/worker-runner-config.yml
-# testRunnerCommand: bash ./user_script/setup_and_run_gw.sh
+# testRunnerCommand: start-worker /home/ltuser/taskcluster/worker-runner-config.yml
+testRunnerCommand: python3 /home/ltuser/taskcluster/run_gw.py
 
 # Only report the status of the test framework
 frameworkStatusOnly: true
