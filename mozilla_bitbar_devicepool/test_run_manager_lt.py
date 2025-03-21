@@ -15,6 +15,7 @@ import argparse
 from mozilla_bitbar_devicepool import configuration_lt, logging_setup
 from mozilla_bitbar_devicepool.lambdatest import job_config, status
 from mozilla_bitbar_devicepool.taskcluster import get_taskcluster_pending_tasks
+from mozilla_bitbar_devicepool.lambdatest.util import shorten_worker_type
 
 
 # state constants
@@ -153,14 +154,13 @@ class TestRunManagerLT(object):
                 # DEBUG: jmaher is using the A55's right now
                 device_type_and_os = "Galaxy A51-11"
 
-                # hyperexecute labels
+                # hyperexecute job labels
                 #
                 # indicate this is scheduled by this program
                 #   - use new name 'mozilla-taskcluster-devicepool'
                 labels_csv = "tcdp"
                 # add the workerType to the labels
-                tc_wt_short = tc_worker_type.replace("gecko-t-lambda-", "")
-                labels_csv += f",{tc_wt_short}"
+                labels_csv += f",{shorten_worker_type(tc_worker_type)}"
                 # add the device type to the labels
                 dtao_underscore = device_type_and_os.replace(" ", "_")
                 labels_csv += f",{dtao_underscore}"
