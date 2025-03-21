@@ -8,6 +8,7 @@ import signal
 import logging
 import time
 import os
+import sys
 import subprocess
 import argparse
 
@@ -31,6 +32,7 @@ class TestRunManagerLT(object):
     def __init__(
         self, max_jobs_to_start=5, exit_wait=5, no_job_sleep=60, debug_mode=False
     ):
+        self.interrupt_signal_count = 0
         self.exit_wait = exit_wait
         self.no_job_sleep = no_job_sleep
         self.max_jobs_to_start = max_jobs_to_start
@@ -46,17 +48,39 @@ class TestRunManagerLT(object):
         signal.signal(signal.SIGINT, self.handle_signal)
 
     def handle_signal(self, signalnum, frame):
-        if self.state != STATE_RUNNING:
-            return
+        MAX_SIGNAL_COUNT = 3
 
         if signalnum == signal.SIGINT or signalnum == signal.SIGUSR2:
-            self.state = STATE_STOP
-            logging.info(
-                # f" handle_signal: set state to stop, exiting in {self.exit_wait} seconds or less"
-                " handle_signal: set state to stop, will exit after current job completes"
-            )
-            # for testing, exit immediately
-            # sys.exit(0)
+            # track how many times we've received the signal. at 3, exit immediately.
+            self.interrupt_signal_count += 1
+            if self.interrupt_signal_count < MAX_SIGNAL_COUNT:
+                self.state = STATE_STOP
+                logging.info(
+                    # f" handle_signal: set state to stop, exiting in {self.exit_wait} seconds or less"
+                    " handle_signal: set state to stop, will exit after current job completes."
+                )
+                logging.info(
+                    f"will exit immediately if signal received {MAX_SIGNAL_COUNT - self.interrupt_signal_count} more times."
+                )
+                # for testing, exit immediately (no wait)
+                # sys.exit(0)
+            else:
+                logging.info(
+                    f" handle_signal: received signal {MAX_SIGNAL_COUNT} times, exiting immediately"
+                )
+                sys.exit(0)
+
+    def handle_signal_old(self, signalnum, frame):
+        if self.state == STATE_STOP:
+            return
+
+        self.state = STATE_STOP
+        logging.info(
+            # f" handle_signal: set state to stop, exiting in {self.exit_wait} seconds or less"
+            " handle_signal: set state to stop, will exit after current job completes"
+        )
+        # for testing, exit immediately
+        # sys.exit(0)
 
     def run_single_project_single_thread_multi_job(
         self, max_jobs_to_start=VERY_LARGE_NUMBER, foreground=False
@@ -203,6 +227,10 @@ class TestRunManagerLT(object):
                             logging.info(
                                 f"would be running command: '{command_string}' in path '{test_run_dir}'..."
                             )
+                            logging.info(
+                                "sleeping 30 seconds (to simulate starting job)..."
+                            )
+                            time.sleep(30)
                         else:
                             logging.info(
                                 f"running: '{command_string}' in path '{test_run_dir}'..."
@@ -248,6 +276,10 @@ class TestRunManagerLT(object):
                         logging.info(
                             f"would be running command: '{command_string}' in path '{test_run_dir}'..."
                         )
+                        logging.info(
+                            "sleeping 30 seconds (to simulate starting job)..."
+                        )
+                        time.sleep(30)
                     else:
                         logging.info(
                             f"running: '{command_string}' in path '{test_run_dir}'..."
