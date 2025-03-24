@@ -25,7 +25,7 @@ class TestRunManagerLT(object):
     STATE_RUNNING = 0x15
     MODE_NO_OP = 0x50
     MODE_SINGLE_JOB = 0x55
-    MODE_SINGLE_JOB_CONCURRENCY = 0x60
+    MODE_SINGLE_JOB_WITH_CONCURRENCY = 0x60
     # TODO: rename this to something more descriptive
     MAX_JOBS_TO_START_AT_ONCE = 2000
 
@@ -255,7 +255,7 @@ class TestRunManagerLT(object):
                             )
                             if self.state == self.STATE_STOP:
                                 break
-                elif mode == self.MODE_SINGLE_JOB_CONCURRENCY:
+                elif mode == self.MODE_SINGLE_JOB_WITH_CONCURRENCY:
                     # start the desired number of jobs (concurrency: jobs_to_start)
                     #
                     # issues:
