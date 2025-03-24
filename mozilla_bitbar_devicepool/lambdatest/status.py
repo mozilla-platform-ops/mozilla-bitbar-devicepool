@@ -2,7 +2,6 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import sys
 import pprint
 
 from mozilla_bitbar_devicepool.lambdatest.api import get_jobs, get_devices
@@ -107,16 +106,19 @@ if __name__ == "__main__":
 
     status = Status(lt_username, lt_api_key)
 
-    pprint.pprint(status.get_job_dict())
+    r = status.get_job_summary(["mbd"])
+    pprint.pprint(r)
+
+    # pprint.pprint(status.get_job_dict())
+    # # print("")
+    # # sys.exit(0)
+    # print(f"initiated job count: {status.get_initiated_job_count()}")
+    # print("job summary:")
+    # pprint.pprint(status.get_job_summary())
+
     # print("")
+
+    # print("device list:")
+    # pprint.pprint(status.get_device_list())
+
     # sys.exit(0)
-    print(f"initiated job count: {status.get_initiated_job_count()}")
-    print("job summary:")
-    pprint.pprint(status.get_job_summary())
-
-    print("")
-
-    print("device list:")
-    pprint.pprint(status.get_device_list())
-
-    sys.exit(0)

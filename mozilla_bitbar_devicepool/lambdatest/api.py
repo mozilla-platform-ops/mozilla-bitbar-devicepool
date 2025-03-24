@@ -84,7 +84,8 @@ if __name__ == "__main__":
     lt_api_key = os.environ["LT_API_KEY"]
 
     # jobs = get_jobs(lt_username, lt_api_key, ['aje_123', 'fun_fun_456'])
-    jobs = get_jobs(lt_username, lt_api_key, ["123", "456"])
+    # jobs = get_jobs(lt_username, lt_api_key, ["123", "456"])
+    jobs = get_jobs(lt_username, lt_api_key, ["mbd"])
 
     pprint.pprint(jobs)
 

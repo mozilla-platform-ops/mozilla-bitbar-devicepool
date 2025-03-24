@@ -33,5 +33,25 @@ def humanhash_from_string(value, **params):
     Returns `human_repr`.  Accepts the same keyword arguments as :meth:`humanize`
     """
 
-    digest = str(uuidlib.uuid3(uuidlib.NAMESPACE_DNS, value)).replace("-", "")
+    digest = str(uuidlib.uuid5(uuidlib.NAMESPACE_DNS, value)).replace("-", "")
     return humanhash.humanize(digest, **params)
+
+
+# main
+if __name__ == "__main__":
+    print(get_utc_date_string())
+    print(get_git_info())
+    print(humanhash_from_string("hello world"))
+    #
+    print(humanhash_from_string("hello world", words=1))
+    print(humanhash_from_string("hello world", words=2))
+    print(humanhash_from_string("hello world", words=2))
+    #
+    print(humanhash_from_string("hello world", words=3))
+    print(humanhash_from_string("hello world", words=3))
+    #
+    print(humanhash_from_string("hello world", words=4))
+    print(humanhash_from_string("hello world", words=5))
+    print(humanhash_from_string("hello world", words=6))
+    print(humanhash_from_string("hello world", words=7))
+    print(humanhash_from_string("hello world", words=8))
