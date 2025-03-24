@@ -18,26 +18,25 @@ from mozilla_bitbar_devicepool.taskcluster import get_taskcluster_pending_tasks
 from mozilla_bitbar_devicepool.lambdatest.util import shorten_worker_type
 
 
-# state constants
-STATE_STOP = "Lequed5b"
-STATE_RUNNING = "ief2Eing"
-# mode constants
-MODE_NO_OP = "Ohwe1ooj"
-MODE_SINGLE_JOB = "oquei8Ch"
-MODE_SINGLE_JOB_CONCURRENCY = "Asohciu0"
-
-VERY_LARGE_NUMBER = 2000
-
-
 class TestRunManagerLT(object):
+    # Constants at class level
+    PROGRAM_LABEL = "tcdp"
+    STATE_STOP = 0x10
+    STATE_RUNNING = 0x15
+    MODE_NO_OP = 0x50
+    MODE_SINGLE_JOB = 0x55
+    MODE_SINGLE_JOB_CONCURRENCY = 0x60
+    VERY_LARGE_NUMBER = 2000
+
     def __init__(
         self, max_jobs_to_start=5, exit_wait=5, no_job_sleep=60, debug_mode=False
     ):
+        # state constants
         self.interrupt_signal_count = 0
         self.exit_wait = exit_wait
         self.no_job_sleep = no_job_sleep
         self.max_jobs_to_start = max_jobs_to_start
-        self.state = STATE_RUNNING
+        self.state = self.STATE_RUNNING
         self.test_mode = debug_mode
         self.config_object = configuration_lt.ConfigurationLt()
         self.config_object.configure()
@@ -55,7 +54,7 @@ class TestRunManagerLT(object):
             # track how many times we've received the signal. at 3, exit immediately.
             self.interrupt_signal_count += 1
             if self.interrupt_signal_count < MAX_SIGNAL_COUNT:
-                self.state = STATE_STOP
+                self.state = self.STATE_STOP
                 logging.info(
                     # f" handle_signal: set state to stop, exiting in {self.exit_wait} seconds or less"
                     " handle_signal: set state to stop, will exit after current job completes."
@@ -72,10 +71,10 @@ class TestRunManagerLT(object):
                 sys.exit(0)
 
     def handle_signal_old(self, signalnum, frame):
-        if self.state == STATE_STOP:
+        if self.state == self.STATE_STOP:
             return
 
-        self.state = STATE_STOP
+        self.state = self.STATE_STOP
         logging.info(
             # f" handle_signal: set state to stop, exiting in {self.exit_wait} seconds or less"
             " handle_signal: set state to stop, will exit after current job completes"
@@ -84,8 +83,11 @@ class TestRunManagerLT(object):
         # sys.exit(0)
 
     def run_single_project_single_thread_multi_job(
-        self, max_jobs_to_start=VERY_LARGE_NUMBER, foreground=False
+        self, max_jobs_to_start=None, foreground=False
     ):
+        # default the value
+        if max_jobs_to_start is None:
+            max_jobs_to_start = self.VERY_LARGE_NUMBER
         # base on __file__ to get the project root dir
         project_source_dir = os.path.dirname(os.path.realpath(__file__))
         project_root_dir = os.path.abspath(os.path.join(project_source_dir, ".."))
@@ -106,7 +108,7 @@ class TestRunManagerLT(object):
         # TODO: if we do multithreading, use messaging vs shared object with locks
 
         logging.info("entering run loop...")
-        while self.state == STATE_RUNNING:
+        while self.state == self.STATE_RUNNING:
             # only a single project for now, so load that up
             current_project = self.config_object.config["projects"]["a55-alpha"]
 
@@ -158,7 +160,7 @@ class TestRunManagerLT(object):
                 #
                 # indicate this is scheduled by this program
                 #   - use new name 'mozilla-taskcluster-devicepool'
-                labels_csv = "tcdp"
+                labels_csv = self.PROGRAM_LABEL
                 # add the workerType to the labels
                 labels_csv += f",{shorten_worker_type(tc_worker_type)}"
                 # add the device type to the labels
@@ -194,10 +196,10 @@ class TestRunManagerLT(object):
 
                 if jobs_to_start <= 0:
                     logging.info("no jobs to start, setting mode MODE_NO_OP...")
-                    mode = MODE_NO_OP
+                    mode = self.MODE_NO_OP
                 else:
                     # MODE_SINGLE_JOB: single job started at a time
-                    mode = MODE_SINGLE_JOB
+                    mode = self.MODE_SINGLE_JOB
                     # issues with mode 1:
                     #   - depending on job run time, with more than 30-60 devices,
                     #       we can't keep enough jobs running to keep up
@@ -206,7 +208,7 @@ class TestRunManagerLT(object):
                     # status: currently broken / needs more work
                     # mode = MODE_SINGLE_JOB_CONCURRENCY
 
-                if mode == MODE_SINGLE_JOB:
+                if mode == self.MODE_SINGLE_JOB:
                     # start the desired number of jobs (concurrency: 1)
 
                     # create hyperexecute.yaml specific to each queue
@@ -251,9 +253,9 @@ class TestRunManagerLT(object):
                             logging.info(
                                 f"starting job {i + 1} of {jobs_to_start} took {round(end_time - start_time, 2)} seconds"
                             )
-                            if self.state == STATE_STOP:
+                            if self.state == self.STATE_STOP:
                                 break
-                elif mode == MODE_SINGLE_JOB_CONCURRENCY:
+                elif mode == self.MODE_SINGLE_JOB_CONCURRENCY:
                     # start the desired number of jobs (concurrency: jobs_to_start)
                     #
                     # issues:
@@ -300,18 +302,18 @@ class TestRunManagerLT(object):
                         logging.info(
                             f"starting job took {round(end_time - start_time, 2)} seconds"
                         )
-                        if self.state == STATE_STOP:
+                        if self.state == self.STATE_STOP:
                             break
-                elif mode == MODE_NO_OP:
+                elif mode == self.MODE_NO_OP:
                     # no op mode (used to get to the sleep)
                     logging.info("mode 3: no op mode")
                 else:
                     raise ValueError(f"unknown mode: {mode}")
 
-            if self.state == STATE_STOP:
+            if self.state == self.STATE_STOP:
                 break
             time.sleep(self.exit_wait)
-            if self.state == STATE_STOP:
+            if self.state == self.STATE_STOP:
                 break
 
 
