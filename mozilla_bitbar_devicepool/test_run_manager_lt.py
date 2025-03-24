@@ -26,12 +26,12 @@ class TestRunManagerLT(object):
     MODE_NO_OP = 0x50
     MODE_SINGLE_JOB = 0x55
     MODE_SINGLE_JOB_CONCURRENCY = 0x60
-    VERY_LARGE_NUMBER = 2000
+    # TODO: rename this to something more descriptive
+    MAX_JOBS_TO_START_AT_ONCE = 2000
 
     def __init__(
         self, max_jobs_to_start=5, exit_wait=5, no_job_sleep=60, debug_mode=False
     ):
-        # state constants
         self.interrupt_signal_count = 0
         self.exit_wait = exit_wait
         self.no_job_sleep = no_job_sleep
@@ -87,7 +87,7 @@ class TestRunManagerLT(object):
     ):
         # default the value
         if max_jobs_to_start is None:
-            max_jobs_to_start = self.VERY_LARGE_NUMBER
+            max_jobs_to_start = self.MAX_JOBS_TO_START_AT_ONCE
         # base on __file__ to get the project root dir
         project_source_dir = os.path.dirname(os.path.realpath(__file__))
         project_root_dir = os.path.abspath(os.path.join(project_source_dir, ".."))
