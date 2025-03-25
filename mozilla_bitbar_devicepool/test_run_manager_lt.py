@@ -82,6 +82,89 @@ class TestRunManagerLT(object):
         # for testing, exit immediately
         # sys.exit(0)
 
+    # jmaher poc replice
+    def single_project_single_thread_single_job(self):
+        project_source_dir = os.path.dirname(os.path.realpath(__file__))
+        project_root_dir = os.path.abspath(os.path.join(project_source_dir, ".."))
+        user_script_golden_dir = os.path.join(
+            project_source_dir, "lambdatest", "user_script"
+        )
+        test_run_dir = "/tmp/mozilla-lt-devicepool-job-dir"
+        test_run_file = os.path.join(test_run_dir, "hyperexecute.yaml")
+
+        test_run_dir = "/tmp/mozilla-lt-devicepool-job-dir"
+        test_run_file = os.path.join(test_run_dir, "hyperexecute.yaml")
+        while True:
+            # only a single project for now, so load that up
+            current_project = self.config_object.config["projects"]["a55-alpha"]
+
+            tc_worker_type = current_project["TC_WORKER_TYPE"]
+            tc_client_id = current_project["TASKCLUSTER_CLIENT_ID"]
+            tc_client_key = current_project["TASKCLUSTER_ACCESS_TOKEN"]
+
+            # TODO: verify this apk is ok, update the apk if needed, and store/use it's app_id
+            lt_app_url = "lt://APP1016023521741987818221818"
+
+            # remove /tmp/user_script dir
+            shutil.rmtree(test_run_dir, ignore_errors=True)
+            # create /tmp/mozilla-lt-devicepool-job-dir dir
+            os.makedirs(test_run_dir, exist_ok=True)
+
+            # TODO: copy user-script dir to correct dir (use basename on config_file_path?)
+            # copy user_script_golden_dir to correct path using python shutil
+            shutil.copytree(
+                user_script_golden_dir, os.path.join(test_run_dir, "user_script")
+            )
+
+            cmd_env = os.environ.copy()
+            cmd_env["LT_USERNAME"] = self.config_object.lt_username
+            cmd_env["LT_ACCESS_KEY"] = self.config_object.lt_access_key
+
+            # set the device type, OS, and optionally UDID for this job
+            #
+            # for now we have a single pool of devices
+            device_type_and_os = "Galaxy A55 5G-14"
+
+            command_string = f"{project_root_dir}/hyperexecute"
+
+            job_config.write_config(
+                tc_client_id,
+                tc_client_key,
+                tc_worker_type,
+                lt_app_url,
+                test_run_file,
+                device_type_and_os,
+                # udid
+                concurrency=1,
+            )
+
+            logging.info("starting job...")
+            # Use test_mode instead of hardcoded DEBUG
+            if self.test_mode:
+                logging.info(
+                    f"would be running command: '{command_string}' in path '{test_run_dir}'..."
+                )
+                logging.info("sleeping 30 seconds (to simulate starting job)...")
+                time.sleep(30)
+            else:
+                logging.info(f"running: '{command_string}' in path '{test_run_dir}'...")
+                start_time = time.time()
+                # TODO: background so we can do this faster or set concurrencty in the YAML?
+                #   - can only get 1-2 jobs going in parallel with trivial tasks
+                #   - for concurrency to work, would we need to emit multiple test targets (1:1 with concurrency?)
+                # start_new_session=True ensures process ignores ctrl-c sent to this process (so it cleans up)
+                subprocess.run(
+                    command_string,
+                    shell=True,
+                    env=cmd_env,
+                    cwd=test_run_dir,
+                    start_new_session=True,
+                )
+                end_time = time.time()
+                logging.info(f"job took {round(end_time - start_time, 2)} seconds")
+            # take a short break
+            time.sleep(5)
+
     # about modes
     #
     # MODE_SINGLE_JOB: single job started at a time
@@ -125,22 +208,22 @@ class TestRunManagerLT(object):
             # only a single project for now, so load that up
             current_project = self.config_object.config["projects"]["a55-alpha"]
 
+            tc_worker_type = current_project["TC_WORKER_TYPE"]
+            tc_client_id = current_project["TASKCLUSTER_CLIENT_ID"]
+            tc_client_key = current_project["TASKCLUSTER_ACCESS_TOKEN"]
+            # debug
+            # print(f"tc_client_id: {tc_client_id}")
+            # print(f"tc_client_key: {tc_client_key}")
+
             # TODO: check tc and if there are jobs, continue, exist go to sleep
             tc_job_count = get_taskcluster_pending_tasks(
-                "proj-autophone", current_project["TC_WORKER_TYPE"], verbose=False
+                "proj-autophone", tc_worker_type, verbose=False
             )
             logging.info(f"tc_job_count: {tc_job_count}")
             if tc_job_count <= 0:
                 logging.info(f"no jobs found, sleeping {self.no_job_sleep}s...")
                 time.sleep(self.no_job_sleep)
             else:
-                tc_worker_type = current_project["TC_WORKER_TYPE"]
-                tc_client_id = current_project["TASKCLUSTER_CLIENT_ID"]
-                tc_client_key = current_project["TASKCLUSTER_ACCESS_TOKEN"]
-                # debug
-                # print(f"tc_client_id: {tc_client_id}")
-                # print(f"tc_client_key: {tc_client_key}")
-
                 # TODO: verify this apk is ok, update the apk if needed, and store/use it's app_id
                 lt_app_url = "lt://APP1016023521741987818221818"
 
@@ -223,6 +306,7 @@ class TestRunManagerLT(object):
                     job_config.write_config(
                         tc_client_id,
                         tc_client_key,
+                        tc_worker_type,
                         lt_app_url,
                         test_run_file,
                         device_type_and_os,
@@ -273,6 +357,7 @@ class TestRunManagerLT(object):
                     job_config.write_config(
                         tc_client_id,
                         tc_client_key,
+                        tc_worker_type,
                         lt_app_url,
                         test_run_file,
                         device_type_and_os,

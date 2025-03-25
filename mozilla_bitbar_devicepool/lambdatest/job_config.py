@@ -6,6 +6,7 @@
 def write_config(
     tc_client_id,
     tc_access_token,
+    tc_worker_type,
     lt_app_url,
     device_type_and_os,
     udid=None,
@@ -29,7 +30,13 @@ def write_config(
         str: Path where the configuration file was written.
     """
     config = return_config(
-        tc_client_id, tc_access_token, lt_app_url, device_type_and_os, udid, concurrency
+        tc_client_id,
+        tc_access_token,
+        tc_worker_type,
+        lt_app_url,
+        device_type_and_os,
+        udid,
+        concurrency,
     )
     with open(path, "w") as f:
         f.write(config)
@@ -39,6 +46,7 @@ def write_config(
 def return_config(
     tc_client_id,
     tc_access_token,
+    tc_worker_type,
     lt_app_url,
     device_type_and_os,
     udid=None,
@@ -104,6 +112,7 @@ env:
     # inject our own secrets
     TASKCLUSTER_CLIENT_ID: {tc_client_id}
     TASKCLUSTER_ACCESS_TOKEN: {tc_access_token}
+    TC_WORKER_TYPE: {tc_worker_type}
 
 # Command to run the tests using the testRunnerCommand
 # testRunnerCommand: ls -la

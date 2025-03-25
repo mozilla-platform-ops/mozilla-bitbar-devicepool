@@ -9,16 +9,19 @@
 
 ## execution loop modes
 
-1. starts a single job, foreground, targets device type
+1. starts a single job, foreground, targets device_type-os_version
   - replica of jmaher's PoC
-2. starts multiple jobs, --no-track, foreground, targets device type
+2. starts multiple jobs, --no-track, foreground, targets device_type-os_version
   - works, current default
   - known issues
     - if 60 jobs come in, will take awhile to have 100% utilization (takes awhile to start jobs)
-3. starts a single job with hyperexecute yaml concurrency, --no-track, foreground, targets device type
+3. starts a single job with hyperexecute yaml concurrency, --no-track, foreground, targets device_type-os_version
   - didn't work, needs more investigation
-4. proposed modes
-  - starts multiple jobs, --no-track, background, targets device type
-    - improve slow start problem
-  - starts multiple jobs, --no-track, background, targets single device (track specific free devices)
-    - enables creation of multiple device pools per device type
+
+### proposed modes
+
+1. starts multiple jobs, --no-track, background, targets device_type-os_version
+  - improve slow start problem
+2. starts multiple jobs, --no-track, background, targets single device (device_type-os_version and udid)
+  - need to track specific free devices in app
+  - enables creation of multiple device pools per device type

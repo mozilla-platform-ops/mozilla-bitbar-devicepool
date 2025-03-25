@@ -173,7 +173,8 @@ export TC_WORKER_GROUP=lambda
 
 # export DEVICE_NAME=${HOSTNAME} # TODO: no spaces- need to find a way to make this unique
 export DEVICE_NAME=$(/usr/bin/adb devices -l | grep usb | grep -v 'List of devices attached' | sed '/^[[:space:]]*$/d' | cut -f 1 -d ' ')
-export TC_WORKER_TYPE=gecko-t-lambda-alpha-a55
+# aje: TC_WORKER_TYPE is now set in the hyperexecute.yaml file
+# export TC_WORKER_TYPE=gecko-t-lambda-alpha-a55
 
 # hacks to prepare lambda environment (serial is super hacky right now):
 export HOST_IP=$HostIP
