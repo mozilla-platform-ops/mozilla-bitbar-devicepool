@@ -72,6 +72,21 @@ class Status:
                 initiated_job_count += 1
         return initiated_job_count
 
+    # TODO: make this generic get_job_count and pass in an array of states to include
+    def get_running_job_count(self, label_filter_arr=None, jobs=100):
+        # TODO: make label_filter work
+        gj_output = get_jobs(
+            self.lt_username,
+            self.lt_api_key,
+            label_filter_arr=label_filter_arr,
+            jobs=jobs,
+        )
+        initiated_job_count = 0
+        for job in gj_output["data"]:
+            if job["status"] == "running":
+                initiated_job_count += 1
+        return initiated_job_count
+
     # TODO: find out which job is for which 'workerType' otherwise we can only run one workerType...
     #   - use job label? `--labels` arg to hyperexecute
 

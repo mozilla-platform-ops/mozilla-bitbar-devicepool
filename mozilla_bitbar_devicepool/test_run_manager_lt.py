@@ -278,8 +278,13 @@ class TestRunManagerLT(object):
                     )
 
                 #
+                running_job_jount = self.status_object.get_running_job_count()
                 initiated_job_count = self.status_object.get_initiated_job_count()
-                tc_jobs_not_handled = tc_job_count - initiated_job_count
+                tc_jobs_not_handled = (
+                    tc_job_count - initiated_job_count - running_job_jount
+                )
+                logging.debug(f"running_job_jount: {running_job_jount}")
+                logging.debug(f"initiated job count: {initiated_job_count}")
                 logging.debug(f"tc_jobs_not_handled: {tc_jobs_not_handled}")
                 logging.debug(f"self.max_jobs_to_start: {self.max_jobs_to_start}")
                 logging.debug(f"max_jobs_to_start: {self.max_jobs_to_start}")
@@ -287,6 +292,9 @@ class TestRunManagerLT(object):
                 # logging.debug(f"initiated_job_count: {initiated_job_count}")
                 jobs_to_start = min(
                     tc_jobs_not_handled, self.max_jobs_to_start, max_jobs_to_start
+                )
+                logging.info(
+                    "taking min of tc_jobs_not_handled, self.max_jobs_to_start, max_jobs_to_start..."
                 )
                 logging.info(f"jobs_to_start: {jobs_to_start}")
                 # subtract the number of jobs already initiated

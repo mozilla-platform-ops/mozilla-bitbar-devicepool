@@ -15,6 +15,8 @@
   - works, current default
   - known issues
     - if 60 jobs come in, will take awhile to have 100% utilization (takes awhile to start jobs)
+    - overshoot at the end (not a huge deal... will time out? hmm, tc timeout... or hyperexecute yaml timeout?)
+      - not considering lt running (only looking at lt initialized)
 3. starts a single job with hyperexecute yaml concurrency, --no-track, foreground, targets device_type-os_version
   - didn't work, needs more investigation
 
