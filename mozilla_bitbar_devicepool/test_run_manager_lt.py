@@ -82,9 +82,22 @@ class TestRunManagerLT(object):
         # for testing, exit immediately
         # sys.exit(0)
 
+    # about modes
+    #
+    # MODE_SINGLE_JOB: single job started at a time
+    # issues with mode 1:
+    #   - depending on job run time, with more than 30-60 devices,
+    #       we can't keep enough jobs running to keep up
+    #
+    # MODE_SINGLE_JOB_CONCURRENCY: single task, but use hyperexecute.yaml's concurrency
+    # status: currently broken / needs more work
+    # mode = MODE_SINGLE_JOB_CONCURRENCY
+    #
     def run_single_project_single_thread_multi_job(
-        self, max_jobs_to_start=None, foreground=False
+        self, max_jobs_to_start=None, foreground=False, mode=None
     ):
+        if mode is None:
+            mode = self.MODE_SINGLE_JOB
         # default the value
         if max_jobs_to_start is None:
             max_jobs_to_start = self.MAX_JOBS_TO_START_AT_ONCE
@@ -196,19 +209,9 @@ class TestRunManagerLT(object):
 
                 if jobs_to_start <= 0:
                     logging.info("no jobs to start, setting mode MODE_NO_OP...")
-                    mode = self.MODE_NO_OP
-                else:
-                    # MODE_SINGLE_JOB: single job started at a time
-                    mode = self.MODE_SINGLE_JOB
-                    # issues with mode 1:
-                    #   - depending on job run time, with more than 30-60 devices,
-                    #       we can't keep enough jobs running to keep up
+                    current_mode = self.MODE_NO_OP
 
-                    # MODE_SINGLE_JOB_CONCURRENCY: single task, but use hyperexecute.yaml's concurrency
-                    # status: currently broken / needs more work
-                    # mode = MODE_SINGLE_JOB_CONCURRENCY
-
-                if mode == self.MODE_SINGLE_JOB:
+                if current_mode == self.MODE_SINGLE_JOB:
                     # start the desired number of jobs (concurrency: 1)
 
                     # create hyperexecute.yaml specific to each queue
@@ -255,7 +258,7 @@ class TestRunManagerLT(object):
                             )
                             if self.state == self.STATE_STOP:
                                 break
-                elif mode == self.MODE_SINGLE_JOB_WITH_CONCURRENCY:
+                elif current_mode == self.MODE_SINGLE_JOB_WITH_CONCURRENCY:
                     # start the desired number of jobs (concurrency: jobs_to_start)
                     #
                     # issues:
@@ -304,11 +307,11 @@ class TestRunManagerLT(object):
                         )
                         if self.state == self.STATE_STOP:
                             break
-                elif mode == self.MODE_NO_OP:
+                elif current_mode == self.MODE_NO_OP:
                     # no op mode (used to get to the sleep)
                     logging.info("mode 3: no op mode")
                 else:
-                    raise ValueError(f"unknown mode: {mode}")
+                    raise ValueError(f"unknown mode: {current_mode}")
 
             if self.state == self.STATE_STOP:
                 break
