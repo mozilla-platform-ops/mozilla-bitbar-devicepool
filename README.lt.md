@@ -14,14 +14,17 @@
 2. starts multiple jobs, --no-track, foreground, targets device_type-os_version
   - works, current default
   - known issues
-    - if 60 jobs come in, will take awhile to have 100% utilization (takes awhile to start jobs)
+    - slwo start problem: if 60 jobs come in, will take awhile to have 100% utilization (takes awhile to start jobs)
 3. starts a single job with hyperexecute yaml concurrency, --no-track, foreground, targets device_type-os_version
-  - didn't work, needs more investigation
+  - didn't work (theoretically should, check with LT about my understanding of field), needs more investigation.
 
 ### proposed modes
 
 1. starts multiple jobs, --no-track, background, targets device_type-os_version
   - improve slow start problem
+  - decision: implement
 2. starts multiple jobs, --no-track, background, targets single device (device_type-os_version and udid)
   - need to track specific free devices in app
   - enables creation of multiple device pools per device type
+  - discussed with jmaher... wait on this
+    - don't expect need for device_type partitions at LT yet
