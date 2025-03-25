@@ -132,10 +132,10 @@ class TestRunManagerLT(object):
                 tc_client_key,
                 tc_worker_type,
                 lt_app_url,
-                test_run_file,
                 device_type_and_os,
-                # udid
+                udid=None,
                 concurrency=1,
+                path=test_run_file,
             )
 
             logging.info("starting job...")
@@ -308,10 +308,10 @@ class TestRunManagerLT(object):
                         tc_client_key,
                         tc_worker_type,
                         lt_app_url,
-                        test_run_file,
                         device_type_and_os,
-                        # udid
+                        udid=None,
                         concurrency=1,
+                        path=test_run_file,
                     )
 
                     for i in range(jobs_to_start):
@@ -359,10 +359,10 @@ class TestRunManagerLT(object):
                         tc_client_key,
                         tc_worker_type,
                         lt_app_url,
-                        test_run_file,
                         device_type_and_os,
-                        # udid
+                        udid=None,
                         concurrency=jobs_to_start,
+                        path=test_run_file,
                     )
 
                     logging.info(f"starting job with concurrency {jobs_to_start}...")

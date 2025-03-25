@@ -2,6 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import logging
+
 
 def write_config(
     tc_client_id,
@@ -10,8 +12,8 @@ def write_config(
     lt_app_url,
     device_type_and_os,
     udid=None,
-    path="/tmp/mozilla-lt-devicepool-job-dir/hyperexecute.yaml",
     concurrency=1,
+    path="/tmp/mozilla-lt-devicepool-job-dir/hyperexecute.yaml",
 ):
     """
     Generate a LambdaTest HyperExecute configuration and write it to a file.
@@ -29,6 +31,17 @@ def write_config(
     Returns:
         str: Path where the configuration file was written.
     """
+
+    # show all options passed in
+    logging.debug(f"write_config: tc_client_id: {tc_client_id}")
+    logging.debug(f"write_config: tc_access_token: {tc_access_token}")
+    logging.debug(f"write_config: tc_worker_type: {tc_worker_type}")
+    logging.debug(f"write_config: lt_app_url: {lt_app_url}")
+    logging.debug(f"write_config: device_type_and_os: {device_type_and_os}")
+    logging.debug(f"write_config: udid: {udid}")
+    logging.debug(f"write_config: path: {path}")
+    logging.debug(f"write_config: concurrency: {concurrency}")
+
     config = return_config(
         tc_client_id,
         tc_access_token,
