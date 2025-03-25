@@ -81,7 +81,7 @@ def get_devices(lt_username, lt_api_key):
 
 if __name__ == "__main__":
     lt_username = os.environ["LT_USERNAME"]
-    lt_api_key = os.environ["LT_API_KEY"]
+    lt_api_key = os.environ["LT_ACCESS_KEY"]
 
     # jobs = get_jobs(lt_username, lt_api_key, ['aje_123', 'fun_fun_456'])
     # jobs = get_jobs(lt_username, lt_api_key, ["123", "456"])

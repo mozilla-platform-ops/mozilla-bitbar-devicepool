@@ -102,7 +102,7 @@ if __name__ == "__main__":
     import os
 
     lt_username = os.environ["LT_USERNAME"]
-    lt_api_key = os.environ["LT_API_KEY"]
+    lt_api_key = os.environ["LT_ACCESS_KEY"]
 
     status = Status(lt_username, lt_api_key)
 
