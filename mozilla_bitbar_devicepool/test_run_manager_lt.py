@@ -41,7 +41,7 @@ class TestRunManagerLT(object):
         self.config_object = configuration_lt.ConfigurationLt()
         self.config_object.configure()
         self.status_object = status.Status(
-            self.config_object.lt_username, self.config_object.lt_api_key
+            self.config_object.lt_username, self.config_object.lt_access_key
         )
 
         signal.signal(signal.SIGUSR2, self.handle_signal)
@@ -157,7 +157,7 @@ class TestRunManagerLT(object):
 
                 cmd_env = os.environ.copy()
                 cmd_env["LT_USERNAME"] = self.config_object.lt_username
-                cmd_env["LT_ACCESS_KEY"] = self.config_object.lt_api_key
+                cmd_env["LT_ACCESS_KEY"] = self.config_object.lt_access_key
 
                 # set the device type, OS, and optionally UDID for this job
                 #

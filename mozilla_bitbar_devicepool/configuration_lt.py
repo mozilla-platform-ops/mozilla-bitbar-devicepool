@@ -14,7 +14,7 @@ from mozilla_bitbar_devicepool.util.template import apply_dict_defaults
 class ConfigurationLt(object):
     def __init__(self):
         # TODO: mash all values into 'config'?
-        self.lt_api_key = None
+        self.lt_access_key = None
         self.lt_username = None
         self.config = {}
         pass
@@ -34,10 +34,10 @@ class ConfigurationLt(object):
 
     def set_lt_api_key(self):
         # load from os environment
-        if "LT_API_KEY" not in os.environ:
-            raise ValueError("LT_API_KEY not found in environment variables")
-        self.lt_api_key = os.environ.get("LT_API_KEY")
-        # self.config["lt_api_key"] = self.lt_api_key
+        if "LT_ACCESS_KEY" not in os.environ:
+            raise ValueError("LT_ACCESS_KEY not found in environment variables")
+        self.lt_access_key = os.environ.get("LT_ACCESS_KEY")
+        # self.config["lt_access_key"] = self.lt_api_key
 
     def set_lt_username(self):
         # load from os environment
