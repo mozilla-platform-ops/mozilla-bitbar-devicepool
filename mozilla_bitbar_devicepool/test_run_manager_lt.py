@@ -197,16 +197,21 @@ class TestRunManagerLT(object):
                 #
                 initiated_job_count = self.status_object.get_initiated_job_count()
                 tc_jobs_not_handled = tc_job_count - initiated_job_count
-                logging.info(f"tc_jobs_not_handled: {tc_jobs_not_handled}")
+                logging.debug(f"tc_jobs_not_handled: {tc_jobs_not_handled}")
+                logging.debug(f"self.max_jobs_to_start: {self.max_jobs_to_start}")
+                logging.debug(f"max_jobs_to_start: {self.max_jobs_to_start}")
+                logging.debug(f"tc_job_count: {tc_job_count}")
+                # logging.debug(f"initiated_job_count: {initiated_job_count}")
                 jobs_to_start = min(
                     tc_jobs_not_handled, self.max_jobs_to_start, max_jobs_to_start
                 )
-                logging.info(f"jobs_to_start 1: {jobs_to_start}")
+                logging.info(f"jobs_to_start: {jobs_to_start}")
                 # subtract the number of jobs already initiated
                 # jobs_to_start = jobs_to_start - initiated_job_count
                 # logging.info(f"initiated_job_count: {initiated_job_count}")
                 # logging.info(f"jobs_to_start 2: {jobs_to_start}")
 
+                current_mode = mode
                 if jobs_to_start <= 0:
                     logging.info("no jobs to start, setting mode MODE_NO_OP...")
                     current_mode = self.MODE_NO_OP
