@@ -342,7 +342,14 @@ def parse_args(action_array):
     parser.add_argument(
         "--debug",
         action="store_true",
-        help="Run in debug mode without executing commands",
+        help="Run in debug mode without executing commands.",
+    )
+    parser.add_argument(
+        "--log-level",
+        dest="log_level",
+        choices=["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"],
+        default="INFO",
+        help="Logging level. Defaults to INFO.",
     )
     return parser.parse_args()
 
@@ -353,7 +360,7 @@ def main():
     args = parse_args(available_actions)
 
     # Configure logging explicitly
-    logging_setup.setup_logging()
+    logging_setup.setup_logging(args.log_level)
 
     if args.action == "start-test-run-manager":
         # logging is now properly configured
