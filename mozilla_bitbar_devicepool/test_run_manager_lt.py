@@ -325,8 +325,20 @@ class TestRunManagerLT(object):
                 break
 
 
-def parse_args():
+def parse_args(action_array):
+    actions_str = ", ".join(action_array)
+    # trim the last comma if more than one action
+    if len(action_array) > 1:
+        actions_str = actions_str[:-2]
+
     parser = argparse.ArgumentParser(description="Test Run Manager for LambdaTest")
+    parser.add_argument(
+        "action",
+        nargs="?",
+        # meta="action",
+        # choices=["start-test-run-manager"],
+        help=f"Action to perform (e.g. {actions_str})",
+    )
     parser.add_argument(
         "--debug",
         action="store_true",
@@ -335,26 +347,44 @@ def parse_args():
     return parser.parse_args()
 
 
-if __name__ == "__main__":
+def main():
     # Parse command line arguments
-    args = parse_args()
+    available_actions = ["start-test-run-manager"]
+    args = parse_args(available_actions)
 
     # Configure logging explicitly
     logging_setup.setup_logging()
 
-    # logging is now properly configured
-    trmlt = TestRunManagerLT(debug_mode=args.debug)
+    if args.action == "start-test-run-manager":
+        # logging is now properly configured
+        trmlt = TestRunManagerLT(debug_mode=args.debug)
 
-    # debugging
-    # import pprint
-    # pprint.pprint(trmlt.config_object.config)
+        # debugging
+        # import pprint
+        # pprint.pprint(trmlt.config_object.config)
 
-    # start the main run loop
+        # start the main run loop
 
-    # single job started at a time
-    # trmlt.run_single_project_single_thread_multi_job(max_jobs_to_start=1, foreground=True)
+        # single job started at a time
+        # trmlt.run_single_project_single_thread_multi_job(max_jobs_to_start=1, foreground=True)
 
-    # multiple jobs started in background
-    #   problems:
-    #     - can start too many jobs since no get_pending_jobs lt call yet
-    trmlt.run_single_project_single_thread_multi_job()  # max_jobs_to_start=5, foreground=False)
+        # multiple jobs started in background
+        #   problems:
+        #     - can start too many jobs since no get_pending_jobs lt call yet
+        trmlt.run_single_project_single_thread_multi_job()  # max_jobs_to_start=5, foreground=False)
+    elif args.action is None:
+        # No action was provided
+        # list the available actions
+        logging.error("No action provided.")
+        logging.error("Available actions:")
+        for action in available_actions:
+            logging.error(f"  {action}")
+        sys.exit(1)
+    else:
+        # This should not happen with argparse choices, but just in case
+        logging.error(f"Unknown action: {args.action}")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
