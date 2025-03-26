@@ -1,10 +1,13 @@
 projects:
   defaults:
     SCRIPT_REPO_COMMIT: master
+    # obviously fake values, inheriting projects below should set reasonable values
+    lt_device_selector: "Samsung GZ4200-90"
     TASKCLUSTER_CLIENT_ID: tc-client-id-set-me
     TC_WORKER_TYPE: tc-worker-type-set-me
   a55-alpha:
-    device_group_name: a55-alpha
+    # device_group_name: a55-alpha
+    lt_device_selector: "Galaxy A55-14"
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-alpha-a55
     # gecko-t-lambda-alpha-a55, env var: gecko_t_lambda_alpha_a55
     TC_WORKER_TYPE: gecko-t-lambda-alpha-a55
@@ -14,12 +17,14 @@ projects:
   #   # setting env var: gecko_t_lambda_gw_perf_a55, lgtm
   #   TC_WORKER_TYPE: gecko-t-lambda-gw-perf-a55
   test-1:
-      device_group_name: test-1
+      # device_group_name: test-1
+      SCRIPT_REPO_COMMIT: future_commit
+      lt_device_selector: "Galaxy A51-11"
       TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1
       TC_WORKER_TYPE: gecko-t-lambda-gw-test-1
       # override SCRIPT_REPO_COMMIT with a test commit
-      SCRIPT_REPO_COMMIT: future_commit
 device_groups:
+  # not used yet (not possible with LT API), future goal. see lt_device_selector in projects.
   a55-prod:
     Galaxy A55 5G-14-R5CY128X71B
     Galaxy A55 5G-14-RZCXA0H3T9P
