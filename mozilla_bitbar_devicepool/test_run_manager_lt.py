@@ -15,7 +15,6 @@ import argparse
 from mozilla_bitbar_devicepool import configuration_lt, logging_setup
 from mozilla_bitbar_devicepool.lambdatest import job_config, status
 from mozilla_bitbar_devicepool.taskcluster import get_taskcluster_pending_tasks
-from mozilla_bitbar_devicepool.lambdatest.util import shorten_worker_type
 
 
 class TestRunManagerLT(object):
@@ -206,7 +205,11 @@ class TestRunManagerLT(object):
         logging.info("entering run loop...")
         while self.state == self.STATE_RUNNING:
             # only a single project for now, so load that up
-            current_project = self.config_object.config["projects"]["a55-alpha"]
+            # hard code for now
+            current_project_name = "a55-alpha"
+            current_project = self.config_object.config["projects"][
+                current_project_name
+            ]
 
             tc_worker_type = current_project["TC_WORKER_TYPE"]
             tc_client_id = current_project["TASKCLUSTER_CLIENT_ID"]
@@ -258,7 +261,9 @@ class TestRunManagerLT(object):
                 #   - use new name 'mozilla-taskcluster-devicepool'
                 labels_csv = self.PROGRAM_LABEL
                 # add the workerType to the labels
-                labels_csv += f",{shorten_worker_type(tc_worker_type)}"
+                #   - we really want the lt side name for this... they turn out to be the same
+                # labels_csv += f",{shorten_worker_type(tc_worker_type)}"
+                labels_csv += f",{current_project_name}"
                 # add the device type to the labels
                 dtao_underscore = device_type_and_os.replace(" ", "_")
                 labels_csv += f",{dtao_underscore}"
