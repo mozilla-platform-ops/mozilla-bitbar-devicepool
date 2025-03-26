@@ -7,7 +7,9 @@ projects:
     TC_WORKER_TYPE: tc-worker-type-set-me
   a55-alpha:
     # device_group_name: a55-alpha
-    lt_device_selector: "Galaxy A55-14"
+    lt_device_selector: "Galaxy A55 5G-14"
+    # testing: use a51
+    # lt_device_selector: "Galaxy A51-11"
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-alpha-a55
     # gecko-t-lambda-alpha-a55, env var: gecko_t_lambda_alpha_a55
     TC_WORKER_TYPE: gecko-t-lambda-alpha-a55

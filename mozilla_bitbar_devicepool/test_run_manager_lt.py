@@ -100,6 +100,7 @@ class TestRunManagerLT(object):
             tc_worker_type = current_project["TC_WORKER_TYPE"]
             tc_client_id = current_project["TASKCLUSTER_CLIENT_ID"]
             tc_client_key = current_project["TASKCLUSTER_ACCESS_TOKEN"]
+            lt_device_selector = current_project["lt_device_selector"]
 
             # TODO: verify this apk is ok, update the apk if needed, and store/use it's app_id
             lt_app_url = "lt://APP1016023521741987818221818"
@@ -122,7 +123,9 @@ class TestRunManagerLT(object):
             # set the device type, OS, and optionally UDID for this job
             #
             # for now we have a single pool of devices
-            device_type_and_os = "Galaxy A55 5G-14"
+            # device_type_and_os = "Galaxy A51-11"
+            # device_type_and_os = "Galaxy A55 5G-14"
+            device_type_and_os = lt_device_selector
 
             command_string = f"{project_root_dir}/hyperexecute"
 
@@ -214,6 +217,7 @@ class TestRunManagerLT(object):
             tc_worker_type = current_project["TC_WORKER_TYPE"]
             tc_client_id = current_project["TASKCLUSTER_CLIENT_ID"]
             tc_client_key = current_project["TASKCLUSTER_ACCESS_TOKEN"]
+            lt_device_selector = current_project["lt_device_selector"]
             # debug
             # print(f"tc_client_id: {tc_client_id}")
             # print(f"tc_client_key: {tc_client_key}")
@@ -247,13 +251,9 @@ class TestRunManagerLT(object):
 
                 # set the device type, OS, and optionally UDID for this job
                 #
-                # for now we have a single pool of devices
-                device_type_and_os = "Galaxy A55 5G-14"
+                device_type_and_os = lt_device_selector
                 # udid = None
                 # TODO: manage device state and specify UDID of exact device to target for each job
-                #
-                # DEBUG: jmaher is using the A55's right now
-                device_type_and_os = "Galaxy A51-11"
 
                 # hyperexecute job labels
                 #
