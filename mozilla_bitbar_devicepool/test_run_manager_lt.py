@@ -20,11 +20,14 @@ from mozilla_bitbar_devicepool.taskcluster import get_taskcluster_pending_tasks
 class TestRunManagerLT(object):
     # Constants at class level
     PROGRAM_LABEL = "tcdp"
+    #
     STATE_STOP = 0x10
     STATE_RUNNING = 0x15
+    #
     MODE_NO_OP = 0x50
     MODE_SINGLE_JOB = 0x55
     MODE_SINGLE_JOB_WITH_CONCURRENCY = 0x60
+    MODE_SINGLE_JOB_IN_BACKGROUND = 0x65
     # TODO: rename this to something more descriptive
     MAX_JOBS_TO_START_AT_ONCE = 2000
 
@@ -224,8 +227,28 @@ class TestRunManagerLT(object):
             tc_job_count = get_taskcluster_pending_tasks(
                 "proj-autophone", tc_worker_type, verbose=False
             )
+
+            # TODO: eventually all of these will need to target to a specfic project
+            label_filters = [self.PROGRAM_LABEL]
+            running_job_jount = self.status_object.get_running_job_count(
+                label_filter_arr=label_filters
+            )
+            initiated_job_count = self.status_object.get_initiated_job_count(
+                label_filter_arr=label_filters
+            )
+            tc_jobs_not_handled = tc_job_count - initiated_job_count - running_job_jount
+
+            # tc data
             logging.info(f"tc_job_count: {tc_job_count}")
-            if tc_job_count <= 0:
+            # lt data
+            logging.debug(f"running_job_jount: {running_job_jount}")
+            logging.debug(f"initiated job count: {initiated_job_count}")
+            logging.debug(f"tc_jobs_not_handled: {tc_jobs_not_handled}")
+            logging.debug(f"self.max_jobs_to_start: {self.max_jobs_to_start}")
+            logging.debug(f"max_jobs_to_start: {self.max_jobs_to_start}")
+            logging.debug(f"tc_job_count: {tc_job_count}")
+
+            if tc_jobs_not_handled <= 0:
                 logging.info(f"no jobs found, sleeping {self.no_job_sleep}s...")
                 time.sleep(self.no_job_sleep)
             else:
@@ -280,20 +303,10 @@ class TestRunManagerLT(object):
                         f"{project_root_dir}/hyperexecute --no-track {labels_arg}"
                     )
 
-                #
-                # TODO: eventually all of these will need to target to a specfic project
-                running_job_jount = self.status_object.get_running_job_count()
-                initiated_job_count = self.status_object.get_initiated_job_count()
-                tc_jobs_not_handled = (
-                    tc_job_count - initiated_job_count - running_job_jount
-                )
-                logging.debug(f"running_job_jount: {running_job_jount}")
-                logging.debug(f"initiated job count: {initiated_job_count}")
-                logging.debug(f"tc_jobs_not_handled: {tc_jobs_not_handled}")
-                logging.debug(f"self.max_jobs_to_start: {self.max_jobs_to_start}")
-                logging.debug(f"max_jobs_to_start: {self.max_jobs_to_start}")
-                logging.debug(f"tc_job_count: {tc_job_count}")
+                # TODO: move this up a level?
                 # logging.debug(f"initiated_job_count: {initiated_job_count}")
+                # TODO: factor in the number of available devices...
+                #  - if one device, and 3 jobs, we start 3, 2 will time out... no point in starting them.
                 jobs_to_start = min(
                     tc_jobs_not_handled, self.max_jobs_to_start, max_jobs_to_start
                 )
@@ -301,10 +314,6 @@ class TestRunManagerLT(object):
                     "taking min of tc_jobs_not_handled, self.max_jobs_to_start, max_jobs_to_start..."
                 )
                 logging.info(f"jobs_to_start: {jobs_to_start}")
-                # subtract the number of jobs already initiated
-                # jobs_to_start = jobs_to_start - initiated_job_count
-                # logging.info(f"initiated_job_count: {initiated_job_count}")
-                # logging.info(f"jobs_to_start 2: {jobs_to_start}")
 
                 current_mode = mode
                 if jobs_to_start <= 0:
@@ -326,6 +335,7 @@ class TestRunManagerLT(object):
                         path=test_run_file,
                     )
 
+                    outer_start_time = time.time()
                     for i in range(jobs_to_start):
                         logging.info(f"starting job {i + 1} of {jobs_to_start}...")
                         # Use test_mode instead of hardcoded DEBUG
@@ -359,6 +369,10 @@ class TestRunManagerLT(object):
                             )
                             if self.state == self.STATE_STOP:
                                 break
+                    outer_end_time = time.time()
+                    logging.info(
+                        f"starting {jobs_to_start} jobs took {round(outer_end_time - outer_start_time, 2)} seconds"
+                    )
                 elif current_mode == self.MODE_SINGLE_JOB_WITH_CONCURRENCY:
                     # start the desired number of jobs (concurrency: jobs_to_start)
                     #
