@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import os
-import sys
 
 import yaml
 
@@ -22,8 +21,9 @@ class DeviceGroupReport:
         self.test_result_dict = {}
         self.device_dict = {}  # device types to count
         if not config_path:
-            pathname = os.path.dirname(sys.argv[0])
-            root_dir = os.path.abspath(os.path.join(pathname, ".."))
+            # get the path of this file
+            filename_path = os.path.abspath(__file__)
+            root_dir = os.path.abspath(os.path.join(filename_path, "..", ".."))
             self.config_path = os.path.join(root_dir, "config", "config.yml")
             if not quiet:
                 print("INFO: Using config file at '%s'." % self.config_path)
@@ -180,3 +180,8 @@ class DeviceGroupReport:
         print()
 
         print("total devices: %s" % result["total_devices"])
+
+
+def main():
+    device_group_report = DeviceGroupReport()
+    device_group_report.main()
