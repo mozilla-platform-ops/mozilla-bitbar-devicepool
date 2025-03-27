@@ -1,6 +1,8 @@
 import pprint
 import os
 
+from mozilla_bitbar_devicepool.util import misc
+
 from mozilla_bitbar_devicepool.lambdatest.api import get_devices
 
 
@@ -35,5 +37,17 @@ class DeviceGroupReportLt:
 
 
 def main():
+    banner = """
+    __                __        __      __            __         __
+   / /___ _____ ___  / /_  ____/ /___ _/ /____  _____/ /_   ____/ /___ ______
+  / / __ `/ __ `__ \/ __ \/ __  / __ `/ __/ _ \/ ___/ __/  / __  / __ `/ ___/
+ / / /_/ / / / / / / /_/ / /_/ / /_/ / /_/  __(__  ) /_   / /_/ / /_/ / /
+/_/\__,_/_/ /_/ /_/_.___/\__,_/\__,_/\__/\___/____/\__/   \__,_/\__, /_/
+                                                               /____/
+"""  # noqa: W605
+    print(banner.lstrip("\n"))
+    print(f"  generated on {misc.get_utc_date_string()} ({misc.get_git_info()})")
+    print()
+
     device_group_report_lt = DeviceGroupReportLt()
     device_group_report_lt.show_report()
