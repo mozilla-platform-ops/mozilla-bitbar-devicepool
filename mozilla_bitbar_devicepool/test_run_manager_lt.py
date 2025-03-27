@@ -196,13 +196,6 @@ class TestRunManagerLT(object):
         test_run_dir = "/tmp/mozilla-lt-devicepool-job-dir"
         test_run_file = os.path.join(test_run_dir, "hyperexecute.yaml")
 
-        # overview:
-        #   1. do configuration / load config data
-        #   2. in loop:
-        #     a. update tc queue count for lt queues
-        #     b. update lt job status (how many running per each 'queue')
-        #     c. start jobs for the tc queue with the appropriate devices
-
         # TODO: if we do multithreading, use messaging vs shared object with locks
 
         # only a single project for now, so load that up

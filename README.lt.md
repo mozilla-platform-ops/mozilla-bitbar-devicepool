@@ -7,6 +7,19 @@
 - rename to mozilla-tc-devicepool or
             mozilla-taskcluster-devicepool
 
+## execution loop overview
+
+```bash
+# overview:
+#   1. do configuration / load config data
+#   2. in loop:
+#     a. update tc queue counts
+#     b. update lt job status (how many running per group)
+#     c. update lt device status (how many devices in each state per group)
+#     d. calculate number of jobs to start
+#     e. start jobs for the appropriate tc queue with selected devices
+```
+
 ## execution loop modes
 
 1. starts a single job, foreground, targets device_type-os_version
