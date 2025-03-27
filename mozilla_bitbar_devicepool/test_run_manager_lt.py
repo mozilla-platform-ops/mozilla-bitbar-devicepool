@@ -95,7 +95,7 @@ class TestRunManagerLT(object):
         test_run_file = os.path.join(test_run_dir, "hyperexecute.yaml")
         while True:
             # only a single project for now, so load that up
-            current_project = self.config_object.config["projects"]["a55-alpha"]
+            current_project = self.config_object.config["projects"]["a55-perf"]
 
             tc_worker_type = current_project["TC_WORKER_TYPE"]
             tc_client_id = current_project["TASKCLUSTER_CLIENT_ID"]
@@ -209,7 +209,7 @@ class TestRunManagerLT(object):
         while self.state == self.STATE_RUNNING:
             # only a single project for now, so load that up
             # hard code for now
-            current_project_name = "a55-alpha"
+            current_project_name = "a55-perf"
             current_project = self.config_object.config["projects"][
                 current_project_name
             ]
