@@ -205,11 +205,15 @@ class TestRunManagerLT(object):
 
         # TODO: if we do multithreading, use messaging vs shared object with locks
 
+        # only a single project for now, so load that up
+        # hard code for now
+        # TODO: once we can target multiple specific devices (via udid), we can have multiple projects
+        #         within the same device_type-os_version pool
+        current_project_name = "a55-perf"
+        logging.info(f"current project: {current_project_name}")
+
         logging.info("entering run loop...")
         while self.state == self.STATE_RUNNING:
-            # only a single project for now, so load that up
-            # hard code for now
-            current_project_name = "a55-perf"
             current_project = self.config_object.config["projects"][
                 current_project_name
             ]
