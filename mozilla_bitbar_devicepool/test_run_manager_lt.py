@@ -298,7 +298,7 @@ class TestRunManagerLT(object):
                 jobs_to_start = min(
                     tc_jobs_not_handled, self.max_jobs_to_start, max_jobs_to_start
                 )
-                logging.info(
+                logging.debug(
                     "taking min of tc_jobs_not_handled, self.max_jobs_to_start, max_jobs_to_start..."
                 )
                 logging.info(f"jobs_to_start: {jobs_to_start}")
