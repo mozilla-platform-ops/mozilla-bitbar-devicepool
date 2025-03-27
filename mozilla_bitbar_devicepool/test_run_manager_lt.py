@@ -287,6 +287,7 @@ class TestRunManagerLT(object):
                     )
 
                 #
+                # TODO: eventually all of these will need to target to a specfic project
                 running_job_jount = self.status_object.get_running_job_count()
                 initiated_job_count = self.status_object.get_initiated_job_count()
                 tc_jobs_not_handled = (
