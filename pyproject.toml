@@ -36,6 +36,7 @@ deptry = "^0.23.0"
 [tool.poetry.scripts]
 mbd = 'mozilla_bitbar_devicepool.main:main'
 mld = 'mozilla_bitbar_devicepool.test_run_manager_lt:main'
+dgrlt = 'mozilla_bitbar_devicepool.device_group_report_lt:main'
 
 [build-system]
 requires = ["poetry-core"]

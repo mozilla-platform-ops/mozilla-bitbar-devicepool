@@ -83,10 +83,16 @@ if __name__ == "__main__":
     lt_username = os.environ["LT_USERNAME"]
     lt_api_key = os.environ["LT_ACCESS_KEY"]
 
+    output = get_devices(lt_username, lt_api_key)
+    pprint.pprint(output)
+
+    import sys
+
+    sys.exit(0)
+
     # jobs = get_jobs(lt_username, lt_api_key, ['aje_123', 'fun_fun_456'])
     # jobs = get_jobs(lt_username, lt_api_key, ["123", "456"])
     jobs = get_jobs(lt_username, lt_api_key, ["mbd"])
-
     pprint.pprint(jobs)
 
     # this code moved to status.py
@@ -96,6 +102,3 @@ if __name__ == "__main__":
     #     # print(f"{job["job_number"]} {job["status"]}")
     #     job_result_dict[job["job_number"]] = job["status"]
     # pprint.pprint(job_result_dict)
-
-    # output = get_devices()
-    # pprint.pprint(output)
