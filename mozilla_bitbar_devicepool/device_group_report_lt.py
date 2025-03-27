@@ -21,7 +21,7 @@ class DeviceGroupReportLt:
         else:
             self.config_path = config_path
 
-    def print_pool_summary(self, verbose=False):
+    def show_report(self, verbose=False):
         config_summary_dict = self.get_config_projects_and_device_types()
         api_device_summary_dict = self.get_lt_device_report()
 
@@ -44,7 +44,15 @@ class DeviceGroupReportLt:
 
         print("")
         print("device types")
-        # TODO: make this report
+
+        output_dict_2 = {}
+        for project in api_device_summary_dict:
+            device_name = api_device_summary_dict[project]["name"]
+            os_version = api_device_summary_dict[project]["os_version"]
+            count = api_device_summary_dict[project]["count"]
+            output_dict_2[f"{device_name}-{os_version}"] = count
+            # print(f"{device_name} - {os_version} - {count}")
+        pprint.pprint(output_dict_2, indent=2)
 
         print("")
         print(f"total devices: {sum(output_dict.values())}")
@@ -68,22 +76,6 @@ class DeviceGroupReportLt:
                 return_dict[project_name] = device_selector
         return return_dict
 
-    # should output something like this:
-    #
-    # pool summary
-    # { 'a55-perf': 76,
-    #   'pixel5-perf': 2,
-    #   'pixel5-unit': 17,
-    #   'pixel6-perf': 4,
-    #   's24-perf': 4,
-    #   'test-1': 2,
-    #   'test-2': 1}
-
-    # device types
-    # {'a55': 78, 'pixel5': 19, 'pixel6': 4, 's21': 1, 's24': 4}
-
-    # total devices: 106
-    #
     def get_lt_device_report(self):
         devices = get_devices(self.lt_username, self.lt_api_key)
         result_dict = {}
@@ -127,4 +119,4 @@ def main():
     # device_group_report_lt.get_lt_device_report()
     # pprint.pprint(device_group_report_lt.get_config_projects_and_device_types())
 
-    device_group_report_lt.print_pool_summary()
+    device_group_report_lt.show_report()
