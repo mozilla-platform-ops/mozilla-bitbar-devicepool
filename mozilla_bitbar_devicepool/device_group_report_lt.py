@@ -1,6 +1,7 @@
 import pprint
 import os
 import yaml
+import argparse
 
 from mozilla_bitbar_devicepool.util import misc
 
@@ -8,15 +9,16 @@ from mozilla_bitbar_devicepool.lambdatest.api import get_devices
 
 
 class DeviceGroupReportLt:
-    def __init__(self, config_path=None, quiet=False):
+    def __init__(self, config_path=None, verbose=False):
         self.lt_username = os.environ["LT_USERNAME"]
         self.lt_api_key = os.environ["LT_ACCESS_KEY"]
+        self.verbose = verbose
         if not config_path:
             # get the path of this file
             filename_path = os.path.abspath(__file__)
             root_dir = os.path.abspath(os.path.join(filename_path, "..", ".."))
             self.config_path = os.path.join(root_dir, "config", "lambdatest.yml")
-            if not quiet:
+            if verbose:
                 print("INFO: Using config file at '%s'." % self.config_path)
         else:
             self.config_path = config_path
@@ -26,7 +28,10 @@ class DeviceGroupReportLt:
         api_device_summary_dict = self.get_lt_device_report()
 
         if verbose:
+            print("config summary")
             pprint.pprint(config_summary_dict)
+            print("")
+            print("api summary")
             pprint.pprint(api_device_summary_dict)
 
         output_dict = {}
@@ -103,6 +108,15 @@ class DeviceGroupReportLt:
 
 
 def main():
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description="LambdaTest device group report")
+    parser.add_argument(
+        "--verbose", "-v", action="store_true", help="Show more detailed output"
+    )
+    # parser.add_argument('--config', '-c', help='Path to config file')
+    # parser.add_argument('--quiet', '-q', action='store_true', help='Suppress informational output')
+    args = parser.parse_args()
+
     banner = r"""
     __                __        __      __            __         __
    / /___ _____ ___  / /_  ____/ /___ _/ /____  _____/ /_   ____/ /___ ______
@@ -115,8 +129,5 @@ def main():
     print(f"  generated on {misc.get_utc_date_string()} ({misc.get_git_info()})")
     print()
 
-    device_group_report_lt = DeviceGroupReportLt()
-    # device_group_report_lt.get_lt_device_report()
-    # pprint.pprint(device_group_report_lt.get_config_projects_and_device_types())
-
-    device_group_report_lt.show_report()
+    device_group_report_lt = DeviceGroupReportLt(verbose=args.verbose)
+    device_group_report_lt.show_report(verbose=args.verbose)
