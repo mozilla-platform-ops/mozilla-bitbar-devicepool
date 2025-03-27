@@ -198,10 +198,11 @@ class TestRunManagerLT(object):
 
         # TODO: if we do multithreading, use messaging vs shared object with locks
 
-        # only a single project for now, so load that up
+        # TODO: once we can target multiple specific devices in hyperexecute.yaml or implement single
+        #         device targeting/tracking, we can have multiple projects within the same
+        #         device_type-os_version pool.
+        #
         # hard code for now
-        # TODO: once we can target multiple specific devices (via udid), we can have multiple projects
-        #         within the same device_type-os_version pool
         current_project_name = "a55-perf"
         logging.info(f"current project: {current_project_name}")
 
