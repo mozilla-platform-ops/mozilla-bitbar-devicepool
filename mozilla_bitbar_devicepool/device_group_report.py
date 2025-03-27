@@ -131,9 +131,7 @@ class DeviceGroupReport:
                         self.device_dict["g5"] = self.device_dict.get("g5", 0) + 1
 
     def main(self):
-        self.get_report_dict()
-
-        banner = """
+        banner = r"""
    __   _ __  __                 __
   / /  (_) /_/ /  ___ _____  ___/ /__ _____
  / _ \/ / __/ _ \/ _ `/ __/ / _  / _ `/ __/
@@ -143,6 +141,8 @@ class DeviceGroupReport:
         print(banner.lstrip("\n"))
         print(f"  generated on {misc.get_utc_date_string()} ({misc.get_git_info()})")
         print()
+
+        self.get_report_dict()
 
         v1_enabled = False
         if v1_enabled:
