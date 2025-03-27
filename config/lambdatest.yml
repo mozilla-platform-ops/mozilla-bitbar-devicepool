@@ -6,15 +6,15 @@ projects:
     TASKCLUSTER_CLIENT_ID: tc-client-id-set-me
     # env var with key is looked for at this with underscores: `tc_worker_type_set_me`
     TC_WORKER_TYPE: tc-worker-type-set-me
-  # a55-alpha:
-  #   lt_device_selector: "Galaxy A55 5G-14"
-  #   # testing: use a51
-  #   # lt_device_selector: "Galaxy A51-11"
-  #   TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-alpha-a55
-  #   TC_WORKER_TYPE: gecko-t-lambda-alpha-a55
+  a55-alpha:
+    lt_device_selector: "Galaxy A55 5G-14"
+    # swapped for testing
+    # lt_device_selector: "Galaxy A51-11"
+    TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-alpha-a55
+    TC_WORKER_TYPE: gecko-t-lambda-alpha-a55
   a55-perf:
     # lt_device_selector: "Galaxy A55 5G-14"
-    # testing: use a51
+    # swapped for testing
     lt_device_selector: "Galaxy A51-11"
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-a55
     TC_WORKER_TYPE: gecko-t-lambda-perf-a55
