@@ -30,6 +30,9 @@ class TestRunManagerLT(object):
     MODE_RUN_NOTRACK_BACKGROUND_TASKS = 0x165
     #
     MAX_JOBS_TO_START_AT_ONCE = 2000
+    # lt api device states
+    LT_DEVICE_STATE_ACTIVE = "active"
+    LT_DEVICE_STATE_BUSY = "busy"
 
     def __init__(
         self, max_jobs_to_start=5, exit_wait=5, no_job_sleep=60, debug_mode=False
@@ -228,7 +231,9 @@ class TestRunManagerLT(object):
             tc_jobs_not_handled = tc_job_count - initiated_job_count - running_job_jount
 
             free_devices_in_requested_config = (
-                self.status_object.get_device_state_count(lt_device_selector, "active")
+                self.status_object.get_device_state_count(
+                    lt_device_selector, self.LT_DEVICE_STATE_ACTIVE
+                )
             )
 
             # tc data
