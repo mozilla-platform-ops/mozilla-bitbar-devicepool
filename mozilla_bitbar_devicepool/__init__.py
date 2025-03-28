@@ -10,9 +10,10 @@ import os
 
 # we need to run basicConfig before any other module does
 # TODO: put %(asctime)s back in?
+# TODO: move this to a separate module and do in main (won't need noqa below)
 logging.basicConfig(format="%(threadName)26s %(levelname)-8s %(message)s")
 
-from testdroid import Testdroid
+from testdroid import Testdroid  # noqa: E402
 
 logger = logging.getLogger()
 
