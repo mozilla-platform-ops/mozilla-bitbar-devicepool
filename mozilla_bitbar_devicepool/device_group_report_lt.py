@@ -41,7 +41,6 @@ class DeviceGroupReportLt:
                 "count"
             ]
             output_dict[lt_project] = count_for_device_type
-            # print(f"{lt_project} - {count_for_device_type}")
 
         print("")
         print("pool summary")
@@ -56,7 +55,6 @@ class DeviceGroupReportLt:
             os_version = api_device_summary_dict[project]["os_version"]
             count = api_device_summary_dict[project]["count"]
             output_dict_2[f"{device_name}-{os_version}"] = count
-            # print(f"{device_name} - {os_version} - {count}")
         pprint.pprint(output_dict_2, indent=2)
 
         print("")
@@ -76,8 +74,6 @@ class DeviceGroupReportLt:
             if project != "defaults":
                 project_name = project
                 device_selector = conf_yaml["projects"][project]["lt_device_selector"]
-                # print(project)
-                # print("  " + device_selector)
                 return_dict[project_name] = device_selector
         return return_dict
 
@@ -100,11 +96,7 @@ class DeviceGroupReportLt:
             else:
                 result_dict[f"{name}-{os_version}"]["count"] += 1
                 result_dict[f"{name}-{os_version}"]["udids"].append(udid)
-            # result_dict[f"{name}-{os_version}"]
-            # print(f"{device['name']} - {device['os_version']} - {device['udid']}")
-        # pprint.pprint(devices)
         return result_dict
-        # pprint.pprint(result_dict)
 
 
 def main():
@@ -113,8 +105,6 @@ def main():
     parser.add_argument(
         "--verbose", "-v", action="store_true", help="Show more detailed output"
     )
-    # parser.add_argument('--config', '-c', help='Path to config file')
-    # parser.add_argument('--quiet', '-q', action='store_true', help='Suppress informational output')
     args = parser.parse_args()
 
     banner = r"""
