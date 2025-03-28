@@ -230,7 +230,7 @@ class TestRunManagerLT(object):
             )
             tc_jobs_not_handled = tc_job_count - initiated_job_count - running_job_jount
 
-            free_devices_in_requested_config = (
+            active_devices_in_requested_config = (
                 self.status_object.get_device_state_count(
                     lt_device_selector, self.LT_DEVICE_STATE_ACTIVE
                 )
@@ -245,7 +245,7 @@ class TestRunManagerLT(object):
             logging.debug(f"self.max_jobs_to_start: {self.max_jobs_to_start}")
             logging.debug(f"max_jobs_to_start: {self.max_jobs_to_start}")
             logging.debug(
-                f"free_devices_in_requested_config: {free_devices_in_requested_config}"
+                f"active_devices_in_requested_config: {active_devices_in_requested_config}"
             )
 
             # limit the amount of jobs we start to a local and global max
@@ -256,9 +256,9 @@ class TestRunManagerLT(object):
                 f"min of tc_jobs_not_handled, self.max_jobs_to_start, max_jobs_to_start is {jobs_to_start}"
             )
             # don't try to start more jobs than free devices
-            jobs_to_start = min(jobs_to_start, free_devices_in_requested_config)
+            jobs_to_start = min(jobs_to_start, active_devices_in_requested_config)
             logging.debug(
-                f"min of jobs_to_start and free_devices_in_requested_config is {jobs_to_start}"
+                f"min of jobs_to_start and active_devices_in_requested_config is {jobs_to_start}"
             )
 
             logging.info(f"jobs_to_start: {jobs_to_start}")
