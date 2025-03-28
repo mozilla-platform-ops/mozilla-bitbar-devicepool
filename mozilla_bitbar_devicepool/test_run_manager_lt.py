@@ -227,6 +227,12 @@ class TestRunManagerLT(object):
             )
             tc_jobs_not_handled = tc_job_count - initiated_job_count - running_job_jount
 
+            free_devices_in_requested_config = self.status_object.get_free_devices(
+                label_filter_arr=label_filters,
+                device_type_and_os=lt_device_selector,
+                # udid=None,
+            )
+
             # tc data
             logging.info(f"tc_job_count: {tc_job_count}")
             # lt data
@@ -235,10 +241,29 @@ class TestRunManagerLT(object):
             logging.debug(f"tc_jobs_not_handled: {tc_jobs_not_handled}")
             logging.debug(f"self.max_jobs_to_start: {self.max_jobs_to_start}")
             logging.debug(f"max_jobs_to_start: {self.max_jobs_to_start}")
-            logging.debug(f"tc_job_count: {tc_job_count}")
+            logging.debug(
+                f"free_devices_in_requested_config: {free_devices_in_requested_config}"
+            )
 
-            if tc_jobs_not_handled <= 0:
-                logging.info(f"no jobs found, sleeping {self.no_job_sleep}s...")
+            # limit the amount of jobs we start to a local and global max
+            jobs_to_start = min(
+                tc_jobs_not_handled, self.max_jobs_to_start, max_jobs_to_start
+            )
+            logging.debug(
+                f"min of tc_jobs_not_handled, self.max_jobs_to_start, max_jobs_to_start is {jobs_to_start}"
+            )
+            # don't try to start more jobs than free devices
+            jobs_to_start = min(jobs_to_start, free_devices_in_requested_config)
+            logging.debug(
+                f"min of jobs_to_start and free_devices_in_requested_config is {jobs_to_start}"
+            )
+
+            logging.info(f"jobs_to_start: {jobs_to_start}")
+
+            if jobs_to_start <= 0:
+                logging.info(
+                    f"no unhandled jobs (either no tc jobs, no free devices, or lt jobs already started), sleeping {self.no_job_sleep}s..."
+                )
                 time.sleep(self.no_job_sleep)
             else:
                 # TODO: verify this apk is ok, update the apk if needed, and store/use it's app_id
@@ -291,18 +316,6 @@ class TestRunManagerLT(object):
                     command_string = (
                         f"{project_root_dir}/hyperexecute --no-track {labels_arg}"
                     )
-
-                # TODO: move this up a level?
-                # logging.debug(f"initiated_job_count: {initiated_job_count}")
-                # TODO: factor in the number of available devices...
-                #  - if one device, and 3 jobs, we start 3, 2 will time out... no point in starting them.
-                jobs_to_start = min(
-                    tc_jobs_not_handled, self.max_jobs_to_start, max_jobs_to_start
-                )
-                logging.debug(
-                    "taking min of tc_jobs_not_handled, self.max_jobs_to_start, max_jobs_to_start..."
-                )
-                logging.info(f"jobs_to_start: {jobs_to_start}")
 
                 current_mode = mode
                 if jobs_to_start <= 0:
