@@ -17,29 +17,39 @@ pip install zstandard
 echo "[extensions]" > ~/.hgrc
 echo "sparse =" >> ~/.hgrc
 
-# AJE: usbutils intalled above
-# list everything
-usbreset
-
 # profgen
 # TODO: get this from a real location
 wget -O cmdlinetools.zip --no-check-certificate "https://android-packages.s3.us-west-2.amazonaws.com/commandlinetools-linux-13114758_latest.zip"
 unzip cmdlinetools.zip
 
 # this is in PATH, lets use it:
-mkdir /home/ltuser/taskcluster/android-sdk-linux
-mkdir /home/ltuser/taskcluster/android-sdk-linux/tools
-mkdir /home/ltuser/taskcluster/android-sdk-linux/tools/bin
-mkdir /home/ltuser/taskcluster/android-sdk-linux/tools/lib
+mkdir -p /home/ltuser/taskcluster/android-sdk-linux
+mkdir -p /home/ltuser/taskcluster/android-sdk-linux/tools
+mkdir -p /home/ltuser/taskcluster/android-sdk-linux/tools/bin
+mkdir -p /home/ltuser/taskcluster/android-sdk-linux/tools/lib
 
 sudo cp -R cmdline-tools/bin/* /home/ltuser/taskcluster/android-sdk-linux/tools/bin/
 sudo cp -R cmdline-tools/lib/* /home/ltuser/taskcluster/android-sdk-linux/tools/lib/
 
 ### for power meter jobs
-# now reset 2x
-usbreset 0483:fffe
-sleep 2
-usbreset 0483:fffe
+POWER_METER_DEVICE_ID="0483:fffe"
+
+# AJE: usbutils intalled above
+# list everything (ignore exit code)
+usbreset || true
+
+# list everthing (and capture output)
+usbreset 2>&1 | tee /tmp/usbreset.log
+# if the power meter is present issue reset commands
+if grep -q "$POWER_METER_DEVICE_ID" /tmp/usbreset.log; then
+    echo "Found power meter, resetting..."
+    # reset the power meter
+    usbreset $POWER_METER_DEVICE_ID
+    sleep 2
+    usbreset $POWER_METER_DEVICE_ID
+else
+    echo "Power meter not found, skipping reset."
+fi
 
 # aje 3/17/25: not needed per LT.
 #   - was interfering with their monitoring and made the main testRunCommand not work.
