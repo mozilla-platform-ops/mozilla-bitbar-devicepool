@@ -23,7 +23,7 @@ class Status:
         job_result_dict = {}
         for job in jobs["data"]:
             job_result_dict[job["job_number"]] = job["status"]
-        # TODO: return sorted?
+        # TODO?: return sorted?
         return job_result_dict
 
     # format:

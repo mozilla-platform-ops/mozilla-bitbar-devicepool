@@ -97,7 +97,7 @@ def return_config(
     if udid:
         fixed_ip_line = f'fixedIP: "{udid}"'
 
-    # TODO: sanity check device_type_and_os (includes hyphen, valid device type)
+    # TODO?: sanity check device_type_and_os (includes hyphen, valid device type)
 
     # here doc with the config, we need string interpolation
     config = f"""

@@ -219,7 +219,7 @@ class TestRunManagerLT(object):
             )
             # gather data targeting the current project or current device_type_and_os
             label_filters = [self.PROGRAM_LABEL, current_project_name]
-            running_job_jount = self.status_object.get_running_job_count(
+            running_job_count = self.status_object.get_running_job_count(
                 label_filter_arr=label_filters
             )
             initiated_job_count = self.status_object.get_initiated_job_count(
@@ -231,12 +231,12 @@ class TestRunManagerLT(object):
                 )
             )
             # do calculations
-            tc_jobs_not_handled = tc_job_count - initiated_job_count - running_job_jount
+            tc_jobs_not_handled = tc_job_count - initiated_job_count - running_job_count
 
             # tc data
             logging.info(f"tc_job_count: {tc_job_count}")
             # lt data
-            logging.debug(f"running_job_jount: {running_job_jount}")
+            logging.debug(f"running_job_jount: {running_job_count}")
             logging.debug(f"initiated job count: {initiated_job_count}")
             logging.debug(f"self.max_jobs_to_start: {self.max_jobs_to_start}")
             logging.debug(f"max_jobs_to_start: {self.max_jobs_to_start}")
