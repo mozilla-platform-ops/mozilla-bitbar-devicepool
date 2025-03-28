@@ -39,7 +39,7 @@ class TestRunManagerLT(object):
         self.no_job_sleep = no_job_sleep
         self.max_jobs_to_start = max_jobs_to_start
         self.state = self.STATE_RUNNING
-        self.test_mode = debug_mode
+        self.debug_mode = debug_mode
         self.config_object = configuration_lt.ConfigurationLt()
         self.config_object.configure()
         self.status_object = status.Status(
@@ -145,7 +145,7 @@ class TestRunManagerLT(object):
 
             logging.info("starting job...")
             # Use test_mode instead of hardcoded DEBUG
-            if self.test_mode:
+            if self.debug_mode:
                 logging.info(
                     f"would be running command: '{command_string}' in path '{test_run_dir}'..."
                 )
@@ -328,7 +328,7 @@ class TestRunManagerLT(object):
                     for i in range(jobs_to_start):
                         logging.info(f"starting job {i + 1} of {jobs_to_start}...")
                         # Use test_mode instead of hardcoded DEBUG
-                        if self.test_mode:
+                        if self.debug_mode:
                             logging.info(
                                 f"would be running command: '{command_string}' in path '{test_run_dir}'..."
                             )
@@ -382,7 +382,7 @@ class TestRunManagerLT(object):
 
                     logging.info(f"starting job with concurrency {jobs_to_start}...")
                     # Use test_mode instead of hardcoded DEBUG
-                    if self.test_mode:
+                    if self.debug_mode:
                         logging.info(
                             f"would be running command: '{command_string}' in path '{test_run_dir}'..."
                         )
