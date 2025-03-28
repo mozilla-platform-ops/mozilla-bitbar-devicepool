@@ -6,6 +6,16 @@ import requests
 import base64
 import pprint
 import os
+import requests_cache
+from datetime import timedelta
+
+# Install requests_cache for caching HTTP requests
+# pip install requests-cache
+
+# Initialize cache with a 10 second expiry
+requests_cache.install_cache(
+    cache_name="lambdatest_cache", backend="memory", expire_after=timedelta(seconds=10)
+)
 
 # https://www.lambdatest.com/support/api-doc/
 
