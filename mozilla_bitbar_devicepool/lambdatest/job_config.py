@@ -121,6 +121,10 @@ testDiscovery:
   # Test type is raw (custom test implementation)
   type: raw
 
+runtime:
+  - language: java
+    version: "17"
+
 env:
     # inject our own secrets
     TASKCLUSTER_CLIENT_ID: {tc_client_id}
