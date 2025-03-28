@@ -265,7 +265,7 @@ class TestRunManagerLT(object):
 
             if jobs_to_start <= 0:
                 logging.info(
-                    f"no unhandled jobs (no tc jobs, no free devices, or lt jobs already started), sleeping {self.no_job_sleep}s..."
+                    f"no unhandled jobs (no tc jobs, no active lt devices, or lt jobs already started), sleeping {self.no_job_sleep}s..."
                 )
                 time.sleep(self.no_job_sleep)
             else:
