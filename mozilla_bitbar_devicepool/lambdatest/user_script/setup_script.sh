@@ -7,10 +7,39 @@ starting_dir=$(pwd)
 echo "starting_dir: $starting_dir"
 
 sudo apt update -y
-sudo apt-get install gettext-base
-sudo apt-get install libgtk-3-0 -y
+sudo apt-get install gettext-base libgtk-3-0 mercurial usbutils -y
 
 pip install zstandard
+
+### for perftest jobs
+# AJE: mercurial installed above
+
+echo "[extensions]" > ~/.hgrc
+echo "sparse =" >> ~/.hgrc
+
+# AJE: usbutils intalled above
+# list everything
+usbreset
+
+# profgen
+# TODO: get this from a real location
+wget -O cmdlinetools.zip --no-check-certificate "https://android-packages.s3.us-west-2.amazonaws.com/commandlinetools-linux-13114758_latest.zip"
+unzip cmdlinetools.zip
+
+# this is in PATH, lets use it:
+mkdir /home/ltuser/taskcluster/android-sdk-linux
+mkdir /home/ltuser/taskcluster/android-sdk-linux/tools
+mkdir /home/ltuser/taskcluster/android-sdk-linux/tools/bin
+mkdir /home/ltuser/taskcluster/android-sdk-linux/tools/lib
+
+sudo cp -R cmdline-tools/bin/* /home/ltuser/taskcluster/android-sdk-linux/tools/bin/
+sudo cp -R cmdline-tools/lib/* /home/ltuser/taskcluster/android-sdk-linux/tools/lib/
+
+### for power meter jobs
+# now reset 2x
+usbreset 0483:fffe
+sleep 2
+usbreset 0483:fffe
 
 # aje 3/17/25: not needed per LT.
 #   - was interfering with their monitoring and made the main testRunCommand not work.
