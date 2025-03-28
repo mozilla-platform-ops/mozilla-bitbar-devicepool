@@ -2,18 +2,15 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import requests
 import base64
 import pprint
 import os
 import requests_cache
 from datetime import timedelta
 
-# Install requests_cache for caching HTTP requests
-# pip install requests-cache
-
-# Initialize cache with a 10 second expiry
-requests_cache.install_cache(
+# Create a cached session with 10 second expiry
+# Only requests using this session will be cached
+cached_session = requests_cache.CachedSession(
     cache_name="lambdatest_cache", backend="memory", expire_after=timedelta(seconds=10)
 )
 
@@ -42,7 +39,8 @@ def get_jobs(
     base64_auth_string = base64.b64encode(auth_string.encode("utf-8")).decode("utf-8")
     headers["Authorization"] = f"Basic {base64_auth_string}"
 
-    response = requests.get(url, headers=headers)
+    # Use cached_session instead of requests directly
+    response = cached_session.get(url, headers=headers)
     # check the response code
     if response.status_code != 200:
         print(f"Error: {response.status_code}")
@@ -79,7 +77,8 @@ def get_devices(lt_username, lt_api_key):
     base64_auth_string = base64.b64encode(auth_string.encode("utf-8")).decode("utf-8")
     headers["Authorization"] = f"Basic {base64_auth_string}"
 
-    response = requests.get(url, headers=headers)
+    # Use cached_session instead of requests directly
+    response = cached_session.get(url, headers=headers)
     # check the response code
     if response.status_code != 200:
         print(f"Error: {response.status_code}")
