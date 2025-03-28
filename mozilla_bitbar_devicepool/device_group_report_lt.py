@@ -80,7 +80,6 @@ class DeviceGroupReportLt:
     def get_lt_device_report(self):
         devices = get_devices(self.lt_username, self.lt_api_key)
         result_dict = {}
-        # TODO: display a report of the devices including a count of each device type
         for device in devices["data"]["private_cloud_devices"]:
             name = device["name"]
             os_version = device["os_version"]
