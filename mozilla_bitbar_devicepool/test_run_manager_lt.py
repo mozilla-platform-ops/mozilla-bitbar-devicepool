@@ -170,17 +170,6 @@ class TestRunManagerLT(object):
             # take a short break
             time.sleep(5)
 
-    # about modes
-    #
-    # MODE_SINGLE_JOB: single job started at a time
-    # issues with mode 1:
-    #   - depending on job run time, with more than 30-60 devices,
-    #       we can't keep enough jobs running to keep up
-    #
-    # MODE_SINGLE_JOB_CONCURRENCY: single task, but use hyperexecute.yaml's concurrency
-    # status: currently broken / needs more work
-    # mode = MODE_SINGLE_JOB_CONCURRENCY
-    #
     def run_single_project_single_thread_multi_job(
         self, max_jobs_to_start=None, foreground=False, mode=None
     ):
