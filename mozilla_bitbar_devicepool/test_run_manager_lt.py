@@ -227,10 +227,8 @@ class TestRunManagerLT(object):
             )
             tc_jobs_not_handled = tc_job_count - initiated_job_count - running_job_jount
 
-            free_devices_in_requested_config = self.status_object.get_free_devices(
-                label_filter_arr=label_filters,
-                device_type_and_os=lt_device_selector,
-                # udid=None,
+            free_devices_in_requested_config = (
+                self.status_object.get_device_state_count(lt_device_selector, "active")
             )
 
             # tc data
@@ -262,7 +260,7 @@ class TestRunManagerLT(object):
 
             if jobs_to_start <= 0:
                 logging.info(
-                    f"no unhandled jobs (either no tc jobs, no free devices, or lt jobs already started), sleeping {self.no_job_sleep}s..."
+                    f"no unhandled jobs (no tc jobs, no free devices, or lt jobs already started), sleeping {self.no_job_sleep}s..."
                 )
                 time.sleep(self.no_job_sleep)
             else:

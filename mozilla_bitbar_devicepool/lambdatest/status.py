@@ -99,9 +99,21 @@ class Status:
     #            'RXYA1824': 'online'},
     #   {'a51': {'DB123212': 'online'}
     # }
-    def get_device_list(self, verbose=False):
+    def get_device_list(self, device_type_and_os_filter=None, verbose=False):
         result_dict = {}
         output = get_devices(self.lt_username, self.lt_api_key)
+        if not output:
+            return result_dict
+        # if verbose:
+        #     pprint.pprint(output)
+
+        device_type = None
+        device_os = None
+        # TODO: sanity check this arg
+        if device_type_and_os_filter:
+            device_type = device_type_and_os_filter.split("-")[0]
+            device_os = device_type_and_os_filter.split("-")[1]
+
         for device in output["data"]["private_cloud_devices"]:
             if verbose:
                 pprint.pprint(device)
@@ -109,8 +121,46 @@ class Status:
             # get the current value in result_dict['name'] or create a new dict
             device_type_entry = result_dict.get(device["name"], {})
             device_type_entry[device["udid"]] = device["status"]
-            result_dict[device["name"]] = device_type_entry
+            if device_type_and_os_filter:
+                # pprint.pprint(device)
+                # result_dict[device["name"]] = device_type_entry
+                if (
+                    device_type == device["name"]
+                    and device_os == device["fullOsVersion"]
+                ):
+                    result_dict[device["name"]] = device_type_entry
+            else:
+                result_dict[device["name"]] = device_type_entry
         return result_dict
+
+    def get_device_state_summary(self, device_type_and_os_filter=None):
+        results = self.get_device_list(
+            device_type_and_os_filter=device_type_and_os_filter
+        )
+        # results dict format: {state: count, ...}
+        result_dict = {}
+        for dev_type in results:
+            for udid in results[dev_type]:
+                # get or set the state
+                state = results[dev_type][udid]
+                if state in result_dict:
+                    result_dict[state] += 1
+                else:
+                    result_dict[state] = 1
+        return result_dict
+
+    def get_device_state_count(self, device_type_and_os_filter, state):
+        results = self.get_device_list(
+            device_type_and_os_filter=device_type_and_os_filter
+        )
+        result_int = 0
+        for dev_type in results:
+            for udid in results[dev_type]:
+                # get or set the state
+                device_state = results[dev_type][udid]
+                if device_state == state:
+                    result_int += 1
+        return result_int
 
 
 if __name__ == "__main__":
@@ -121,8 +171,16 @@ if __name__ == "__main__":
 
     status = Status(lt_username, lt_api_key)
 
-    r = status.get_job_summary(["mbd"])
+    r = status.get_device_list("Galaxy A55 5G-14")
     pprint.pprint(r)
+    # r = status.get_device_state_summary("Galaxy A55 5G-14")
+    r = status.get_device_state_summary("Galaxy A55 5G-14")
+    pprint.pprint(r)
+    r = status.get_device_state_count("Galaxy A55 5G-14", "active")
+    pprint.pprint(r)
+
+    # r = status.get_job_summary(["mbd"])
+    # pprint.pprint(r)
 
     # pprint.pprint(status.get_job_dict())
     # # print("")
