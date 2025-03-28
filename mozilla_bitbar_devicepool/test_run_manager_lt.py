@@ -24,11 +24,11 @@ class TestRunManagerLT(object):
     STATE_STOP = 0x10
     STATE_RUNNING = 0x15
     #
-    MODE_NO_OP = 0x50
-    MODE_SINGLE_JOB = 0x55
-    MODE_SINGLE_JOB_WITH_CONCURRENCY = 0x60
-    MODE_SINGLE_JOB_IN_BACKGROUND = 0x65
-    # TODO: rename this to something more descriptive
+    MODE_NO_OP = 0x150
+    MODE_RUN = 0x155
+    MODE_RUN_WITH_CONCURRENCY = 0x160
+    MODE_RUN_BACKGROUND_TASKS = 0x165
+    #
     MAX_JOBS_TO_START_AT_ONCE = 2000
 
     def __init__(
@@ -185,7 +185,7 @@ class TestRunManagerLT(object):
         self, max_jobs_to_start=None, foreground=False, mode=None
     ):
         if mode is None:
-            mode = self.MODE_SINGLE_JOB
+            mode = self.MODE_RUN
         # default the value
         if max_jobs_to_start is None:
             max_jobs_to_start = self.MAX_JOBS_TO_START_AT_ONCE
@@ -320,7 +320,7 @@ class TestRunManagerLT(object):
                     logging.info("no jobs to start, setting mode MODE_NO_OP...")
                     current_mode = self.MODE_NO_OP
 
-                if current_mode == self.MODE_SINGLE_JOB:
+                if current_mode == self.MODE_RUN:
                     # start the desired number of jobs (concurrency: 1)
 
                     # create hyperexecute.yaml specific to each queue
@@ -373,7 +373,7 @@ class TestRunManagerLT(object):
                     logging.info(
                         f"starting {jobs_to_start} jobs took {round(outer_end_time - outer_start_time, 2)} seconds"
                     )
-                elif current_mode == self.MODE_SINGLE_JOB_WITH_CONCURRENCY:
+                elif current_mode == self.MODE_RUN_WITH_CONCURRENCY:
                     # start the desired number of jobs (concurrency: jobs_to_start)
                     #
                     # issues:
