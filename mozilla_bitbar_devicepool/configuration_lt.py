@@ -13,7 +13,7 @@ from mozilla_bitbar_devicepool.util.template import apply_dict_defaults
 
 class ConfigurationLt(object):
     def __init__(self):
-        # TODO: mash all values into 'config'?
+        # TODO?: mash all values into 'config'?
         self.lt_access_key = None
         self.lt_username = None
         self.config = {}
@@ -74,11 +74,11 @@ class ConfigurationLt(object):
                 project_config, project_defaults
             )
 
-        # TODO: remove 'defaults' from CONFIG['projects']?
+        # TODO?: remove 'defaults' from CONFIG['projects']?
         #   - would save later code from having to exclude it
 
     def configure(self):
-        # TODO: add filespath?
+        # TODO?: add filespath?
 
         # Check for hyperexecute binary on path using a shell command
         cmd = "where" if sys.platform == "win32" else "which"

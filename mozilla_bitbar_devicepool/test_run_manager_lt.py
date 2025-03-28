@@ -116,7 +116,6 @@ class TestRunManagerLT(object):
             # create /tmp/mozilla-lt-devicepool-job-dir dir
             os.makedirs(test_run_dir, exist_ok=True)
 
-            # TODO: copy user-script dir to correct dir (use basename on config_file_path?)
             # copy user_script_golden_dir to correct path using python shutil
             shutil.copytree(
                 user_script_golden_dir, os.path.join(test_run_dir, "user_script")
@@ -157,7 +156,7 @@ class TestRunManagerLT(object):
             else:
                 logging.info(f"running: '{command_string}' in path '{test_run_dir}'...")
                 start_time = time.time()
-                # TODO: background so we can do this faster or set concurrencty in the YAML?
+                # NOTE: background so we can do this faster or set concurrencty in the YAML?
                 #   - can only get 1-2 jobs going in parallel with trivial tasks
                 #   - for concurrency to work, would we need to emit multiple test targets (1:1 with concurrency?)
                 # start_new_session=True ensures process ignores ctrl-c sent to this process (so it cleans up)
@@ -191,9 +190,9 @@ class TestRunManagerLT(object):
         test_run_dir = "/tmp/mozilla-lt-devicepool-job-dir"
         test_run_file = os.path.join(test_run_dir, "hyperexecute.yaml")
 
-        # TODO: if we do multithreading, use messaging vs shared object with locks
+        # TODO?: if we do multithreading, use messaging vs shared object with locks
 
-        # TODO: once we can target multiple specific devices in hyperexecute.yaml or implement single
+        # TODO?: once we can target multiple specific devices in hyperexecute.yaml or implement single
         #         device targeting/tracking, we can have multiple projects within the same
         #         device_type-os_version pool.
         #
@@ -215,38 +214,37 @@ class TestRunManagerLT(object):
             # print(f"tc_client_id: {tc_client_id}")
             # print(f"tc_client_key: {tc_client_key}")
 
-            # TODO: check tc and if there are jobs, continue, exist go to sleep
             tc_job_count = get_taskcluster_pending_tasks(
                 "proj-autophone", tc_worker_type, verbose=False
             )
-
-            # TODO: eventually all of these will need to target to a specfic project
-            label_filters = [self.PROGRAM_LABEL]
+            # gather data targeting the current project or current device_type_and_os
+            label_filters = [self.PROGRAM_LABEL, current_project_name]
             running_job_jount = self.status_object.get_running_job_count(
                 label_filter_arr=label_filters
             )
             initiated_job_count = self.status_object.get_initiated_job_count(
                 label_filter_arr=label_filters
             )
-            tc_jobs_not_handled = tc_job_count - initiated_job_count - running_job_jount
-
             active_devices_in_requested_config = (
                 self.status_object.get_device_state_count(
                     lt_device_selector, self.LT_DEVICE_STATE_ACTIVE
                 )
             )
+            # do calculations
+            tc_jobs_not_handled = tc_job_count - initiated_job_count - running_job_jount
 
             # tc data
             logging.info(f"tc_job_count: {tc_job_count}")
             # lt data
             logging.debug(f"running_job_jount: {running_job_jount}")
             logging.debug(f"initiated job count: {initiated_job_count}")
-            logging.debug(f"tc_jobs_not_handled: {tc_jobs_not_handled}")
             logging.debug(f"self.max_jobs_to_start: {self.max_jobs_to_start}")
             logging.debug(f"max_jobs_to_start: {self.max_jobs_to_start}")
             logging.debug(
-                f"active_devices_in_requested_config: {active_devices_in_requested_config}"
+                f"active_devices_in_requested_config ({lt_device_selector}): {active_devices_in_requested_config}"
             )
+            # merged data
+            logging.debug(f"tc_jobs_not_handled: {tc_jobs_not_handled}")
 
             # limit the amount of jobs we start to a local and global max
             jobs_to_start = min(
@@ -277,7 +275,6 @@ class TestRunManagerLT(object):
                 # create /tmp/mozilla-lt-devicepool-job-dir dir
                 os.makedirs(test_run_dir, exist_ok=True)
 
-                # TODO: copy user-script dir to correct dir (use basename on config_file_path?)
                 # copy user_script_golden_dir to correct path using python shutil
                 shutil.copytree(
                     user_script_golden_dir, os.path.join(test_run_dir, "user_script")
@@ -291,7 +288,7 @@ class TestRunManagerLT(object):
                 #
                 device_type_and_os = lt_device_selector
                 # udid = None
-                # TODO: manage device state and specify UDID of exact device to target for each job
+                # TODO?: manage device state and specify UDID of exact device to target for each job
 
                 # hyperexecute job labels
                 #
@@ -305,7 +302,7 @@ class TestRunManagerLT(object):
                 # add the device type to the labels
                 dtao_underscore = device_type_and_os.replace(" ", "_")
                 labels_csv += f",{dtao_underscore}"
-                # TODO: enable adding udid to the labels?
+                # TODO?: enable adding udid to the labels?
                 # if udid:
                 #     labels_csv += f",{udid}"
 
@@ -357,7 +354,7 @@ class TestRunManagerLT(object):
                                 f"running: '{command_string}' in path '{test_run_dir}'..."
                             )
                             start_time = time.time()
-                            # TODO: background so we can do this faster or set concurrencty in the YAML?
+                            # NOTE: background so we can do this faster or set concurrencty in the YAML?
                             #   - can only get 1-2 jobs going in parallel with trivial tasks
                             #   - for concurrency to work, would we need to emit multiple test targets (1:1 with concurrency?)
                             # start_new_session=True ensures process ignores ctrl-c sent to this process (so it cleans up)
@@ -411,7 +408,7 @@ class TestRunManagerLT(object):
                             f"running: '{command_string}' in path '{test_run_dir}'..."
                         )
                         start_time = time.time()
-                        # TODO: background so we can do this faster or set concurrencty in the YAML?
+                        # NOTE: background so we can do this faster or set concurrencty in the YAML?
                         #   - can only get 1-2 jobs going in parallel with trivial tasks
                         #   - for concurrency to work, would we need to emit multiple test targets (1:1 with concurrency?)
                         # start_new_session=True ensures process ignores ctrl-c sent to this process (so it cleans up)
