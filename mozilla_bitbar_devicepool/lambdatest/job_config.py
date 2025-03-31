@@ -3,6 +3,7 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import logging
+import os
 
 
 def write_config(
@@ -51,6 +52,11 @@ def write_config(
         udid,
         concurrency,
     )
+
+    # mkdir -p the path
+    dir_to_create = os.path.dirname(path)
+    os.makedirs(dir_to_create, exist_ok=True)
+
     with open(path, "w") as f:
         f.write(config)
     return path
