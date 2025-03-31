@@ -388,13 +388,15 @@ class TestRunManagerLT(object):
                     outer_start_time = time.time()
                     processes = []
 
+                    output_arr = []
                     for i in range(jobs_to_start):
                         logging.info(
                             f"Launching background job {i + 1} of {jobs_to_start}..."
                         )
 
                         # we need unique paths or we'll overwrite the dir we're using in a backgrounded task
-                        test_run_file = f"{test_run_file}.{i}"
+                        test_run_dir = f"/tmp/mozilla-lt-devicepool-job-dir.{i}"
+                        test_run_file = os.path.join(test_run_dir, "hyperexecute.yaml")
                         job_config.write_config(
                             tc_client_id,
                             tc_client_key,
@@ -419,8 +421,11 @@ class TestRunManagerLT(object):
                                 env=cmd_env,
                                 cwd=test_run_dir,
                                 start_new_session=True,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE,
                             )
                             processes.append(process)
+                            output_arr.append(None)  # Initialize output slot
                             logging.info(
                                 f"Started background job {i + 1} with PID {process.pid}"
                             )
@@ -435,8 +440,20 @@ class TestRunManagerLT(object):
                         )
                         for i, process in enumerate(processes):
                             process.wait()
+                            # Collect stdout and stderr and store in output_arr
+                            stdout, stderr = process.communicate()
+                            output_arr[i] = {
+                                "stdout": stdout.decode("utf-8") if stdout else "",
+                                "stderr": stderr.decode("utf-8") if stderr else "",
+                                "returncode": process.returncode,
+                            }
                             logging.info(
                                 f"Background job {i + 1} completed with return code {process.returncode}"
+                            )
+                        # display the output_arr
+                        for i, output in enumerate(output_arr):
+                            logging.info(
+                                f"Output for job {i + 1} (rc is {output['returncode']}):\nSTDOUT: {output['stdout']}\nSTDERR: {output['stderr']}"
                             )
 
                     outer_end_time = time.time()
