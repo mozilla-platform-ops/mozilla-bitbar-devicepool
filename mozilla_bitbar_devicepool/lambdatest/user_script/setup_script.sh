@@ -75,7 +75,8 @@ rm -Rf taskcluster/
 # assume taskcluster/* was copied over
 # TODO: either clone repo, or build package for single download;  a lot of this is added via dockerfile
 cd /home/ltuser/
-mkdir taskcluster
+# TODO?: this can already exist, `-p` for now, but how to manage this?
+mkdir -p taskcluster
 cd taskcluster
 TC_VERSION=83.3.0
 wget -O generic-worker https://github.com/taskcluster/taskcluster/releases/download/v${TC_VERSION}/generic-worker-insecure-linux-amd64
