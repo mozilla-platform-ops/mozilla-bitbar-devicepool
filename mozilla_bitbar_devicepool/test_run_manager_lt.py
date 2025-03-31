@@ -21,18 +21,24 @@ class TestRunManagerLT(object):
     # Constants at class level
     PROGRAM_LABEL = "tcdp"
     #
-    STATE_STOP = 0x10
-    STATE_RUNNING = 0x15
+    STATE_STOP = "STATE_STOP"
+    STATE_RUNNING = "STATE_RUNNING"
     #
-    MODE_NO_OP = 0x150
-    MODE_RUN_NOTRACK = 0x155
-    MODE_RUN_NOTRACK_WITH_CONCURRENCY = 0x160
-    MODE_RUN_NOTRACK_BACKGROUND_TASKS = 0x165
+    MODE_NO_OP = "MODE_NO_OP"
+    MODE_RUN_NOTRACK = "MODE_RUN_NOTRACK"
+    MODE_RUN_NOTRACK_WITH_CONCURRENCY = "MODE_RUN_NOTRACK_WITH_CONCURRENCY"
+    MODE_RUN_NOTRACK_BACKGROUND_TASKS = "MODE_RUN_NOTRACK_BACKGROUND_TASKS"
     #
     MAX_JOBS_TO_START_AT_ONCE = 2000
     # lt api device states
     LT_DEVICE_STATE_ACTIVE = "active"
     LT_DEVICE_STATE_BUSY = "busy"
+    # background task control
+    # TODO: making this work when False is going to require more work...
+    #     - our loop is too fast and we end up
+    #       - overwriting dirs (handled within loop with path per job)
+    #       - starting too many jobs... we don't detect that they've started yet (TODO: check state name they are in)
+    WAIT_FOR_BACKGROUND_TASKS = True
 
     def __init__(
         self, max_jobs_to_start=5, exit_wait=5, no_job_sleep=60, debug_mode=False
@@ -200,7 +206,7 @@ class TestRunManagerLT(object):
         current_project_name = "a55-perf"
         logging.info(f"current project: {current_project_name}")
 
-        logging.info("entering run loop...")
+        logging.info(f"entering run loop (execution mode is {mode})...")
         while self.state == self.STATE_RUNNING:
             current_project = self.config_object.config["projects"][
                 current_project_name
@@ -375,6 +381,68 @@ class TestRunManagerLT(object):
                     logging.info(
                         f"starting {jobs_to_start} jobs took {round(outer_end_time - outer_start_time, 2)} seconds"
                     )
+                elif current_mode == self.MODE_RUN_NOTRACK_BACKGROUND_TASKS:
+                    # Background tasks mode - starts all tasks concurrently
+                    logging.info(f"Starting {jobs_to_start} jobs in background mode...")
+
+                    outer_start_time = time.time()
+                    processes = []
+
+                    for i in range(jobs_to_start):
+                        logging.info(
+                            f"Launching background job {i + 1} of {jobs_to_start}..."
+                        )
+
+                        # we need unique paths or we'll overwrite the dir we're using in a backgrounded task
+                        test_run_file = f"{test_run_file}.{i}"
+                        job_config.write_config(
+                            tc_client_id,
+                            tc_client_key,
+                            tc_worker_type,
+                            lt_app_url,
+                            device_type_and_os,
+                            udid=None,
+                            concurrency=1,
+                            path=test_run_file,
+                        )
+
+                        if self.debug_mode:
+                            logging.info(
+                                f"Would run command: '{command_string}' in path '{test_run_dir}'..."
+                            )
+                            time.sleep(1)  # Just a short delay to simulate starting job
+                        else:
+                            # Start process in background
+                            process = subprocess.Popen(
+                                command_string,
+                                shell=True,
+                                env=cmd_env,
+                                cwd=test_run_dir,
+                                start_new_session=True,
+                            )
+                            processes.append(process)
+                            logging.info(
+                                f"Started background job {i + 1} with PID {process.pid}"
+                            )
+
+                        if self.state == self.STATE_STOP:
+                            break
+
+                    # Wait for processes to complete if configured to do so
+                    if self.WAIT_FOR_BACKGROUND_TASKS and processes:
+                        logging.info(
+                            f"Waiting for {len(processes)} background tasks to complete..."
+                        )
+                        for i, process in enumerate(processes):
+                            process.wait()
+                            logging.info(
+                                f"Background job {i + 1} completed with return code {process.returncode}"
+                            )
+
+                    outer_end_time = time.time()
+                    logging.info(
+                        f"Launching {len(processes) if not self.debug_mode else jobs_to_start} background jobs took {round(outer_end_time - outer_start_time, 2)} seconds"
+                    )
                 elif current_mode == self.MODE_RUN_NOTRACK_WITH_CONCURRENCY:
                     # start the desired number of jobs (concurrency: jobs_to_start)
                     #
@@ -479,19 +547,10 @@ def main():
         # logging is now properly configured
         trmlt = TestRunManagerLT(debug_mode=args.debug)
 
-        # debugging
-        # import pprint
-        # pprint.pprint(trmlt.config_object.config)
-
-        # start the main run loop
-
-        # single job started at a time
-        # trmlt.run_single_project_single_thread_multi_job(max_jobs_to_start=1, foreground=True)
-
-        # multiple jobs started in background
-        #   problems:
-        #     - can start too many jobs since no get_pending_jobs lt call yet
-        trmlt.run_single_project_single_thread_multi_job()  # max_jobs_to_start=5, foreground=False)
+        # start the main run loop using background tasks mode
+        trmlt.run_single_project_single_thread_multi_job(
+            mode=trmlt.MODE_RUN_NOTRACK_BACKGROUND_TASKS
+        )
     elif args.action is None:
         # No action was provided
         # list the available actions
