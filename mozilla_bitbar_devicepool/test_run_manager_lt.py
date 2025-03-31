@@ -62,7 +62,7 @@ class TestRunManagerLT(object):
                 self.state = self.STATE_STOP
                 logging.info(
                     # f" handle_signal: set state to stop, exiting in {self.exit_wait} seconds or less"
-                    " handle_signal: set state to stop, will exit after current job completes."
+                    " handle_signal: set state to stop, will exit when safe."
                 )
                 logging.info(
                     f"will exit immediately if signal received {MAX_SIGNAL_COUNT - self.interrupt_signal_count} more times."
