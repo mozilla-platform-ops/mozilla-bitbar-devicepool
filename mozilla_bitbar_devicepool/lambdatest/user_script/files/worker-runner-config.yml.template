@@ -14,7 +14,7 @@ worker:
 workerConfig:
     certificate:                ""
     ed25519SigningKeyLocation:   "${ED25519_PRIVKEY}"
-    idleTimeoutSecs:            5400
+    idleTimeoutSecs:            3600
     livelogExecutable:          "/home/ltuser/taskcluster/livelog"
     numberOfTasksToRun:         1
     provisionerId:              "proj-autophone"
