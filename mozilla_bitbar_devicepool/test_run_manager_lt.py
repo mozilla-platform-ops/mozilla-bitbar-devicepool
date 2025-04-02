@@ -408,6 +408,12 @@ class TestRunManagerLT(object):
                             path=test_run_file,
                         )
 
+                        # copy user_script_golden_dir to correct path using python shutil
+                        shutil.copytree(
+                            user_script_golden_dir,
+                            os.path.join(test_run_dir, "user_script"),
+                        )
+
                         if self.debug_mode:
                             logging.info(
                                 f"Would run command: '{command_string}' in path '{test_run_dir}'..."
