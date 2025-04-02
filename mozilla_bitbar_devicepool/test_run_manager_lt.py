@@ -394,14 +394,23 @@ class TestRunManagerLT(object):
                             f"Launching background job {i + 1} of {jobs_to_start}..."
                         )
 
+                        # we need unique paths or we'll overwrite the dir we're using in a backgrounded task
+                        test_run_dir = f"/tmp/mozilla-lt-devicepool-job-dir.{i}"
+                        test_run_file = os.path.join(test_run_dir, "hyperexecute.yaml")
+
+                        # this is done at the start of this function, but with the non unique paths
+                        # so we need to redo.
+                        #
                         # remove /tmp/user_script dir
                         shutil.rmtree(test_run_dir, ignore_errors=True)
                         # create /tmp/mozilla-lt-devicepool-job-dir dir
                         os.makedirs(test_run_dir, exist_ok=True)
+                        # copy user_script_golden_dir to correct path using python shutil
+                        shutil.copytree(
+                            user_script_golden_dir,
+                            os.path.join(test_run_dir, "user_script"),
+                        )
 
-                        # we need unique paths or we'll overwrite the dir we're using in a backgrounded task
-                        test_run_dir = f"/tmp/mozilla-lt-devicepool-job-dir.{i}"
-                        test_run_file = os.path.join(test_run_dir, "hyperexecute.yaml")
                         job_config.write_config(
                             tc_client_id,
                             tc_client_key,
@@ -411,12 +420,6 @@ class TestRunManagerLT(object):
                             udid=None,
                             concurrency=1,
                             path=test_run_file,
-                        )
-
-                        # copy user_script_golden_dir to correct path using python shutil
-                        shutil.copytree(
-                            user_script_golden_dir,
-                            os.path.join(test_run_dir, "user_script"),
                         )
 
                         if self.debug_mode:
