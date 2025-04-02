@@ -242,7 +242,7 @@ class TestRunManagerLT(object):
             # tc data
             logging.info(f"tc_job_count: {tc_job_count}")
             # lt data
-            logging.debug(f"running_job_jount: {running_job_count}")
+            logging.debug(f"running_job_count: {running_job_count}")
             logging.debug(f"initiated job count: {initiated_job_count}")
             logging.debug(f"self.max_jobs_to_start: {self.max_jobs_to_start}")
             logging.debug(f"max_jobs_to_start: {self.max_jobs_to_start}")
