@@ -394,6 +394,11 @@ class TestRunManagerLT(object):
                             f"Launching background job {i + 1} of {jobs_to_start}..."
                         )
 
+                        # remove /tmp/user_script dir
+                        shutil.rmtree(test_run_dir, ignore_errors=True)
+                        # create /tmp/mozilla-lt-devicepool-job-dir dir
+                        os.makedirs(test_run_dir, exist_ok=True)
+
                         # we need unique paths or we'll overwrite the dir we're using in a backgrounded task
                         test_run_dir = f"/tmp/mozilla-lt-devicepool-job-dir.{i}"
                         test_run_file = os.path.join(test_run_dir, "hyperexecute.yaml")
