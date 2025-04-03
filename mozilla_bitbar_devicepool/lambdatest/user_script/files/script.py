@@ -175,9 +175,6 @@ def main():
     )
 
     print("\nscript.py: starting")
-    with open("/home/ltuser/taskcluster/version") as versionfile:
-        version = versionfile.read().strip()
-    print("\nDockerfile version {}".format(version))
 
     taskcluster_debug = "*"
 
