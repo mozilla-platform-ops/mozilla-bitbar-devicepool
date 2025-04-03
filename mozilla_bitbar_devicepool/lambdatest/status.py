@@ -149,6 +149,26 @@ class Status:
                     result_dict[state] = 1
         return result_dict
 
+    def get_device_state_summary_by_device(self):
+        results = self.get_device_list()
+        # results dict format: {state: count, ...}
+        import sys
+
+        pprint.pprint(results, stream=sys.stderr)
+        sys.exit(0)
+        result_dict = {}
+        for dev_type in results:
+            for udid in results[dev_type]:
+                # get or set the state
+                state = results[dev_type][udid]
+                if dev_type in result_dict:
+                    result_dict[dev_type][state] += 1
+                else:
+                    result_dict[dev_type] = {state: 1}
+        return result_dict
+        # pprint.pprint(result_dict)
+        # return result_dict
+
     def get_device_state_count(self, device_type_and_os_filter, state):
         results = self.get_device_list(
             device_type_and_os_filter=device_type_and_os_filter
@@ -171,23 +191,31 @@ if __name__ == "__main__":
 
     status = Status(lt_username, lt_api_key)
 
-    r = status.get_device_list("Galaxy A55 5G-14")
-    pprint.pprint(r)
+    print("device summary by device:")
+    pprint.pprint(status.get_device_state_summary_by_device())
+    print("")
+
+    # r = status.get_device_list("Galaxy A55 5G-14")
+    print("device summary:")
+    # pprint.pprint(r)
+    r = status.get_device_state_summary()
+    # # r = status.get_device_state_summary("Galaxy A55 5G-14")
     # r = status.get_device_state_summary("Galaxy A55 5G-14")
-    r = status.get_device_state_summary("Galaxy A55 5G-14")
     pprint.pprint(r)
-    r = status.get_device_state_count("Galaxy A55 5G-14", "active")
-    pprint.pprint(r)
+    # r = status.get_device_state_count("Galaxy A55 5G-14", "active")
+    # pprint.pprint(r)
 
     # r = status.get_job_summary(["mbd"])
     # pprint.pprint(r)
+
+    print("")
 
     # pprint.pprint(status.get_job_dict())
     # # print("")
     # # sys.exit(0)
     # print(f"initiated job count: {status.get_initiated_job_count()}")
-    # print("job summary:")
-    # pprint.pprint(status.get_job_summary())
+    print("job summary:")
+    pprint.pprint(status.get_job_summary())
 
     # print("")
 
