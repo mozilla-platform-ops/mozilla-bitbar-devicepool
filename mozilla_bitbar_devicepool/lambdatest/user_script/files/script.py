@@ -183,13 +183,15 @@ def main():
 
     with open("/home/ltuser/taskcluster/scriptvars.json") as scriptvars:
         scriptvarsenv = json.loads(scriptvars.read())
-        print(
-            "Bitbar test run: https://mozilla.testdroid.com/#testing/device-session/{}/{}/{}".format(
-                scriptvarsenv["TESTDROID_PROJECT_ID"],
-                scriptvarsenv["TESTDROID_BUILD_ID"],
-                scriptvarsenv["TESTDROID_RUN_ID"],
-            )
-        )
+        # TODO: figure out a way to show similar data in LT
+        #
+        #     print(
+        #         "Bitbar test run: https://mozilla.testdroid.com/#testing/device-session/{}/{}/{}".format(
+        #             scriptvarsenv["TESTDROID_PROJECT_ID"],
+        #             scriptvarsenv["TESTDROID_BUILD_ID"],
+        #             scriptvarsenv["TESTDROID_RUN_ID"],
+        #         )
+        #     )
 
     env = dict(os.environ)
 
