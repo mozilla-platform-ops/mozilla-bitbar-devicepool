@@ -151,11 +151,6 @@ class Status:
 
     def get_device_state_summary_by_device(self):
         results = self.get_device_list()
-        # results dict format: {state: count, ...}
-        import sys
-
-        pprint.pprint(results, stream=sys.stderr)
-        sys.exit(0)
         result_dict = {}
         for dev_type in results:
             for udid in results[dev_type]:
@@ -166,8 +161,6 @@ class Status:
                 else:
                     result_dict[dev_type] = {state: 1}
         return result_dict
-        # pprint.pprint(result_dict)
-        # return result_dict
 
     def get_device_state_count(self, device_type_and_os_filter, state):
         results = self.get_device_list(
@@ -190,6 +183,10 @@ if __name__ == "__main__":
     lt_api_key = os.environ["LT_ACCESS_KEY"]
 
     status = Status(lt_username, lt_api_key)
+
+    print("device list: ")
+    pprint.pprint(status.get_device_list())
+    print("")
 
     print("device summary by device:")
     pprint.pprint(status.get_device_state_summary_by_device())
