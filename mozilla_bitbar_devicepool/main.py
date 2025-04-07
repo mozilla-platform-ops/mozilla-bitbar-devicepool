@@ -87,7 +87,6 @@ def run_test(args):
 
 
 def main():
-
     parser = argparse.ArgumentParser(
         description="Mozilla Android Hardware testing at Bitbar.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
