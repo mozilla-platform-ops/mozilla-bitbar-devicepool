@@ -273,8 +273,8 @@ class TestRunManagerLT(object):
                 )
                 time.sleep(self.no_job_sleep)
             else:
-                # TODO: verify this apk is ok, update the apk if needed, and store/use it's app_id
-                lt_app_url = "lt://APP1016023521741987818221818"
+                # eternal APK provided by LT
+                lt_app_url = "lt://proverbial-android"
 
                 # remove /tmp/user_script dir
                 shutil.rmtree(test_run_dir, ignore_errors=True)
