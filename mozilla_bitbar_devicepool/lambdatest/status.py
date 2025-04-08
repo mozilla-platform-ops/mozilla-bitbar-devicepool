@@ -156,8 +156,10 @@ class Status:
             for udid in results[dev_type]:
                 # get or set the state
                 state = results[dev_type][udid]
-                if dev_type in result_dict:
+                if dev_type in result_dict and state in result_dict[dev_type]:
                     result_dict[dev_type][state] += 1
+                elif dev_type in result_dict:
+                    result_dict[dev_type][state] = 1
                 else:
                     result_dict[dev_type] = {state: 1}
         return result_dict
