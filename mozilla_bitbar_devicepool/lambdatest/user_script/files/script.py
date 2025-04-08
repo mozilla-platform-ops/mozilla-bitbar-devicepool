@@ -275,6 +275,7 @@ def main():
         device_datetime = device.shell_output("date", timeout=ADB_COMMAND_TIMEOUT)
         print("Android device datetime:  {}".format(device_datetime))
 
+        # TODO: pull out into a cleanup script
         # clean up the device.
         device.rm("/data/local/tests", recursive=True, force=True)
         device.rm("/data/local/tmp/*", recursive=True, force=True)

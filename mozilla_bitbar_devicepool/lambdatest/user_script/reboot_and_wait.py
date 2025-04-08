@@ -4,6 +4,10 @@ import sys
 import os
 
 
+# TODO: pull most of this code out into a library/class
+# TODO: consider using mozdevice pip for many of these functions
+
+
 MAX_WAIT_TIME = 120
 
 
@@ -56,7 +60,7 @@ for port in ports:
 
 # cmd = "adb devices -l | grep -v 'List of devices attached' | sed '/^[[:space:]]*$/d' | cut -f 1 -d ' '"
 
-#
+# TODO: could be a mozdevice.get_connected_devices() call
 cmd = ["/usr/bin/adb", "devices", "-l"]
 #
 run(cmd)
