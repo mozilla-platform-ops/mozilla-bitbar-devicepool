@@ -237,7 +237,10 @@ class TestRunManagerLT(object):
                 )
             )
             # do calculations
-            tc_jobs_not_handled = tc_job_count - initiated_job_count - running_job_count
+            # TODO: should running jobs be included? they most likely have taken a tc task already.
+            #    - ignoring running will overshoot, better than undershoot
+            # tc_jobs_not_handled = tc_job_count - initiated_job_count - running_job_count
+            tc_jobs_not_handled = tc_job_count - initiated_job_count
 
             # tc data
             logging.info(f"tc_job_count: {tc_job_count}")
