@@ -241,7 +241,12 @@ class TestRunManagerLT(object):
             #    - ignoring running will overshoot, better than undershoot
             #    - they should have a task if the sleep we do before launching more jobs is longer than our setup time
             #      - currently 0 seconds... so not enough
+            #
+            # problem with below line:
+            #    - if 5 jobs in tc and 5 jobs running, we won't start any jobs
             # tc_jobs_not_handled = tc_job_count - initiated_job_count - running_job_count
+            # problem with below line:
+            #    - launches too many (see note above)
             tc_jobs_not_handled = tc_job_count - initiated_job_count
 
             # tc data
