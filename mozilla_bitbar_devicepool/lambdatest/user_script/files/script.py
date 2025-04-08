@@ -33,7 +33,7 @@ def fatal(message, exception=None, retry=True):
     #     exit_code = TBPL_RETRY_EXIT_STATUS
     # else:
     #     exit_code = 1
-    print("TEST-UNEXPECTED-FAIL | bitbar | {}".format(message))
+    print("TEST-UNEXPECTED-FAIL | lambdatest | {}".format(message))
     if exception:
         print("{}: {}".format(exception.__class__.__name__, exception))
     # pass
@@ -146,7 +146,7 @@ def enable_charging(device, device_type):
                 retry=False,
             )
     except (ADBError, ADBTimeoutError) as e:
-        print("TEST-WARNING | bitbar | Error while attempting to enable charging.")
+        print("TEST-WARNING | lambdatest | Error while attempting to enable charging.")
         print("{}: {}".format(e.__class__.__name__, e))
 
 
@@ -164,7 +164,7 @@ def _monitor_readline(process, q):
 def main():
     parser = argparse.ArgumentParser(
         usage="%(prog)s [options] <test command> (<test command option> ...)",
-        description="Wrapper script for tests run on physical Android devices at Bitbar. Runs the provided command "
+        description="Wrapper script for tests run on physical Android devices at Lambdatest. Runs the provided command "
         "wrapped with required setup and teardown.",
     )
     _args, extra_args = parser.parse_known_args()
@@ -225,21 +225,24 @@ def main():
     # to connect to the device. DEVICE_SERIAL will be set to either
     # the device's serial number or its ipaddress:5555 by the framework.
     try:
+        usb_device_count = 0
         adbhost = ADBHost(verbose=True)
         if env["DEVICE_SERIAL"].endswith(":5555"):
             # Power testing with adb over wifi.
             adbhost.command_output(["connect", env["DEVICE_SERIAL"]])
         devices = adbhost.devices()
         print(json.dumps(devices, indent=4))
-        if len(devices) != 1:
+        for device in devices:
+            # only look at usb devices
+            if device["transport_id"] == 1:
+                usb_device_count += 1
+        if usb_device_count != 1:
             fatal(
-                "Must have exactly one connected device. {} found.".format(
-                    len(devices)
-                ),
+                f"Must have exactly one connected Android USB device. {usb_device_count} found.",
                 retry=True,
             )
     except (ADBError, ADBTimeoutError) as e:
-        fatal("{} Unable to obtain attached devices".format(e), retry=True)
+        fatal(f"{e} Unable to obtain attached devices", retry=True)
 
     try:
         for f in glob("/tmp/adb.*.log"):
