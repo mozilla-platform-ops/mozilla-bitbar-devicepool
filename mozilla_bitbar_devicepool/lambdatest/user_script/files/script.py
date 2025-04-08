@@ -28,15 +28,15 @@ def fatal(message, exception=None, retry=True):
 
     """
     # TBPL_RETRY_EXIT_STATUS = 4
-    # TODO: use this again, was a global?
+    print("TEST-UNEXPECTED-FAIL | lambdatest | {}".format(message))
+    if exception:
+        print("{}: {}".format(exception.__class__.__name__, exception))
+    # TODO: revisit if we should sys.exit() here immediately, why wait for return?
+    # TODO: revisit if we should use TBPL_RETRY_EXIT_STATUS, could cause infinite looping
     # if retry:
     #     exit_code = TBPL_RETRY_EXIT_STATUS
     # else:
     #     exit_code = 1
-    print("TEST-UNEXPECTED-FAIL | lambdatest | {}".format(message))
-    if exception:
-        print("{}: {}".format(exception.__class__.__name__, exception))
-    # pass
 
 
 def show_df():
