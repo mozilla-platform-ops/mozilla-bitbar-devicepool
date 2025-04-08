@@ -239,6 +239,8 @@ class TestRunManagerLT(object):
             # do calculations
             # TODO: should running jobs be included? they most likely have taken a tc task already.
             #    - ignoring running will overshoot, better than undershoot
+            #    - they should have a task if the sleep we do before launching more jobs is longer than our setup time
+            #      - currently 0 seconds... so not enough
             # tc_jobs_not_handled = tc_job_count - initiated_job_count - running_job_count
             tc_jobs_not_handled = tc_job_count - initiated_job_count
 
