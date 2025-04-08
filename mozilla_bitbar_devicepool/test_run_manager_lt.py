@@ -244,10 +244,10 @@ class TestRunManagerLT(object):
             #
             # problem with below line:
             #    - if 5 jobs in tc and 5 jobs running, we won't start any jobs
-            # tc_jobs_not_handled = tc_job_count - initiated_job_count - running_job_count
+            tc_jobs_not_handled = tc_job_count - initiated_job_count - running_job_count
             # problem with below line:
             #    - launches too many (see note above)
-            tc_jobs_not_handled = tc_job_count - initiated_job_count
+            # tc_jobs_not_handled = tc_job_count - initiated_job_count
 
             # tc data
             logging.info(f"tc_job_count: {tc_job_count}")
