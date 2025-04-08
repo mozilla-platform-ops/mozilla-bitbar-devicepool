@@ -3,7 +3,7 @@
 # virtualenv
 # search_string="main.py"
 # poetry
-search_string="mld start-test-run-manager"
+search_string="mld"
 
 pkill -USR2 -f "$search_string"
 while pkill -0 -f "$search_string"; do
