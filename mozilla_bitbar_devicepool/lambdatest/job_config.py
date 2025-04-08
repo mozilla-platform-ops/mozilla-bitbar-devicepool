@@ -182,7 +182,7 @@ framework:
     # Enable or disable device log support
     deviceLogs: true
     # App ID to be installed (mandatory field, using <app_id>)
-    appId: {lt_app_url}
+    # appId: {lt_app_url}
     # Build name for identification on the automation dashboard
     buildName: geckoview_example.apk
     # All devices are in a private cloud
