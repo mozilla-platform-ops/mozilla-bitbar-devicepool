@@ -9,7 +9,8 @@ echo "starting_dir: $starting_dir"
 sudo apt update -y
 sudo apt-get install gettext-base libgtk-3-0 mercurial usbutils -y
 
-pip install zstandard
+# google-cloud-logging is for stackdriver
+pip install zstandard google-cloud-logging
 
 ### for perftest jobs
 # AJE: mercurial installed above
