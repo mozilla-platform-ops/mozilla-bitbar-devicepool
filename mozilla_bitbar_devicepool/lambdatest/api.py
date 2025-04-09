@@ -6,6 +6,8 @@ import base64
 import pprint
 import os
 import requests_cache
+import requests.adapters
+from urllib3.util import Retry
 from datetime import timedelta
 
 # Create a cached session with 10 second expiry
@@ -13,6 +15,17 @@ from datetime import timedelta
 cached_session = requests_cache.CachedSession(
     cache_name="lambdatest_cache", backend="memory", expire_after=timedelta(seconds=10)
 )
+
+# Configure retry strategy
+retry_strategy = Retry(
+    total=5,
+    backoff_factor=0.1,
+    status_forcelist=[429, 500, 502, 503, 504],
+    allowed_methods=["GET", "POST"],
+)
+adapter = requests.adapters.HTTPAdapter(max_retries=retry_strategy)
+cached_session.mount("http://", adapter)
+cached_session.mount("https://", adapter)
 
 # https://www.lambdatest.com/support/api-doc/
 
