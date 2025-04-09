@@ -293,6 +293,7 @@ class TestRunManagerLT(object):
                     f"no unhandled jobs (no tc jobs, no active lt devices, or lt jobs already started), sleeping {self.no_job_sleep}s..."
                 )
                 time.sleep(self.no_job_sleep)
+                jobs_started_last_cycle = 0
             else:
                 # eternal APK provided by LT
                 lt_app_url = "lt://proverbial-android"
