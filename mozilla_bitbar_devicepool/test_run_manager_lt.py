@@ -206,6 +206,8 @@ class TestRunManagerLT(object):
         current_project_name = "a55-perf"
         logging.info(f"current project: {current_project_name}")
 
+        jobs_started_last_cycle = 0
+
         logging.info(f"entering run loop (execution mode is {mode})...")
         while self.state == self.STATE_RUNNING:
             current_project = self.config_object.config["projects"][
@@ -244,10 +246,17 @@ class TestRunManagerLT(object):
             #
             # problem with below line:
             #    - if 5 jobs in tc and 5 jobs running, we won't start any jobs
-            tc_jobs_not_handled = tc_job_count - initiated_job_count - running_job_count
+            # tc_jobs_not_handled = tc_job_count - initiated_job_count - running_job_count
+            #
             # problem with below line:
             #    - launches too many (see note above)
             # tc_jobs_not_handled = tc_job_count - initiated_job_count
+            #
+            # new calculation method: consider tasks started last cycle also
+            tc_jobs_not_handled = (
+                tc_job_count - initiated_job_count - jobs_started_last_cycle
+            )
+            # TODO: print out how this is calculatted
 
             # tc data
             logging.info(f"tc_job_count: {tc_job_count}")
@@ -259,6 +268,8 @@ class TestRunManagerLT(object):
             logging.debug(
                 f"active_devices_in_requested_config ({lt_device_selector}): {active_devices_in_requested_config}"
             )
+            # state data
+            logging.debug(f"jobs_started_last_cycle: {jobs_started_last_cycle}")
             # merged data
             logging.debug(f"tc_jobs_not_handled: {tc_jobs_not_handled}")
 
@@ -388,6 +399,7 @@ class TestRunManagerLT(object):
                             if self.state == self.STATE_STOP:
                                 break
                     outer_end_time = time.time()
+                    jobs_started_last_cycle = jobs_to_start
                     logging.info(
                         f"starting {jobs_to_start} jobs took {round(outer_end_time - outer_start_time, 2)} seconds"
                     )
@@ -481,6 +493,7 @@ class TestRunManagerLT(object):
                             )
 
                     outer_end_time = time.time()
+                    jobs_started_last_cycle = jobs_to_start
                     logging.info(
                         f"Launching {len(processes) if not self.debug_mode else jobs_to_start} background jobs took {round(outer_end_time - outer_start_time, 2)} seconds"
                     )
@@ -532,6 +545,8 @@ class TestRunManagerLT(object):
                         logging.info(
                             f"starting job took {round(end_time - start_time, 2)} seconds"
                         )
+                        # hm, 1 job, but it handles jobs_to_start tc tasks...
+                        jobs_started_last_cycle = jobs_to_start
                         if self.state == self.STATE_STOP:
                             break
                 elif current_mode == self.MODE_NO_OP:
