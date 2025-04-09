@@ -34,6 +34,7 @@ pytest = "^7.2.1"
 pytest-watch = "^4.2.0"
 pytest-cov = "^4.0.0"
 deptry = "^0.23.0"
+mozdevice = "^4.2.0"
 
 [tool.poetry.scripts]
 mbd = 'mozilla_bitbar_devicepool.main:main'
@@ -49,5 +50,6 @@ build-backend = "poetry.core.masonry.api"
 #ignore = ["DEP001", "DEP002"]
 
 [tool.deptry.per_rule_ignores]
-DEP001 = ["google", "mozdevice"]
+DEP001 = ["google", "mozdevice", "script"]
 DEP003 = ["google", "mozdevice"]
+DEP004 = ["mozdevice"]

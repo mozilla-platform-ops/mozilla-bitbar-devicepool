@@ -161,6 +161,16 @@ def _monitor_readline(process, q):
             break
 
 
+def get_usb_device_count(devices_json):
+    usb_device_count = 0
+    for device in devices_json:
+        # only look at usb devices
+        print(device["transport_id"])
+        if int(device["transport_id"]) == 1:
+            usb_device_count += 1
+    return usb_device_count
+
+
 def main():
     parser = argparse.ArgumentParser(
         usage="%(prog)s [options] <test command> (<test command option> ...)",
@@ -232,10 +242,7 @@ def main():
             adbhost.command_output(["connect", env["DEVICE_SERIAL"]])
         devices = adbhost.devices()
         print(json.dumps(devices, indent=4))
-        for device in devices:
-            # only look at usb devices
-            if device["transport_id"] == 1:
-                usb_device_count += 1
+        usb_device_count = get_usb_device_count(devices)
         if usb_device_count != 1:
             fatal(
                 f"Must have exactly one connected Android USB device. {usb_device_count} found.",
