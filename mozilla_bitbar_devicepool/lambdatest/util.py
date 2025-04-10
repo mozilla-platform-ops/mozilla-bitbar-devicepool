@@ -6,7 +6,10 @@ def shorten_worker_type(worker_type):
 
 def array_key_search(prefix_match, search_array):
     """Search for a prefix match in an array of strings."""
+    # print(f"sa {search_array}")
+    # print(type(search_array))
     for item in search_array:
+        # print(item)
         if item.startswith(prefix_match):
             return item
     return None

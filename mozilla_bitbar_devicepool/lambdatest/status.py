@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import ast
 import pprint
 
 from mozilla_bitbar_devicepool.lambdatest.api import get_jobs, get_devices
@@ -70,9 +71,9 @@ class Status:
         initiated_job_count = 0
         for job in gj_output["data"]:
             if job["status"] == "initiated":
-                concurrency = array_key_search("c=", job["job_label"])
+                concurrency = array_key_search("c=", ast.literal_eval(job["job_label"]))
                 if concurrency:
-                    initiated_job_count = int(concurrency.split("=")[1])
+                    initiated_job_count += int(concurrency.split("=")[1])
                 else:
                     initiated_job_count += 1
         return initiated_job_count
@@ -92,9 +93,13 @@ class Status:
         running_job_count = 0
         for job in gj_output["data"]:
             if job["status"] == "running":
-                concurrency = array_key_search("c=", job["job_label"])
+                # print(job['id'])
+                # print(job['job_label'])
+                concurrency = array_key_search("c=", ast.literal_eval(job["job_label"]))
+                # print(concurrency)
                 if concurrency:
-                    running_job_count = int(concurrency.split("=")[1])
+                    # print("c")
+                    running_job_count += int(concurrency.split("=")[1])
                 else:
                     running_job_count += 1
         return running_job_count
