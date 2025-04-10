@@ -2,11 +2,9 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import ast
 import pprint
 
 from mozilla_bitbar_devicepool.lambdatest.api import get_jobs, get_devices
-from mozilla_bitbar_devicepool.lambdatest.util import array_key_search
 
 # idea: uses api data to build a status/state
 #   - a presentation layer for data from api.py
@@ -95,11 +93,10 @@ class Status:
         initiated_job_count = 0
         for job in gj_output["data"]:
             if job["status"] == "initiated":
-                # TODO: don't use label to detect concurrency
-                concurrency = array_key_search("c=", ast.literal_eval(job["job_label"]))
-                if concurrency:
+                concurrency = int(job["Tasks"])
+                if concurrency > 1:
                     # TODO: running calculates this based on the sub-tasks... should we also do here?
-                    initiated_job_count += int(concurrency.split("=")[1])
+                    initiated_job_count += concurrency
                 else:
                     initiated_job_count += 1
         return initiated_job_count
@@ -123,10 +120,9 @@ class Status:
             if job["status"] == "running":
                 # print(job['id'])
                 # print(job['job_label'])
-                # TODO: don't use label to detect concurrency
-                concurrency = array_key_search("c=", ast.literal_eval(job["job_label"]))
+                concurrency = int(job["Tasks"])
                 # print(concurrency)
-                if concurrency:
+                if concurrency > 1:
                     # print("c")
                     # issue with this is that the tasks could have finished
                     # running_job_count += int(concurrency.split("=")[1])
@@ -257,8 +253,8 @@ if __name__ == "__main__":
 
     status = Status(lt_username, lt_api_key)
 
-    pprint.pprint(status.get_running_job_count())
-    sys.exit()
+    # pprint.pprint(status.get_running_job_count())
+    # sys.exit()
 
     # pprint.pprint(status.get_jobs())
     for job in status.get_jobs()["data"]:
@@ -270,10 +266,11 @@ if __name__ == "__main__":
         # print("device os: %s" % job["device_os"])
         # print("device status: %s" % job["device_status"])
         if job["status"] == "running":
-            pprint.pprint(job)
+            # pprint.pprint(job)
             # where number of currently running is for concurrent jobs
             # TODO: incorporate into functions above
-            print(job["job_summary"]["scenario_stage_summary"]["status_counts_excluding_retries"]["in_progress"])
+            # print(job["job_summary"]["scenario_stage_summary"]["status_counts_excluding_retries"]["in_progress"])
+            print(job["Tasks"])
         print("")
     print("")
     sys.exit()
