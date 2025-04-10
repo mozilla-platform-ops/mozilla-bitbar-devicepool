@@ -475,23 +475,48 @@ class TestRunManagerLT(object):
                         logging.info(
                             f"Waiting for {len(processes)} background tasks to complete..."
                         )
-                        for i, process in enumerate(processes):
-                            process.wait()
-                            # Collect stdout and stderr and store in output_arr
-                            stdout, stderr = process.communicate()
-                            output_arr[i] = {
-                                "stdout": stdout.decode("utf-8") if stdout else "",
-                                "stderr": stderr.decode("utf-8") if stderr else "",
-                                "returncode": process.returncode,
-                            }
-                            logging.info(
-                                f"Background job {i + 1} completed with return code {process.returncode}"
-                            )
-                        # display the output_arr
+
+                        # Initialize output array with None values
+                        output_arr = [None] * len(processes)
+                        remaining_processes = list(enumerate(processes))
+
+                        # Wait for all processes to complete
+                        while remaining_processes:
+                            # Check each process without blocking
+                            still_running = []
+                            for i, process in remaining_processes:
+                                if process.poll() is None:
+                                    # Process is still running
+                                    still_running.append((i, process))
+                                else:
+                                    # Process completed, collect output
+                                    stdout, stderr = process.communicate()
+                                    output_arr[i] = {
+                                        "stdout": stdout.decode("utf-8")
+                                        if stdout
+                                        else "",
+                                        "stderr": stderr.decode("utf-8")
+                                        if stderr
+                                        else "",
+                                        "returncode": process.returncode,
+                                    }
+                                    logging.info(
+                                        f"Background job {i + 1} completed with return code {process.returncode}"
+                                    )
+
+                            # Update the remaining processes list
+                            remaining_processes = still_running
+
+                            # If processes are still running, sleep briefly before checking again
+                            if remaining_processes:
+                                time.sleep(0.5)
+
+                        # Display output from all completed processes
                         for i, output in enumerate(output_arr):
-                            logging.info(
-                                f"Output for job {i + 1} (rc is {output['returncode']}):\nSTDOUT: {output['stdout']}\nSTDERR: {output['stderr']}"
-                            )
+                            if output:  # Skip any None entries
+                                logging.info(
+                                    f"Output for job {i + 1} (rc is {output['returncode']}):\nSTDOUT: {output['stdout']}\nSTDERR: {output['stderr']}"
+                                )
 
                     outer_end_time = time.time()
                     jobs_started_last_cycle = jobs_to_start
