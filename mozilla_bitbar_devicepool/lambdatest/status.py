@@ -12,6 +12,25 @@ from mozilla_bitbar_devicepool.lambdatest.util import array_key_search
 #   - a presentation layer for data from api.py
 
 
+# TODO: make these constants and use them everywhere
+# list of possible lt states:
+# 'aborted': 0,
+# 'cancelled': 0,
+# 'completed': 0,
+# 'created': 0,
+# 'error': 0,
+# 'failed': 0,
+# 'ignored': 0,
+# 'in_progress': 1,
+# 'lambda_error': 0,
+# 'log_available': 0,
+# 'muted': 0,
+# 'passed': 0,
+# 'skipped': 0,
+# 'stopped': 0,
+# 'timeout': 0},
+
+
 class Status:
     def __init__(self, lt_username, lt_api_key):
         self.lt_username = lt_username
