@@ -14,6 +14,7 @@ import argparse
 
 from mozilla_bitbar_devicepool import configuration_lt, logging_setup
 from mozilla_bitbar_devicepool.lambdatest import job_config, status
+from mozilla_bitbar_devicepool.lambdatest.job_tracker import JobTracker
 from mozilla_bitbar_devicepool.taskcluster import get_taskcluster_pending_tasks
 
 
@@ -56,6 +57,15 @@ class TestRunManagerLT(object):
         self.config_object = configuration_lt.ConfigurationLt()
         self.config_object.configure()
         self.status_object = status.Status(self.config_object.lt_username, self.config_object.lt_access_key)
+
+        # ISSUE: lt jobs (even more so concurrent jobs) take 1-3 minutes to start and grab a tc task, in that time
+        #        we can start more jobs and end up with too many jobs running.
+        # SOLUTION: maintain a list of started jobs, when they were started, and how many tasks (if concurrency)
+        # .       we will remove any entries older than our estimated time to start a job (3.5 minutes)
+        # TODO: maintain a jobs started log with datetimes
+        #
+        # Initialize job tracker with 3.5 minute expiry
+        self.job_tracker = JobTracker(expiry_seconds=210)
 
         signal.signal(signal.SIGUSR2, self.handle_signal)
         signal.signal(signal.SIGINT, self.handle_signal)
@@ -196,8 +206,6 @@ class TestRunManagerLT(object):
         current_project_name = "a55-perf"
         logging.info(f"current project: {current_project_name}")
 
-        jobs_started_last_cycle = 0
-
         logging.info(f"entering run loop (execution mode is {mode})...")
         while self.state == self.STATE_RUNNING:
             current_project = self.config_object.config["projects"][current_project_name]
@@ -213,28 +221,18 @@ class TestRunManagerLT(object):
             tc_job_count = get_taskcluster_pending_tasks("proj-autophone", tc_worker_type, verbose=False)
             # gather data targeting the current project or current device_type_and_os
             label_filters = [self.PROGRAM_LABEL, current_project_name]
-            # TODO: make get_running_job_count read the concurrency label
             running_job_count = self.status_object.get_running_job_count(label_filter_arr=label_filters)
             initiated_job_count = self.status_object.get_initiated_job_count(label_filter_arr=label_filters)
             active_devices_in_requested_config = self.status_object.get_device_state_count(
                 lt_device_selector, self.LT_DEVICE_STATE_ACTIVE
             )
-            # do calculations
-            # TODO: should running jobs be included? they most likely have taken a tc task already.
-            #    - ignoring running will overshoot, better than undershoot
-            #    - they should have a task if the sleep we do before launching more jobs is longer than our setup time
-            #      - currently 0 seconds... so not enough
-            #
-            # problem with below line:
-            #    - if 5 jobs in tc and 5 jobs running, we won't start any jobs
-            # tc_jobs_not_handled = tc_job_count - initiated_job_count - running_job_count
-            #
-            # problem with below line:
-            #    - launches too many (see note above)
-            # tc_jobs_not_handled = tc_job_count - initiated_job_count
-            #
-            # new calculation method: consider tasks started last cycle also
-            tc_jobs_not_handled = tc_job_count - initiated_job_count - jobs_started_last_cycle
+
+            # Get count of recently started jobs that are still in startup phase
+            recently_started_jobs = self.job_tracker.get_active_job_count()
+
+            # New calculation that includes recently started jobs
+            tc_jobs_not_handled = tc_job_count - initiated_job_count - recently_started_jobs
+
             # TODO: print out how this is calculatted
 
             # tc data
@@ -248,7 +246,7 @@ class TestRunManagerLT(object):
                 f"active_devices_in_requested_config ({lt_device_selector}): {active_devices_in_requested_config}"
             )
             # state data
-            logging.debug(f"jobs_started_last_cycle: {jobs_started_last_cycle}")
+            logging.debug(f"recently_started_jobs: {recently_started_jobs}")
             # merged data
             logging.debug(f"tc_jobs_not_handled: {tc_jobs_not_handled}")
 
@@ -266,7 +264,6 @@ class TestRunManagerLT(object):
                     f"no unhandled jobs (no tc jobs, no active lt devices, or lt jobs already started), sleeping {self.no_job_sleep}s..."
                 )
                 time.sleep(self.no_job_sleep)
-                jobs_started_last_cycle = 0
             else:
                 # eternal APK provided by LT
                 lt_app_url = "lt://proverbial-android"
@@ -298,9 +295,11 @@ class TestRunManagerLT(object):
                 #   - we really want the lt side name for this... they turn out to be the same
                 # labels_csv += f",{shorten_worker_type(tc_worker_type)}"
                 labels_csv += f",{current_project_name}"
+                # TODO: revisit this decision in a bit
+                #   - not adding device type because it's largely redundant given current_project_name
                 # add the device type to the labels
-                dtao_underscore = device_type_and_os.replace(" ", "_")
-                labels_csv += f",{dtao_underscore}"
+                # dtao_underscore = device_type_and_os.replace(" ", "_")
+                # labels_csv += f",{dtao_underscore}"
                 # TODO?: enable adding udid to the labels?
                 # if udid:
                 #     labels_csv += f",{udid}"
@@ -363,7 +362,8 @@ class TestRunManagerLT(object):
                             if self.state == self.STATE_STOP:
                                 break
                     outer_end_time = time.time()
-                    jobs_started_last_cycle = jobs_to_start
+                    # Record the jobs we just started
+                    self.job_tracker.add_jobs(jobs_to_start)
                     logging.info(
                         f"starting {jobs_to_start} jobs took {round(outer_end_time - outer_start_time, 2)} seconds"
                     )
@@ -470,7 +470,8 @@ class TestRunManagerLT(object):
                                 )
 
                     outer_end_time = time.time()
-                    jobs_started_last_cycle = jobs_to_start
+                    # Record the jobs we just started
+                    self.job_tracker.add_jobs(jobs_to_start)
                     logging.info(
                         f"Launching {len(processes) if not self.debug_mode else jobs_to_start} background jobs took {round(outer_end_time - outer_start_time, 2)} seconds"
                     )
@@ -523,10 +524,13 @@ class TestRunManagerLT(object):
                         )
                         end_time = time.time()
                         logging.info(f"starting job took {round(end_time - start_time, 2)} seconds")
-                        # hm, 1 job, but it handles jobs_to_start tc tasks...
-                        jobs_started_last_cycle = jobs_to_start
                         if self.state == self.STATE_STOP:
                             break
+
+                    # Record the jobs we just started
+                    self.job_tracker.add_jobs(jobs_to_start)
+                    if self.state == self.STATE_STOP:
+                        break
                 elif current_mode == self.MODE_NO_OP:
                     # no op mode (used to get to the sleep)
                     logging.info("mode 3: no op mode")
