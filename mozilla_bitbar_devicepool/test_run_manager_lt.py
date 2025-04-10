@@ -231,7 +231,8 @@ class TestRunManagerLT(object):
             recently_started_jobs = self.job_tracker.get_active_job_count()
 
             # New calculation that includes recently started jobs
-            tc_jobs_not_handled = tc_job_count - initiated_job_count - recently_started_jobs
+            # TODO: should this include initiated_job_count?
+            tc_jobs_not_handled = tc_job_count - recently_started_jobs
 
             # TODO: print out how this is calculatted
 
