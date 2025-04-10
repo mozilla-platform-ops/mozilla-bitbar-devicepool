@@ -35,7 +35,8 @@ def get_taskcluster_pending_tasks(provisioner_id, worker_type, verbose=False):
     )
     if verbose:
         print("taskcluster_queue_url: %s" % taskcluster_queue_url)
-    r = session.get(taskcluster_queue_url)
+    # Adding timeouts: 10 seconds to establish connection, 30 seconds to read response
+    r = session.get(taskcluster_queue_url, timeout=(10, 30))
     if verbose:
         print("r.status_code: %s" % r.status_code)
         print("r.text: %s" % r.text if r.text else "r.content: %s" % r.content)
