@@ -83,6 +83,7 @@ class Status:
                 result_dict[status] = 1
         return result_dict
 
+    # includes concurrent shards
     def get_initiated_job_count(self, label_filter_arr=None, jobs=100):
         # TODO: make label_filter work
         gj_output = get_jobs(
@@ -107,6 +108,7 @@ class Status:
     def get_job_count(self, state_filter=None, label_filter=None, jobs=100):
         pass
 
+    # includes concurrent shards
     def get_running_job_count(self, label_filter_arr=None, jobs=100):
         # TODO: make label_filter work
         gj_output = get_jobs(
