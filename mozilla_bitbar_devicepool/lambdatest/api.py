@@ -36,7 +36,12 @@ cached_session.mount("https://", adapter)
 #
 # /v1.0/jobs
 def get_jobs(
-    lt_username, lt_api_key, label_filter_arr=None, jobs=100, show_test_summary=False
+    lt_username,
+    lt_api_key,
+    label_filter_arr=None,
+    jobs=100,
+    show_test_summary=False,
+    timeout=30,
 ):
     url = (
         "https://api.hyperexecute.cloud/v1.0/jobs"
@@ -53,7 +58,7 @@ def get_jobs(
     headers["Authorization"] = f"Basic {base64_auth_string}"
 
     # Use cached_session instead of requests directly
-    response = cached_session.get(url, headers=headers)
+    response = cached_session.get(url, headers=headers, timeout=timeout)
     # check the response code
     if response.status_code != 200:
         print(f"Error: {response.status_code}")
