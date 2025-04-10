@@ -124,19 +124,14 @@ class Status:
             if device_type_and_os_filter:
                 # pprint.pprint(device)
                 # result_dict[device["name"]] = device_type_entry
-                if (
-                    device_type == device["name"]
-                    and device_os == device["fullOsVersion"]
-                ):
+                if device_type == device["name"] and device_os == device["fullOsVersion"]:
                     result_dict[device["name"]] = device_type_entry
             else:
                 result_dict[device["name"]] = device_type_entry
         return result_dict
 
     def get_device_state_summary(self, device_type_and_os_filter=None):
-        results = self.get_device_list(
-            device_type_and_os_filter=device_type_and_os_filter
-        )
+        results = self.get_device_list(device_type_and_os_filter=device_type_and_os_filter)
         # results dict format: {state: count, ...}
         result_dict = {}
         for dev_type in results:
@@ -165,9 +160,7 @@ class Status:
         return result_dict
 
     def get_device_state_count(self, device_type_and_os_filter, state):
-        results = self.get_device_list(
-            device_type_and_os_filter=device_type_and_os_filter
-        )
+        results = self.get_device_list(device_type_and_os_filter=device_type_and_os_filter)
         result_int = 0
         for dev_type in results:
             for udid in results[dev_type]:
@@ -178,7 +171,7 @@ class Status:
         return result_int
 
 
-if __name__ == "__main__":
+def lt_status_main():
     import os
 
     lt_username = os.environ["LT_USERNAME"]
@@ -194,31 +187,59 @@ if __name__ == "__main__":
     pprint.pprint(status.get_device_state_summary_by_device())
     print("")
 
-    # r = status.get_device_list("Galaxy A55 5G-14")
     print("device summary:")
-    # pprint.pprint(r)
     r = status.get_device_state_summary()
-    # # r = status.get_device_state_summary("Galaxy A55 5G-14")
-    # r = status.get_device_state_summary("Galaxy A55 5G-14")
     pprint.pprint(r)
-    # r = status.get_device_state_count("Galaxy A55 5G-14", "active")
-    # pprint.pprint(r)
-
-    # r = status.get_job_summary(["mbd"])
-    # pprint.pprint(r)
 
     print("")
 
-    # pprint.pprint(status.get_job_dict())
-    # # print("")
-    # # sys.exit(0)
-    # print(f"initiated job count: {status.get_initiated_job_count()}")
     print("job summary:")
     pprint.pprint(status.get_job_summary())
 
+
+if __name__ == "__main__":
+    import os
+
+    lt_username = os.environ["LT_USERNAME"]
+    lt_api_key = os.environ["LT_ACCESS_KEY"]
+
+    status = Status(lt_username, lt_api_key)
+
+    pprint.pprint(status.get_running_job_count())
+
+    # print("device list: ")
+    # pprint.pprint(status.get_device_list())
     # print("")
 
-    # print("device list:")
-    # pprint.pprint(status.get_device_list())
+    # print("device summary by device:")
+    # pprint.pprint(status.get_device_state_summary_by_device())
+    # print("")
 
-    # sys.exit(0)
+    # # r = status.get_device_list("Galaxy A55 5G-14")
+    # print("device summary:")
+    # # pprint.pprint(r)
+    # r = status.get_device_state_summary()
+    # # # r = status.get_device_state_summary("Galaxy A55 5G-14")
+    # # r = status.get_device_state_summary("Galaxy A55 5G-14")
+    # pprint.pprint(r)
+    # # r = status.get_device_state_count("Galaxy A55 5G-14", "active")
+    # # pprint.pprint(r)
+
+    # # r = status.get_job_summary(["mbd"])
+    # # pprint.pprint(r)
+
+    # print("")
+
+    # # pprint.pprint(status.get_job_dict())
+    # # # print("")
+    # # # sys.exit(0)
+    # # print(f"initiated job count: {status.get_initiated_job_count()}")
+    # print("job summary:")
+    # pprint.pprint(status.get_job_summary())
+
+    # # print("")
+
+    # # print("device list:")
+    # # pprint.pprint(status.get_device_list())
+
+    # # sys.exit(0)
