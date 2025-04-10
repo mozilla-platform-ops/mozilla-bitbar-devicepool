@@ -19,6 +19,10 @@ class Status:
 
     # jobs
 
+    def get_jobs(self, jobs=100):
+        jobs = get_jobs(self.lt_username, self.lt_api_key, jobs=jobs)
+        return jobs
+
     def get_job_dict(self, jobs=100):
         jobs = get_jobs(self.lt_username, self.lt_api_key, jobs=jobs)
         pprint.pprint(jobs)
@@ -73,6 +77,7 @@ class Status:
             if job["status"] == "initiated":
                 concurrency = array_key_search("c=", ast.literal_eval(job["job_label"]))
                 if concurrency:
+                    # TODO: running calculates this based on the sub-tasks... should we also do here?
                     initiated_job_count += int(concurrency.split("=")[1])
                 else:
                     initiated_job_count += 1
@@ -100,7 +105,11 @@ class Status:
                 # print(concurrency)
                 if concurrency:
                     # print("c")
-                    running_job_count += int(concurrency.split("=")[1])
+                    # issue with this is that the tasks could have finished
+                    # running_job_count += int(concurrency.split("=")[1])
+                    running_job_count += int(
+                        job["job_summary"]["scenario_stage_summary"]["status_counts_excluding_retries"]["in_progress"]
+                    )
                 else:
                     running_job_count += 1
         return running_job_count
@@ -217,6 +226,8 @@ def lt_status_main():
 
 if __name__ == "__main__":
     import os
+    import sys
+    import pprint
 
     lt_username = os.environ["LT_USERNAME"]
     lt_api_key = os.environ["LT_ACCESS_KEY"]
@@ -224,6 +235,25 @@ if __name__ == "__main__":
     status = Status(lt_username, lt_api_key)
 
     pprint.pprint(status.get_running_job_count())
+    sys.exit()
+
+    # pprint.pprint(status.get_jobs())
+    for job in status.get_jobs()["data"]:
+        print("job number: %s" % job["job_number"])
+        print("status: %s" % job["status"])
+        print("job label: %s" % job["job_label"])
+        # print("device udid: %s" % job["device_udid"])
+        # print("device name: %s" % job["device_name"])
+        # print("device os: %s" % job["device_os"])
+        # print("device status: %s" % job["device_status"])
+        if job["status"] == "running":
+            pprint.pprint(job)
+            # where number of currently running is for concurrent jobs
+            # TODO: incorporate into functions above
+            print(job["job_summary"]["scenario_stage_summary"]["status_counts_excluding_retries"]["in_progress"])
+        print("")
+    print("")
+    sys.exit()
 
     # print("device list: ")
     # pprint.pprint(status.get_device_list())
