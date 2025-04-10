@@ -70,14 +70,17 @@ class Status:
         initiated_job_count = 0
         for job in gj_output["data"]:
             if job["status"] == "initiated":
-                initiated_job_count += 1
+                concurrency = array_key_search("c=", job["job_label"])
+                if concurrency:
+                    initiated_job_count = int(concurrency.split("=")[1])
+                else:
+                    initiated_job_count += 1
         return initiated_job_count
 
     # TODO: write this so we don't need get_initiated_job_count and get_running_job_count
     def get_job_count(self, state_filter=None, label_filter=None, jobs=100):
         pass
 
-    # TODO: make this generic get_job_count and pass in an array of states to include
     def get_running_job_count(self, label_filter_arr=None, jobs=100):
         # TODO: make label_filter work
         gj_output = get_jobs(
@@ -86,18 +89,15 @@ class Status:
             label_filter_arr=label_filter_arr,
             jobs=jobs,
         )
-        initiated_job_count = 0
+        running_job_count = 0
         for job in gj_output["data"]:
-            # pprint.pprint(job)
             if job["status"] == "running":
-                # TODO: inspect label for 'c=X'
-                # print(job['job_label'])
                 concurrency = array_key_search("c=", job["job_label"])
                 if concurrency:
-                    initiated_job_count = int(concurrency.split("=")[1])
+                    running_job_count = int(concurrency.split("=")[1])
                 else:
-                    initiated_job_count += 1
-        return initiated_job_count
+                    running_job_count += 1
+        return running_job_count
 
     # TODO: find out which job is for which 'workerType' otherwise we can only run one workerType...
     #   - use job label? `--labels` arg to hyperexecute
