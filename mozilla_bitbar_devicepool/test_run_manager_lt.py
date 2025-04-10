@@ -28,8 +28,8 @@ class TestRunManagerLT(object):
     MODE_RUN_NOTRACK = "MODE_RUN_NOTRACK"
     MODE_RUN_NOTRACK_WITH_CONCURRENCY = "MODE_RUN_NOTRACK_WITH_CONCURRENCY"
     MODE_RUN_NOTRACK_BACKGROUND_TASKS = "MODE_RUN_NOTRACK_BACKGROUND_TASKS"
-    #
-    MAX_JOBS_TO_START_AT_ONCE = 2000
+    # TODO: increase this to 10, 20, 30 once we're more confident
+    MAX_JOBS_TO_START_AT_ONCE = 5
     # lt api device states
     LT_DEVICE_STATE_ACTIVE = "active"
     LT_DEVICE_STATE_BUSY = "busy"
@@ -41,7 +41,11 @@ class TestRunManagerLT(object):
     WAIT_FOR_BACKGROUND_TASKS = True
 
     def __init__(
-        self, max_jobs_to_start=5, exit_wait=5, no_job_sleep=60, debug_mode=False
+        self,
+        max_jobs_to_start=MAX_JOBS_TO_START_AT_ONCE,
+        exit_wait=5,
+        no_job_sleep=60,
+        debug_mode=False,
     ):
         self.interrupt_signal_count = 0
         self.exit_wait = exit_wait
@@ -529,6 +533,16 @@ class TestRunManagerLT(object):
                     # issues:
                     #   - doesn't work
 
+                    # TODO: add a label indicating how much concurrency we're running with (like c=5)
+                    labels_arg += f"c={jobs_to_start}"
+                    # rebuild the command with new label
+                    if foreground:
+                        command_string = f"{project_root_dir}/hyperexecute {labels_arg}"
+                    else:
+                        command_string = (
+                            f"{project_root_dir}/hyperexecute --no-track {labels_arg}"
+                        )
+
                     # create hyperexecute.yaml specific to each queue
                     job_config.write_config(
                         tc_client_id,
@@ -631,7 +645,8 @@ def main():
 
         # start the main run loop using background tasks mode
         trmlt.run_single_project_single_thread_multi_job(
-            mode=trmlt.MODE_RUN_NOTRACK_BACKGROUND_TASKS
+            # mode=trmlt.MODE_RUN_NOTRACK_BACKGROUND_TASKS
+            mode=trmlt.MODE_RUN_NOTRACK_WITH_CONCURRENCY,
         )
     elif args.action is None:
         # No action was provided
