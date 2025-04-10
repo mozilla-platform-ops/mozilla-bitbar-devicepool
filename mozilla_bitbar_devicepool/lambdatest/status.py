@@ -94,6 +94,7 @@ class Status:
         initiated_job_count = 0
         for job in gj_output["data"]:
             if job["status"] == "initiated":
+                # TODO: don't use label to detect concurrency
                 concurrency = array_key_search("c=", ast.literal_eval(job["job_label"]))
                 if concurrency:
                     # TODO: running calculates this based on the sub-tasks... should we also do here?
@@ -120,6 +121,7 @@ class Status:
             if job["status"] == "running":
                 # print(job['id'])
                 # print(job['job_label'])
+                # TODO: don't use label to detect concurrency
                 concurrency = array_key_search("c=", ast.literal_eval(job["job_label"]))
                 # print(concurrency)
                 if concurrency:
