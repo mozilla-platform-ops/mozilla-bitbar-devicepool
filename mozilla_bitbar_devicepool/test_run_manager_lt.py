@@ -481,15 +481,6 @@ class TestRunManagerLT(object):
                     # issues:
                     #   - doesn't work
 
-                    # TODO: add a label indicating how much concurrency we're running with (like c=5)
-                    labels_csv += f",c={jobs_to_start}"
-                    labels_arg = f"--labels '{labels_csv}'"
-                    # rebuild the command with new label
-                    if foreground:
-                        command_string = f"{project_root_dir}/hyperexecute {labels_arg}"
-                    else:
-                        command_string = f"{project_root_dir}/hyperexecute --no-track {labels_arg}"
-
                     # create hyperexecute.yaml specific to each queue
                     job_config.write_config(
                         tc_client_id,
