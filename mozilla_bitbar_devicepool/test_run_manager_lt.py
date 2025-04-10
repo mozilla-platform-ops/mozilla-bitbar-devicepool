@@ -55,9 +55,7 @@ class TestRunManagerLT(object):
         self.debug_mode = debug_mode
         self.config_object = configuration_lt.ConfigurationLt()
         self.config_object.configure()
-        self.status_object = status.Status(
-            self.config_object.lt_username, self.config_object.lt_access_key
-        )
+        self.status_object = status.Status(self.config_object.lt_username, self.config_object.lt_access_key)
 
         signal.signal(signal.SIGUSR2, self.handle_signal)
         signal.signal(signal.SIGINT, self.handle_signal)
@@ -80,9 +78,7 @@ class TestRunManagerLT(object):
                 # for testing, exit immediately (no wait)
                 # sys.exit(0)
             else:
-                logging.info(
-                    f" handle_signal: received signal {MAX_SIGNAL_COUNT} times, exiting immediately"
-                )
+                logging.info(f" handle_signal: received signal {MAX_SIGNAL_COUNT} times, exiting immediately")
                 sys.exit(0)
 
     def handle_signal_old(self, signalnum, frame):
@@ -101,9 +97,7 @@ class TestRunManagerLT(object):
     def single_project_single_thread_single_job(self):
         project_source_dir = os.path.dirname(os.path.realpath(__file__))
         project_root_dir = os.path.abspath(os.path.join(project_source_dir, ".."))
-        user_script_golden_dir = os.path.join(
-            project_source_dir, "lambdatest", "user_script"
-        )
+        user_script_golden_dir = os.path.join(project_source_dir, "lambdatest", "user_script")
         test_run_dir = "/tmp/mozilla-lt-devicepool-job-dir"
         test_run_file = os.path.join(test_run_dir, "hyperexecute.yaml")
 
@@ -127,9 +121,7 @@ class TestRunManagerLT(object):
             os.makedirs(test_run_dir, exist_ok=True)
 
             # copy user_script_golden_dir to correct path using python shutil
-            shutil.copytree(
-                user_script_golden_dir, os.path.join(test_run_dir, "user_script")
-            )
+            shutil.copytree(user_script_golden_dir, os.path.join(test_run_dir, "user_script"))
 
             cmd_env = os.environ.copy()
             cmd_env["LT_USERNAME"] = self.config_object.lt_username
@@ -158,9 +150,7 @@ class TestRunManagerLT(object):
             logging.info("starting job...")
             # Use test_mode instead of hardcoded DEBUG
             if self.debug_mode:
-                logging.info(
-                    f"would be running command: '{command_string}' in path '{test_run_dir}'..."
-                )
+                logging.info(f"would be running command: '{command_string}' in path '{test_run_dir}'...")
                 logging.info("sleeping 30 seconds (to simulate starting job)...")
                 time.sleep(30)
             else:
@@ -182,9 +172,7 @@ class TestRunManagerLT(object):
             # take a short break
             time.sleep(5)
 
-    def run_single_project_single_thread_multi_job(
-        self, max_jobs_to_start=None, foreground=False, mode=None
-    ):
+    def run_single_project_single_thread_multi_job(self, max_jobs_to_start=None, foreground=False, mode=None):
         if mode is None:
             mode = self.MODE_RUN_NOTRACK
         # default the value
@@ -193,9 +181,7 @@ class TestRunManagerLT(object):
         # base on __file__ to get the project root dir
         project_source_dir = os.path.dirname(os.path.realpath(__file__))
         project_root_dir = os.path.abspath(os.path.join(project_source_dir, ".."))
-        user_script_golden_dir = os.path.join(
-            project_source_dir, "lambdatest", "user_script"
-        )
+        user_script_golden_dir = os.path.join(project_source_dir, "lambdatest", "user_script")
 
         test_run_dir = "/tmp/mozilla-lt-devicepool-job-dir"
         test_run_file = os.path.join(test_run_dir, "hyperexecute.yaml")
@@ -214,9 +200,7 @@ class TestRunManagerLT(object):
 
         logging.info(f"entering run loop (execution mode is {mode})...")
         while self.state == self.STATE_RUNNING:
-            current_project = self.config_object.config["projects"][
-                current_project_name
-            ]
+            current_project = self.config_object.config["projects"][current_project_name]
 
             tc_worker_type = current_project["TC_WORKER_TYPE"]
             tc_client_id = current_project["TASKCLUSTER_CLIENT_ID"]
@@ -226,21 +210,14 @@ class TestRunManagerLT(object):
             # print(f"tc_client_id: {tc_client_id}")
             # print(f"tc_client_key: {tc_client_key}")
 
-            tc_job_count = get_taskcluster_pending_tasks(
-                "proj-autophone", tc_worker_type, verbose=False
-            )
+            tc_job_count = get_taskcluster_pending_tasks("proj-autophone", tc_worker_type, verbose=False)
             # gather data targeting the current project or current device_type_and_os
             label_filters = [self.PROGRAM_LABEL, current_project_name]
-            running_job_count = self.status_object.get_running_job_count(
-                label_filter_arr=label_filters
-            )
-            initiated_job_count = self.status_object.get_initiated_job_count(
-                label_filter_arr=label_filters
-            )
-            active_devices_in_requested_config = (
-                self.status_object.get_device_state_count(
-                    lt_device_selector, self.LT_DEVICE_STATE_ACTIVE
-                )
+            # TODO: make get_running_job_count read the concurrency label
+            running_job_count = self.status_object.get_running_job_count(label_filter_arr=label_filters)
+            initiated_job_count = self.status_object.get_initiated_job_count(label_filter_arr=label_filters)
+            active_devices_in_requested_config = self.status_object.get_device_state_count(
+                lt_device_selector, self.LT_DEVICE_STATE_ACTIVE
             )
             # do calculations
             # TODO: should running jobs be included? they most likely have taken a tc task already.
@@ -257,9 +234,7 @@ class TestRunManagerLT(object):
             # tc_jobs_not_handled = tc_job_count - initiated_job_count
             #
             # new calculation method: consider tasks started last cycle also
-            tc_jobs_not_handled = (
-                tc_job_count - initiated_job_count - jobs_started_last_cycle
-            )
+            tc_jobs_not_handled = tc_job_count - initiated_job_count - jobs_started_last_cycle
             # TODO: print out how this is calculatted
 
             # tc data
@@ -278,17 +253,11 @@ class TestRunManagerLT(object):
             logging.debug(f"tc_jobs_not_handled: {tc_jobs_not_handled}")
 
             # limit the amount of jobs we start to a local and global max
-            jobs_to_start = min(
-                tc_jobs_not_handled, self.max_jobs_to_start, max_jobs_to_start
-            )
-            logging.debug(
-                f"min of tc_jobs_not_handled, self.max_jobs_to_start, max_jobs_to_start is {jobs_to_start}"
-            )
+            jobs_to_start = min(tc_jobs_not_handled, self.max_jobs_to_start, max_jobs_to_start)
+            logging.debug(f"min of tc_jobs_not_handled, self.max_jobs_to_start, max_jobs_to_start is {jobs_to_start}")
             # don't try to start more jobs than free devices
             jobs_to_start = min(jobs_to_start, active_devices_in_requested_config)
-            logging.debug(
-                f"min of jobs_to_start and active_devices_in_requested_config is {jobs_to_start}"
-            )
+            logging.debug(f"min of jobs_to_start and active_devices_in_requested_config is {jobs_to_start}")
 
             logging.info(f"jobs_to_start: {jobs_to_start}")
 
@@ -308,9 +277,7 @@ class TestRunManagerLT(object):
                 os.makedirs(test_run_dir, exist_ok=True)
 
                 # copy user_script_golden_dir to correct path using python shutil
-                shutil.copytree(
-                    user_script_golden_dir, os.path.join(test_run_dir, "user_script")
-                )
+                shutil.copytree(user_script_golden_dir, os.path.join(test_run_dir, "user_script"))
 
                 cmd_env = os.environ.copy()
                 cmd_env["LT_USERNAME"] = self.config_object.lt_username
@@ -345,9 +312,7 @@ class TestRunManagerLT(object):
                 if foreground:
                     command_string = f"{project_root_dir}/hyperexecute {labels_arg}"
                 else:
-                    command_string = (
-                        f"{project_root_dir}/hyperexecute --no-track {labels_arg}"
-                    )
+                    command_string = f"{project_root_dir}/hyperexecute --no-track {labels_arg}"
 
                 current_mode = mode
                 if jobs_to_start <= 0:
@@ -374,17 +339,11 @@ class TestRunManagerLT(object):
                         logging.info(f"starting job {i + 1} of {jobs_to_start}...")
                         # Use test_mode instead of hardcoded DEBUG
                         if self.debug_mode:
-                            logging.info(
-                                f"would be running command: '{command_string}' in path '{test_run_dir}'..."
-                            )
-                            logging.info(
-                                "sleeping 30 seconds (to simulate starting job)..."
-                            )
+                            logging.info(f"would be running command: '{command_string}' in path '{test_run_dir}'...")
+                            logging.info("sleeping 30 seconds (to simulate starting job)...")
                             time.sleep(30)
                         else:
-                            logging.info(
-                                f"running: '{command_string}' in path '{test_run_dir}'..."
-                            )
+                            logging.info(f"running: '{command_string}' in path '{test_run_dir}'...")
                             start_time = time.time()
                             # NOTE: background so we can do this faster or set concurrencty in the YAML?
                             #   - can only get 1-2 jobs going in parallel with trivial tasks
@@ -417,9 +376,7 @@ class TestRunManagerLT(object):
 
                     output_arr = []
                     for i in range(jobs_to_start):
-                        logging.info(
-                            f"Launching background job {i + 1} of {jobs_to_start}..."
-                        )
+                        logging.info(f"Launching background job {i + 1} of {jobs_to_start}...")
 
                         # we need unique paths or we'll overwrite the dir we're using in a backgrounded task
                         test_run_dir = f"/tmp/mozilla-lt-devicepool-job-dir.{i}"
@@ -450,9 +407,7 @@ class TestRunManagerLT(object):
                         )
 
                         if self.debug_mode:
-                            logging.info(
-                                f"Would run command: '{command_string}' in path '{test_run_dir}'..."
-                            )
+                            logging.info(f"Would run command: '{command_string}' in path '{test_run_dir}'...")
                             time.sleep(1)  # Just a short delay to simulate starting job
                         else:
                             # Start process in background
@@ -467,18 +422,14 @@ class TestRunManagerLT(object):
                             )
                             processes.append(process)
                             output_arr.append(None)  # Initialize output slot
-                            logging.info(
-                                f"Started background job {i + 1} with PID {process.pid}"
-                            )
+                            logging.info(f"Started background job {i + 1} with PID {process.pid}")
 
                         if self.state == self.STATE_STOP:
                             break
 
                     # Wait for processes to complete if configured to do so
                     if self.WAIT_FOR_BACKGROUND_TASKS and processes:
-                        logging.info(
-                            f"Waiting for {len(processes)} background tasks to complete..."
-                        )
+                        logging.info(f"Waiting for {len(processes)} background tasks to complete...")
 
                         # Initialize output array with None values
                         output_arr = [None] * len(processes)
@@ -496,12 +447,8 @@ class TestRunManagerLT(object):
                                     # Process completed, collect output
                                     stdout, stderr = process.communicate()
                                     output_arr[i] = {
-                                        "stdout": stdout.decode("utf-8")
-                                        if stdout
-                                        else "",
-                                        "stderr": stderr.decode("utf-8")
-                                        if stderr
-                                        else "",
+                                        "stdout": stdout.decode("utf-8") if stdout else "",
+                                        "stderr": stderr.decode("utf-8") if stderr else "",
                                         "returncode": process.returncode,
                                     }
                                     logging.info(
@@ -534,14 +481,13 @@ class TestRunManagerLT(object):
                     #   - doesn't work
 
                     # TODO: add a label indicating how much concurrency we're running with (like c=5)
-                    labels_arg += f"c={jobs_to_start}"
+                    labels_csv += f",c={jobs_to_start}"
+                    labels_arg = f"--labels '{labels_csv}'"
                     # rebuild the command with new label
                     if foreground:
                         command_string = f"{project_root_dir}/hyperexecute {labels_arg}"
                     else:
-                        command_string = (
-                            f"{project_root_dir}/hyperexecute --no-track {labels_arg}"
-                        )
+                        command_string = f"{project_root_dir}/hyperexecute --no-track {labels_arg}"
 
                     # create hyperexecute.yaml specific to each queue
                     job_config.write_config(
@@ -558,17 +504,11 @@ class TestRunManagerLT(object):
                     logging.info(f"starting job with concurrency {jobs_to_start}...")
                     # Use test_mode instead of hardcoded DEBUG
                     if self.debug_mode:
-                        logging.info(
-                            f"would be running command: '{command_string}' in path '{test_run_dir}'..."
-                        )
-                        logging.info(
-                            "sleeping 30 seconds (to simulate starting job)..."
-                        )
+                        logging.info(f"would be running command: '{command_string}' in path '{test_run_dir}'...")
+                        logging.info("sleeping 30 seconds (to simulate starting job)...")
                         time.sleep(30)
                     else:
-                        logging.info(
-                            f"running: '{command_string}' in path '{test_run_dir}'..."
-                        )
+                        logging.info(f"running: '{command_string}' in path '{test_run_dir}'...")
                         start_time = time.time()
                         # NOTE: background so we can do this faster or set concurrencty in the YAML?
                         #   - can only get 1-2 jobs going in parallel with trivial tasks
@@ -582,9 +522,7 @@ class TestRunManagerLT(object):
                             start_new_session=True,
                         )
                         end_time = time.time()
-                        logging.info(
-                            f"starting job took {round(end_time - start_time, 2)} seconds"
-                        )
+                        logging.info(f"starting job took {round(end_time - start_time, 2)} seconds")
                         # hm, 1 job, but it handles jobs_to_start tc tasks...
                         jobs_started_last_cycle = jobs_to_start
                         if self.state == self.STATE_STOP:

@@ -46,6 +46,10 @@ dgrlt = 'mozilla_bitbar_devicepool.device_group_report_lt:main'
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.ruff]
+# Allow lines to be as long as 120.
+line-length = 120
+
 [tool.deptry]
 #ignore = ["DEP001", "DEP002"]
 
