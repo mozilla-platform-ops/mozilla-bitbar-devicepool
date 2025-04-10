@@ -92,6 +92,7 @@ class Status:
         )
         running_job_count = 0
         for job in gj_output["data"]:
+            # TODO: we need to check if the concurrent tasks are running, outer job could be runing but 4/5 jobs done!
             if job["status"] == "running":
                 # print(job['id'])
                 # print(job['job_label'])
