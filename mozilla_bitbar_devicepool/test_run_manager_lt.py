@@ -30,7 +30,7 @@ class TestRunManagerLT(object):
     MODE_RUN_NOTRACK_WITH_CONCURRENCY = "MODE_RUN_NOTRACK_WITH_CONCURRENCY"
     MODE_RUN_NOTRACK_BACKGROUND_TASKS = "MODE_RUN_NOTRACK_BACKGROUND_TASKS"
     # TODO: increase this to 10, 20, 30 once we're more confident
-    MAX_JOBS_TO_START_AT_ONCE = 5
+    MAX_JOBS_TO_START_AT_ONCE = 10
     # lt api device states
     LT_DEVICE_STATE_ACTIVE = "active"
     LT_DEVICE_STATE_BUSY = "busy"
