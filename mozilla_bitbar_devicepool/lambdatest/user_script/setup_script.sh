@@ -79,7 +79,7 @@ cd /home/ltuser/
 # TODO?: this can already exist, `-p` for now, but how to manage this?
 mkdir -p taskcluster
 cd taskcluster
-TC_VERSION=83.3.0
+TC_VERSION=83.5.6
 wget -O generic-worker https://github.com/taskcluster/taskcluster/releases/download/v${TC_VERSION}/generic-worker-insecure-linux-amd64
 wget -O livelog https://github.com/taskcluster/taskcluster/releases/download/v${TC_VERSION}/livelog-linux-amd64
 wget -O taskcluster-proxy https://github.com/taskcluster/taskcluster/releases/download/v${TC_VERSION}/taskcluster-proxy-linux-amd64
