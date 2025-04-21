@@ -24,6 +24,7 @@ def dump_scriptvars():
     """
     names = (
         "ANDROID_DEVICE",
+        "ANDROID_SERIAL",
         "DEVICE_IP",
         "DEVICE_NAME",
         "DEVICE_SERIAL",
@@ -31,13 +32,14 @@ def dump_scriptvars():
         "HOME",
         "HOST_IP",
         "HOSTNAME",
+        "HYE_JOB_NUMBER",
+        "ORIGINAL_TASK_ID",
         "PATH",
         "PYTHONIOENCODING",
         "TC_WORKER_GROUP",
-        "ANDROID_SERIAL",
-        "UserPorts",
         "TC_WORKER_TYPE",
         "USER",
+        "UserPorts",
     )
     variables = dict((k, get_envvar(k)) for k in names)
 
