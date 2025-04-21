@@ -3,6 +3,16 @@
 set -e
 set -x
 
+# functions
+
+# Function to get the currently focused window
+getCurrentWindow() {
+    adb shell dumpsys window | grep mFocusedWindow
+}
+
+
+### main
+
 starting_dir=$(pwd)
 echo "starting_dir: $starting_dir"
 
@@ -222,8 +232,16 @@ export HOST_IP=$HostIP
 export DEVICE_SERIAL=$DEVICE_NAME
 export ANDROID_SERIAL=$DEVICE_NAME # mozdevice uses this if it exists, avoids issue with >1 device
 
-# unlock the screen, no passcode
-adb shell input keyevent 3
+# set the screen to never turn off
+adb shell svc power stayon true
+# detect if screen is off, wake if not
+if [ -z "$(getCurrentWindow)" ]; then
+    echo "Screen is asleep. Waking up..."
+    # wake the screen by pressing MENU key
+    adb shell input keyevent 82
+else
+    echo "Screen is awake."
+fi
 
 ss -np
 
