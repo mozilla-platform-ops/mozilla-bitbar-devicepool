@@ -1,5 +1,5 @@
 [Unit]
-Description=Bitbar Testrun manager service
+Description=Lambdatest Testrun manager service
 
 [Service]
 Type=simple
