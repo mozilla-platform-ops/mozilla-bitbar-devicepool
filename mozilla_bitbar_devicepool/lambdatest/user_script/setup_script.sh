@@ -222,6 +222,8 @@ export HOST_IP=$HostIP
 export DEVICE_SERIAL=$DEVICE_NAME
 export ANDROID_SERIAL=$DEVICE_NAME # mozdevice uses this if it exists, avoids issue with >1 device
 
+# unlock the screen, no passcode
+adb shell input keyevent 3
 
 ss -np
 
