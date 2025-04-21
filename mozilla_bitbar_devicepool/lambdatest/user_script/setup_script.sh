@@ -235,8 +235,8 @@ export ANDROID_SERIAL=$DEVICE_NAME # mozdevice uses this if it exists, avoids is
 # set the screen to never turn off
 adb shell svc power stayon true
 # detect if screen is off, wake if not
-if [ -z "$(getCurrentWindow)" ]; then
-    echo "Screen is asleep. Waking up..."
+if [ -z "$(getCurrentWindow)" ] || [[ "$(getCurrentWindow)" == *"NotificationShade"* ]]; then
+    echo "Screen is asleep or showing notification shade. Waking up..."
     # wake the screen by pressing MENU key
     adb shell input keyevent 82
 else
