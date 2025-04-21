@@ -309,10 +309,12 @@ class TestRunManagerLT(object):
                 #   old: command_string = f"{project_root_dir}/hyperexecute --user \
                 #           '{self.config_object.lt_username}' --key '{self.config_object.lt_api_key}'"
                 labels_arg = f"--labels '{labels_csv}'"
+                extra_flags = "--exclude-external-binaries"
+
                 if foreground:
-                    command_string = f"{project_root_dir}/hyperexecute {labels_arg}"
+                    command_string = f"{project_root_dir}/hyperexecute {labels_arg} {extra_flags} "
                 else:
-                    command_string = f"{project_root_dir}/hyperexecute --no-track {labels_arg}"
+                    command_string = f"{project_root_dir}/hyperexecute --no-track {labels_arg} {extra_flags}"
 
                 current_mode = mode
                 if jobs_to_start <= 0:
