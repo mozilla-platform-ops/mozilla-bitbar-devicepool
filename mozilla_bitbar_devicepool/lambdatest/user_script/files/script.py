@@ -41,19 +41,14 @@ def fatal(message, exception=None, retry=True):
 
 def show_df():
     try:
-        print(
-            "\ndf -h\n%s\n\n"
-            % subprocess.check_output(["df", "-h"], stderr=subprocess.STDOUT).decode()
-        )
+        print("\ndf -h\n%s\n\n" % subprocess.check_output(["df", "-h"], stderr=subprocess.STDOUT).decode())
     except subprocess.CalledProcessError as e:
         print("{} attempting df".format(e))
 
 
 # TODO: rename to ensure_known_device or similar
 def get_device_type(device):
-    device_type = device.shell_output(
-        "getprop ro.product.model", timeout=ADB_COMMAND_TIMEOUT
-    )
+    device_type = device.shell_output("getprop ro.product.model", timeout=ADB_COMMAND_TIMEOUT)
     if device_type == "Pixel 2" or device_type == "Pixel 5":
         pass
     elif device_type == "Moto G (5)":
@@ -83,52 +78,31 @@ def enable_charging(device, device_type):
         return
 
     try:
-        print(
-            "script.py: enabling charging for device '%s' ('%s')..."
-            % (device_type, device.get_info("id")["id"])
-        )
+        print("script.py: enabling charging for device '%s' ('%s')..." % (device_type, device.get_info("id")["id"]))
         if device_type == "Pixel 2":
             p2_charging_disabled = (
-                device.shell_output(
-                    "cat %s 2>/dev/null" % p2_path, timeout=ADB_COMMAND_TIMEOUT
-                ).strip()
-                == "1"
+                device.shell_output("cat %s 2>/dev/null" % p2_path, timeout=ADB_COMMAND_TIMEOUT).strip() == "1"
             )
             if p2_charging_disabled:
                 print("Enabling charging...")
-                device.shell_bool(
-                    "echo %s > %s" % (0, p2_path), timeout=ADB_COMMAND_TIMEOUT
-                )
+                device.shell_bool("echo %s > %s" % (0, p2_path), timeout=ADB_COMMAND_TIMEOUT)
         elif device_type == "Pixel 5":
             p5_charging_disabled = (
-                device.shell_output(
-                    "cat %s 2>/dev/null" % p5_path, timeout=ADB_COMMAND_TIMEOUT
-                ).strip()
-                == "1"
+                device.shell_output("cat %s 2>/dev/null" % p5_path, timeout=ADB_COMMAND_TIMEOUT).strip() == "1"
             )
             if p5_charging_disabled:
                 print("Enabling charging...")
-                device.shell_bool(
-                    "echo %s > %s" % (0, p5_path), timeout=ADB_COMMAND_TIMEOUT
-                )
+                device.shell_bool("echo %s > %s" % (0, p5_path), timeout=ADB_COMMAND_TIMEOUT)
         elif device_type == "Moto G (5)":
             g5_charging_disabled = (
-                device.shell_output(
-                    "cat %s 2>/dev/null" % g5_path, timeout=ADB_COMMAND_TIMEOUT
-                ).strip()
-                == "0"
+                device.shell_output("cat %s 2>/dev/null" % g5_path, timeout=ADB_COMMAND_TIMEOUT).strip() == "0"
             )
             if g5_charging_disabled:
                 print("Enabling charging...")
-                device.shell_bool(
-                    "echo %s > %s" % (1, g5_path), timeout=ADB_COMMAND_TIMEOUT
-                )
+                device.shell_bool("echo %s > %s" % (1, g5_path), timeout=ADB_COMMAND_TIMEOUT)
         elif device_type == "SM-G930F" or device_type == "SM-A515F":
             s7_charging_disabled = (
-                device.shell_output(
-                    "cat %s 2>/dev/null" % s7_path, timeout=ADB_COMMAND_TIMEOUT
-                ).strip()
-                == "1"
+                device.shell_output("cat %s 2>/dev/null" % s7_path, timeout=ADB_COMMAND_TIMEOUT).strip() == "1"
             )
             if s7_charging_disabled:
                 print("Enabling charging...")
@@ -141,8 +115,7 @@ def enable_charging(device, device_type):
             pass
         else:
             fatal(
-                "Unknown device ('%s')! Contact Android Relops immediately."
-                % device_type,
+                "Unknown device ('%s')! Contact Android Relops immediately." % device_type,
                 retry=False,
             )
     except (ADBError, ADBTimeoutError) as e:
@@ -221,6 +194,13 @@ def main():
     env["DEVICE_IP"] = scriptvarsenv["DEVICE_IP"]
     env["DOCKER_IMAGE_VERSION"] = scriptvarsenv["DOCKER_IMAGE_VERSION"]
 
+    # show LT info
+    print("")
+    print(f"LambdaTest Job Number: {scriptvarsenv['HYE_JOB_NUMBER']}")
+    print(
+        f"LambdaTest Job URL: https://hyperexecute.lambdatest.com/hyperexecute/task?jobId={scriptvarsenv['ORIGINAL_TASK_ID']}"
+    )
+
     if "HOME" not in env:
         env["HOME"] = "/home/ltuser/taskcluster"
         print("setting HOME to {}".format(env["HOME"]))
@@ -263,11 +243,7 @@ def main():
     try:
         device = ADBDevice(device=env["DEVICE_SERIAL"])
         android_version = device.get_prop("ro.build.version.release")
-        print(
-            "Android device version (ro.build.version.release):  {}".format(
-                android_version
-            )
-        )
+        print("Android device version (ro.build.version.release):  {}".format(android_version))
 
         # power testing
         #   - 10/23 (aje): disabled as per Sparky we're not going to be doing power testing
@@ -278,9 +254,7 @@ def main():
 
         # set device to UTC
         if device.is_rooted:
-            device.shell_output(
-                'setprop persist.sys.timezone "UTC"', timeout=ADB_COMMAND_TIMEOUT
-            )
+            device.shell_output('setprop persist.sys.timezone "UTC"', timeout=ADB_COMMAND_TIMEOUT)
         # show date for visual confirmation
         device_datetime = device.shell_output("date", timeout=ADB_COMMAND_TIMEOUT)
         print("Android device datetime:  {}".format(device_datetime))
