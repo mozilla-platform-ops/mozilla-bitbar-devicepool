@@ -198,7 +198,7 @@ def main():
     print("")
     print(f"LambdaTest Job Number: {scriptvarsenv['HYE_JOB_NUMBER']}")
     print(
-        f"LambdaTest Job URL: https://hyperexecute.lambdatest.com/hyperexecute/task?jobId={scriptvarsenv['ORIGINAL_TASK_ID']}"
+        f"LambdaTest Job URL: https://hyperexecute.lambdatest.com/hyperexecute/task?jobId={scriptvarsenv['JOB_ID']}&link=&logType=&order=&scenario_search_text=&taskId={scriptvarsenv['TASK_ID']}&taskStatus="
     )
 
     if "HOME" not in env:
