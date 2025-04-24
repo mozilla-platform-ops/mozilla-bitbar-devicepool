@@ -130,6 +130,8 @@ testDiscovery:
 runtime:
   - language: java
     version: "17"
+  - language: node
+    version: '20'
 
 env:
     # inject our own secrets
