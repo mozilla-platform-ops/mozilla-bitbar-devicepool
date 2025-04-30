@@ -29,9 +29,9 @@ def get_taskcluster_pending_tasks(provisioner_id, worker_type, verbose=False):
     session.mount("http://", adapter)
     session.mount("https://", adapter)
 
-    taskcluster_queue_url = (
-        "https://firefox-ci-tc.services.mozilla.com/api/queue/v1/pending/%s/%s"
-        % (provisioner_id, worker_type)
+    taskcluster_queue_url = "https://firefox-ci-tc.services.mozilla.com/api/queue/v1/pending/%s/%s" % (
+        provisioner_id,
+        worker_type,
     )
     if verbose:
         print("taskcluster_queue_url: %s" % taskcluster_queue_url)
@@ -43,3 +43,13 @@ def get_taskcluster_pending_tasks(provisioner_id, worker_type, verbose=False):
     if r.ok:
         return r.json()["pendingTasks"]
     return 0
+
+
+# main
+if __name__ == "__main__":
+    # Example usage
+    provisioner_id = "proj-autophone"
+    worker_type = "t-lambda-alpha-a55"
+    worker_type = "gecko-t-lambda-alpha-a55"
+    pending_tasks = get_taskcluster_pending_tasks(provisioner_id, worker_type, verbose=True)
+    print("Pending tasks: %s" % pending_tasks)
