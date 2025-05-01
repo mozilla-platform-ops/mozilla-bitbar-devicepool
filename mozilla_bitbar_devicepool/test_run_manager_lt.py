@@ -871,6 +871,7 @@ class TestRunManagerLT(object):
                     # )
 
                 # TODO: send a signal to the other threads to wake them up and have them gather?
+                # TODO: could also track next run for threads, and then sleep just a bit longer also
                 # avoid race with tc and lt threads, pause so we have updated data on next loop
                 time.sleep(self.LT_MONITOR_INTERVAL)
                 # --- End Start Jobs ---
