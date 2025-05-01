@@ -73,6 +73,9 @@ class ConfigurationLt(object):
         # TODO?: remove 'defaults' from CONFIG['projects']?
         #   - would save later code from having to exclude it
 
+        # remove the defaults project
+        del projects_config["defaults"]
+
     def configure(self):
         # TODO?: add filespath?
 
