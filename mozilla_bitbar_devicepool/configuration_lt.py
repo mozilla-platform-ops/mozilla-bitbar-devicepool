@@ -61,6 +61,7 @@ class ConfigurationLt(object):
         """Materializes the configuration. Sets default values when none are specified."""
         projects_config = self.config["projects"]
         project_defaults = projects_config["defaults"]
+        project_device_groups = self.config["device_groups"]
 
         for project_name in projects_config:
             if project_name == "defaults":
@@ -72,6 +73,10 @@ class ConfigurationLt(object):
 
         # TODO?: remove 'defaults' from CONFIG['projects']?
         #   - would save later code from having to exclude it
+
+        # massage device_groups into a more usable format
+        for item in project_device_groups:
+            project_device_groups[item] = project_device_groups[item].split(" ")
 
         # remove the defaults project
         del projects_config["defaults"]
