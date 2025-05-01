@@ -743,6 +743,8 @@ class TestRunManagerLT(object):
 
             # logging.info(f"{logging_header} Calculated jobs_to_start: {jobs_to_start}")
 
+            # TODO: show busy LT devices
+            # TODO: compress LT info into single block `Configured/Active/Busy LT Devs`
             logging.info(
                 f"{logging_header} TC Jobs: {tc_job_count:>4}, Configured LT Devs: {len(self.config_object.config['device_groups'][project_name]):>3}, Active LT Devs: {active_devices:>3}, "
                 f"Recently Started: {recently_started_jobs:>3}, Need Handling: {tc_jobs_not_handled:>3}, Jobs To Start: {jobs_to_start:>3}"
