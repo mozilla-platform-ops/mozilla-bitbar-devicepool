@@ -75,6 +75,7 @@ class TestRunManagerLT(object):
         self.shared_data = {
             "tc_job_count": 0,
             "lt_active_devices": 0,
+            "lt_busy_devices": 0,
             "lt_device_selector": None,  # Store selector for job starter
             "current_project_name": None,  # Store project name for job starter
         }
@@ -576,6 +577,7 @@ class TestRunManagerLT(object):
                         "lt_device_selector": project_config.get("lt_device_selector", None),
                         "tc_job_count": 0,
                         "lt_active_devices": 0,
+                        "lt_busy_devices": 0,
                     }
 
         while not self.shutdown_event.is_set():
@@ -590,14 +592,16 @@ class TestRunManagerLT(object):
                         with self.shared_data_lock:
                             if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
                                 self.shared_data["projects"][project_name]["tc_job_count"] = tc_job_count
-                        if tc_job_count > 0:
-                            logging.debug(
-                                f"{logging_header} Found {tc_job_count} pending tasks for {project_name} ({tc_worker_type})"
-                            )
-                        else:
-                            logging.debug(f"{logging_header} No pending tasks for {project_name} ({tc_worker_type})")
+                        # if tc_job_count > 0:
+                        #     logging.debug(
+                        #         f"{logging_header} Found {tc_job_count} pending tasks for {project_name} ({tc_worker_type})"
+                        #     )
+                        # else:
+                        #     logging.debug(f"{logging_header} No pending tasks for {project_name} ({tc_worker_type})")
                 except Exception as e:
                     logging.error(f"{logging_header} Error fetching TC tasks for {project_name}: {e}", exc_info=True)
+
+            logging.info(f"{logging_header} Updated data.")
 
             # Wait for the specified interval or until shutdown is signaled
             self.shutdown_event.wait(self.TC_MONITOR_INTERVAL)
@@ -606,7 +610,8 @@ class TestRunManagerLT(object):
 
     def _lambdatest_monitor_thread(self):
         """Monitors LambdaTest device status for all projects."""
-        # logging.info("[LT Monitor] Thread started.")
+        logging_header = "[LT Monitor]"
+        # logging.info("{logging_header} Thread started.")
 
         # Initialize projects structure in shared data
         with self.shared_data_lock:
@@ -620,6 +625,7 @@ class TestRunManagerLT(object):
                         "lt_device_selector": project_config.get("lt_device_selector", None),
                         "tc_job_count": 0,
                         "lt_active_devices": 0,
+                        "lt_busy_devices": 0,
                         "available_devices": [],  # List to store detailed device info
                     }
 
@@ -628,7 +634,7 @@ class TestRunManagerLT(object):
             try:
                 device_list = self.status_object.get_device_list()
             except Exception as e:
-                logging.error(f"[LT Monitor] Error fetching device list: {e}", exc_info=True)
+                logging.error(f"{logging_header} Error fetching device list: {e}", exc_info=True)
                 device_list = {}
 
             # For each project, filter the device list based on the project's device_groups
@@ -637,6 +643,7 @@ class TestRunManagerLT(object):
                     lt_device_selector = project_config.get("lt_device_selector")
                     if lt_device_selector:
                         active_devices = 0
+                        busy_devices = 0
                         available_devices = []
 
                         # Only continue if there's a device_groups config for this project
@@ -650,17 +657,22 @@ class TestRunManagerLT(object):
                                     if state == self.LT_DEVICE_STATE_ACTIVE and udid in project_device_group:
                                         active_devices += 1
                                         available_devices.append(udid)
+                                    if state == self.LT_DEVICE_STATE_BUSY and udid in project_device_group:
+                                        busy_devices += 1
 
                         with self.shared_data_lock:
                             if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
                                 self.shared_data["projects"][project_name]["lt_active_devices"] = active_devices
+                                self.shared_data["projects"][project_name]["lt_busy_devices"] = busy_devices
                                 self.shared_data["projects"][project_name]["available_devices"] = available_devices
 
-                        logging.debug(
-                            f"[LT Monitor] Found {active_devices} active devices for '{project_name}' ({lt_device_selector}) filtered by device_groups"
-                        )
+                        # logging.debug(
+                        #     f"{logging_header} Found {active_devices} active devices for '{project_name}' ({lt_device_selector}) filtered by device_groups"
+                        # )
                 except Exception as e:
-                    logging.error(f"[LT Monitor] Error processing devices for {project_name}: {e}", exc_info=True)
+                    logging.error(f"{logging_header} Error processing devices for {project_name}: {e}", exc_info=True)
+
+            logging.info(f"{logging_header} Updated data.")
 
             self.shutdown_event.wait(self.LT_MONITOR_INTERVAL)
 
@@ -694,6 +706,7 @@ class TestRunManagerLT(object):
                         "lt_device_selector": lt_device_selector,
                         "tc_job_count": 0,
                         "lt_active_devices": 0,
+                        "lt_busy_devices": 0,
                         "available_devices": [],
                     }
         except KeyError as e:
@@ -711,6 +724,7 @@ class TestRunManagerLT(object):
                     project_data = self.shared_data["projects"][project_name]
                     tc_job_count = project_data.get("tc_job_count", 0)
                     active_devices = project_data.get("lt_active_devices", 0)
+                    busy_devices = project_data.get("lt_busy_devices", 0)
                     available_devices = project_data.get(
                         "available_devices", []
                     ).copy()  # Copy to avoid modification issues
@@ -745,11 +759,14 @@ class TestRunManagerLT(object):
 
             # TODO: show busy LT devices
             # TODO: compress LT info into single block `Configured/Active/Busy LT Devs`
+            lt_blob_p1 = (
+                f"{len(self.config_object.config['device_groups'][project_name])}/{active_devices}/{busy_devices}"
+            )
+            lt_blob = f"Configured/Active/Busy LT Devs: {lt_blob_p1:>9}"
             logging.info(
-                f"{logging_header} TC Jobs: {tc_job_count:>4}, Configured LT Devs: {len(self.config_object.config['device_groups'][project_name]):>3}, Active LT Devs: {active_devices:>3}, "
+                f"{logging_header} TC Jobs: {tc_job_count:>4}, {lt_blob:>41}, "
                 f"Recently Started: {recently_started_jobs:>3}, Need Handling: {tc_jobs_not_handled:>3}, Jobs To Start: {jobs_to_start:>3}"
             )
-
             if jobs_to_start > 0:
                 # --- Start Jobs (using background task logic) ---
                 logging.info(f"{logging_header} Starting {jobs_to_start} jobs in background...")
