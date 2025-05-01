@@ -681,7 +681,7 @@ class TestRunManagerLT(object):
     def _job_starter_thread(self, project_name):
         """Starts jobs based on monitored data for a specific project."""
 
-        logging_header = f"[Job Starter] {project_name:>10}:"
+        logging_header = f"[Job Starter - {project_name:<10}]"
 
         # logging.info(
         #     f"{logging_header} {len(self.config_object.config['device_groups'][project_name])} devices configured.]"
@@ -879,7 +879,7 @@ class TestRunManagerLT(object):
             # Wait before next check or until shutdown
             self.shutdown_event.wait(self.JOB_STARTER_INTERVAL)
 
-        logging.info(f"Job starter thread for {project_name} stopped.")
+        logging.info(f"{logging_header} stopped.")
 
     def run_multithreaded(self):
         """Runs the manager with separate threads for monitoring and job starting for each project."""
