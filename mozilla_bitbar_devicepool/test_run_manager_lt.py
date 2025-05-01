@@ -208,9 +208,9 @@ class TestRunManagerLT(object):
                 try:
                     lt_device_selector = project_config.get("lt_device_selector")
                     if lt_device_selector:
-                        active_devices = 0
+                        active_device_count = 0  # Rename to active_device_count for clarity
                         busy_devices = 0
-                        active_devices = []
+                        active_device_list = []  # Rename to active_device_list for clarity
 
                         # Only continue if there's a device_groups config for this project
                         if project_name in self.config_object.config.get("device_groups", {}):
@@ -221,9 +221,9 @@ class TestRunManagerLT(object):
                                 for udid, state in device_list[device_type].items():
                                     # Only count the device if it's active AND in this project's device group
                                     if state == self.LT_DEVICE_STATE_ACTIVE and udid in project_device_group:
-                                        active_devices += 1
+                                        active_device_count += 1  # Use the new variable name
                                         g_active_devices += 1
-                                        active_devices.append(udid)
+                                        active_device_list.append(udid)  # Use the new variable name
                                     if state == self.LT_DEVICE_STATE_BUSY and udid in project_device_group:
                                         busy_devices += 1
                                     if state == self.LT_DEVICE_STATE_INITIATED:
@@ -231,17 +231,21 @@ class TestRunManagerLT(object):
                                         g_initiated_jobs += 1
 
                         logging.info(
-                            f"{logging_header} Active devices for {project_name} ({len(active_devices)}): {active_devices}"
+                            f"{logging_header} Active devices for {project_name} ({len(active_device_list)}): {active_device_list}"
                         )
                         with self.shared_data_lock:
                             self.shared_data["lt_g_initiated_jobs"] = g_initiated_jobs
                             if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
-                                self.shared_data["projects"][project_name]["lt_active_devices"] = active_devices
+                                self.shared_data["projects"][project_name]["lt_active_devices"] = (
+                                    active_device_count  # Use count here
+                                )
                                 self.shared_data["projects"][project_name]["lt_busy_devices"] = busy_devices
-                                self.shared_data["projects"][project_name]["available_devices"] = active_devices
+                                self.shared_data["projects"][project_name]["available_devices"] = (
+                                    active_device_list  # Use list here
+                                )
 
                         # logging.debug(
-                        #     f"{logging_header} Found {active_devices} active devices for '{project_name}' ({lt_device_selector}) filtered by device_groups"
+                        #     f"{logging_header} Found {active_device_count} active devices for '{project_name}' ({lt_device_selector}) filtered by device_groups"
                         # )
                 except Exception as e:
                     logging.error(f"{logging_header} Error processing devices for {project_name}: {e}", exc_info=True)
