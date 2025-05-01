@@ -390,6 +390,9 @@ class TestRunManagerLT(object):
                             # add the udid to labels
                             labels_csv = f"{self.PROGRAM_LABEL},{project_name},{device_udid}"
                             labels_arg = f"--labels '{labels_csv}'"
+                            base_command_string = (
+                                f"{project_root_dir}/hyperexecute --no-track {labels_arg} {extra_flags}"
+                            )
 
                             # remove the device from available devices to avoid reusing it
                             available_devices.remove(d)
