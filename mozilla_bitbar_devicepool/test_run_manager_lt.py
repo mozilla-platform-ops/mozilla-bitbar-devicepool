@@ -32,9 +32,12 @@ class TestRunManagerLT(object):
     MODE_RUN_NOTRACK_BACKGROUND_TASKS = "MODE_RUN_NOTRACK_BACKGROUND_TASKS"
     # TODO: increase this to 10, 20, 30 once we're more confident
     MAX_JOBS_TO_START_AT_ONCE = 10
+    # keep around the total number of devices online?
+    MAX_INITITATED_JOBS = 40
     # lt api device states
     LT_DEVICE_STATE_ACTIVE = "active"
     LT_DEVICE_STATE_BUSY = "busy"
+    LT_DEVICE_STATE_INITIATED = "initiated"
     # background task control
     # TODO: making this work when False is going to require more work...
     #     - our loop is too fast and we end up
@@ -73,6 +76,8 @@ class TestRunManagerLT(object):
 
         # Threading related initializations
         self.shared_data = {
+            # global values
+            "lt_g_initiated_jobs": 0,
             "tc_job_count": 0,
             "lt_active_devices": 0,
             "lt_busy_devices": 0,
@@ -196,6 +201,7 @@ class TestRunManagerLT(object):
                 logging.error(f"{logging_header} Error fetching device list: {e}", exc_info=True)
                 device_list = {}
 
+            g_initiated_jobs = 0
             # For each project, filter the device list based on the project's device_groups
             for project_name, project_config in self.config_object.config["projects"].items():
                 try:
@@ -218,8 +224,11 @@ class TestRunManagerLT(object):
                                         available_devices.append(udid)
                                     if state == self.LT_DEVICE_STATE_BUSY and udid in project_device_group:
                                         busy_devices += 1
+                                    if state == self.LT_DEVICE_STATE_INITIATED:
+                                        g_initiated_jobs += 1
 
                         with self.shared_data_lock:
+                            self.shared_data["lt_g_initiated_jobs"] = g_initiated_jobs
                             if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
                                 self.shared_data["projects"][project_name]["lt_active_devices"] = active_devices
                                 self.shared_data["projects"][project_name]["lt_busy_devices"] = busy_devices
@@ -311,7 +320,9 @@ class TestRunManagerLT(object):
             #     f"Recently Started: {recently_started_jobs}, Need Handling: {tc_jobs_not_handled}"
             # )
 
-            jobs_to_start = self.calculate_jobs_to_start(tc_jobs_not_handled, len(available_devices))
+            jobs_to_start = self.calculate_jobs_to_start(
+                tc_jobs_not_handled, len(available_devices), self.shared_data["lt_g_initiated_jobs"]
+            )
             jobs_to_start = max(0, jobs_to_start)  # Ensure non-negative
 
             # logging.info(f"{logging_header} Calculated jobs_to_start: {jobs_to_start}")
@@ -486,7 +497,7 @@ class TestRunManagerLT(object):
         if lt_monitor.is_alive():
             logging.warning("[Main] LT monitor thread did not exit cleanly.")
 
-    def calculate_jobs_to_start(self, tc_jobs_not_handled, available_devices_count, max_jobs=None):
+    def calculate_jobs_to_start(self, tc_jobs_not_handled, available_devices_count, global_initiated, max_jobs=None):
         """
         Calculate the number of jobs to start based on pending TC jobs and available devices.
 
@@ -500,6 +511,12 @@ class TestRunManagerLT(object):
         """
         if max_jobs is None:
             max_jobs = self.max_jobs_to_start
+
+        # short circuit if we have too many initiated jobs
+        if global_initiated > self.MAX_INITITATED_JOBS:
+            # logging.info(f"{logging_header} Too many initiated jobs, not starting any new jobs.")
+            jobs_to_start = 0
+            return jobs_to_start
 
         # Calculate the minimum of pending jobs, max jobs limit, and available devices
         jobs_to_start = min(tc_jobs_not_handled, max_jobs, available_devices_count)
