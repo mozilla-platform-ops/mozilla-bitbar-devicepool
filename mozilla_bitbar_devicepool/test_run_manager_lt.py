@@ -563,7 +563,6 @@ class TestRunManagerLT(object):
     def _taskcluster_monitor_thread(self):
         """Monitors Taskcluster pending tasks for all projects."""
         logging_header = "[TC Monitor]"
-        # logging.info(f"{logging_header} Thread started.")
 
         # Initialize projects structure in shared data
         with self.shared_data_lock:
@@ -587,19 +586,12 @@ class TestRunManagerLT(object):
                 try:
                     tc_worker_type = project_config.get("TC_WORKER_TYPE")
                     if tc_worker_type:
-                        # logging.info(f"{logging_header} Getting queue count for for {project_name} - {tc_worker_type}")
                         # TODO: Make provisioner name dynamic if needed
                         tc_job_count = get_taskcluster_pending_tasks("proj-autophone", tc_worker_type, verbose=False)
                         count_of_fetched_projects += 1
                         with self.shared_data_lock:
                             if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
                                 self.shared_data["projects"][project_name]["tc_job_count"] = tc_job_count
-                        # if tc_job_count > 0:
-                        #     logging.debug(
-                        #         f"{logging_header} Found {tc_job_count} pending tasks for {project_name} ({tc_worker_type})"
-                        #     )
-                        # else:
-                        #     logging.debug(f"{logging_header} No pending tasks for {project_name} ({tc_worker_type})")
                 except Exception as e:
                     logging.error(f"{logging_header} Error fetching TC tasks for {project_name}: {e}", exc_info=True)
 
@@ -613,7 +605,6 @@ class TestRunManagerLT(object):
     def _lambdatest_monitor_thread(self):
         """Monitors LambdaTest device status for all projects."""
         logging_header = "[LT Monitor]"
-        # logging.info("{logging_header} Thread started.")
 
         # Initialize projects structure in shared data
         with self.shared_data_lock:
