@@ -405,7 +405,8 @@ class TestRunManagerLT(object):
                             break
 
                     if not device_udid:
-                        logging.warning(f"{logging_header} No more available devices to assign!")
+                        # TODO: mention this? or basically expected.
+                        # logging.warning(f"{logging_header} No more available devices to assign!")
                         break
 
                     test_run_dir = f"/tmp/mozilla-lt-devicepool-job-dir.{project_name}.{time.time_ns()}"  # Project-specific unique dir
