@@ -380,12 +380,13 @@ class TestRunManagerLT(object):
                     for d in available_devices:
                         # only use the udid if it's assigned to the project
                         if d in self.config_object.config["device_groups"][project_name]:
-                            device_udid = d
-
                             # device in job tracker means it's already in use
                             if d in self.get_job_tracker(project_name).get_active_udids():
                                 logging.info(f"{logging_header} Device {d} is already in use, skipping.")
+                                # skip to the next device
                                 continue
+
+                            device_udid = d
 
                             # remove the device from available devices to avoid reusing it
                             available_devices.remove(d)
