@@ -63,13 +63,12 @@ class TestRunManagerLT(object):
         self.config_object.configure()
         self.status_object = status.Status(self.config_object.lt_username, self.config_object.lt_access_key)
 
-        # ISSUE: lt jobs (even more so concurrent jobs) take 1-3 minutes to start and grab a tc task, in that time
-        #        we can start more jobs and end up with too many jobs running.
-        # SOLUTION: maintain a list of started jobs, when they were started, and how many tasks (if concurrency)
-        # .       we will remove any entries older than our estimated time to start a job (3.5 minutes)
-        # TODO: maintain a jobs started log with datetimes
-        #
-        # Initialize job tracker with 3.5 minute expiry
+        # Replace single job_tracker with a dictionary of job trackers per project
+        self.job_trackers = {}
+        # Initialize job trackers for each project in config
+        for project_name in self.config_object.config.get("projects", {}):
+            self.job_trackers[project_name] = JobTracker(expiry_seconds=210)
+        # Keep a default tracker for backward compatibility
         self.job_tracker = JobTracker(expiry_seconds=210)
 
         # Threading related initializations
@@ -101,6 +100,28 @@ class TestRunManagerLT(object):
                 logging.info(f" handle_signal: received signal {MAX_SIGNAL_COUNT} times, exiting immediately")
                 # Force exit if threads don't stop quickly
                 os._exit(1)  # Use os._exit for immediate termination
+
+    # Helper methods for project-specific job trackers
+    def get_job_tracker(self, project_name):
+        """Get the job tracker for a specific project, creating it if it doesn't exist."""
+        if project_name not in self.job_trackers:
+            self.job_trackers[project_name] = JobTracker(expiry_seconds=210)
+        return self.job_trackers[project_name]
+
+    def add_jobs(self, count, project_name=None):
+        """Add jobs to the specified project tracker or default tracker if no project specified."""
+        if project_name and project_name in self.job_trackers:
+            self.job_trackers[project_name].add_jobs(count)
+        else:
+            # For backward compatibility
+            self.job_tracker.add_jobs(count)
+
+    def get_active_job_count(self, project_name=None):
+        """Get active job count from the specified project tracker or default tracker."""
+        if project_name and project_name in self.job_trackers:
+            return self.job_trackers[project_name].get_active_job_count()
+        # For backward compatibility
+        return self.job_tracker.get_active_job_count()
 
     # jmaher poc replice
     def single_project_single_thread_single_job(self):
@@ -227,7 +248,7 @@ class TestRunManagerLT(object):
             )
 
             # Get count of recently started jobs that are still in startup phase
-            recently_started_jobs = self.job_tracker.get_active_job_count()
+            recently_started_jobs = self.get_active_job_count(current_project_name)
 
             # New calculation that includes recently started jobs
             # TODO: should this include initiated_job_count?
@@ -365,7 +386,7 @@ class TestRunManagerLT(object):
                                 break
                     outer_end_time = time.time()
                     # Record the jobs we just started
-                    self.job_tracker.add_jobs(jobs_to_start)
+                    self.add_jobs(jobs_to_start, current_project_name)
                     logging.info(
                         f"starting {jobs_to_start} jobs took {round(outer_end_time - outer_start_time, 2)} seconds"
                     )
@@ -473,7 +494,7 @@ class TestRunManagerLT(object):
 
                     outer_end_time = time.time()
                     # Record the jobs we just started
-                    self.job_tracker.add_jobs(jobs_to_start)
+                    self.add_jobs(jobs_to_start, current_project_name)
                     logging.info(
                         f"Launching {len(processes) if not self.debug_mode else jobs_to_start} background jobs took {round(outer_end_time - outer_start_time, 2)} seconds"
                     )
@@ -521,7 +542,7 @@ class TestRunManagerLT(object):
                             break
 
                     # Record the jobs we just started
-                    self.job_tracker.add_jobs(jobs_to_start)
+                    self.add_jobs(jobs_to_start, current_project_name)
                     if self.state == self.STATE_STOP:
                         break
                 elif current_mode == self.MODE_NO_OP:
@@ -539,118 +560,174 @@ class TestRunManagerLT(object):
     # --- Multithreaded Implementation ---
 
     def _taskcluster_monitor_thread(self):
-        """Monitors Taskcluster pending tasks."""
-        logging.info("Taskcluster monitor thread started.")
-        # Hardcode project for now, similar to single-threaded version
-        project_name = "a55-perf"
-        try:
-            current_project = self.config_object.config["projects"][project_name]
-            tc_worker_type = current_project["TC_WORKER_TYPE"]
-        except KeyError:
-            logging.error(f"Project '{project_name}' not found in config. TC monitor thread exiting.")
-            return
+        """Monitors Taskcluster pending tasks for all projects."""
+        logging.info("[TC Monitor] Thread started.")
+
+        # Initialize projects structure in shared data
+        with self.shared_data_lock:
+            if "projects" not in self.shared_data:
+                self.shared_data["projects"] = {}
+
+            # Initialize all projects
+            for project_name, project_config in self.config_object.config["projects"].items():
+                if project_name not in self.shared_data["projects"]:
+                    self.shared_data["projects"][project_name] = {
+                        "lt_device_selector": project_config.get("lt_device_selector", None),
+                        "tc_job_count": 0,
+                        "lt_active_devices": 0,
+                    }
 
         while not self.shutdown_event.is_set():
-            try:
-                # TODO: Make provisioner name dynamic if needed
-                tc_job_count = get_taskcluster_pending_tasks("proj-autophone", tc_worker_type, verbose=False)
-                with self.shared_data_lock:
-                    self.shared_data["tc_job_count"] = tc_job_count
-                logging.debug(f"[TC Monitor] Found {tc_job_count} pending tasks for {tc_worker_type}")
-            except Exception as e:
-                logging.error(f"[TC Monitor] Error fetching TC tasks: {e}", exc_info=True)
+            # For each project, get taskcluster job count
+            for project_name, project_config in self.config_object.config["projects"].items():
+                try:
+                    tc_worker_type = project_config.get("TC_WORKER_TYPE")
+                    if tc_worker_type:
+                        logging.info(f"[TC Monitor]: Getting queue count for for {project_name} - {tc_worker_type}")
+                        # TODO: Make provisioner name dynamic if needed
+                        tc_job_count = get_taskcluster_pending_tasks("proj-autophone", tc_worker_type, verbose=False)
+                        with self.shared_data_lock:
+                            if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
+                                self.shared_data["projects"][project_name]["tc_job_count"] = tc_job_count
+                        logging.debug(
+                            f"[TC Monitor] Found {tc_job_count} pending tasks for {project_name} ({tc_worker_type})"
+                        )
+                except Exception as e:
+                    logging.error(f"[TC Monitor] Error fetching TC tasks for {project_name}: {e}", exc_info=True)
 
             # Wait for the specified interval or until shutdown is signaled
             self.shutdown_event.wait(self.TC_MONITOR_INTERVAL)
-        logging.info("Taskcluster monitor thread stopped.")
+
+        logging.info("[TC Monitor] Thread stopped.")
 
     def _lambdatest_monitor_thread(self):
-        """Monitors LambdaTest device status."""
-        logging.info("LambdaTest monitor thread started.")
-        # Hardcode project for now
-        project_name = "a55-perf"
-        try:
-            current_project = self.config_object.config["projects"][project_name]
-            lt_device_selector = current_project["lt_device_selector"]
-            # Store selector and project name for job starter thread
-            with self.shared_data_lock:
-                self.shared_data["lt_device_selector"] = lt_device_selector
-                self.shared_data["current_project_name"] = project_name
-        except KeyError:
-            logging.error(f"Project '{project_name}' not found in config. LT monitor thread exiting.")
-            return
+        """Monitors LambdaTest device status for all projects."""
+        logging.info("[LT Monitor]: Thread started.")
+
+        # Initialize projects structure in shared data
+        with self.shared_data_lock:
+            if "projects" not in self.shared_data:
+                self.shared_data["projects"] = {}
+
+            # Initialize all projects
+            for project_name, project_config in self.config_object.config["projects"].items():
+                if project_name not in self.shared_data["projects"]:
+                    self.shared_data["projects"][project_name] = {
+                        "lt_device_selector": project_config.get("lt_device_selector", None),
+                        "tc_job_count": 0,
+                        "lt_active_devices": 0,
+                    }
 
         while not self.shutdown_event.is_set():
-            try:
-                active_devices = self.status_object.get_device_state_count(
-                    lt_device_selector, self.LT_DEVICE_STATE_ACTIVE
-                )
-                # TODO: Could also fetch running/initiated job counts here if needed by job starter
-                with self.shared_data_lock:
-                    self.shared_data["lt_active_devices"] = active_devices
-                logging.debug(f"[LT Monitor] Found {active_devices} active devices for '{lt_device_selector}'")
-            except Exception as e:
-                logging.error(f"[LT Monitor] Error fetching LT device status: {e}", exc_info=True)
+            # For each project, get LambdaTest device status
+            for project_name, project_config in self.config_object.config["projects"].items():
+                try:
+                    lt_device_selector = project_config.get("lt_device_selector")
+                    if lt_device_selector:
+                        active_devices = self.status_object.get_device_state_count(
+                            lt_device_selector, self.LT_DEVICE_STATE_ACTIVE
+                        )
+                        with self.shared_data_lock:
+                            if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
+                                self.shared_data["projects"][project_name]["lt_active_devices"] = active_devices
+                        logging.debug(
+                            f"[LT Monitor] Found {active_devices} active devices for '{project_name}' ({lt_device_selector})"
+                        )
+                except Exception as e:
+                    logging.error(
+                        f"[LT Monitor] Error fetching LT device status for {project_name}: {e}", exc_info=True
+                    )
 
             self.shutdown_event.wait(self.LT_MONITOR_INTERVAL)
+
         logging.info("LambdaTest monitor thread stopped.")
 
-    def _job_starter_thread(self):
-        """Starts jobs based on monitored data."""
-        logging.info("Job starter thread started.")
+    def _job_starter_thread(self, project_name):
+        """Starts jobs based on monitored data for a specific project."""
+        if project_name == "defaults":
+            return
+
+        # logging.info(f"[Job Starter] Starting thread for {project_name}.")
         project_source_dir = os.path.dirname(os.path.realpath(__file__))
         project_root_dir = os.path.abspath(os.path.join(project_source_dir, ".."))
         user_script_golden_dir = os.path.join(project_source_dir, "lambdatest", "user_script")
 
+        try:
+            current_project = self.config_object.config["projects"][project_name]
+            tc_worker_type = current_project["TC_WORKER_TYPE"]
+            tc_client_id = current_project["TASKCLUSTER_CLIENT_ID"]
+            tc_client_key = current_project["TASKCLUSTER_ACCESS_TOKEN"]
+            lt_device_selector = current_project["lt_device_selector"]
+
+            # Store selector for this project
+            with self.shared_data_lock:
+                if "projects" not in self.shared_data:
+                    self.shared_data["projects"] = {}
+                if project_name not in self.shared_data["projects"]:
+                    self.shared_data["projects"][project_name] = {
+                        "lt_device_selector": lt_device_selector,
+                        "tc_job_count": 0,
+                        "lt_active_devices": 0,
+                    }
+        except KeyError as e:
+            logging.error(f"[Job Starter: {project_name}] Missing config: {e}. Thread exiting.")
+            return
+
         while not self.shutdown_event.is_set():
             tc_job_count = 0
             active_devices = 0
-            lt_device_selector = None
-            current_project_name = None
 
+            # Try to get device data for this project
             with self.shared_data_lock:
-                tc_job_count = self.shared_data["tc_job_count"]
-                active_devices = self.shared_data["lt_active_devices"]
-                lt_device_selector = self.shared_data["lt_device_selector"]
-                current_project_name = self.shared_data["current_project_name"]
+                if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
+                    project_data = self.shared_data["projects"][project_name]
+                    tc_job_count = project_data.get("tc_job_count", 0)
+                    active_devices = project_data.get("lt_active_devices", 0)
 
-            if not lt_device_selector or not current_project_name:
-                logging.warning("[Job Starter] Waiting for monitor threads to provide config...")
-                self.shutdown_event.wait(self.JOB_STARTER_INTERVAL)
-                continue  # Skip this cycle if config isn't ready
+            # If we don't have data yet, try to fetch it directly
+            if tc_job_count == 0:
+                try:
+                    tc_job_count = get_taskcluster_pending_tasks("proj-autophone", tc_worker_type, verbose=False)
+                    with self.shared_data_lock:
+                        self.shared_data["projects"][project_name]["tc_job_count"] = tc_job_count
+                except Exception as e:
+                    logging.error(f"[Job Starter: {project_name}] Error fetching TC tasks: {e}")
 
-            try:
-                current_project = self.config_object.config["projects"][current_project_name]
-                tc_worker_type = current_project["TC_WORKER_TYPE"]
-                tc_client_id = current_project["TASKCLUSTER_CLIENT_ID"]
-                tc_client_key = current_project["TASKCLUSTER_ACCESS_TOKEN"]
-            except KeyError:
-                logging.error(f"[Job Starter] Project '{current_project_name}' not found in config. Skipping cycle.")
-                self.shutdown_event.wait(self.JOB_STARTER_INTERVAL)
-                continue
+            if active_devices == 0:
+                try:
+                    active_devices = self.status_object.get_device_state_count(
+                        lt_device_selector, self.LT_DEVICE_STATE_ACTIVE
+                    )
+                    with self.shared_data_lock:
+                        self.shared_data["projects"][project_name]["lt_active_devices"] = active_devices
+                except Exception as e:
+                    logging.error(f"[Job Starter: {project_name}] Error fetching active devices: {e}")
 
-            recently_started_jobs = self.job_tracker.get_active_job_count()
+            # Get count of recently started jobs that are still in startup phase for this project
+            # Use the project-specific job tracker
+            recently_started_jobs = self.get_active_job_count(project_name)
             tc_jobs_not_handled = tc_job_count - recently_started_jobs
 
             logging.info(
-                f"[Job Starter] TC Jobs: {tc_job_count}, Active LT Devs: {active_devices}, Recently Started: {recently_started_jobs}, Need Handling: {tc_jobs_not_handled}"
+                f"[Job Starter: {project_name}] TC Jobs: {tc_job_count}, Active LT Devs: {active_devices}, "
+                f"Recently Started: {recently_started_jobs}, Need Handling: {tc_jobs_not_handled}"
             )
 
             jobs_to_start = min(tc_jobs_not_handled, self.max_jobs_to_start, active_devices)
             jobs_to_start = max(0, jobs_to_start)  # Ensure non-negative
 
-            logging.info(f"[Job Starter] Calculated jobs_to_start: {jobs_to_start}")
+            logging.info(f"[Job Starter: {project_name}] Calculated jobs_to_start: {jobs_to_start}")
 
             if jobs_to_start > 0:
                 # --- Start Jobs (using background task logic) ---
-                logging.info(f"[Job Starter] Starting {jobs_to_start} jobs in background...")
+                logging.info(f"[Job Starter: {project_name}] Starting {jobs_to_start} jobs in background...")
                 lt_app_url = "lt://proverbial-android"  # Eternal APK
 
                 cmd_env = os.environ.copy()
                 cmd_env["LT_USERNAME"] = self.config_object.lt_username
                 cmd_env["LT_ACCESS_KEY"] = self.config_object.lt_access_key
 
-                labels_csv = f"{self.PROGRAM_LABEL},{current_project_name}"
+                labels_csv = f"{self.PROGRAM_LABEL},{project_name}"
                 labels_arg = f"--labels '{labels_csv}'"
                 extra_flags = "--exclude-external-binaries"
                 base_command_string = f"{project_root_dir}/hyperexecute --no-track {labels_arg} {extra_flags}"
@@ -659,10 +736,10 @@ class TestRunManagerLT(object):
                 processes_started = 0
                 for i in range(jobs_to_start):
                     if self.shutdown_event.is_set():
-                        logging.info("[Job Starter] Shutdown signaled during job starting loop.")
+                        logging.info(f"[Job Starter: {project_name}] Shutdown signaled during job starting loop.")
                         break
 
-                    test_run_dir = f"/tmp/mozilla-lt-devicepool-job-dir.{time.time_ns()}"  # Unique dir
+                    test_run_dir = f"/tmp/mozilla-lt-devicepool-job-dir.{project_name}.{time.time_ns()}"  # Project-specific unique dir
                     test_run_file = os.path.join(test_run_dir, "hyperexecute.yaml")
 
                     try:
@@ -688,13 +765,13 @@ class TestRunManagerLT(object):
 
                         if self.debug_mode:
                             logging.info(
-                                f"[Job Starter] Would run command: '{base_command_string}' in path '{test_run_dir}'..."
+                                f"[Job Starter: {project_name}] Would run command: '{base_command_string}' in path '{test_run_dir}'..."
                             )
                             time.sleep(0.1)  # Simulate tiny delay
                         else:
                             # Start process in background
                             logging.info(
-                                f"[Job Starter] Launching background job {i + 1}/{jobs_to_start} in {test_run_dir}"
+                                f"[Job Starter: {project_name}] Launching background job {i + 1}/{jobs_to_start} in {test_run_dir}"
                             )
                             process = subprocess.Popen(
                                 base_command_string,
@@ -705,62 +782,75 @@ class TestRunManagerLT(object):
                                 stdout=subprocess.DEVNULL,  # Discard output for background tasks
                                 stderr=subprocess.DEVNULL,
                             )
-                            logging.debug(f"[Job Starter] Started background job {i + 1} with PID {process.pid}")
+                            logging.debug(
+                                f"[Job Starter: {project_name}] Started background job {i + 1} with PID {process.pid}"
+                            )
                         processes_started += 1
 
                     except Exception as e:
-                        logging.error(f"[Job Starter] Error starting job {i + 1}: {e}", exc_info=True)
+                        logging.error(f"[Job Starter: {project_name}] Error starting job {i + 1}: {e}", exc_info=True)
                         # Clean up potentially partially created dir
                         shutil.rmtree(test_run_dir, ignore_errors=True)
 
                 outer_end_time = time.time()
                 if processes_started > 0:
-                    self.job_tracker.add_jobs(processes_started)
+                    self.add_jobs(processes_started, project_name)
                     logging.info(
-                        f"[Job Starter] Launched {processes_started} background jobs in {round(outer_end_time - outer_start_time, 2)} seconds"
+                        f"[Job Starter: {project_name}] Launched {processes_started} background jobs in {round(outer_end_time - outer_start_time, 2)} seconds"
                     )
                 # --- End Start Jobs ---
             else:
-                logging.info("[Job Starter] No jobs to start. Sleeping.")
+                logging.info(f"[Job Starter: {project_name}] No jobs to start. Sleeping.")
 
             # Wait before next check or until shutdown
             self.shutdown_event.wait(self.JOB_STARTER_INTERVAL)
 
-        logging.info("Job starter thread stopped.")
+        logging.info(f"Job starter thread for {project_name} stopped.")
 
     def run_multithreaded(self):
-        """Runs the manager with separate threads for monitoring and job starting."""
-        logging.info("Starting Test Run Manager in multithreaded mode...")
+        """Runs the manager with separate threads for monitoring and job starting for each project."""
+        logging.info("[Main] Starting Test Run Manager in multithreaded mode...")
 
-        # Create threads
+        # Create monitor threads
         tc_monitor = threading.Thread(target=self._taskcluster_monitor_thread, name="TC Monitor")
         lt_monitor = threading.Thread(target=self._lambdatest_monitor_thread, name="LT Monitor")
-        job_starter = threading.Thread(target=self._job_starter_thread, name="Job Starter")
 
-        # Start threads
+        # Start monitor threads
         tc_monitor.start()
         lt_monitor.start()
+
         # Give monitors a moment to potentially fetch initial data
         time.sleep(2)
-        job_starter.start()
+
+        # Create and start a job starter thread for each project
+        job_starters = []
+        for project_name in self.config_object.config["projects"]:
+            job_starter = threading.Thread(
+                target=self._job_starter_thread, args=(project_name,), name=f"Job Starter - {project_name}"
+            )
+            job_starters.append(job_starter)
+            job_starter.start()
+            logging.info(f"[Main] Started job starter thread for project: {project_name}")
 
         # Keep main thread alive until shutdown is signaled
-        logging.info("Main thread waiting for shutdown signal...")
+        logging.info("[Main] Main thread waiting for shutdown signal...")
         self.shutdown_event.wait()
-        logging.info("Shutdown signal received. Waiting for threads to join...")
+        logging.info("[Main] Shutdown signal received. Waiting for threads to join...")
 
         # Wait for threads to finish
         tc_monitor.join(timeout=self.TC_MONITOR_INTERVAL + 5)
         lt_monitor.join(timeout=self.LT_MONITOR_INTERVAL + 5)
-        job_starter.join(timeout=self.JOB_STARTER_INTERVAL + 10)  # Give starter a bit more time
 
-        logging.info("All threads joined. Exiting.")
+        for i, job_starter in enumerate(job_starters):
+            job_starter.join(timeout=self.JOB_STARTER_INTERVAL + 10)  # Give starter a bit more time
+            if job_starter.is_alive():
+                logging.warning(f"[Main] Job starter thread {i} did not exit cleanly.")
+
+        logging.info("[Main] All threads joined. Exiting.")
         if tc_monitor.is_alive():
-            logging.warning("TC monitor thread did not exit cleanly.")
+            logging.warning("[Main] TC monitor thread did not exit cleanly.")
         if lt_monitor.is_alive():
-            logging.warning("LT monitor thread did not exit cleanly.")
-        if job_starter.is_alive():
-            logging.warning("Job starter thread did not exit cleanly.")
+            logging.warning("[Main] LT monitor thread did not exit cleanly.")
 
 
 def parse_args(action_array):

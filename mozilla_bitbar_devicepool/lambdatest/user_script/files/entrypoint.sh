@@ -17,7 +17,7 @@ fi
 
 CONF_PATH='/home/ltuser/taskcluster'
 export ED25519_PRIVKEY="$CONF_PATH/ed25519_private_key"
-export GOOGLE_APPLICATION_CREDENTIALS="/etc/google/stackdriver_credentials.json"
+export GOOGLE_APPLICATION_CREDENTIALS="/etc/bitbar/stackdriver_credentials.json"
 # generic-worker docker hack.
 # see https://github.com/taskcluster/generic-worker/issues/151
 export USER=root
