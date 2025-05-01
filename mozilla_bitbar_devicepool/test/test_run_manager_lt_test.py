@@ -13,6 +13,14 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 from mozilla_bitbar_devicepool.test_run_manager_lt import TestRunManagerLT
 
 
+# TODO: convert shared data to use multiprocessing.Manager
+#    - avoid having to deal with locking
+#
+#   ```Option 2: Thread-safe Collections
+#     Using multiprocessing.Manager for shared state:
+#    ```
+
+
 @pytest.fixture
 def test_manager():
     """Create a test instance of TestRunManagerLT with mocked dependencies."""
