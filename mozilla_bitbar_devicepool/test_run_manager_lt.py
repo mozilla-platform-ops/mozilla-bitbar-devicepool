@@ -581,6 +581,7 @@ class TestRunManagerLT(object):
                     }
 
         while not self.shutdown_event.is_set():
+            count_of_fetched_projects = 0
             # For each project, get taskcluster job count
             for project_name, project_config in self.config_object.config["projects"].items():
                 try:
@@ -589,6 +590,7 @@ class TestRunManagerLT(object):
                         # logging.info(f"{logging_header} Getting queue count for for {project_name} - {tc_worker_type}")
                         # TODO: Make provisioner name dynamic if needed
                         tc_job_count = get_taskcluster_pending_tasks("proj-autophone", tc_worker_type, verbose=False)
+                        count_of_fetched_projects += 1
                         with self.shared_data_lock:
                             if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
                                 self.shared_data["projects"][project_name]["tc_job_count"] = tc_job_count
@@ -601,7 +603,7 @@ class TestRunManagerLT(object):
                 except Exception as e:
                     logging.error(f"{logging_header} Error fetching TC tasks for {project_name}: {e}", exc_info=True)
 
-            logging.info(f"{logging_header} Updated data.")
+            logging.info(f"{logging_header} Updated data for {count_of_fetched_projects} queues.")
 
             # Wait for the specified interval or until shutdown is signaled
             self.shutdown_event.wait(self.TC_MONITOR_INTERVAL)
@@ -762,7 +764,7 @@ class TestRunManagerLT(object):
             lt_blob_p1 = (
                 f"{len(self.config_object.config['device_groups'][project_name])}/{active_devices}/{busy_devices}"
             )
-            lt_blob = f"Configured/Active/Busy LT Devs: {lt_blob_p1:>9}"
+            lt_blob = f"LT Devs Configured/Active/Busy: {lt_blob_p1:>9}"
             logging.info(
                 f"{logging_header} TC Jobs: {tc_job_count:>4}, {lt_blob:>41}, "
                 f"Recently Started: {recently_started_jobs:>3}, Need Handling: {tc_jobs_not_handled:>3}, Jobs To Start: {jobs_to_start:>3}"
