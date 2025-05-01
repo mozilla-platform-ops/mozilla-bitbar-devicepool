@@ -16,37 +16,40 @@ class JobTracker:
     # 4 minutes
     def __init__(self, expiry_seconds=(4 * 60)):
         self.expiry_seconds = expiry_seconds
-        self.job_timestamps = []
-        self.job_udids = {}  # New dictionary to map timestamps to UDIDs
+        self.job_timestamps = {}  # Changed to dict mapping UDIDs to timestamps
         self.logger = logging.getLogger(__name__)
 
     def add_jobs(self, count, udids=None):
         """
-        Record that a number of jobs were started at the current time.
+        Backward compatibility method that calls add_job_udids.
+        If udids are not provided, this method does nothing as we require UDIDs.
 
         Args:
-            count (int): Number of jobs started
-            udids (list, optional): List of UDIDs associated with jobs, must be same length as count if provided
+            count (int): Number of jobs (unused, kept for compatibility)
+            udids (list): List of UDIDs to track
         """
-        if count <= 0:
+        if udids:
+            self.add_job_udids(udids)
+        else:
+            self.logger.warning("add_jobs called without UDIDs, cannot track jobs")
+
+    def add_job_udids(self, udids):
+        """
+        Record that jobs with specific UDIDs were started at the current time.
+
+        Args:
+            udids (list): List of UDIDs associated with jobs
+        """
+        if not udids:
             return
 
         now = time.time()
 
-        if udids and len(udids) != count:
-            self.logger.warning(
-                f"UDID list length ({len(udids)}) doesn't match job count ({count}). UDIDs may not be properly tracked."
-            )
+        # Store timestamp for each UDID
+        for udid in udids:
+            self.job_timestamps[udid] = now
 
-        for i in range(count):
-            timestamp = now
-            self.job_timestamps.append(timestamp)
-
-            # Store UDID if provided
-            if udids and i < len(udids):
-                self.job_udids[timestamp] = udids[i]
-
-        self.logger.debug(f"Added {count} job(s) at timestamp {now}")
+        self.logger.debug(f"Added {len(udids)} job(s) with UDIDs at timestamp {now}")
 
     def get_active_job_count(self):
         """
@@ -68,7 +71,7 @@ class JobTracker:
             list: List of active UDIDs
         """
         self._clean_expired()
-        return list(self.job_udids.values())
+        return list(self.job_timestamps.keys())
 
     def is_udid_active(self, udid):
         """
@@ -81,32 +84,22 @@ class JobTracker:
             bool: True if UDID is active, False otherwise
         """
         self._clean_expired()
-        return udid in self.job_udids.values()
+        return udid in self.job_timestamps
 
     def _clean_expired(self):
         """Remove job entries older than expiry_seconds."""
         now = time.time()
-        expired_indices = []
+        expired_udids = []
 
-        for i, timestamp in enumerate(self.job_timestamps):
+        for udid, timestamp in self.job_timestamps.items():
             if now - timestamp > self.expiry_seconds:
-                expired_indices.append(i)
+                expired_udids.append(udid)
 
-        # Remove expired timestamps and their UDIDs
-        if expired_indices:
-            # Remove from timestamps list
-            new_timestamps = [ts for i, ts in enumerate(self.job_timestamps) if i not in expired_indices]
-
-            # Remove from UDIDs dict
-            expired_timestamps = [self.job_timestamps[i] for i in expired_indices]
-            for ts in expired_timestamps:
-                if ts in self.job_udids:
-                    del self.job_udids[ts]
-
-            self.job_timestamps = new_timestamps
+        # Remove expired timestamps
+        for udid in expired_udids:
+            del self.job_timestamps[udid]
 
     def clear(self):
         """Clear all tracked jobs."""
         self.job_timestamps.clear()
-        self.job_udids.clear()
         self.logger.debug("Cleared all tracked jobs")

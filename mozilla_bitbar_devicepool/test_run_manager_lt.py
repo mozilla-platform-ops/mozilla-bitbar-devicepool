@@ -117,10 +117,10 @@ class TestRunManagerLT(object):
     def add_jobs(self, count, project_name=None, udids=None):
         """Add jobs to the specified project tracker or default tracker if no project specified."""
         if project_name and project_name in self.job_trackers:
-            self.job_trackers[project_name].add_jobs(count, udids=udids)
+            self.job_trackers[project_name].add_job_udids(udids)
         else:
             # For backward compatibility
-            self.job_tracker.add_jobs(count, udids=udids)
+            self.job_tracker.add_job_udids(udids)
 
     def get_active_job_count(self, project_name=None):
         """Get active job count from the specified project tracker or default tracker."""
