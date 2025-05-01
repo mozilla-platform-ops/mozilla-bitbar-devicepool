@@ -210,7 +210,7 @@ class TestRunManagerLT(object):
                     if lt_device_selector:
                         active_devices = 0
                         busy_devices = 0
-                        available_devices = []
+                        active_devices = []
 
                         # Only continue if there's a device_groups config for this project
                         if project_name in self.config_object.config.get("device_groups", {}):
@@ -223,7 +223,7 @@ class TestRunManagerLT(object):
                                     if state == self.LT_DEVICE_STATE_ACTIVE and udid in project_device_group:
                                         active_devices += 1
                                         g_active_devices += 1
-                                        available_devices.append(udid)
+                                        active_devices.append(udid)
                                     if state == self.LT_DEVICE_STATE_BUSY and udid in project_device_group:
                                         busy_devices += 1
                                     if state == self.LT_DEVICE_STATE_INITIATED:
@@ -231,14 +231,14 @@ class TestRunManagerLT(object):
                                         g_initiated_jobs += 1
 
                         logging.info(
-                            f"{logging_header} Available devices for {project_name} ({len(available_devices)}): {available_devices}"
+                            f"{logging_header} Active devices for {project_name} ({len(active_devices)}): {active_devices}"
                         )
                         with self.shared_data_lock:
                             self.shared_data["lt_g_initiated_jobs"] = g_initiated_jobs
                             if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
                                 self.shared_data["projects"][project_name]["lt_active_devices"] = active_devices
                                 self.shared_data["projects"][project_name]["lt_busy_devices"] = busy_devices
-                                self.shared_data["projects"][project_name]["available_devices"] = available_devices
+                                self.shared_data["projects"][project_name]["available_devices"] = active_devices
 
                         # logging.debug(
                         #     f"{logging_header} Found {active_devices} active devices for '{project_name}' ({lt_device_selector}) filtered by device_groups"
@@ -246,9 +246,9 @@ class TestRunManagerLT(object):
                 except Exception as e:
                     logging.error(f"{logging_header} Error processing devices for {project_name}: {e}", exc_info=True)
 
-            logging.info(
-                f"{logging_header} Updated data (global initiated jobs: {g_initiated_jobs}, active devices: {g_active_devices})"
-            )
+            # logging.info(
+            #     f"{logging_header} Updated data (global initiated jobs: {g_initiated_jobs}, active devices: {g_active_devices})"
+            # )
 
             self.shutdown_event.wait(self.LT_MONITOR_INTERVAL)
 
