@@ -343,6 +343,7 @@ class TestRunManagerLT(object):
             lt_blob = f"LT Devs Configured/Active/Busy: {lt_blob_p1:>9}"
             # TODO: add back in 'LT G Init' once working
             #  `LT G Init: {self.shared_data['lt_g_initiated_jobs']:> 3},`
+            # TODO: rework this for clarity (keep tc info together, etc)
             logging.info(
                 f"{logging_header} TC Jobs: {tc_job_count:>4}, {lt_blob:>41}, "
                 f"Recently Started: {recently_started_jobs:>3}, Need Handling: {tc_jobs_not_handled:>3}, Jobs To Start: {jobs_to_start:>3}"
