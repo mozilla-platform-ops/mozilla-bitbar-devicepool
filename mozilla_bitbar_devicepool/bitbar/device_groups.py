@@ -26,9 +26,7 @@ def get_device_groups(**kwargs):
     fields = {"displayname": str, "id": int, "ostype": str}
 
     filter = get_filter(fields, **kwargs)
-    response = TESTDROID.get(
-        "api/v2/me/device-groups", payload={"limit": 0, "filter": filter}
-    )
+    response = TESTDROID.get("api/v2/me/device-groups", payload={"limit": 0, "filter": filter})
     return response["data"]
 
 
@@ -40,9 +38,7 @@ def get_device_group(id):
     Examples:
        get_device_group(27) # Return device group with id 27
     """
-    response = TESTDROID.get(
-        "api/v2/device-groups/{}".format(id), payload={"limit": 0, "filter": filter}
-    )
+    response = TESTDROID.get("api/v2/device-groups/{}".format(id), payload={"limit": 0, "filter": filter})
     return response["data"]
 
 
@@ -102,9 +98,7 @@ def create_device_group(displayname, ostype="ANDROID"):
         "osType": ostype,
     }
 
-    response = TESTDROID.post(
-        path="users/{}/device-groups".format(me["id"]), payload=payload
-    )
+    response = TESTDROID.post(path="users/{}/device-groups".format(me["id"]), payload=payload)
     return response
 
 
@@ -121,9 +115,7 @@ def add_devices_to_device_group(id, deviceids):
         "deviceIds[]": deviceids,
     }
 
-    response = TESTDROID.post(
-        path="device-groups/{}/devices".format(id), payload=payload
-    )
+    response = TESTDROID.post(path="device-groups/{}/devices".format(id), payload=payload)
     return response
 
 

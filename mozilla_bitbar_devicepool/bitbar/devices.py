@@ -49,9 +49,7 @@ def get_device(id):
     Examples:
        get_device(1) # Return device with id 1
     """
-    response = TESTDROID.get(
-        "api/v2/devices/{}".format(id), payload={"limit": 0, "filter": filter}
-    )
+    response = TESTDROID.get("api/v2/devices/{}".format(id), payload={"limit": 0, "filter": filter})
     return response
 
 

@@ -54,9 +54,7 @@ class ConfigurationLt(object):
             taskcluster_access_token_name = data["TC_WORKER_TYPE"].replace("-", "_")
             # ensure the environment variable is set
             if taskcluster_access_token_name not in os.environ:
-                raise ValueError(
-                    f"Environment variable {taskcluster_access_token_name} not found"
-                )
+                raise ValueError(f"Environment variable {taskcluster_access_token_name} not found")
             data["TASKCLUSTER_ACCESS_TOKEN"] = os.environ[taskcluster_access_token_name]
 
     def expand_configuration(self):
@@ -70,9 +68,7 @@ class ConfigurationLt(object):
 
             project_config = projects_config[project_name]
             # Set the default project values.
-            projects_config[project_name] = apply_dict_defaults(
-                project_config, project_defaults
-            )
+            projects_config[project_name] = apply_dict_defaults(project_config, project_defaults)
 
         # TODO?: remove 'defaults' from CONFIG['projects']?
         #   - would save later code from having to exclude it
@@ -83,9 +79,7 @@ class ConfigurationLt(object):
         # Check for hyperexecute binary on path using a shell command
         cmd = "where" if sys.platform == "win32" else "which"
         try:
-            subprocess.check_call(
-                [cmd, "hyperexecute"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
-            )
+            subprocess.check_call([cmd, "hyperexecute"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         except subprocess.CalledProcessError:
             raise FileNotFoundError("hyperexecute binary not found on the system PATH")
 

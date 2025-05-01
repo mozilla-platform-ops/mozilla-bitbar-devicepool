@@ -82,9 +82,7 @@ class TestRunManager(object):
         device_group_count = bitbar_device_group["deviceCount"]
 
         offline_devices = []
-        temp_offline_devices = get_offline_devices(
-            device_model=project_config.get("device_model", None)
-        )
+        temp_offline_devices = get_offline_devices(device_model=project_config.get("device_model", None))
         for device_name in temp_offline_devices:
             if device_name in device_group:
                 offline_devices.append(device_name)
@@ -117,21 +115,15 @@ class TestRunManager(object):
                         )
                     )
 
-                taskcluster_provisioner_id = projects_config["defaults"][
-                    "taskcluster_provisioner_id"
-                ]
+                taskcluster_provisioner_id = projects_config["defaults"]["taskcluster_provisioner_id"]
 
                 # create enough tests to service either the pending tasks or the number of idle
                 # devices which do not already have a waiting test + a small logarithmic fudge
                 # term based on the number of pending tasks (whichever is smaller).
                 try:
-                    pending_tasks = get_taskcluster_pending_tasks(
-                        taskcluster_provisioner_id, worker_type
-                    )
+                    pending_tasks = get_taskcluster_pending_tasks(taskcluster_provisioner_id, worker_type)
                 except requests.ConnectionError as e:
-                    logger.warning(
-                        "exception raised when calling get_taskcluster_pending_tasks."
-                    )
+                    logger.warning("exception raised when calling get_taskcluster_pending_tasks.")
                     logger.warning(e)
                     pending_tasks = 0
 
@@ -189,9 +181,7 @@ class TestRunManager(object):
                         # if there are no devices assigned, the API will throw an exception
                         # when we try to start, so detect and warn here.
                         if stats["COUNT"] == 0:
-                            logger.warning(
-                                "Didn't try to start a job because there are no devices assigned."
-                            )
+                            logger.warning("Didn't try to start a job because there are no devices assigned.")
                         else:
                             test_run = run_test_for_project(project_name)
                             # increment so we don't start too many jobs before main thread updates stats
@@ -201,17 +191,11 @@ class TestRunManager(object):
                             logger.info("test run {} started".format(test_run["id"]))
                 except RequestResponseError as e:
                     if e.status_code == 404 and re.search(ARCHIVED_FILE_REGEX, str(e)):
-                        logger.warning(
-                            "Test files have been archived. Exiting so configuration is rerun..."
-                        )
+                        logger.warning("Test files have been archived. Exiting so configuration is rerun...")
                         logger.warning("%s: %s" % (e.__class__.__name__, e))
                         self.state = "STOP"
-                    elif e.status_code == 404 and re.search(
-                        PROJECT_DOES_NOT_EXIST_REGEX, str(e)
-                    ):
-                        logger.warning(
-                            "Project does not exist!. Exiting so configuration is rerun..."
-                        )
+                    elif e.status_code == 404 and re.search(PROJECT_DOES_NOT_EXIST_REGEX, str(e)):
+                        logger.warning("Project does not exist!. Exiting so configuration is rerun...")
                         logger.warning("%s: %s" % (e.__class__.__name__, e))
                         self.state = "STOP"
                     else:
@@ -258,9 +242,7 @@ class TestRunManager(object):
 
         for item in result:
             # remove user id from this (see configuration.py:configure_projects)
-            project_name = item["projectName"].replace(
-                "%s-" % (configuration.get_me_id()), ""
-            )
+            project_name = item["projectName"].replace("%s-" % (configuration.get_me_id()), "")
             # only accumulate for projects in our config
             if project_name in bitbar_projects:
                 accumulation_dict[project_name].append(item)
@@ -278,12 +260,7 @@ class TestRunManager(object):
                     test_run_state = test_run["state"]
                     stats[test_run_state] += 1
 
-                stats["IDLE"] = (
-                    stats["COUNT"]
-                    - stats["DISABLED"]
-                    - stats["OFFLINE"]
-                    - stats["RUNNING"]
-                )
+                stats["IDLE"] = stats["COUNT"] - stats["DISABLED"] - stats["OFFLINE"] - stats["RUNNING"]
                 if stats["IDLE"] < 0:
                     stats["IDLE"] = 0
 
@@ -291,9 +268,7 @@ class TestRunManager(object):
         projects_config = CONFIG["projects"]
         CONFIG["threads"] = []
 
-        active_job_thread = threading.Thread(
-            target=self.thread_active_jobs, name="active_jobs", args=()
-        )
+        active_job_thread = threading.Thread(target=self.thread_active_jobs, name="active_jobs", args=())
         logger.info("test-run-manager: loading existing runs")
         active_job_thread.start()
         CONFIG["threads"].append(active_job_thread)
@@ -345,22 +320,16 @@ class TestRunManager(object):
                 running_total += stats["RUNNING"]
                 with lock:
                     try:
-                        self.get_bitbar_test_stats(
-                            project_name, projects_config[project_name]
-                        )
+                        self.get_bitbar_test_stats(project_name, projects_config[project_name])
                     except (
                         requests.exceptions.ConnectionError,
                         requests.Timeout,
                         RequestResponseError,
                     ) as e:
-                        logger.warning(
-                            "exception raised when calling get_bitbar_test_stats."
-                        )
+                        logger.warning("exception raised when calling get_bitbar_test_stats.")
                         logger.warning(e)
                         # TODO: if we see this a lot, add exponential backoff?
                         time.sleep(15)
                 time.sleep(1)
-            logger.info(
-                "WAITING_TOTAL {} RUNNING_TOTAL {}".format(waiting_total, running_total)
-            )
+            logger.info("WAITING_TOTAL {} RUNNING_TOTAL {}".format(waiting_total, running_total))
         logger.info("main thread exiting")

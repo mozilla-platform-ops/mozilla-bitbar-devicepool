@@ -14,9 +14,7 @@ MAX_WAIT_TIME = 120
 def get_connected_devices():
     try:
         # Run adb devices command and capture the output
-        result = subprocess.run(
-            ["/usr/bin/adb", "devices"], capture_output=True, text=True, check=True
-        )
+        result = subprocess.run(["/usr/bin/adb", "devices"], capture_output=True, text=True, check=True)
         # result = subprocess.run([os.environ['ADB_BINARY_PATH'], 'devices'], capture_output=True, text=True, check=True)
 
         print("got stdout from 'adb devices': %s" % result.stdout)

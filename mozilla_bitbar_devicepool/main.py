@@ -41,9 +41,7 @@ def empty_test_zip(args):
 
 def test_run_manager(args):
     if not TESTDROID:
-        logger.warning(
-            "The environment variabels TESTDROID_URL, TESTDROID_APIKEY both need to be set."
-        )
+        logger.warning("The environment variabels TESTDROID_URL, TESTDROID_APIKEY both need to be set.")
         sys.exit(1)
 
     if args.bitbar_config is None:
@@ -52,13 +50,9 @@ def test_run_manager(args):
         bitbar_configpath = args.bitbar_config
 
     try:
-        configuration.configure(
-            bitbar_configpath, filespath=args.files, update_bitbar=args.update_bitbar
-        )
+        configuration.configure(bitbar_configpath, filespath=args.files, update_bitbar=args.update_bitbar)
     except configuration.DuplicateProjectException as e:
-        logger.warning(
-            "Duplicate project found! Please archive all but one and restart. Exiting..."
-        )
+        logger.warning("Duplicate project found! Please archive all but one and restart. Exiting...")
         logger.warning(e)
         sys.exit(1)
 
@@ -68,9 +62,7 @@ def test_run_manager(args):
 
 def run_test(args):
     if not TESTDROID:
-        logger.warning(
-            "The environment variabels TESTDROID_URL, TESTDROID_APIKEY both need to be set."
-        )
+        logger.warning("The environment variabels TESTDROID_URL, TESTDROID_APIKEY both need to be set.")
         sys.exit(1)
 
     if args.bitbar_config is None:
@@ -78,9 +70,7 @@ def run_test(args):
     else:
         bitbar_configpath = args.bitbar_config
 
-    configuration.configure(
-        bitbar_configpath, filespath=args.files, update_bitbar=args.update_bitbar
-    )
+    configuration.configure(bitbar_configpath, filespath=args.files, update_bitbar=args.update_bitbar)
 
     run_test_for_project(args.project_name)
     logger.info("run started for project '%s'" % args.project_name)
@@ -119,8 +109,7 @@ Terminate Now
     parser.add_argument(
         "--files",
         default=os.path.join(modulepath, "files"),
-        help="Directory where downloaded files are saved. "
-        "Defaults to %s/files" % modulepath,
+        help="Directory where downloaded files are saved. Defaults to %s/files" % modulepath,
     )
     parser.add_argument(
         "--log-level",
@@ -130,9 +119,7 @@ Terminate Now
         help="Logging level. Defaults to INFO.",
     )
 
-    subparsers = parser.add_subparsers(
-        help="Specify one of the positional arguments to select the command to execute."
-    )
+    subparsers = parser.add_subparsers(help="Specify one of the positional arguments to select the command to execute.")
 
     ### download-test-apk ###
     subparser = subparsers.add_parser(
@@ -143,9 +130,7 @@ Terminate Now
         "--filename",
         help="Specify filename to save Testdroid.apk to in the files directory.",
     )
-    subparser.add_argument(
-        "--force", action="store_true", default=False, help="Overwrite existing file."
-    )
+    subparser.add_argument("--force", action="store_true", default=False, help="Overwrite existing file.")
     subparser.set_defaults(func=download_testdroid_apk)
 
     ### empty-test-zip ###
@@ -156,18 +141,13 @@ Terminate Now
     subparser.add_argument(
         "--filename",
         default="empty-test.zip",
-        help="Specify filename to save in the files directory. "
-        "Defaults to empty-test.zip.",
+        help="Specify filename to save in the files directory. Defaults to empty-test.zip.",
     )
     subparser.set_defaults(func=empty_test_zip)
 
     ### test-run-manager ###
-    subparser = subparsers.add_parser(
-        "start-test-run-manager", help="Run the test run manager."
-    )
-    subparser.add_argument(
-        "--bitbar-config", help="Path to Bitbar yaml configuration file."
-    )
+    subparser = subparsers.add_parser("start-test-run-manager", help="Run the test run manager.")
+    subparser.add_argument("--bitbar-config", help="Path to Bitbar yaml configuration file.")
     subparser.add_argument(
         "--wait",
         dest="wait",
@@ -184,12 +164,8 @@ Terminate Now
     subparser.set_defaults(func=test_run_manager)
 
     ### run-test ###
-    subparser = subparsers.add_parser(
-        "run-test", help="Run test for a project then exit."
-    )
-    subparser.add_argument(
-        "--bitbar-config", help="Path to Bitbar yaml configuration file."
-    )
+    subparser = subparsers.add_parser("run-test", help="Run test for a project then exit.")
+    subparser.add_argument("--bitbar-config", help="Path to Bitbar yaml configuration file.")
     subparser.add_argument(
         "--update-bitbar",
         action="store_true",

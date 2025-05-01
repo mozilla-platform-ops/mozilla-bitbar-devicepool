@@ -37,9 +37,7 @@ class DeviceGroupReportLt:
         output_dict = {}
         for lt_project in config_summary_dict:
             project_lt_device_selector = config_summary_dict[lt_project]
-            count_for_device_type = api_device_summary_dict[project_lt_device_selector][
-                "count"
-            ]
+            count_for_device_type = api_device_summary_dict[project_lt_device_selector]["count"]
             output_dict[lt_project] = count_for_device_type
 
         print("")
@@ -101,9 +99,7 @@ class DeviceGroupReportLt:
 def main():
     # Parse command line arguments
     parser = argparse.ArgumentParser(description="LambdaTest device group report")
-    parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Show more detailed output"
-    )
+    parser.add_argument("--verbose", "-v", action="store_true", help="Show more detailed output")
     args = parser.parse_args()
 
     banner = r"""

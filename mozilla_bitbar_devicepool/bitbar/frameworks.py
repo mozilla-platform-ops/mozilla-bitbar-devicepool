@@ -36,7 +36,5 @@ def get_frameworks(**kwargs):
     }
 
     filter = get_filter(fields, **kwargs)
-    response = TESTDROID.get(
-        "api/v2/admin/frameworks", payload={"limit": 0, "filter": filter}
-    )
+    response = TESTDROID.get("api/v2/admin/frameworks", payload={"limit": 0, "filter": filter})
     return response["data"]

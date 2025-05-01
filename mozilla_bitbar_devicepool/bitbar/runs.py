@@ -39,9 +39,7 @@ def run_test_for_project(project_name):
         "projectId": CACHE["projects"][project_name]["id"],
         "scheduler": project_config["scheduler"],
         "timeout": project_config["timeout"],
-        "deviceGroupId": CACHE["device_groups"][project_config["device_group_name"]][
-            "id"
-        ],
+        "deviceGroupId": CACHE["device_groups"][project_config["device_group_name"]]["id"],
         "testRunParameters": [],
         "files": [],
     }
@@ -49,22 +47,16 @@ def run_test_for_project(project_name):
     if "test_file" in project_config:
         test_file = project_config["test_file"]
         bitbar_test_file = CACHE["files"][test_file]
-        test_configuration["files"].append(
-            {"id": bitbar_test_file["id"], "action": "RUN_TEST"}
-        )
+        test_configuration["files"].append({"id": bitbar_test_file["id"], "action": "RUN_TEST"})
     if "application_file" in project_config:
         application_file = project_config["application_file"]
         bitbar_application_file = CACHE["files"][application_file]
-        test_configuration["files"].append(
-            {"id": bitbar_application_file["id"], "action": "INSTALL"}
-        )
+        test_configuration["files"].append({"id": bitbar_application_file["id"], "action": "INSTALL"})
 
     additional_parameters = project_config["additional_parameters"]
     for parameter_name in additional_parameters:
         parameter_value = additional_parameters[parameter_name]
-        test_configuration["testRunParameters"].append(
-            {"key": parameter_name, "value": parameter_value}
-        )
+        test_configuration["testRunParameters"].append({"key": parameter_name, "value": parameter_value})
 
     return run_test_with_configuration(test_configuration)
 
@@ -79,9 +71,7 @@ def get_test_runs(project_id, active=None):
     if active:
         test_runs = [run for run in test_runs if run["state"] in ("WAITING", "RUNNING")]
     else:
-        test_runs = [
-            run for run in test_runs if run["state"] not in ("WAITING", "RUNNING")
-        ]
+        test_runs = [run for run in test_runs if run["state"] not in ("WAITING", "RUNNING")]
     return test_runs
 
 

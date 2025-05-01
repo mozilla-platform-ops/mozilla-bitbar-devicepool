@@ -86,15 +86,11 @@ def ensure_filenames_are_unique(config):
                 if deeper_item == "application_file" or deeper_item == "test_file":
                     a_filename = config["projects"][item][deeper_item]
                     if a_filename in seen_filenames:
-                        raise ConfigurationFileDuplicateFilenamesException(
-                            "duplicate filenames found!"
-                        )
+                        raise ConfigurationFileDuplicateFilenamesException("duplicate filenames found!")
                     seen_filenames.append(a_filename)
     except KeyError as e:
         print(e)
-        raise ConfigurationFileException(
-            "config does not appear to be in proper format"
-        )
+        raise ConfigurationFileException("config does not appear to be in proper format")
     return seen_filenames
 
 
@@ -128,9 +124,7 @@ def configure(bitbar_configpath, filespath=None, update_bitbar=False):
         configuration_preflight()
     except ConfigurationFileException as e:
         logger.warning(e)
-        logger.warning(
-            "Configuration files seem to be missing! Please place and restart. Exiting..."
-        )
+        logger.warning("Configuration files seem to be missing! Please place and restart. Exiting...")
         sys.exit(1)
     configure_device_groups(update_bitbar=update_bitbar)
     configure_projects(update_bitbar=update_bitbar)
@@ -151,9 +145,7 @@ def expand_configuration():
 
         project_config = projects_config[project_name]
         # Set the default project values.
-        projects_config[project_name] = apply_dict_defaults(
-            project_config, project_defaults
-        )
+        projects_config[project_name] = apply_dict_defaults(project_config, project_defaults)
 
     # TODO: remove 'defaults' from CONFIG['projects']?
     #   - would save later code from having to exclude it
@@ -196,9 +188,7 @@ def configure_device_groups(update_bitbar=False):
 
     device_groups_config = CONFIG["device_groups"]
     for device_group_name in device_groups_config:
-        logger.info(
-            "configure_device_groups: configuring group {}".format(device_group_name)
-        )
+        logger.info("configure_device_groups: configuring group {}".format(device_group_name))
         device_group_config = device_groups_config[device_group_name]
         if device_group_config is None:
             # Handle the case where the configured device group is empty.
@@ -209,16 +199,12 @@ def configure_device_groups(update_bitbar=False):
         bitbar_device_groups = get_device_groups(displayname=device_group_name)
         if len(bitbar_device_groups) > 1:
             raise Exception(
-                "device group {} has {} duplicates".format(
-                    device_group_name, len(bitbar_device_groups) - 1
-                )
+                "device group {} has {} duplicates".format(device_group_name, len(bitbar_device_groups) - 1)
             )
         elif len(bitbar_device_groups) == 1:
             bitbar_device_group = bitbar_device_groups[0]
             logger.debug(
-                "configure_device_groups: configuring group {} to use {}".format(
-                    device_group_name, bitbar_device_group
-                )
+                "configure_device_groups: configuring group {} to use {}".format(device_group_name, bitbar_device_group)
             )
         else:
             # no such device group. create it.
@@ -230,18 +216,10 @@ def configure_device_groups(update_bitbar=False):
                     )
                 )
             else:
-                raise Exception(
-                    "device group {} does not exist but can not create.".format(
-                        device_group_name
-                    )
-                )
+                raise Exception("device group {} does not exist but can not create.".format(device_group_name))
 
-        bitbar_device_group_devices = get_device_group_devices(
-            bitbar_device_group["id"]
-        )
-        bitbar_device_group_names = set(
-            [device["displayName"] for device in bitbar_device_group_devices]
-        )
+        bitbar_device_group_devices = get_device_group_devices(bitbar_device_group["id"])
+        bitbar_device_group_names = set([device["displayName"] for device in bitbar_device_group_devices])
 
         # determine which devices need to be deleted from or added to
         # the device group at bitbar.
@@ -249,11 +227,7 @@ def configure_device_groups(update_bitbar=False):
         add_device_names = new_device_group_names - bitbar_device_group_names
 
         delete_device_ids = [devices_cache[name]["id"] for name in delete_device_names]
-        add_device_ids = [
-            devices_cache[name]["id"]
-            for name in add_device_names
-            if name in devices_cache
-        ]
+        add_device_ids = [devices_cache[name]["id"] for name in add_device_names if name in devices_cache]
 
         for device_id in delete_device_ids:
             if update_bitbar:
@@ -266,15 +240,11 @@ def configure_device_groups(update_bitbar=False):
                 )
             bitbar_device_group["deviceCount"] -= 1
             if bitbar_device_group["deviceCount"] < 0:
-                raise Exception(
-                    "device group {} has negative deviceCount".format(device_group_name)
-                )
+                raise Exception("device group {} has negative deviceCount".format(device_group_name))
 
         if add_device_ids:
             if update_bitbar:
-                bitbar_device_group = add_devices_to_device_group(
-                    bitbar_device_group["id"], add_device_ids
-                )
+                bitbar_device_group = add_devices_to_device_group(bitbar_device_group["id"], add_device_ids)
             else:
                 raise Exception(
                     "Attempting to add device(s) {} to group {}, but not configured to update bitbar config.".format(
@@ -302,9 +272,7 @@ def configure_projects(update_bitbar=False):
     counter = 0
     for project_name in projects_config:
         counter += 1
-        log_header = "configure_projects: {} ({}/{})".format(
-            project_name, counter, project_total
-        )
+        log_header = "configure_projects: {} ({}/{})".format(project_name, counter, project_total)
 
         if project_name == "defaults":
             logger.info("{}: skipping".format(log_header))
@@ -322,27 +290,15 @@ def configure_projects(update_bitbar=False):
         bitbar_projects = get_projects(name=user_project_name)
         if len(bitbar_projects) > 1:
             raise DuplicateProjectException(
-                "project {} ({}) has {} duplicates".format(
-                    project_name, user_project_name, len(bitbar_projects) - 1
-                )
+                "project {} ({}) has {} duplicates".format(project_name, user_project_name, len(bitbar_projects) - 1)
             )
         elif len(bitbar_projects) == 1:
             bitbar_project = bitbar_projects[0]
-            logger.debug(
-                "configure_projects: using project {} ({})".format(
-                    bitbar_project, user_project_name
-                )
-            )
+            logger.debug("configure_projects: using project {} ({})".format(bitbar_project, user_project_name))
         else:
             if update_bitbar:
-                bitbar_project = create_project(
-                    user_project_name, project_type=project_config["project_type"]
-                )
-                logger.debug(
-                    "configure_projects: created project {} ({})".format(
-                        bitbar_project, user_project_name
-                    )
-                )
+                bitbar_project = create_project(user_project_name, project_type=project_config["project_type"])
+                logger.debug("configure_projects: created project {} ({})".format(bitbar_project, user_project_name))
             else:
                 raise Exception(
                     "Project {} ({}) does not exist, but not creating as not configured to update bitbar!".format(
@@ -351,9 +307,7 @@ def configure_projects(update_bitbar=False):
                 )
 
         framework_name = project_config["framework_name"]
-        BITBAR_CACHE["frameworks"][framework_name] = get_frameworks(
-            name=framework_name
-        )[0]
+        BITBAR_CACHE["frameworks"][framework_name] = get_frameworks(name=framework_name)[0]
 
         logger.info("{}: configuring test file".format(log_header))
         file_name = project_config.get("test_file")
@@ -367,9 +321,7 @@ def configure_projects(update_bitbar=False):
                     bitbar_file = get_files(name=file_name)[-1]
                 else:
                     raise Exception(
-                        "Test file {} not found and not configured to update bitbar configuration!".format(
-                            file_name
-                        )
+                        "Test file {} not found and not configured to update bitbar configuration!".format(file_name)
                     )
             BITBAR_CACHE["files"][file_name] = bitbar_file
 
@@ -394,8 +346,7 @@ def configure_projects(update_bitbar=False):
         # Sync the base project properties if they have changed.
         if (
             project_config["archivingStrategy"] != bitbar_project["archivingStrategy"]
-            or project_config["archivingItemCount"]
-            != bitbar_project["archivingItemCount"]
+            or project_config["archivingItemCount"] != bitbar_project["archivingItemCount"]
             or project_config["description"] != bitbar_project["description"]
         ):
             # project basic attributes changed in config, update bitbar version.
@@ -438,12 +389,8 @@ def configure_projects(update_bitbar=False):
             # projects may be configured to use it. Non-taskcluster
             # projects such as mozilla-docker-build are not invoke by
             # Taskcluster currently.
-            taskcluster_access_token_name = additional_parameters[
-                "TC_WORKER_TYPE"
-            ].replace("-", "_")
-            additional_parameters["TASKCLUSTER_ACCESS_TOKEN"] = os.environ[
-                taskcluster_access_token_name
-            ]
+            taskcluster_access_token_name = additional_parameters["TC_WORKER_TYPE"].replace("-", "_")
+            additional_parameters["TASKCLUSTER_ACCESS_TOKEN"] = os.environ[taskcluster_access_token_name]
 
         BITBAR_CACHE["projects"][project_name] = bitbar_project
         BITBAR_CACHE["projects"][project_name]["lock"] = threading.Lock()
