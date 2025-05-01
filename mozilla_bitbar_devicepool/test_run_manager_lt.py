@@ -867,6 +867,10 @@ class TestRunManagerLT(object):
                     # logging.info(
                     #     f"{logging_header} Launched {processes_started} background jobs in {round(outer_end_time - outer_start_time, 2)} seconds"
                     # )
+
+                # TODO: send a signal to the other threads to wake them up and have them gather?
+                # avoid race with tc and lt threads, pause so we have updated data on next loop
+                time.sleep(self.LT_MONITOR_INTERVAL)
                 # --- End Start Jobs ---
             else:
                 # logging.info(f"{logging_header} No jobs to start. Sleeping.")
