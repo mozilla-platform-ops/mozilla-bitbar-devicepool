@@ -329,7 +329,6 @@ class TestRunManagerLT(object):
             # )
 
             # TODO: make jobs_to_start consider JobTracker or figure out how to short circuit sooner if no free devices
-            #  - currently we say we're going to start jobs, but all devices could be busy
 
             jobs_to_start = self.calculate_jobs_to_start(
                 tc_jobs_not_handled, len(available_devices), self.shared_data["lt_g_initiated_jobs"]
