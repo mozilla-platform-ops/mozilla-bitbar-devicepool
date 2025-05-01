@@ -203,360 +203,362 @@ class TestRunManagerLT(object):
             # take a short break
             time.sleep(5)
 
-    def run_single_project_single_thread_multi_job(self, max_jobs_to_start=None, foreground=False, mode=None):
-        if mode is None:
-            mode = self.MODE_RUN_NOTRACK
-        # default the value
-        if max_jobs_to_start is None:
-            max_jobs_to_start = self.MAX_JOBS_TO_START_AT_ONCE
-        # base on __file__ to get the project root dir
-        project_source_dir = os.path.dirname(os.path.realpath(__file__))
-        project_root_dir = os.path.abspath(os.path.join(project_source_dir, ".."))
-        user_script_golden_dir = os.path.join(project_source_dir, "lambdatest", "user_script")
+    # single-threaded code (not used, for reference)
 
-        test_run_dir = "/tmp/mozilla-lt-devicepool-job-dir"
-        test_run_file = os.path.join(test_run_dir, "hyperexecute.yaml")
+    # def run_single_project_single_thread_multi_job(self, max_jobs_to_start=None, foreground=False, mode=None):
+    #     if mode is None:
+    #         mode = self.MODE_RUN_NOTRACK
+    #     # default the value
+    #     if max_jobs_to_start is None:
+    #         max_jobs_to_start = self.MAX_JOBS_TO_START_AT_ONCE
+    #     # base on __file__ to get the project root dir
+    #     project_source_dir = os.path.dirname(os.path.realpath(__file__))
+    #     project_root_dir = os.path.abspath(os.path.join(project_source_dir, ".."))
+    #     user_script_golden_dir = os.path.join(project_source_dir, "lambdatest", "user_script")
 
-        # TODO?: if we do multithreading, use messaging vs shared object with locks
+    #     test_run_dir = "/tmp/mozilla-lt-devicepool-job-dir"
+    #     test_run_file = os.path.join(test_run_dir, "hyperexecute.yaml")
 
-        # TODO?: once we can target multiple specific devices in hyperexecute.yaml or implement single
-        #         device targeting/tracking, we can have multiple projects within the same
-        #         device_type-os_version pool.
-        #
-        # hard code for now
-        current_project_name = "a55-perf"
-        logging.info(f"current project: {current_project_name}")
+    #     # TODO?: if we do multithreading, use messaging vs shared object with locks
 
-        logging.info(f"entering run loop (execution mode is {mode})...")
-        while self.state == self.STATE_RUNNING:
-            current_project = self.config_object.config["projects"][current_project_name]
+    #     # TODO?: once we can target multiple specific devices in hyperexecute.yaml or implement single
+    #     #         device targeting/tracking, we can have multiple projects within the same
+    #     #         device_type-os_version pool.
+    #     #
+    #     # hard code for now
+    #     current_project_name = "a55-perf"
+    #     logging.info(f"current project: {current_project_name}")
 
-            tc_worker_type = current_project["TC_WORKER_TYPE"]
-            tc_client_id = current_project["TASKCLUSTER_CLIENT_ID"]
-            tc_client_key = current_project["TASKCLUSTER_ACCESS_TOKEN"]
-            lt_device_selector = current_project["lt_device_selector"]
-            # debug
-            # print(f"tc_client_id: {tc_client_id}")
-            # print(f"tc_client_key: {tc_client_key}")
+    #     logging.info(f"entering run loop (execution mode is {mode})...")
+    #     while self.state == self.STATE_RUNNING:
+    #         current_project = self.config_object.config["projects"][current_project_name]
 
-            tc_job_count = get_taskcluster_pending_tasks("proj-autophone", tc_worker_type, verbose=False)
-            # gather data targeting the current project or current device_type_and_os
-            label_filters = [self.PROGRAM_LABEL, current_project_name]
-            running_job_count = self.status_object.get_running_job_count(label_filter_arr=label_filters)
-            initiated_job_count = self.status_object.get_initiated_job_count(label_filter_arr=label_filters)
-            active_devices_in_requested_config = self.status_object.get_device_state_count(
-                lt_device_selector, self.LT_DEVICE_STATE_ACTIVE
-            )
+    #         tc_worker_type = current_project["TC_WORKER_TYPE"]
+    #         tc_client_id = current_project["TASKCLUSTER_CLIENT_ID"]
+    #         tc_client_key = current_project["TASKCLUSTER_ACCESS_TOKEN"]
+    #         lt_device_selector = current_project["lt_device_selector"]
+    #         # debug
+    #         # print(f"tc_client_id: {tc_client_id}")
+    #         # print(f"tc_client_key: {tc_client_key}")
 
-            # Get count of recently started jobs that are still in startup phase
-            recently_started_jobs = self.get_active_job_count(current_project_name)
+    #         tc_job_count = get_taskcluster_pending_tasks("proj-autophone", tc_worker_type, verbose=False)
+    #         # gather data targeting the current project or current device_type_and_os
+    #         label_filters = [self.PROGRAM_LABEL, current_project_name]
+    #         running_job_count = self.status_object.get_running_job_count(label_filter_arr=label_filters)
+    #         initiated_job_count = self.status_object.get_initiated_job_count(label_filter_arr=label_filters)
+    #         active_devices_in_requested_config = self.status_object.get_device_state_count(
+    #             lt_device_selector, self.LT_DEVICE_STATE_ACTIVE
+    #         )
 
-            # New calculation that includes recently started jobs
-            # TODO: should this include initiated_job_count?
-            tc_jobs_not_handled = tc_job_count - recently_started_jobs
+    #         # Get count of recently started jobs that are still in startup phase
+    #         recently_started_jobs = self.get_active_job_count(current_project_name)
 
-            # TODO: print out how this is calculatted
+    #         # New calculation that includes recently started jobs
+    #         # TODO: should this include initiated_job_count?
+    #         tc_jobs_not_handled = tc_job_count - recently_started_jobs
 
-            # tc data
-            logging.info(f"tc_job_count: {tc_job_count}")
-            # lt data
-            logging.debug(f"running_job_count: {running_job_count}")
-            logging.debug(f"initiated job count: {initiated_job_count}")
-            logging.debug(f"self.max_jobs_to_start: {self.max_jobs_to_start}")
-            logging.debug(f"max_jobs_to_start: {self.max_jobs_to_start}")
-            logging.debug(
-                f"active_devices_in_requested_config ({lt_device_selector}): {active_devices_in_requested_config}"
-            )
-            # state data
-            logging.debug(f"recently_started_jobs: {recently_started_jobs}")
-            # merged data
-            logging.debug(f"tc_jobs_not_handled: {tc_jobs_not_handled}")
+    #         # TODO: print out how this is calculatted
 
-            # limit the amount of jobs we start to a local and global max
-            jobs_to_start = min(tc_jobs_not_handled, self.max_jobs_to_start, max_jobs_to_start)
-            logging.debug(f"min of tc_jobs_not_handled, self.max_jobs_to_start, max_jobs_to_start is {jobs_to_start}")
-            # don't try to start more jobs than free devices
-            jobs_to_start = min(jobs_to_start, active_devices_in_requested_config)
-            logging.debug(f"min of jobs_to_start and active_devices_in_requested_config is {jobs_to_start}")
+    #         # tc data
+    #         logging.info(f"tc_job_count: {tc_job_count}")
+    #         # lt data
+    #         logging.debug(f"running_job_count: {running_job_count}")
+    #         logging.debug(f"initiated job count: {initiated_job_count}")
+    #         logging.debug(f"self.max_jobs_to_start: {self.max_jobs_to_start}")
+    #         logging.debug(f"max_jobs_to_start: {self.max_jobs_to_start}")
+    #         logging.debug(
+    #             f"active_devices_in_requested_config ({lt_device_selector}): {active_devices_in_requested_config}"
+    #         )
+    #         # state data
+    #         logging.debug(f"recently_started_jobs: {recently_started_jobs}")
+    #         # merged data
+    #         logging.debug(f"tc_jobs_not_handled: {tc_jobs_not_handled}")
 
-            logging.info(f"jobs_to_start: {jobs_to_start}")
+    #         # limit the amount of jobs we start to a local and global max
+    #         jobs_to_start = min(tc_jobs_not_handled, self.max_jobs_to_start, max_jobs_to_start)
+    #         logging.debug(f"min of tc_jobs_not_handled, self.max_jobs_to_start, max_jobs_to_start is {jobs_to_start}")
+    #         # don't try to start more jobs than free devices
+    #         jobs_to_start = min(jobs_to_start, active_devices_in_requested_config)
+    #         logging.debug(f"min of jobs_to_start and active_devices_in_requested_config is {jobs_to_start}")
 
-            if jobs_to_start <= 0:
-                logging.info(
-                    f"no unhandled jobs (no tc jobs, no active lt devices, or lt jobs already started), sleeping {self.no_job_sleep}s..."
-                )
-                time.sleep(self.no_job_sleep)
-            else:
-                # eternal APK provided by LT
-                lt_app_url = "lt://proverbial-android"
+    #         logging.info(f"jobs_to_start: {jobs_to_start}")
 
-                # remove /tmp/user_script dir
-                shutil.rmtree(test_run_dir, ignore_errors=True)
-                # create /tmp/mozilla-lt-devicepool-job-dir dir
-                os.makedirs(test_run_dir, exist_ok=True)
+    #         if jobs_to_start <= 0:
+    #             logging.info(
+    #                 f"no unhandled jobs (no tc jobs, no active lt devices, or lt jobs already started), sleeping {self.no_job_sleep}s..."
+    #             )
+    #             time.sleep(self.no_job_sleep)
+    #         else:
+    #             # eternal APK provided by LT
+    #             lt_app_url = "lt://proverbial-android"
 
-                # copy user_script_golden_dir to correct path using python shutil
-                shutil.copytree(user_script_golden_dir, os.path.join(test_run_dir, "user_script"))
+    #             # remove /tmp/user_script dir
+    #             shutil.rmtree(test_run_dir, ignore_errors=True)
+    #             # create /tmp/mozilla-lt-devicepool-job-dir dir
+    #             os.makedirs(test_run_dir, exist_ok=True)
 
-                cmd_env = os.environ.copy()
-                cmd_env["LT_USERNAME"] = self.config_object.lt_username
-                cmd_env["LT_ACCESS_KEY"] = self.config_object.lt_access_key
+    #             # copy user_script_golden_dir to correct path using python shutil
+    #             shutil.copytree(user_script_golden_dir, os.path.join(test_run_dir, "user_script"))
 
-                # set the device type, OS, and optionally UDID for this job
-                #
-                device_type_and_os = lt_device_selector
-                # udid = None
-                # TODO?: manage device state and specify UDID of exact device to target for each job
+    #             cmd_env = os.environ.copy()
+    #             cmd_env["LT_USERNAME"] = self.config_object.lt_username
+    #             cmd_env["LT_ACCESS_KEY"] = self.config_object.lt_access_key
 
-                # hyperexecute job labels
-                #
-                # indicate this is scheduled by this program
-                #   - use new name 'mozilla-taskcluster-devicepool'
-                labels_csv = self.PROGRAM_LABEL
-                # add the workerType to the labels
-                #   - we really want the lt side name for this... they turn out to be the same
-                # labels_csv += f",{shorten_worker_type(tc_worker_type)}"
-                labels_csv += f",{current_project_name}"
-                # TODO: revisit this decision in a bit
-                #   - not adding device type because it's largely redundant given current_project_name
-                # add the device type to the labels
-                # dtao_underscore = device_type_and_os.replace(" ", "_")
-                # labels_csv += f",{dtao_underscore}"
-                # TODO?: enable adding udid to the labels?
-                # if udid:
-                #     labels_csv += f",{udid}"
+    #             # set the device type, OS, and optionally UDID for this job
+    #             #
+    #             device_type_and_os = lt_device_selector
+    #             # udid = None
+    #             # TODO?: manage device state and specify UDID of exact device to target for each job
 
-                # lt user and lt key are passsed in via env vars
-                #   old: command_string = f"{project_root_dir}/hyperexecute --user \
-                #           '{self.config_object.lt_username}' --key '{self.config_object.lt_api_key}'"
-                labels_arg = f"--labels '{labels_csv}'"
-                extra_flags = "--exclude-external-binaries"
+    #             # hyperexecute job labels
+    #             #
+    #             # indicate this is scheduled by this program
+    #             #   - use new name 'mozilla-taskcluster-devicepool'
+    #             labels_csv = self.PROGRAM_LABEL
+    #             # add the workerType to the labels
+    #             #   - we really want the lt side name for this... they turn out to be the same
+    #             # labels_csv += f",{shorten_worker_type(tc_worker_type)}"
+    #             labels_csv += f",{current_project_name}"
+    #             # TODO: revisit this decision in a bit
+    #             #   - not adding device type because it's largely redundant given current_project_name
+    #             # add the device type to the labels
+    #             # dtao_underscore = device_type_and_os.replace(" ", "_")
+    #             # labels_csv += f",{dtao_underscore}"
+    #             # TODO?: enable adding udid to the labels?
+    #             # if udid:
+    #             #     labels_csv += f",{udid}"
 
-                if foreground:
-                    command_string = f"{project_root_dir}/hyperexecute {labels_arg} {extra_flags} "
-                else:
-                    command_string = f"{project_root_dir}/hyperexecute --no-track {labels_arg} {extra_flags}"
+    #             # lt user and lt key are passsed in via env vars
+    #             #   old: command_string = f"{project_root_dir}/hyperexecute --user \
+    #             #           '{self.config_object.lt_username}' --key '{self.config_object.lt_api_key}'"
+    #             labels_arg = f"--labels '{labels_csv}'"
+    #             extra_flags = "--exclude-external-binaries"
 
-                current_mode = mode
-                if jobs_to_start <= 0:
-                    logging.info("no jobs to start, setting mode MODE_NO_OP...")
-                    current_mode = self.MODE_NO_OP
+    #             if foreground:
+    #                 command_string = f"{project_root_dir}/hyperexecute {labels_arg} {extra_flags} "
+    #             else:
+    #                 command_string = f"{project_root_dir}/hyperexecute --no-track {labels_arg} {extra_flags}"
 
-                if current_mode == self.MODE_RUN_NOTRACK:
-                    # start the desired number of jobs (concurrency: 1)
+    #             current_mode = mode
+    #             if jobs_to_start <= 0:
+    #                 logging.info("no jobs to start, setting mode MODE_NO_OP...")
+    #                 current_mode = self.MODE_NO_OP
 
-                    # create hyperexecute.yaml specific to each queue
-                    job_config.write_config(
-                        tc_client_id,
-                        tc_client_key,
-                        tc_worker_type,
-                        lt_app_url,
-                        device_type_and_os,
-                        udid=None,
-                        concurrency=1,
-                        path=test_run_file,
-                    )
+    #             if current_mode == self.MODE_RUN_NOTRACK:
+    #                 # start the desired number of jobs (concurrency: 1)
 
-                    outer_start_time = time.time()
-                    for i in range(jobs_to_start):
-                        logging.info(f"starting job {i + 1} of {jobs_to_start}...")
-                        # Use test_mode instead of hardcoded DEBUG
-                        if self.debug_mode:
-                            logging.info(f"would be running command: '{command_string}' in path '{test_run_dir}'...")
-                            logging.info("sleeping 30 seconds (to simulate starting job)...")
-                            time.sleep(30)
-                        else:
-                            logging.info(f"running: '{command_string}' in path '{test_run_dir}'...")
-                            start_time = time.time()
-                            # NOTE: background so we can do this faster or set concurrencty in the YAML?
-                            #   - can only get 1-2 jobs going in parallel with trivial tasks
-                            #   - for concurrency to work, would we need to emit multiple test targets (1:1 with concurrency?)
-                            # start_new_session=True ensures process ignores ctrl-c sent to this process (so it cleans up)
-                            subprocess.run(
-                                command_string,
-                                shell=True,
-                                env=cmd_env,
-                                cwd=test_run_dir,
-                                start_new_session=True,
-                            )
-                            end_time = time.time()
-                            logging.info(
-                                f"starting job {i + 1} of {jobs_to_start} took {round(end_time - start_time, 2)} seconds"
-                            )
-                            if self.state == self.STATE_STOP:
-                                break
-                    outer_end_time = time.time()
-                    # Record the jobs we just started
-                    self.add_jobs(jobs_to_start, current_project_name)
-                    logging.info(
-                        f"starting {jobs_to_start} jobs took {round(outer_end_time - outer_start_time, 2)} seconds"
-                    )
-                elif current_mode == self.MODE_RUN_NOTRACK_BACKGROUND_TASKS:
-                    # Background tasks mode - starts all tasks concurrently
-                    logging.info(f"Starting {jobs_to_start} jobs in background mode...")
+    #                 # create hyperexecute.yaml specific to each queue
+    #                 job_config.write_config(
+    #                     tc_client_id,
+    #                     tc_client_key,
+    #                     tc_worker_type,
+    #                     lt_app_url,
+    #                     device_type_and_os,
+    #                     udid=None,
+    #                     concurrency=1,
+    #                     path=test_run_file,
+    #                 )
 
-                    outer_start_time = time.time()
-                    processes = []
+    #                 outer_start_time = time.time()
+    #                 for i in range(jobs_to_start):
+    #                     logging.info(f"starting job {i + 1} of {jobs_to_start}...")
+    #                     # Use test_mode instead of hardcoded DEBUG
+    #                     if self.debug_mode:
+    #                         logging.info(f"would be running command: '{command_string}' in path '{test_run_dir}'...")
+    #                         logging.info("sleeping 30 seconds (to simulate starting job)...")
+    #                         time.sleep(30)
+    #                     else:
+    #                         logging.info(f"running: '{command_string}' in path '{test_run_dir}'...")
+    #                         start_time = time.time()
+    #                         # NOTE: background so we can do this faster or set concurrencty in the YAML?
+    #                         #   - can only get 1-2 jobs going in parallel with trivial tasks
+    #                         #   - for concurrency to work, would we need to emit multiple test targets (1:1 with concurrency?)
+    #                         # start_new_session=True ensures process ignores ctrl-c sent to this process (so it cleans up)
+    #                         subprocess.run(
+    #                             command_string,
+    #                             shell=True,
+    #                             env=cmd_env,
+    #                             cwd=test_run_dir,
+    #                             start_new_session=True,
+    #                         )
+    #                         end_time = time.time()
+    #                         logging.info(
+    #                             f"starting job {i + 1} of {jobs_to_start} took {round(end_time - start_time, 2)} seconds"
+    #                         )
+    #                         if self.state == self.STATE_STOP:
+    #                             break
+    #                 outer_end_time = time.time()
+    #                 # Record the jobs we just started
+    #                 self.add_jobs(jobs_to_start, current_project_name)
+    #                 logging.info(
+    #                     f"starting {jobs_to_start} jobs took {round(outer_end_time - outer_start_time, 2)} seconds"
+    #                 )
+    #             elif current_mode == self.MODE_RUN_NOTRACK_BACKGROUND_TASKS:
+    #                 # Background tasks mode - starts all tasks concurrently
+    #                 logging.info(f"Starting {jobs_to_start} jobs in background mode...")
 
-                    output_arr = []
-                    for i in range(jobs_to_start):
-                        logging.info(f"Launching background job {i + 1} of {jobs_to_start}...")
+    #                 outer_start_time = time.time()
+    #                 processes = []
 
-                        # we need unique paths or we'll overwrite the dir we're using in a backgrounded task
-                        test_run_dir = f"/tmp/mozilla-lt-devicepool-job-dir.{i}"
-                        test_run_file = os.path.join(test_run_dir, "hyperexecute.yaml")
+    #                 output_arr = []
+    #                 for i in range(jobs_to_start):
+    #                     logging.info(f"Launching background job {i + 1} of {jobs_to_start}...")
 
-                        # this is done at the start of this function, but with the non unique paths
-                        # so we need to redo.
-                        #
-                        # remove /tmp/user_script dir
-                        shutil.rmtree(test_run_dir, ignore_errors=True)
-                        # create /tmp/mozilla-lt-devicepool-job-dir dir
-                        os.makedirs(test_run_dir, exist_ok=True)
-                        # copy user_script_golden_dir to correct path using python shutil
-                        shutil.copytree(
-                            user_script_golden_dir,
-                            os.path.join(test_run_dir, "user_script"),
-                        )
+    #                     # we need unique paths or we'll overwrite the dir we're using in a backgrounded task
+    #                     test_run_dir = f"/tmp/mozilla-lt-devicepool-job-dir.{i}"
+    #                     test_run_file = os.path.join(test_run_dir, "hyperexecute.yaml")
 
-                        job_config.write_config(
-                            tc_client_id,
-                            tc_client_key,
-                            tc_worker_type,
-                            lt_app_url,
-                            device_type_and_os,
-                            udid=None,
-                            concurrency=1,
-                            path=test_run_file,
-                        )
+    #                     # this is done at the start of this function, but with the non unique paths
+    #                     # so we need to redo.
+    #                     #
+    #                     # remove /tmp/user_script dir
+    #                     shutil.rmtree(test_run_dir, ignore_errors=True)
+    #                     # create /tmp/mozilla-lt-devicepool-job-dir dir
+    #                     os.makedirs(test_run_dir, exist_ok=True)
+    #                     # copy user_script_golden_dir to correct path using python shutil
+    #                     shutil.copytree(
+    #                         user_script_golden_dir,
+    #                         os.path.join(test_run_dir, "user_script"),
+    #                     )
 
-                        if self.debug_mode:
-                            logging.info(f"Would run command: '{command_string}' in path '{test_run_dir}'...")
-                            time.sleep(1)  # Just a short delay to simulate starting job
-                        else:
-                            # Start process in background
-                            process = subprocess.Popen(
-                                command_string,
-                                shell=True,
-                                env=cmd_env,
-                                cwd=test_run_dir,
-                                start_new_session=True,
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE,
-                            )
-                            processes.append(process)
-                            output_arr.append(None)  # Initialize output slot
-                            logging.info(f"Started background job {i + 1} with PID {process.pid}")
+    #                     job_config.write_config(
+    #                         tc_client_id,
+    #                         tc_client_key,
+    #                         tc_worker_type,
+    #                         lt_app_url,
+    #                         device_type_and_os,
+    #                         udid=None,
+    #                         concurrency=1,
+    #                         path=test_run_file,
+    #                     )
 
-                        if self.state == self.STATE_STOP:
-                            break
+    #                     if self.debug_mode:
+    #                         logging.info(f"Would run command: '{command_string}' in path '{test_run_dir}'...")
+    #                         time.sleep(1)  # Just a short delay to simulate starting job
+    #                     else:
+    #                         # Start process in background
+    #                         process = subprocess.Popen(
+    #                             command_string,
+    #                             shell=True,
+    #                             env=cmd_env,
+    #                             cwd=test_run_dir,
+    #                             start_new_session=True,
+    #                             stdout=subprocess.PIPE,
+    #                             stderr=subprocess.PIPE,
+    #                         )
+    #                         processes.append(process)
+    #                         output_arr.append(None)  # Initialize output slot
+    #                         logging.info(f"Started background job {i + 1} with PID {process.pid}")
 
-                    # Wait for processes to complete if configured to do so
-                    if self.WAIT_FOR_BACKGROUND_TASKS and processes:
-                        logging.info(f"Waiting for {len(processes)} background tasks to complete...")
+    #                     if self.state == self.STATE_STOP:
+    #                         break
 
-                        # Initialize output array with None values
-                        output_arr = [None] * len(processes)
-                        remaining_processes = list(enumerate(processes))
+    #                 # Wait for processes to complete if configured to do so
+    #                 if self.WAIT_FOR_BACKGROUND_TASKS and processes:
+    #                     logging.info(f"Waiting for {len(processes)} background tasks to complete...")
 
-                        # Wait for all processes to complete
-                        while remaining_processes:
-                            # Check each process without blocking
-                            still_running = []
-                            for i, process in remaining_processes:
-                                if process.poll() is None:
-                                    # Process is still running
-                                    still_running.append((i, process))
-                                else:
-                                    # Process completed, collect output
-                                    stdout, stderr = process.communicate()
-                                    output_arr[i] = {
-                                        "stdout": stdout.decode("utf-8") if stdout else "",
-                                        "stderr": stderr.decode("utf-8") if stderr else "",
-                                        "returncode": process.returncode,
-                                    }
-                                    logging.info(
-                                        f"Background job {i + 1} completed with return code {process.returncode}"
-                                    )
+    #                     # Initialize output array with None values
+    #                     output_arr = [None] * len(processes)
+    #                     remaining_processes = list(enumerate(processes))
 
-                            # Update the remaining processes list
-                            remaining_processes = still_running
+    #                     # Wait for all processes to complete
+    #                     while remaining_processes:
+    #                         # Check each process without blocking
+    #                         still_running = []
+    #                         for i, process in remaining_processes:
+    #                             if process.poll() is None:
+    #                                 # Process is still running
+    #                                 still_running.append((i, process))
+    #                             else:
+    #                                 # Process completed, collect output
+    #                                 stdout, stderr = process.communicate()
+    #                                 output_arr[i] = {
+    #                                     "stdout": stdout.decode("utf-8") if stdout else "",
+    #                                     "stderr": stderr.decode("utf-8") if stderr else "",
+    #                                     "returncode": process.returncode,
+    #                                 }
+    #                                 logging.info(
+    #                                     f"Background job {i + 1} completed with return code {process.returncode}"
+    #                                 )
 
-                            # If processes are still running, sleep briefly before checking again
-                            if remaining_processes:
-                                time.sleep(0.5)
+    #                         # Update the remaining processes list
+    #                         remaining_processes = still_running
 
-                        # Display output from all completed processes
-                        for i, output in enumerate(output_arr):
-                            if output:  # Skip any None entries
-                                logging.info(
-                                    f"Output for job {i + 1} (rc is {output['returncode']}):\nSTDOUT: {output['stdout']}\nSTDERR: {output['stderr']}"
-                                )
+    #                         # If processes are still running, sleep briefly before checking again
+    #                         if remaining_processes:
+    #                             time.sleep(0.5)
 
-                    outer_end_time = time.time()
-                    # Record the jobs we just started
-                    self.add_jobs(jobs_to_start, current_project_name)
-                    logging.info(
-                        f"Launching {len(processes) if not self.debug_mode else jobs_to_start} background jobs took {round(outer_end_time - outer_start_time, 2)} seconds"
-                    )
-                elif current_mode == self.MODE_RUN_NOTRACK_WITH_CONCURRENCY:
-                    # start the desired number of jobs (concurrency: jobs_to_start)
-                    #
-                    # issues:
-                    #   - doesn't work
+    #                     # Display output from all completed processes
+    #                     for i, output in enumerate(output_arr):
+    #                         if output:  # Skip any None entries
+    #                             logging.info(
+    #                                 f"Output for job {i + 1} (rc is {output['returncode']}):\nSTDOUT: {output['stdout']}\nSTDERR: {output['stderr']}"
+    #                             )
 
-                    # create hyperexecute.yaml specific to each queue
-                    job_config.write_config(
-                        tc_client_id,
-                        tc_client_key,
-                        tc_worker_type,
-                        lt_app_url,
-                        device_type_and_os,
-                        udid=None,
-                        concurrency=jobs_to_start,
-                        path=test_run_file,
-                    )
+    #                 outer_end_time = time.time()
+    #                 # Record the jobs we just started
+    #                 self.add_jobs(jobs_to_start, current_project_name)
+    #                 logging.info(
+    #                     f"Launching {len(processes) if not self.debug_mode else jobs_to_start} background jobs took {round(outer_end_time - outer_start_time, 2)} seconds"
+    #                 )
+    #             elif current_mode == self.MODE_RUN_NOTRACK_WITH_CONCURRENCY:
+    #                 # start the desired number of jobs (concurrency: jobs_to_start)
+    #                 #
+    #                 # issues:
+    #                 #   - doesn't work
 
-                    logging.info(f"starting job with concurrency {jobs_to_start}...")
-                    # Use test_mode instead of hardcoded DEBUG
-                    if self.debug_mode:
-                        logging.info(f"would be running command: '{command_string}' in path '{test_run_dir}'...")
-                        logging.info("sleeping 30 seconds (to simulate starting job)...")
-                        time.sleep(30)
-                    else:
-                        logging.info(f"running: '{command_string}' in path '{test_run_dir}'...")
-                        start_time = time.time()
-                        # NOTE: background so we can do this faster or set concurrencty in the YAML?
-                        #   - can only get 1-2 jobs going in parallel with trivial tasks
-                        #   - for concurrency to work, would we need to emit multiple test targets (1:1 with concurrency?)
-                        # start_new_session=True ensures process ignores ctrl-c sent to this process (so it cleans up)
-                        subprocess.run(
-                            command_string,
-                            shell=True,
-                            env=cmd_env,
-                            cwd=test_run_dir,
-                            start_new_session=True,
-                        )
-                        end_time = time.time()
-                        logging.info(f"starting job took {round(end_time - start_time, 2)} seconds")
-                        if self.state == self.STATE_STOP:
-                            break
+    #                 # create hyperexecute.yaml specific to each queue
+    #                 job_config.write_config(
+    #                     tc_client_id,
+    #                     tc_client_key,
+    #                     tc_worker_type,
+    #                     lt_app_url,
+    #                     device_type_and_os,
+    #                     udid=None,
+    #                     concurrency=jobs_to_start,
+    #                     path=test_run_file,
+    #                 )
 
-                    # Record the jobs we just started
-                    self.add_jobs(jobs_to_start, current_project_name)
-                    if self.state == self.STATE_STOP:
-                        break
-                elif current_mode == self.MODE_NO_OP:
-                    # no op mode (used to get to the sleep)
-                    logging.info("mode 3: no op mode")
-                else:
-                    raise ValueError(f"unknown mode: {current_mode}")
+    #                 logging.info(f"starting job with concurrency {jobs_to_start}...")
+    #                 # Use test_mode instead of hardcoded DEBUG
+    #                 if self.debug_mode:
+    #                     logging.info(f"would be running command: '{command_string}' in path '{test_run_dir}'...")
+    #                     logging.info("sleeping 30 seconds (to simulate starting job)...")
+    #                     time.sleep(30)
+    #                 else:
+    #                     logging.info(f"running: '{command_string}' in path '{test_run_dir}'...")
+    #                     start_time = time.time()
+    #                     # NOTE: background so we can do this faster or set concurrencty in the YAML?
+    #                     #   - can only get 1-2 jobs going in parallel with trivial tasks
+    #                     #   - for concurrency to work, would we need to emit multiple test targets (1:1 with concurrency?)
+    #                     # start_new_session=True ensures process ignores ctrl-c sent to this process (so it cleans up)
+    #                     subprocess.run(
+    #                         command_string,
+    #                         shell=True,
+    #                         env=cmd_env,
+    #                         cwd=test_run_dir,
+    #                         start_new_session=True,
+    #                     )
+    #                     end_time = time.time()
+    #                     logging.info(f"starting job took {round(end_time - start_time, 2)} seconds")
+    #                     if self.state == self.STATE_STOP:
+    #                         break
 
-            if self.state == self.STATE_STOP:
-                break
-            time.sleep(self.exit_wait)
-            if self.state == self.STATE_STOP:
-                break
+    #                 # Record the jobs we just started
+    #                 self.add_jobs(jobs_to_start, current_project_name)
+    #                 if self.state == self.STATE_STOP:
+    #                     break
+    #             elif current_mode == self.MODE_NO_OP:
+    #                 # no op mode (used to get to the sleep)
+    #                 logging.info("mode 3: no op mode")
+    #             else:
+    #                 raise ValueError(f"unknown mode: {current_mode}")
+
+    #         if self.state == self.STATE_STOP:
+    #             break
+    #         time.sleep(self.exit_wait)
+    #         if self.state == self.STATE_STOP:
+    #             break
 
     # --- Multithreaded Implementation ---
 
