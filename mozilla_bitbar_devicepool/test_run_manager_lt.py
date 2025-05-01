@@ -707,10 +707,11 @@ class TestRunManagerLT(object):
 
     def _job_starter_thread(self, project_name):
         """Starts jobs based on monitored data for a specific project."""
-        if project_name == "defaults":
-            return
 
         # logging.info(f"[Job Starter] Starting thread for {project_name}.")
+        logging.info(
+            f"[Job Starter: {project_name}: {len(self.config_object.config['device_groups'][project_name])} devices configured.]"
+        )
         project_source_dir = os.path.dirname(os.path.realpath(__file__))
         project_root_dir = os.path.abspath(os.path.join(project_source_dir, ".."))
         user_script_golden_dir = os.path.join(project_source_dir, "lambdatest", "user_script")
@@ -833,11 +834,10 @@ class TestRunManagerLT(object):
                     # Get next available device that hasn't been assigned yet
                     device_udid = None
                     for d in available_devices:
-                        # we don't care if it's been assigned in the past, just if it's free now
-                        # if d not in assigned_devices:
-                        device_udid = d
-                        # assigned_devices.append(d)
-                        break
+                        # only use the udid if it's assigned to the project
+                        if d in self.config_object.config["device_groups"][project_name]:
+                            device_udid = d
+                            break
 
                     if not device_udid:
                         logging.warning(f"[Job Starter: {project_name}] No more available devices to assign!")
