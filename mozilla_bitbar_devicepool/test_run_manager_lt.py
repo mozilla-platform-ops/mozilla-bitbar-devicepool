@@ -177,6 +177,14 @@ class TestRunManagerLT(object):
         """Monitors LambdaTest device status for all projects."""
         logging_header = "[LT Monitor]"
 
+        # Track global device utilization
+        global_device_utilization = {
+            "total_devices": 0,
+            "active_devices": 0,
+            "busy_devices": 0,
+            "initiated_jobs": 0,
+        }
+
         # Initialize projects structure in shared data
         with self.shared_data_lock:
             if "projects" not in self.shared_data:
@@ -197,12 +205,33 @@ class TestRunManagerLT(object):
             # Get entire device list once - we'll filter it for each project
             try:
                 device_list = self.status_object.get_device_list()
+
+                # Reset global utilization counts for this cycle
+                global_device_utilization["total_devices"] = 0
+                global_device_utilization["active_devices"] = 0
+                global_device_utilization["busy_devices"] = 0
+                global_device_utilization["initiated_jobs"] = 0
+
+                # Count total devices across all device types
+                for device_type in device_list:
+                    global_device_utilization["total_devices"] += len(device_list[device_type])
+
+                    # Count devices by state
+                    for udid, state in device_list[device_type].items():
+                        if state == self.LT_DEVICE_STATE_ACTIVE:
+                            global_device_utilization["active_devices"] += 1
+                        elif state == self.LT_DEVICE_STATE_BUSY:
+                            global_device_utilization["busy_devices"] += 1
+                        elif state == self.LT_DEVICE_STATE_INITIATED:
+                            global_device_utilization["initiated_jobs"] += 1
+
             except Exception as e:
                 logging.error(f"{logging_header} Error fetching device list: {e}", exc_info=True)
                 device_list = {}
 
-            g_initiated_jobs = 0
-            g_active_devices = 0
+            g_initiated_jobs = global_device_utilization["initiated_jobs"]
+            g_active_devices = global_device_utilization["active_devices"]
+
             # For each project, filter the device list based on the project's device_groups
             for project_name, project_config in self.config_object.config["projects"].items():
                 try:
@@ -222,19 +251,18 @@ class TestRunManagerLT(object):
                                     # Only count the device if it's active AND in this project's device group
                                     if state == self.LT_DEVICE_STATE_ACTIVE and udid in project_device_group:
                                         active_device_count += 1  # Use the new variable name
-                                        g_active_devices += 1
                                         active_device_list.append(udid)  # Use the new variable name
                                     if state == self.LT_DEVICE_STATE_BUSY and udid in project_device_group:
                                         busy_devices += 1
-                                    if state == self.LT_DEVICE_STATE_INITIATED:
-                                        # TODO: this doesn't seem to be working... debug
-                                        g_initiated_jobs += 1
 
                         logging.info(
                             f"{logging_header} Active devices for {project_name} ({len(active_device_list)}): {active_device_list}"
                         )
                         with self.shared_data_lock:
                             self.shared_data["lt_g_initiated_jobs"] = g_initiated_jobs
+                            self.shared_data["lt_active_devices"] = (
+                                g_active_devices  # Store global active devices count
+                            )
                             if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
                                 self.shared_data["projects"][project_name]["lt_active_devices"] = (
                                     active_device_count  # Use count here
@@ -244,15 +272,23 @@ class TestRunManagerLT(object):
                                     active_device_list  # Use list here
                                 )
 
-                        # logging.debug(
-                        #     f"{logging_header} Found {active_device_count} active devices for '{project_name}' ({lt_device_selector}) filtered by device_groups"
-                        # )
                 except Exception as e:
                     logging.error(f"{logging_header} Error processing devices for {project_name}: {e}", exc_info=True)
 
-            # logging.info(
-            #     f"{logging_header} Updated data (global initiated jobs: {g_initiated_jobs}, active devices: {g_active_devices})"
-            # )
+            # Log global device utilization statistics
+            util_percent = 0
+            if global_device_utilization["total_devices"] > 0:
+                util_percent = (
+                    global_device_utilization["busy_devices"] / global_device_utilization["total_devices"]
+                ) * 100
+
+            logging.info(
+                f"{logging_header} Global Device Utilization: "
+                f"Total: {global_device_utilization['total_devices']}, "
+                f"Active: {global_device_utilization['active_devices']}, "
+                f"Busy: {global_device_utilization['busy_devices']} ({util_percent:.1f}%), "
+                f"Initiated: {global_device_utilization['initiated_jobs']}"
+            )
 
             self.shutdown_event.wait(self.LT_MONITOR_INTERVAL)
 
