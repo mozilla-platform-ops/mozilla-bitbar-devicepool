@@ -562,7 +562,7 @@ class TestRunManagerLT(object):
     def _taskcluster_monitor_thread(self):
         """Monitors Taskcluster pending tasks for all projects."""
         logging_header = "[TC Monitor]"
-        logging.info(f"{logging_header} Thread started.")
+        # logging.info(f"{logging_header} Thread started.")
 
         # Initialize projects structure in shared data
         with self.shared_data_lock:
@@ -606,7 +606,7 @@ class TestRunManagerLT(object):
 
     def _lambdatest_monitor_thread(self):
         """Monitors LambdaTest device status for all projects."""
-        logging.info("[LT Monitor] Thread started.")
+        # logging.info("[LT Monitor] Thread started.")
 
         # Initialize projects structure in shared data
         with self.shared_data_lock:
@@ -669,7 +669,7 @@ class TestRunManagerLT(object):
     def _job_starter_thread(self, project_name):
         """Starts jobs based on monitored data for a specific project."""
 
-        logging_header = f"[Job Starter] {project_name:<10}:"
+        logging_header = f"[Job Starter] {project_name:>10}:"
 
         # logging.info(
         #     f"{logging_header} {len(self.config_object.config['device_groups'][project_name])} devices configured.]"
@@ -744,8 +744,8 @@ class TestRunManagerLT(object):
             # logging.info(f"{logging_header} Calculated jobs_to_start: {jobs_to_start}")
 
             logging.info(
-                f"{logging_header} TC Jobs: {tc_job_count}, Configured LT Devs: {len(self.config_object.config['device_groups'][project_name])}, Active LT Devs: {active_devices}, "
-                f"Recently Started: {recently_started_jobs}, Need Handling: {tc_jobs_not_handled}, Jobs To Start: {jobs_to_start}"
+                f"{logging_header} TC Jobs: {tc_job_count:>4}, Configured LT Devs: {len(self.config_object.config['device_groups'][project_name]):>3}, Active LT Devs: {active_devices:>3}, "
+                f"Recently Started: {recently_started_jobs:>3}, Need Handling: {tc_jobs_not_handled:>3}, Jobs To Start: {jobs_to_start:>3}"
             )
 
             if jobs_to_start > 0:
@@ -762,7 +762,7 @@ class TestRunManagerLT(object):
                 extra_flags = "--exclude-external-binaries"
                 base_command_string = f"{project_root_dir}/hyperexecute --no-track {labels_arg} {extra_flags}"
 
-                outer_start_time = time.time()
+                # outer_start_time = time.time()
                 processes_started = 0
 
                 # Track which devices we've assigned
@@ -841,12 +841,12 @@ class TestRunManagerLT(object):
                         # Clean up potentially partially created dir
                         shutil.rmtree(test_run_dir, ignore_errors=True)
 
-                outer_end_time = time.time()
+                # outer_end_time = time.time()
                 if processes_started > 0 and not self.debug_mode:
                     self.add_jobs(processes_started, project_name)
-                    logging.info(
-                        f"{logging_header} Launched {processes_started} background jobs in {round(outer_end_time - outer_start_time, 2)} seconds"
-                    )
+                    # logging.info(
+                    #     f"{logging_header} Launched {processes_started} background jobs in {round(outer_end_time - outer_start_time, 2)} seconds"
+                    # )
                 # --- End Start Jobs ---
             else:
                 # logging.info(f"{logging_header} No jobs to start. Sleeping.")
@@ -867,7 +867,9 @@ class TestRunManagerLT(object):
 
         # Start monitor threads
         tc_monitor.start()
+        logging.info("[Main] Started TC Monitor thread.")
         lt_monitor.start()
+        logging.info("[Main] Started LT Monitor thread.")
 
         # Give monitors a moment to potentially fetch initial data
         time.sleep(2)
@@ -883,7 +885,7 @@ class TestRunManagerLT(object):
             logging.info(f"[Main] Started job starter thread for project: {project_name}")
 
         # Keep main thread alive until shutdown is signaled
-        logging.info("[Main] Main thread waiting for shutdown signal...")
+        logging.info("[Main] Waiting for shutdown signal...")
         self.shutdown_event.wait()
         logging.info("[Main] Shutdown signal received. Waiting for threads to join...")
 
