@@ -616,6 +616,7 @@ class TestRunManagerLT(object):
                         "lt_device_selector": project_config.get("lt_device_selector", None),
                         "tc_job_count": 0,
                         "lt_active_devices": 0,
+                        "available_devices": [],  # List to store detailed device info
                     }
 
         while not self.shutdown_event.is_set():
@@ -624,12 +625,74 @@ class TestRunManagerLT(object):
                 try:
                     lt_device_selector = project_config.get("lt_device_selector")
                     if lt_device_selector:
-                        active_devices = self.status_object.get_device_state_count(
-                            lt_device_selector, self.LT_DEVICE_STATE_ACTIVE
-                        )
+                        # Get detailed device list
+                        device_list = self.status_object.get_device_list()
+                        active_devices = 0
+                        available_devices = []
+
+                        # self.status_object.get_device_list output:
+                        #
+                        # {'Galaxy A51': {'RZ8NB0WJ47H': 'active'},
+                        #  'Galaxy A55 5G': {'R5CX4089QNL': 'active',
+                        #                    'R5CXC1AHV4M': 'active',
+                        #                    'R5CXC1ALFED': 'active',
+                        #                    'R5CXC1AMMNK': 'active',
+                        #                    'R5CXC1AMNFY': 'active',
+                        #                    'R5CXC1ANGLT': 'active',
+                        #                    'R5CXC1AP2KT': 'active',
+                        #                    'R5CXC1ARCER': 'active',
+                        #                    'R5CXC1ARELR': 'active',
+                        #                    'R5CXC1ARM0A': 'active',
+                        #                    'R5CXC1ASA0L': 'active',
+                        #                    'R5CXC1ASA2E': 'active',
+                        #                    'R5CXC1ASA3P': 'active',
+                        #                    'R5CXC1ASLHH': 'active',
+                        #                    'R5CXC1HZK0W': 'active',
+                        #                    'R5CXC1HZKLR': 'active',
+                        #                    'R5CY128X71B': 'active',
+                        #                    'R5CY21T22NH': 'active',
+                        #                    'RZCX31FDGJE': 'active',
+                        #                    'RZCX50TW03H': 'active',
+                        #                    'RZCX71ZVF6J': 'active',
+                        #                    'RZCX821GXDJ': 'active',
+                        #                    'RZCX821GYPX': 'active',
+                        #                    'RZCXA0H3T9P': 'active',
+                        #                    'RZCY10LGB6W': 'active',
+                        #                    'RZCY10Y4HWD': 'active',
+                        #                    'RZCY10Y4QVX': 'active',
+                        #                    'RZCY10Y4TAV': 'active',
+                        #                    'RZCY10Y4TBY': 'active',
+                        #                    'RZCY10Y4TJX': 'active',
+                        #                    'RZCY10Y548K': 'active',
+                        #                    'RZCY2011M7N': 'active',
+                        #                    'RZCY203N75Z': 'active',
+                        #                    'RZCY204AAZD': 'active'}}
+
+                        for device_type in device_list:
+                            for udid, state in device_list[device_type].items():
+                                if state == self.LT_DEVICE_STATE_ACTIVE:
+                                    active_devices += 1
+                                    available_devices.append(udid)
+
+                        # Filter for active devices and extract relevant info
+                        # for device in device_list:
+                        #     if device.get('status') == self.LT_DEVICE_STATE_ACTIVE:
+                        #         active_devices += 1
+                        #         available_devices.append({
+                        #             'id': device.get('id'),
+                        #             'manufacturer': device.get('manufacturer'),
+                        #             'name': device.get('name'),
+                        #             'os_version': device.get('os_version'),
+                        #             'platform': device.get('platform'),
+                        #             'ip_address': device.get('ip_address'),  # This will be used as fixedIP
+                        #             'udid': device.get('udid')
+                        #         })
+
                         with self.shared_data_lock:
                             if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
                                 self.shared_data["projects"][project_name]["lt_active_devices"] = active_devices
+                                self.shared_data["projects"][project_name]["available_devices"] = available_devices
+
                         logging.debug(
                             f"[LT Monitor] Found {active_devices} active devices for '{project_name}' ({lt_device_selector})"
                         )
@@ -668,6 +731,7 @@ class TestRunManagerLT(object):
                         "lt_device_selector": lt_device_selector,
                         "tc_job_count": 0,
                         "lt_active_devices": 0,
+                        "available_devices": [],
                     }
         except KeyError as e:
             logging.error(f"[Job Starter: {project_name}] Missing config: {e}. Thread exiting.")
@@ -676,6 +740,7 @@ class TestRunManagerLT(object):
         while not self.shutdown_event.is_set():
             tc_job_count = 0
             active_devices = 0
+            available_devices = []
 
             # Try to get device data for this project
             with self.shared_data_lock:
@@ -683,6 +748,9 @@ class TestRunManagerLT(object):
                     project_data = self.shared_data["projects"][project_name]
                     tc_job_count = project_data.get("tc_job_count", 0)
                     active_devices = project_data.get("lt_active_devices", 0)
+                    available_devices = project_data.get(
+                        "available_devices", []
+                    ).copy()  # Copy to avoid modification issues
 
             # If we don't have data yet, try to fetch it directly
             if tc_job_count == 0:
@@ -693,13 +761,32 @@ class TestRunManagerLT(object):
                 except Exception as e:
                     logging.error(f"[Job Starter: {project_name}] Error fetching TC tasks: {e}")
 
-            if active_devices == 0:
+            if not available_devices:
                 try:
-                    active_devices = self.status_object.get_device_state_count(
-                        lt_device_selector, self.LT_DEVICE_STATE_ACTIVE
-                    )
+                    # Only fetch if we don't already have device data
+                    # TODO: why are we querything this here? ah just if we have none, a second chance to get them
+                    device_list = self.status_object.get_device_list(lt_device_selector)
+                    active_devices = 0
+                    available_devices = []
+
+                    for device_udid in device_list:
+                        if device_udid.get("status") == self.LT_DEVICE_STATE_ACTIVE:
+                            active_devices += 1
+                            available_devices.append(
+                                {
+                                    "id": device_udid.get("id"),
+                                    "manufacturer": device_udid.get("manufacturer"),
+                                    "name": device_udid.get("name"),
+                                    "os_version": device_udid.get("os_version"),
+                                    "platform": device_udid.get("platform"),
+                                    "ip_address": device_udid.get("ip_address"),
+                                    "udid": device_udid.get("udid"),
+                                }
+                            )
+
                     with self.shared_data_lock:
                         self.shared_data["projects"][project_name]["lt_active_devices"] = active_devices
+                        self.shared_data["projects"][project_name]["available_devices"] = available_devices
                 except Exception as e:
                     logging.error(f"[Job Starter: {project_name}] Error fetching active devices: {e}")
 
@@ -713,7 +800,7 @@ class TestRunManagerLT(object):
                 f"Recently Started: {recently_started_jobs}, Need Handling: {tc_jobs_not_handled}"
             )
 
-            jobs_to_start = min(tc_jobs_not_handled, self.max_jobs_to_start, active_devices)
+            jobs_to_start = min(tc_jobs_not_handled, self.max_jobs_to_start, len(available_devices))
             jobs_to_start = max(0, jobs_to_start)  # Ensure non-negative
 
             logging.info(f"[Job Starter: {project_name}] Calculated jobs_to_start: {jobs_to_start}")
@@ -734,9 +821,26 @@ class TestRunManagerLT(object):
 
                 outer_start_time = time.time()
                 processes_started = 0
+
+                # Track which devices we've assigned
+                # assigned_devices = []
+
                 for i in range(jobs_to_start):
                     if self.shutdown_event.is_set():
                         logging.info(f"[Job Starter: {project_name}] Shutdown signaled during job starting loop.")
+                        break
+
+                    # Get next available device that hasn't been assigned yet
+                    device_udid = None
+                    for d in available_devices:
+                        # we don't care if it's been assigned in the past, just if it's free now
+                        # if d not in assigned_devices:
+                        device_udid = d
+                        # assigned_devices.append(d)
+                        break
+
+                    if not device_udid:
+                        logging.warning(f"[Job Starter: {project_name}] No more available devices to assign!")
                         break
 
                     test_run_dir = f"/tmp/mozilla-lt-devicepool-job-dir.{project_name}.{time.time_ns()}"  # Project-specific unique dir
@@ -751,27 +855,30 @@ class TestRunManagerLT(object):
                             os.path.join(test_run_dir, "user_script"),
                         )
 
-                        # Write config
+                        # Write config with specific device IP
                         job_config.write_config(
                             tc_client_id,
                             tc_client_key,
                             tc_worker_type,
                             lt_app_url,
                             lt_device_selector,
-                            udid=None,
+                            udid=device_udid,  # Use device UDID if available
                             concurrency=1,  # Each job is separate
                             path=test_run_file,
                         )
+
+                        device_info = f"{device_udid}"
 
                         if self.debug_mode:
                             logging.info(
                                 f"[Job Starter: {project_name}] Would run command: '{base_command_string}' in path '{test_run_dir}'..."
                             )
+                            logging.info(f"[Job Starter: {project_name}] Would target device: {device_info}")
                             time.sleep(0.1)  # Simulate tiny delay
                         else:
                             # Start process in background
                             logging.info(
-                                f"[Job Starter: {project_name}] Launching background job {i + 1}/{jobs_to_start} in {test_run_dir}"
+                                f"[Job Starter: {project_name}] Launching job {i + 1}/{jobs_to_start} targeting device: {device_info}"
                             )
                             process = subprocess.Popen(
                                 base_command_string,
@@ -793,7 +900,7 @@ class TestRunManagerLT(object):
                         shutil.rmtree(test_run_dir, ignore_errors=True)
 
                 outer_end_time = time.time()
-                if processes_started > 0:
+                if processes_started > 0 and not self.debug_mode:
                     self.add_jobs(processes_started, project_name)
                     logging.info(
                         f"[Job Starter: {project_name}] Launched {processes_started} background jobs in {round(outer_end_time - outer_start_time, 2)} seconds"
