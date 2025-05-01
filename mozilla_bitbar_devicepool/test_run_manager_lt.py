@@ -114,13 +114,13 @@ class TestRunManagerLT(object):
             self.job_trackers[project_name] = JobTracker(expiry_seconds=210)
         return self.job_trackers[project_name]
 
-    def add_jobs(self, count, project_name=None):
+    def add_jobs(self, count, project_name=None, udids=None):
         """Add jobs to the specified project tracker or default tracker if no project specified."""
         if project_name and project_name in self.job_trackers:
-            self.job_trackers[project_name].add_jobs(count)
+            self.job_trackers[project_name].add_jobs(count, udids=udids)
         else:
             # For backward compatibility
-            self.job_tracker.add_jobs(count)
+            self.job_tracker.add_jobs(count, udids=udids)
 
     def get_active_job_count(self, project_name=None):
         """Get active job count from the specified project tracker or default tracker."""
@@ -339,8 +339,10 @@ class TestRunManagerLT(object):
                 f"{len(self.config_object.config['device_groups'][project_name])}/{active_devices}/{busy_devices}"
             )
             lt_blob = f"LT Devs Configured/Active/Busy: {lt_blob_p1:>9}"
+            # TODO: add back in 'LT G Init' once working
+            #  `LT G Init: {self.shared_data['lt_g_initiated_jobs']:> 3},`
             logging.info(
-                f"{logging_header} TC Jobs: {tc_job_count:>4}, LT G Init: {self.shared_data['lt_g_initiated_jobs']:> 3}, {lt_blob:>41}, "
+                f"{logging_header} TC Jobs: {tc_job_count:>4}, {lt_blob:>41}, "
                 f"Recently Started: {recently_started_jobs:>3}, Need Handling: {tc_jobs_not_handled:>3}, Jobs To Start: {jobs_to_start:>3}"
             )
             if jobs_to_start > 0:
@@ -353,12 +355,14 @@ class TestRunManagerLT(object):
                 cmd_env["LT_ACCESS_KEY"] = self.config_object.lt_access_key
 
                 labels_csv = f"{self.PROGRAM_LABEL},{project_name}"
+                # TODO: add the udid to labels
                 labels_arg = f"--labels '{labels_csv}'"
                 extra_flags = "--exclude-external-binaries"
                 base_command_string = f"{project_root_dir}/hyperexecute --no-track {labels_arg} {extra_flags}"
 
                 # outer_start_time = time.time()
                 processes_started = 0
+                assigned_device_udids = []  # Track UDIDs of assigned devices
 
                 # Track which devices we've assigned
                 # assigned_devices = []
@@ -374,8 +378,20 @@ class TestRunManagerLT(object):
                         # only use the udid if it's assigned to the project
                         if d in self.config_object.config["device_groups"][project_name]:
                             device_udid = d
+
+                            # device in job tracker means it's already in use
+                            if d in self.get_job_tracker(project_name).get_active_udids():
+                                logging.info(f"{logging_header} Device {d} is already in use, skipping.")
+                                continue
+
                             # remove the device from available devices to avoid reusing it
                             available_devices.remove(d)
+                            # Keep track of the assigned UDID
+                            assigned_device_udids.append(device_udid)
+                            # update the shared data
+                            # TODO: needed? helps guard against race? or will we never hit that case?
+                            with self.shared_data_lock:
+                                self.shared_data["projects"][project_name]["available_devices"] = available_devices
                             break
 
                     if not device_udid:
@@ -442,7 +458,8 @@ class TestRunManagerLT(object):
 
                 # outer_end_time = time.time()
                 if processes_started > 0 and not self.debug_mode:
-                    self.add_jobs(processes_started, project_name)
+                    # Pass the collected UDIDs when adding jobs to the tracker
+                    self.add_jobs(processes_started, project_name, udids=assigned_device_udids)
                     # logging.info(
                     #     f"{logging_header} Launched {processes_started} background jobs in {round(outer_end_time - outer_start_time, 2)} seconds"
                     # )
@@ -450,7 +467,9 @@ class TestRunManagerLT(object):
                 # TODO: send a signal to the other threads to wake them up and have them gather?
                 # TODO: could also track next run for threads, and then sleep just a bit longer also
                 # avoid race with tc and lt threads, pause so we have updated data on next loop
-                time.sleep(self.LT_MONITOR_INTERVAL)
+                # time.sleep(self.LT_MONITOR_INTERVAL)
+                # sleep doesn't work?
+                self.shutdown_event.wait(self.LT_MONITOR_INTERVAL)
                 # --- End Start Jobs ---
             else:
                 # logging.info(f"{logging_header} No jobs to start. Sleeping.")
