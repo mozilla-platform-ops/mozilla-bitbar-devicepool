@@ -26,7 +26,7 @@ projects:
   #     # override SCRIPT_REPO_COMMIT with a test commit
 device_groups:
   # this block is not used yet (not possible with LT API), future goal. see lt_device_selector in projects.
-  a55-prod:
+  a55-perf:
     R5CX4089QNL
     R5CXC1AHV4M
     R5CXC1ALFED
