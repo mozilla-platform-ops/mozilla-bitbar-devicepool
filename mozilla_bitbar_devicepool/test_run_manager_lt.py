@@ -583,7 +583,7 @@ class TestRunManagerLT(object):
                 try:
                     tc_worker_type = project_config.get("TC_WORKER_TYPE")
                     if tc_worker_type:
-                        logging.info(f"[TC Monitor]: Getting queue count for for {project_name} - {tc_worker_type}")
+                        logging.info(f"[TC Monitor] Getting queue count for for {project_name} - {tc_worker_type}")
                         # TODO: Make provisioner name dynamic if needed
                         tc_job_count = get_taskcluster_pending_tasks("proj-autophone", tc_worker_type, verbose=False)
                         with self.shared_data_lock:
@@ -602,7 +602,7 @@ class TestRunManagerLT(object):
 
     def _lambdatest_monitor_thread(self):
         """Monitors LambdaTest device status for all projects."""
-        logging.info("[LT Monitor]: Thread started.")
+        logging.info("[LT Monitor] Thread started.")
 
         # Initialize projects structure in shared data
         with self.shared_data_lock:
@@ -708,9 +708,10 @@ class TestRunManagerLT(object):
     def _job_starter_thread(self, project_name):
         """Starts jobs based on monitored data for a specific project."""
 
-        # logging.info(f"[Job Starter] Starting thread for {project_name}.")
+        logging_header = f"[Job Starter] {project_name}:"
+
         logging.info(
-            f"[Job Starter: {project_name}: {len(self.config_object.config['device_groups'][project_name])} devices configured.]"
+            f"{logging_header} {len(self.config_object.config['device_groups'][project_name])} devices configured.]"
         )
         project_source_dir = os.path.dirname(os.path.realpath(__file__))
         project_root_dir = os.path.abspath(os.path.join(project_source_dir, ".."))
@@ -735,7 +736,7 @@ class TestRunManagerLT(object):
                         "available_devices": [],
                     }
         except KeyError as e:
-            logging.error(f"[Job Starter: {project_name}] Missing config: {e}. Thread exiting.")
+            logging.error(f"{logging_header} Missing config: {e}. Thread exiting.")
             return
 
         while not self.shutdown_event.is_set():
@@ -760,7 +761,7 @@ class TestRunManagerLT(object):
                     with self.shared_data_lock:
                         self.shared_data["projects"][project_name]["tc_job_count"] = tc_job_count
                 except Exception as e:
-                    logging.error(f"[Job Starter: {project_name}] Error fetching TC tasks: {e}")
+                    logging.error(f"{logging_header} {project_name}] Error fetching TC tasks: {e}")
 
             if not available_devices:
                 try:
@@ -789,7 +790,7 @@ class TestRunManagerLT(object):
                         self.shared_data["projects"][project_name]["lt_active_devices"] = active_devices
                         self.shared_data["projects"][project_name]["available_devices"] = available_devices
                 except Exception as e:
-                    logging.error(f"[Job Starter: {project_name}] Error fetching active devices: {e}")
+                    logging.error(f"{logging_header} Error fetching active devices: {e}")
 
             # Get count of recently started jobs that are still in startup phase for this project
             # Use the project-specific job tracker
@@ -797,18 +798,18 @@ class TestRunManagerLT(object):
             tc_jobs_not_handled = tc_job_count - recently_started_jobs
 
             logging.info(
-                f"[Job Starter: {project_name}] TC Jobs: {tc_job_count}, Active LT Devs: {active_devices}, "
+                f"{logging_header} TC Jobs: {tc_job_count}, Active LT Devs: {active_devices}, "
                 f"Recently Started: {recently_started_jobs}, Need Handling: {tc_jobs_not_handled}"
             )
 
             jobs_to_start = min(tc_jobs_not_handled, self.max_jobs_to_start, len(available_devices))
             jobs_to_start = max(0, jobs_to_start)  # Ensure non-negative
 
-            logging.info(f"[Job Starter: {project_name}] Calculated jobs_to_start: {jobs_to_start}")
+            logging.info(f"{logging_header} Calculated jobs_to_start: {jobs_to_start}")
 
             if jobs_to_start > 0:
                 # --- Start Jobs (using background task logic) ---
-                logging.info(f"[Job Starter: {project_name}] Starting {jobs_to_start} jobs in background...")
+                logging.info(f"{logging_header} Starting {jobs_to_start} jobs in background...")
                 lt_app_url = "lt://proverbial-android"  # Eternal APK
 
                 cmd_env = os.environ.copy()
@@ -828,7 +829,7 @@ class TestRunManagerLT(object):
 
                 for i in range(jobs_to_start):
                     if self.shutdown_event.is_set():
-                        logging.info(f"[Job Starter: {project_name}] Shutdown signaled during job starting loop.")
+                        logging.info(f"{logging_header} Shutdown signaled during job starting loop.")
                         break
 
                     # Get next available device that hasn't been assigned yet
@@ -840,7 +841,7 @@ class TestRunManagerLT(object):
                             break
 
                     if not device_udid:
-                        logging.warning(f"[Job Starter: {project_name}] No more available devices to assign!")
+                        logging.warning(f"{logging_header} No more available devices to assign!")
                         break
 
                     test_run_dir = f"/tmp/mozilla-lt-devicepool-job-dir.{project_name}.{time.time_ns()}"  # Project-specific unique dir
@@ -871,14 +872,14 @@ class TestRunManagerLT(object):
 
                         if self.debug_mode:
                             logging.info(
-                                f"[Job Starter: {project_name}] Would run command: '{base_command_string}' in path '{test_run_dir}'..."
+                                f"{logging_header} Would run command: '{base_command_string}' in path '{test_run_dir}'..."
                             )
-                            logging.info(f"[Job Starter: {project_name}] Would target device: {device_info}")
+                            logging.info(f"{logging_header} Would target device: {device_info}")
                             time.sleep(0.1)  # Simulate tiny delay
                         else:
                             # Start process in background
                             logging.info(
-                                f"[Job Starter: {project_name}] Launching job {i + 1}/{jobs_to_start} targeting device: {device_info}"
+                                f"{logging_header} Launching job {i + 1}/{jobs_to_start} targeting device: {device_info}"
                             )
                             process = subprocess.Popen(
                                 base_command_string,
@@ -889,13 +890,11 @@ class TestRunManagerLT(object):
                                 stdout=subprocess.DEVNULL,  # Discard output for background tasks
                                 stderr=subprocess.DEVNULL,
                             )
-                            logging.debug(
-                                f"[Job Starter: {project_name}] Started background job {i + 1} with PID {process.pid}"
-                            )
+                            logging.debug(f"{logging_header} Started background job {i + 1} with PID {process.pid}")
                         processes_started += 1
 
                     except Exception as e:
-                        logging.error(f"[Job Starter: {project_name}] Error starting job {i + 1}: {e}", exc_info=True)
+                        logging.error(f"{logging_header} Error starting job {i + 1}: {e}", exc_info=True)
                         # Clean up potentially partially created dir
                         shutil.rmtree(test_run_dir, ignore_errors=True)
 
@@ -903,11 +902,11 @@ class TestRunManagerLT(object):
                 if processes_started > 0 and not self.debug_mode:
                     self.add_jobs(processes_started, project_name)
                     logging.info(
-                        f"[Job Starter: {project_name}] Launched {processes_started} background jobs in {round(outer_end_time - outer_start_time, 2)} seconds"
+                        f"{logging_header} Launched {processes_started} background jobs in {round(outer_end_time - outer_start_time, 2)} seconds"
                     )
                 # --- End Start Jobs ---
             else:
-                logging.info(f"[Job Starter: {project_name}] No jobs to start. Sleeping.")
+                logging.info(f"{logging_header} No jobs to start. Sleeping.")
 
             # Wait before next check or until shutdown
             self.shutdown_event.wait(self.JOB_STARTER_INTERVAL)
