@@ -54,9 +54,9 @@ def main():
 
     # Print any duplicates found
     if api_duplicates:
-        print("Duplicates in API array: ", pprint.pformat(sorted(set(api_duplicates))))
+        print("WARNING: Duplicates in API array: ", pprint.pformat(sorted(set(api_duplicates))))
     if config_duplicates:
-        print("Duplicates in Config array: ", pprint.pformat(sorted(set(config_duplicates))))
+        print("WARNING: Duplicates in Config array: ", pprint.pformat(sorted(set(config_duplicates))))
     if api_duplicates or config_duplicates:
         print("")
 
