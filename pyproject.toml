@@ -37,11 +37,14 @@ deptry = "^0.23.0"
 mozdevice = "^4.2.0"
 
 [tool.poetry.scripts]
+# TODO: rework all of these (tcdp-lt, tcdp-bb?)
+# TODO: use consistent way of differentiating lt vs bb bins
 mbd = 'mozilla_bitbar_devicepool.main:main'
 mld = 'mozilla_bitbar_devicepool.test_run_manager_lt:main'
 dgr = 'mozilla_bitbar_devicepool.device_group_report:main'
 dgrlt = 'mozilla_bitbar_devicepool.device_group_report_lt:main'
 lt_status = 'mozilla_bitbar_devicepool.lambdatest.status:lt_status_main'
+lt_compare_to_api = 'mozilla_bitbar_devicepool.compare_to_api_lt:main'
 
 [build-system]
 requires = ["poetry-core"]
