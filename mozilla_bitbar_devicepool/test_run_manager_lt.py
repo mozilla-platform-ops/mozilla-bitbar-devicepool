@@ -754,7 +754,7 @@ class TestRunManagerLT(object):
             #     f"Recently Started: {recently_started_jobs}, Need Handling: {tc_jobs_not_handled}"
             # )
 
-            jobs_to_start = min(tc_jobs_not_handled, self.max_jobs_to_start, len(available_devices))
+            jobs_to_start = self.calculate_jobs_to_start(tc_jobs_not_handled, len(available_devices))
             jobs_to_start = max(0, jobs_to_start)  # Ensure non-negative
 
             # logging.info(f"{logging_header} Calculated jobs_to_start: {jobs_to_start}")
@@ -930,6 +930,28 @@ class TestRunManagerLT(object):
             logging.warning("[Main] TC monitor thread did not exit cleanly.")
         if lt_monitor.is_alive():
             logging.warning("[Main] LT monitor thread did not exit cleanly.")
+
+    def calculate_jobs_to_start(self, tc_jobs_not_handled, available_devices_count, max_jobs=None):
+        """
+        Calculate the number of jobs to start based on pending TC jobs and available devices.
+
+        Args:
+            tc_jobs_not_handled (int): Number of Taskcluster jobs that are not yet handled
+            available_devices_count (int): Number of available devices
+            max_jobs (int, optional): Maximum jobs to start, defaults to self.max_jobs_to_start
+
+        Returns:
+            int: Number of jobs that should be started
+        """
+        if max_jobs is None:
+            max_jobs = self.max_jobs_to_start
+
+        # Calculate the minimum of pending jobs, max jobs limit, and available devices
+        jobs_to_start = min(tc_jobs_not_handled, max_jobs, available_devices_count)
+        # Ensure the result is not negative
+        jobs_to_start = max(0, jobs_to_start)
+
+        return jobs_to_start
 
 
 def parse_args(action_array):
