@@ -561,7 +561,8 @@ class TestRunManagerLT(object):
 
     def _taskcluster_monitor_thread(self):
         """Monitors Taskcluster pending tasks for all projects."""
-        logging.info("[TC Monitor] Thread started.")
+        logging_header = "[TC Monitor]"
+        logging.info(f"{logging_header} Thread started.")
 
         # Initialize projects structure in shared data
         with self.shared_data_lock:
@@ -583,22 +584,25 @@ class TestRunManagerLT(object):
                 try:
                     tc_worker_type = project_config.get("TC_WORKER_TYPE")
                     if tc_worker_type:
-                        logging.info(f"[TC Monitor] Getting queue count for for {project_name} - {tc_worker_type}")
+                        # logging.info(f"{logging_header} Getting queue count for for {project_name} - {tc_worker_type}")
                         # TODO: Make provisioner name dynamic if needed
                         tc_job_count = get_taskcluster_pending_tasks("proj-autophone", tc_worker_type, verbose=False)
                         with self.shared_data_lock:
                             if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
                                 self.shared_data["projects"][project_name]["tc_job_count"] = tc_job_count
-                        logging.debug(
-                            f"[TC Monitor] Found {tc_job_count} pending tasks for {project_name} ({tc_worker_type})"
-                        )
+                        if tc_job_count > 0:
+                            logging.debug(
+                                f"{logging_header} Found {tc_job_count} pending tasks for {project_name} ({tc_worker_type})"
+                            )
+                        else:
+                            logging.debug(f"{logging_header} No pending tasks for {project_name} ({tc_worker_type})")
                 except Exception as e:
-                    logging.error(f"[TC Monitor] Error fetching TC tasks for {project_name}: {e}", exc_info=True)
+                    logging.error(f"{logging_header} Error fetching TC tasks for {project_name}: {e}", exc_info=True)
 
             # Wait for the specified interval or until shutdown is signaled
             self.shutdown_event.wait(self.TC_MONITOR_INTERVAL)
 
-        logging.info("[TC Monitor] Thread stopped.")
+        logging.info("{logging_header} Thread stopped.")
 
     def _lambdatest_monitor_thread(self):
         """Monitors LambdaTest device status for all projects."""
@@ -665,11 +669,11 @@ class TestRunManagerLT(object):
     def _job_starter_thread(self, project_name):
         """Starts jobs based on monitored data for a specific project."""
 
-        logging_header = f"[Job Starter] {project_name}:"
+        logging_header = f"[Job Starter] {project_name:<10}:"
 
-        logging.info(
-            f"{logging_header} {len(self.config_object.config['device_groups'][project_name])} devices configured.]"
-        )
+        # logging.info(
+        #     f"{logging_header} {len(self.config_object.config['device_groups'][project_name])} devices configured.]"
+        # )
         project_source_dir = os.path.dirname(os.path.realpath(__file__))
         project_root_dir = os.path.abspath(os.path.join(project_source_dir, ".."))
         user_script_golden_dir = os.path.join(project_source_dir, "lambdatest", "user_script")
@@ -729,15 +733,20 @@ class TestRunManagerLT(object):
             recently_started_jobs = self.get_active_job_count(project_name)
             tc_jobs_not_handled = tc_job_count - recently_started_jobs
 
-            logging.info(
-                f"{logging_header} TC Jobs: {tc_job_count}, Active LT Devs: {active_devices}, "
-                f"Recently Started: {recently_started_jobs}, Need Handling: {tc_jobs_not_handled}"
-            )
+            # logging.info(
+            #     f"{logging_header} TC Jobs: {tc_job_count}, Active LT Devs: {active_devices}, "
+            #     f"Recently Started: {recently_started_jobs}, Need Handling: {tc_jobs_not_handled}"
+            # )
 
             jobs_to_start = min(tc_jobs_not_handled, self.max_jobs_to_start, len(available_devices))
             jobs_to_start = max(0, jobs_to_start)  # Ensure non-negative
 
-            logging.info(f"{logging_header} Calculated jobs_to_start: {jobs_to_start}")
+            # logging.info(f"{logging_header} Calculated jobs_to_start: {jobs_to_start}")
+
+            logging.info(
+                f"{logging_header} TC Jobs: {tc_job_count}, Configured LT Devs: {len(self.config_object.config['device_groups'][project_name])}, Active LT Devs: {active_devices}, "
+                f"Recently Started: {recently_started_jobs}, Need Handling: {tc_jobs_not_handled}, Jobs To Start: {jobs_to_start}"
+            )
 
             if jobs_to_start > 0:
                 # --- Start Jobs (using background task logic) ---
@@ -840,7 +849,8 @@ class TestRunManagerLT(object):
                     )
                 # --- End Start Jobs ---
             else:
-                logging.info(f"{logging_header} No jobs to start. Sleeping.")
+                # logging.info(f"{logging_header} No jobs to start. Sleeping.")
+                pass
 
             # Wait before next check or until shutdown
             self.shutdown_event.wait(self.JOB_STARTER_INTERVAL)
