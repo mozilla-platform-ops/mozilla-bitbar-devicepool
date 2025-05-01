@@ -440,14 +440,14 @@ class TestRunManagerLT(object):
                             # )
                             # logging.info(f"{logging_header} Would target device: {device_info}")
                             logging.info(
-                                f"{logging_header} WOULD BE launching job {i + 1}/{jobs_to_start} targeting device: {device_info}"
+                                f"{logging_header} WOULD BE launching job {i + 1}/{jobs_to_start} targeting device '{device_info}'"
                             )
                             time.sleep(0.1)  # Simulate tiny delay
                         else:
                             # Start process in background
                             # TODO: only print one line with number of jobs and all udid we'll be using?
                             logging.info(
-                                f"{logging_header} Launching job {i + 1}/{jobs_to_start} targeting device: {device_info}"
+                                f"{logging_header} Launching job {i + 1}/{jobs_to_start} targeting device '{device_info}'"
                             )
                             process = subprocess.Popen(
                                 base_command_string,
