@@ -620,73 +620,32 @@ class TestRunManagerLT(object):
                     }
 
         while not self.shutdown_event.is_set():
-            # For each project, get LambdaTest device status
+            # Get entire device list once - we'll filter it for each project
+            try:
+                device_list = self.status_object.get_device_list()
+            except Exception as e:
+                logging.error(f"[LT Monitor] Error fetching device list: {e}", exc_info=True)
+                device_list = {}
+
+            # For each project, filter the device list based on the project's device_groups
             for project_name, project_config in self.config_object.config["projects"].items():
                 try:
                     lt_device_selector = project_config.get("lt_device_selector")
                     if lt_device_selector:
-                        # Get detailed device list
-                        device_list = self.status_object.get_device_list()
                         active_devices = 0
                         available_devices = []
 
-                        # self.status_object.get_device_list output:
-                        #
-                        # {'Galaxy A51': {'RZ8NB0WJ47H': 'active'},
-                        #  'Galaxy A55 5G': {'R5CX4089QNL': 'active',
-                        #                    'R5CXC1AHV4M': 'active',
-                        #                    'R5CXC1ALFED': 'active',
-                        #                    'R5CXC1AMMNK': 'active',
-                        #                    'R5CXC1AMNFY': 'active',
-                        #                    'R5CXC1ANGLT': 'active',
-                        #                    'R5CXC1AP2KT': 'active',
-                        #                    'R5CXC1ARCER': 'active',
-                        #                    'R5CXC1ARELR': 'active',
-                        #                    'R5CXC1ARM0A': 'active',
-                        #                    'R5CXC1ASA0L': 'active',
-                        #                    'R5CXC1ASA2E': 'active',
-                        #                    'R5CXC1ASA3P': 'active',
-                        #                    'R5CXC1ASLHH': 'active',
-                        #                    'R5CXC1HZK0W': 'active',
-                        #                    'R5CXC1HZKLR': 'active',
-                        #                    'R5CY128X71B': 'active',
-                        #                    'R5CY21T22NH': 'active',
-                        #                    'RZCX31FDGJE': 'active',
-                        #                    'RZCX50TW03H': 'active',
-                        #                    'RZCX71ZVF6J': 'active',
-                        #                    'RZCX821GXDJ': 'active',
-                        #                    'RZCX821GYPX': 'active',
-                        #                    'RZCXA0H3T9P': 'active',
-                        #                    'RZCY10LGB6W': 'active',
-                        #                    'RZCY10Y4HWD': 'active',
-                        #                    'RZCY10Y4QVX': 'active',
-                        #                    'RZCY10Y4TAV': 'active',
-                        #                    'RZCY10Y4TBY': 'active',
-                        #                    'RZCY10Y4TJX': 'active',
-                        #                    'RZCY10Y548K': 'active',
-                        #                    'RZCY2011M7N': 'active',
-                        #                    'RZCY203N75Z': 'active',
-                        #                    'RZCY204AAZD': 'active'}}
+                        # Only continue if there's a device_groups config for this project
+                        if project_name in self.config_object.config.get("device_groups", {}):
+                            project_device_group = self.config_object.config["device_groups"][project_name]
 
-                        for device_type in device_list:
-                            for udid, state in device_list[device_type].items():
-                                if state == self.LT_DEVICE_STATE_ACTIVE:
-                                    active_devices += 1
-                                    available_devices.append(udid)
-
-                        # Filter for active devices and extract relevant info
-                        # for device in device_list:
-                        #     if device.get('status') == self.LT_DEVICE_STATE_ACTIVE:
-                        #         active_devices += 1
-                        #         available_devices.append({
-                        #             'id': device.get('id'),
-                        #             'manufacturer': device.get('manufacturer'),
-                        #             'name': device.get('name'),
-                        #             'os_version': device.get('os_version'),
-                        #             'platform': device.get('platform'),
-                        #             'ip_address': device.get('ip_address'),  # This will be used as fixedIP
-                        #             'udid': device.get('udid')
-                        #         })
+                            # Now iterate through all devices
+                            for device_type in device_list:
+                                for udid, state in device_list[device_type].items():
+                                    # Only count the device if it's active AND in this project's device group
+                                    if state == self.LT_DEVICE_STATE_ACTIVE and udid in project_device_group:
+                                        active_devices += 1
+                                        available_devices.append(udid)
 
                         with self.shared_data_lock:
                             if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
@@ -694,12 +653,10 @@ class TestRunManagerLT(object):
                                 self.shared_data["projects"][project_name]["available_devices"] = available_devices
 
                         logging.debug(
-                            f"[LT Monitor] Found {active_devices} active devices for '{project_name}' ({lt_device_selector})"
+                            f"[LT Monitor] Found {active_devices} active devices for '{project_name}' ({lt_device_selector}) filtered by device_groups"
                         )
                 except Exception as e:
-                    logging.error(
-                        f"[LT Monitor] Error fetching LT device status for {project_name}: {e}", exc_info=True
-                    )
+                    logging.error(f"[LT Monitor] Error processing devices for {project_name}: {e}", exc_info=True)
 
             self.shutdown_event.wait(self.LT_MONITOR_INTERVAL)
 
@@ -764,33 +721,8 @@ class TestRunManagerLT(object):
                     logging.error(f"{logging_header} {project_name}] Error fetching TC tasks: {e}")
 
             if not available_devices:
-                try:
-                    # Only fetch if we don't already have device data
-                    # TODO: why are we querything this here? ah just if we have none, a second chance to get them
-                    device_list = self.status_object.get_device_list(lt_device_selector)
-                    active_devices = 0
-                    available_devices = []
-
-                    for device_udid in device_list:
-                        if device_udid.get("status") == self.LT_DEVICE_STATE_ACTIVE:
-                            active_devices += 1
-                            available_devices.append(
-                                {
-                                    "id": device_udid.get("id"),
-                                    "manufacturer": device_udid.get("manufacturer"),
-                                    "name": device_udid.get("name"),
-                                    "os_version": device_udid.get("os_version"),
-                                    "platform": device_udid.get("platform"),
-                                    "ip_address": device_udid.get("ip_address"),
-                                    "udid": device_udid.get("udid"),
-                                }
-                            )
-
-                    with self.shared_data_lock:
-                        self.shared_data["projects"][project_name]["lt_active_devices"] = active_devices
-                        self.shared_data["projects"][project_name]["available_devices"] = available_devices
-                except Exception as e:
-                    logging.error(f"{logging_header} Error fetching active devices: {e}")
+                # normal case... do nohting
+                pass
 
             # Get count of recently started jobs that are still in startup phase for this project
             # Use the project-specific job tracker
@@ -838,6 +770,8 @@ class TestRunManagerLT(object):
                         # only use the udid if it's assigned to the project
                         if d in self.config_object.config["device_groups"][project_name]:
                             device_udid = d
+                            # remove the device from available devices to avoid reusing it
+                            available_devices.remove(d)
                             break
 
                     if not device_udid:
