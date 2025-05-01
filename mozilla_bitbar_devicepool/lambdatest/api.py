@@ -112,7 +112,11 @@ if __name__ == "__main__":
     lt_username = os.environ["LT_USERNAME"]
     lt_api_key = os.environ["LT_ACCESS_KEY"]
 
-    output = get_devices(lt_username, lt_api_key)
+    # output = get_devices(lt_username, lt_api_key)
+    # pprint.pprint(output)
+
+    # show get_jobs() output
+    output = get_jobs(lt_username, lt_api_key)
     pprint.pprint(output)
 
     import sys
