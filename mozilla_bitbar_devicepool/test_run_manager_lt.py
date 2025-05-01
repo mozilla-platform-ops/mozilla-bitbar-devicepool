@@ -387,6 +387,10 @@ class TestRunManagerLT(object):
 
                             device_udid = d
 
+                            # add the udid to labels
+                            labels_csv = f"{self.PROGRAM_LABEL},{project_name},{device_udid}"
+                            labels_arg = f"--labels '{labels_csv}'"
+
                             # remove the device from available devices to avoid reusing it
                             available_devices.remove(d)
                             # Keep track of the assigned UDID
