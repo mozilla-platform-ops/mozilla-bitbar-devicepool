@@ -202,6 +202,7 @@ class TestRunManagerLT(object):
                 device_list = {}
 
             g_initiated_jobs = 0
+            g_active_devices = 0
             # For each project, filter the device list based on the project's device_groups
             for project_name, project_config in self.config_object.config["projects"].items():
                 try:
@@ -221,12 +222,17 @@ class TestRunManagerLT(object):
                                     # Only count the device if it's active AND in this project's device group
                                     if state == self.LT_DEVICE_STATE_ACTIVE and udid in project_device_group:
                                         active_devices += 1
+                                        g_active_devices += 1
                                         available_devices.append(udid)
                                     if state == self.LT_DEVICE_STATE_BUSY and udid in project_device_group:
                                         busy_devices += 1
                                     if state == self.LT_DEVICE_STATE_INITIATED:
+                                        # TODO: this doesn't seem to be working... debug
                                         g_initiated_jobs += 1
 
+                        logging.info(
+                            f"{logging_header} Available devices for {project_name} ({len(available_devices)}): {available_devices}"
+                        )
                         with self.shared_data_lock:
                             self.shared_data["lt_g_initiated_jobs"] = g_initiated_jobs
                             if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
@@ -240,7 +246,9 @@ class TestRunManagerLT(object):
                 except Exception as e:
                     logging.error(f"{logging_header} Error processing devices for {project_name}: {e}", exc_info=True)
 
-            logging.info(f"{logging_header} Updated data.")
+            logging.info(
+                f"{logging_header} Updated data (global initiated jobs: {g_initiated_jobs}, active devices: {g_active_devices})"
+            )
 
             self.shutdown_event.wait(self.LT_MONITOR_INTERVAL)
 
@@ -332,7 +340,7 @@ class TestRunManagerLT(object):
             )
             lt_blob = f"LT Devs Configured/Active/Busy: {lt_blob_p1:>9}"
             logging.info(
-                f"{logging_header} TC Jobs: {tc_job_count:>4}, {lt_blob:>41}, "
+                f"{logging_header} TC Jobs: {tc_job_count:>4}, LT G Init: {self.shared_data['lt_g_initiated_jobs']:> 3}, {lt_blob:>41}, "
                 f"Recently Started: {recently_started_jobs:>3}, Need Handling: {tc_jobs_not_handled:>3}, Jobs To Start: {jobs_to_start:>3}"
             )
             if jobs_to_start > 0:
@@ -401,10 +409,13 @@ class TestRunManagerLT(object):
                         device_info = f"{device_udid}"
 
                         if self.debug_mode:
+                            # logging.info(
+                            #     f"{logging_header} Would run command: '{base_command_string}' in path '{test_run_dir}'..."
+                            # )
+                            # logging.info(f"{logging_header} Would target device: {device_info}")
                             logging.info(
-                                f"{logging_header} Would run command: '{base_command_string}' in path '{test_run_dir}'..."
+                                f"{logging_header} WOULD BE launching job {i + 1}/{jobs_to_start} targeting device: {device_info}"
                             )
-                            logging.info(f"{logging_header} Would target device: {device_info}")
                             time.sleep(0.1)  # Simulate tiny delay
                         else:
                             # Start process in background
