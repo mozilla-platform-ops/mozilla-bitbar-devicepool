@@ -316,8 +316,6 @@ class TestRunManagerLT(object):
 
             # logging.info(f"{logging_header} Calculated jobs_to_start: {jobs_to_start}")
 
-            # TODO: show busy LT devices
-            # TODO: compress LT info into single block `Configured/Active/Busy LT Devs`
             lt_blob_p1 = (
                 f"{len(self.config_object.config['device_groups'][project_name])}/{active_devices}/{busy_devices}"
             )
@@ -551,12 +549,6 @@ def main():
     if args.action == "start-test-run-manager":
         # logging is now properly configured
         trmlt = TestRunManagerLT(debug_mode=args.debug)
-
-        # start the main run loop using background tasks mode
-        # trmlt.run_single_project_single_thread_multi_job(
-        #     # mode=trmlt.MODE_RUN_NOTRACK_BACKGROUND_TASKS
-        #     mode=trmlt.MODE_RUN_NOTRACK_WITH_CONCURRENCY,
-        # )
 
         # Start the main run loop using the multithreaded runner
         trmlt.run_multithreaded()
