@@ -13,7 +13,7 @@ from datetime import timedelta
 # Create a cached session with 10 second expiry
 # Only requests using this session will be cached
 cached_session = requests_cache.CachedSession(
-    cache_name="lambdatest_cache", backend="memory", expire_after=timedelta(seconds=10)
+    cache_name="lambdatest_cache", backend="memory", expire_after=timedelta(seconds=8)
 )
 
 # Configure retry strategy
