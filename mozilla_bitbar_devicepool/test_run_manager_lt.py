@@ -13,6 +13,8 @@ import subprocess
 import argparse
 import threading  # Added import
 
+import pprint
+
 from mozilla_bitbar_devicepool import configuration_lt, logging_setup
 from mozilla_bitbar_devicepool.lambdatest import job_config, status
 from mozilla_bitbar_devicepool.lambdatest.job_tracker import JobTracker
@@ -202,6 +204,7 @@ class TestRunManagerLT(object):
                     }
 
         while not self.shutdown_event.is_set():
+            active_device_count_by_project_dict = {}
             # Get entire device list once - we'll filter it for each project
             try:
                 device_list = self.status_object.get_device_list()
@@ -235,6 +238,7 @@ class TestRunManagerLT(object):
             # For each project, filter the device list based on the project's device_groups
             for project_name, project_config in self.config_object.config["projects"].items():
                 try:
+                    # TODO: should we gate on this any longer? i think no
                     lt_device_selector = project_config.get("lt_device_selector")
                     if lt_device_selector:
                         active_device_count = 0  # Rename to active_device_count for clarity
@@ -255,9 +259,11 @@ class TestRunManagerLT(object):
                                     if state == self.LT_DEVICE_STATE_BUSY and udid in project_device_group:
                                         busy_devices += 1
 
-                        logging.info(
-                            f"{logging_header} Active devices for {project_name} ({len(active_device_list)}): {active_device_list}"
-                        )
+                        active_device_count_by_project_dict[project_name] = active_device_count
+                        # was helpful, but lots of output now
+                        # logging.info(
+                        #     f"{logging_header} Active devices for {project_name} ({len(active_device_list)}): {active_device_list}"
+                        # )
                         with self.shared_data_lock:
                             self.shared_data["lt_g_initiated_jobs"] = g_initiated_jobs
                             self.shared_data["lt_active_devices"] = (
@@ -271,9 +277,12 @@ class TestRunManagerLT(object):
                                 self.shared_data["projects"][project_name]["available_devices"] = (
                                     active_device_list  # Use list here
                                 )
-
                 except Exception as e:
                     logging.error(f"{logging_header} Error processing devices for {project_name}: {e}", exc_info=True)
+
+            logging.info(
+                f"{logging_header} Updated. Active device counts: {pprint.pformat(active_device_count_by_project_dict)}"
+            )
 
             # Log global device utilization statistics
             util_percent = 0
