@@ -649,6 +649,11 @@ def parse_args(action_array):
         default="INFO",
         help="Logging level. Defaults to INFO.",
     )
+    parser.add_argument(
+        "--disable-logging-timestamps-dlt",
+        action="store_true",
+        help="Disable logging timestamps.",
+    )
     return parser.parse_args()
 
 
@@ -658,7 +663,7 @@ def main():
     args = parse_args(available_actions)
 
     # Configure logging explicitly
-    logging_setup.setup_logging(args.log_level)
+    logging_setup.setup_logging(args.log_level, args.disable_logging_timestamps)
 
     if args.action == "start-test-run-manager":
         # logging is now properly configured
