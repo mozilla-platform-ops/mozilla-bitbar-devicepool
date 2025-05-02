@@ -154,6 +154,7 @@ class TestRunManagerLT(object):
 
         while not self.shutdown_event.is_set():
             count_of_fetched_projects = 0
+            worker_type_to_count_dict = {}
             # For each project, get taskcluster job count
             for project_name, project_config in self.config_object.config["projects"].items():
                 try:
@@ -162,13 +163,15 @@ class TestRunManagerLT(object):
                         # TODO: Make provisioner name dynamic if needed
                         tc_job_count = get_taskcluster_pending_tasks("proj-autophone", tc_worker_type, verbose=False)
                         count_of_fetched_projects += 1
+                        worker_type_to_count_dict[tc_worker_type] = tc_job_count
                         with self.shared_data_lock:
                             if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
                                 self.shared_data["projects"][project_name]["tc_job_count"] = tc_job_count
                 except Exception as e:
                     logging.error(f"{logging_header} Error fetching TC tasks for {project_name}: {e}", exc_info=True)
 
-            logging.info(f"{logging_header} Updated data for {count_of_fetched_projects} queues.")
+            # logging.info(f"{logging_header} Updated data for {count_of_fetched_projects} queues.")
+            logging.info(f"{logging_header} Updated. Queue counts: {pprint.pformat(worker_type_to_count_dict)}")
 
             # Wait for the specified interval or until shutdown is signaled
             self.shutdown_event.wait(self.TC_MONITOR_INTERVAL)
@@ -280,9 +283,9 @@ class TestRunManagerLT(object):
                 except Exception as e:
                     logging.error(f"{logging_header} Error processing devices for {project_name}: {e}", exc_info=True)
 
-            logging.info(
-                f"{logging_header} Updated. Active device counts: {pprint.pformat(active_device_count_by_project_dict)}"
-            )
+            # logging.info(
+            #     f"{logging_header} Updated. Active device counts: {pprint.pformat(active_device_count_by_project_dict)}"
+            # )
 
             # Log global device utilization statistics
             util_percent = 0
@@ -292,12 +295,23 @@ class TestRunManagerLT(object):
                 ) * 100
 
             logging.info(
-                f"{logging_header} Global Device Utilization: "
-                f"Total: {global_device_utilization['total_devices']}, "
-                f"Active: {global_device_utilization['active_devices']}, "
-                f"Busy: {global_device_utilization['busy_devices']} ({util_percent:.1f}%), "
-                f"Initiated: {global_device_utilization['initiated_jobs']}"
+                f"{logging_header} Updated. Active device counts: {pprint.pformat(active_device_count_by_project_dict)}, "
+                # more compact format
+                "Global device utilization: Total/Active/Busy/BusyPercentage: "
+                f"{global_device_utilization['total_devices']}/{global_device_utilization['active_devices']}/"
+                f"{global_device_utilization['busy_devices']}/{util_percent:.1f}%"
+                # f"Total: {global_device_utilization['total_devices']}, "
+                # f"Active: {global_device_utilization['active_devices']}, "
+                # f"Busy: {global_device_utilization['busy_devices']} ({util_percent:.1f}%), "
+                # f"Initiated: {global_device_utilization['initiated_jobs']}"
             )
+            # logging.info(
+            #     f"{logging_header} Global Device Utilization: "
+            #     f"Total: {global_device_utilization['total_devices']}, "
+            #     f"Active: {global_device_utilization['active_devices']}, "
+            #     f"Busy: {global_device_utilization['busy_devices']} ({util_percent:.1f}%), "
+            #     f"Initiated: {global_device_utilization['initiated_jobs']}"
+            # )
 
             self.shutdown_event.wait(self.LT_MONITOR_INTERVAL)
 
