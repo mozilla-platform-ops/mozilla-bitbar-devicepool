@@ -496,7 +496,7 @@ class TestRunManagerLT(object):
 
                         device_info = f"{device_udid}"
 
-                        if self.debug_mode:
+                        if self.unit_testing_mode:
                             # logging.info(
                             #     f"{logging_header} Would run command: '{base_command_string}' in path '{test_run_dir}'..."
                             # )
@@ -529,7 +529,7 @@ class TestRunManagerLT(object):
                         shutil.rmtree(test_run_dir, ignore_errors=True)
 
                 # outer_end_time = time.time()
-                if processes_started > 0 and not self.debug_mode:
+                if processes_started > 0 and not self.unit_testing_mode:
                     # Pass the collected UDIDs when adding jobs to the tracker
                     self.add_jobs(processes_started, project_name, udids=assigned_device_udids)
                     # logging.info(
@@ -674,7 +674,7 @@ def main():
 
     if args.action == "start-test-run-manager":
         # logging is now properly configured
-        trmlt = TestRunManagerLT(debug_mode=args.debug)
+        trmlt = TestRunManagerLT(unit_testing_mode=args.debug)
 
         # Start the main run loop using the multithreaded runner
         trmlt.run_multithreaded()
