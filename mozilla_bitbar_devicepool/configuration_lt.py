@@ -34,6 +34,9 @@ class ConfigurationLt(object):
 
     def set_lt_api_key(self):
         # load from os environment
+        if self.ci_mode:
+            self.lt_api_key = "fake123"
+            return
         if "LT_ACCESS_KEY" not in os.environ:
             raise ValueError("LT_ACCESS_KEY not found in environment variables")
         self.lt_access_key = os.environ.get("LT_ACCESS_KEY")
@@ -41,6 +44,9 @@ class ConfigurationLt(object):
 
     def set_lt_username(self):
         # load from os environment
+        if self.ci_mode:
+            self.lt_username = "fake123"
+            return
         if "LT_USERNAME" not in os.environ:
             raise ValueError("LT_USERNAME not found in environment variables")
         self.lt_username = os.environ.get("LT_USERNAME")
@@ -53,7 +59,10 @@ class ConfigurationLt(object):
             data = self.config["projects"][project_name]
             taskcluster_access_token_name = data["TC_WORKER_TYPE"].replace("-", "_")
             # ensure the environment variable is set
-            if taskcluster_access_token_name not in os.environ and not self.ci_mode:
+            if self.ci_mode:
+                data["TASKCLUSTER_ACCESS_TOKEN"] = "fake123"
+                continue
+            if taskcluster_access_token_name not in os.environ:
                 raise ValueError(f"Environment variable {taskcluster_access_token_name} not found")
             data["TASKCLUSTER_ACCESS_TOKEN"] = os.environ[taskcluster_access_token_name]
 
