@@ -64,6 +64,7 @@ class TestRunManagerLT(object):
         self.max_jobs_to_start = max_jobs_to_start
         self.state = self.STATE_RUNNING
         self.debug_mode = debug_mode
+        self.logging_padding = 12  # Store the padding value as instance variable
         self.config_object = configuration_lt.ConfigurationLt()
         self.config_object.configure()
         self.status_object = status.Status(self.config_object.lt_username, self.config_object.lt_access_key)
@@ -135,7 +136,7 @@ class TestRunManagerLT(object):
 
     def _taskcluster_monitor_thread(self):
         """Monitors Taskcluster pending tasks for all projects."""
-        logging_header = "[TC Monitor]"
+        logging_header = f"[ {'TC Monitor':<{self.logging_padding}} ]"
 
         # Initialize projects structure in shared data
         with self.shared_data_lock:
@@ -180,7 +181,7 @@ class TestRunManagerLT(object):
 
     def _lambdatest_monitor_thread(self):
         """Monitors LambdaTest device status for all projects."""
-        logging_header = "[LT Monitor]"
+        logging_header = f"[ {'LT Monitor':<{self.logging_padding}} ]"
 
         # Track global device utilization
         global_device_utilization = {
@@ -310,7 +311,7 @@ class TestRunManagerLT(object):
     def _job_starter_thread(self, project_name):
         """Starts jobs based on monitored data for a specific project."""
 
-        logging_header = f"[Job Starter - {project_name:<10}]"
+        logging_header = f"[ {'JS ' + project_name:<{self.logging_padding}} ]"
 
         # logging.info(
         #     f"{logging_header} {len(self.config_object.config['device_groups'][project_name])} devices configured.]"
@@ -403,7 +404,7 @@ class TestRunManagerLT(object):
             )
             if jobs_to_start > 0:
                 # --- Start Jobs (using background task logic) ---
-                logging.info(f"{logging_header} Starting {jobs_to_start} jobs in background...")
+                # logging.info(f"{logging_header} Starting {jobs_to_start} jobs in background...")
                 lt_app_url = "lt://proverbial-android"  # Eternal APK
 
                 cmd_env = os.environ.copy()
@@ -546,8 +547,9 @@ class TestRunManagerLT(object):
         logging.info(f"{logging_header} stopped.")
 
     def run_multithreaded(self):
+        logging_header = f"[ {'Main':<{self.logging_padding}} ]"
         """Runs the manager with separate threads for monitoring and job starting for each project."""
-        logging.info("[Main] Starting Test Run Manager in multithreaded mode...")
+        logging.info(f"{logging_header} Starting Test Run Manager in multithreaded mode...")
 
         # Create monitor threads
         tc_monitor = threading.Thread(target=self._taskcluster_monitor_thread, name="TC Monitor")
@@ -555,9 +557,9 @@ class TestRunManagerLT(object):
 
         # Start monitor threads
         tc_monitor.start()
-        logging.info("[Main] Started TC Monitor thread.")
+        logging.info(f"{logging_header} Started TC Monitor thread.")
         lt_monitor.start()
-        logging.info("[Main] Started LT Monitor thread.")
+        logging.info(f"{logging_header} Started LT Monitor thread.")
 
         # Give monitors a moment to potentially fetch initial data
         time.sleep(2)
@@ -570,12 +572,12 @@ class TestRunManagerLT(object):
             )
             job_starters.append(job_starter)
             job_starter.start()
-            logging.info(f"[Main] Started job starter thread for project: {project_name}")
+            logging.info(f"{logging_header} Started job starter thread for project: {project_name}")
 
         # Keep main thread alive until shutdown is signaled
-        logging.info("[Main] Waiting for shutdown signal...")
+        logging.info(f"{logging_header} Waiting for shutdown signal...")
         self.shutdown_event.wait()
-        logging.info("[Main] Shutdown signal received. Waiting for threads to join...")
+        logging.info(f"{logging_header} Shutdown signal received. Waiting for threads to join...")
 
         # Wait for threads to finish
         tc_monitor.join(timeout=self.TC_MONITOR_INTERVAL + 5)
@@ -584,13 +586,13 @@ class TestRunManagerLT(object):
         for i, job_starter in enumerate(job_starters):
             job_starter.join(timeout=self.JOB_STARTER_INTERVAL + 10)  # Give starter a bit more time
             if job_starter.is_alive():
-                logging.warning(f"[Main] Job starter thread {i} did not exit cleanly.")
+                logging.warning(f"{logging_header} Job starter thread {i} did not exit cleanly.")
 
-        logging.info("[Main] All threads joined. Exiting.")
+        logging.info(f"{logging_header} All threads joined. Exiting.")
         if tc_monitor.is_alive():
-            logging.warning("[Main] TC monitor thread did not exit cleanly.")
+            logging.warning(f"{logging_header} TC monitor thread did not exit cleanly.")
         if lt_monitor.is_alive():
-            logging.warning("[Main] LT monitor thread did not exit cleanly.")
+            logging.warning(f"{logging_header} LT monitor thread did not exit cleanly.")
 
     def calculate_jobs_to_start(self, tc_jobs_not_handled, available_devices_count, global_initiated, max_jobs=None):
         """
