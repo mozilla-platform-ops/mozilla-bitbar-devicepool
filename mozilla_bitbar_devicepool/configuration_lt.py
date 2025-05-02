@@ -12,12 +12,12 @@ from mozilla_bitbar_devicepool.util.template import apply_dict_defaults
 
 
 class ConfigurationLt(object):
-    def __init__(self, skip_binary_check=False):
+    def __init__(self, ci_mode=False):
         # TODO?: mash all values into 'config'?
         self.lt_access_key = None
         self.lt_username = None
         self.config = {}
-        self.skip_binary_check = skip_binary_check
+        self.ci_mode = ci_mode
 
     def load_file_config(self, config_path="config/lambdatest.yml"):
         # get this file's directory path
@@ -53,7 +53,7 @@ class ConfigurationLt(object):
             data = self.config["projects"][project_name]
             taskcluster_access_token_name = data["TC_WORKER_TYPE"].replace("-", "_")
             # ensure the environment variable is set
-            if taskcluster_access_token_name not in os.environ:
+            if taskcluster_access_token_name not in os.environ and not self.ci_mode:
                 raise ValueError(f"Environment variable {taskcluster_access_token_name} not found")
             data["TASKCLUSTER_ACCESS_TOKEN"] = os.environ[taskcluster_access_token_name]
 
@@ -85,7 +85,7 @@ class ConfigurationLt(object):
         # TODO?: add filespath?
 
         # Check for hyperexecute binary on path using a shell command
-        if not self.skip_binary_check:
+        if not self.ci_mode:
             cmd = "where" if sys.platform == "win32" else "which"
             try:
                 subprocess.check_call([cmd, "hyperexecute"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
