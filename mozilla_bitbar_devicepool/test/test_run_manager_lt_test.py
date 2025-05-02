@@ -5,7 +5,8 @@ from mozilla_bitbar_devicepool.test_run_manager_lt import TestRunManagerLT
 @pytest.fixture
 def test_manager():
     """Create and return a TestRunManagerLT instance for testing."""
-    return TestRunManagerLT()
+    # Create manager with debug_mode=True to skip hyperexecute binary check
+    return TestRunManagerLT(unit_testing_mode=True)
 
 
 def test_calculate_jobs_to_start_basic(test_manager):

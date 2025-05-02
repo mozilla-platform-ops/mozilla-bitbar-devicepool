@@ -56,16 +56,17 @@ class TestRunManagerLT(object):
         max_jobs_to_start=MAX_JOBS_TO_START_AT_ONCE,
         exit_wait=5,
         no_job_sleep=60,
-        debug_mode=False,
+        unit_testing_mode=False,
     ):
         self.interrupt_signal_count = 0
         self.exit_wait = exit_wait
         self.no_job_sleep = no_job_sleep
         self.max_jobs_to_start = max_jobs_to_start
         self.state = self.STATE_RUNNING
-        self.debug_mode = debug_mode
+        self.unit_testing_mode = unit_testing_mode
         self.logging_padding = 12  # Store the padding value as instance variable
-        self.config_object = configuration_lt.ConfigurationLt()
+        # Skip hyperexecute binary check in unit testing mode or when running tests
+        self.config_object = configuration_lt.ConfigurationLt(skip_binary_check=self.unit_testing_mode)
         self.config_object.configure()
         self.status_object = status.Status(self.config_object.lt_username, self.config_object.lt_access_key)
 
