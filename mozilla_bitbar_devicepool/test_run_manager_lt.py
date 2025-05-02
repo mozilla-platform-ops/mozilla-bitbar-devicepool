@@ -22,6 +22,11 @@ from mozilla_bitbar_devicepool.taskcluster import get_taskcluster_pending_tasks
 
 
 class TestRunManagerLT(object):
+    """Test Run Manager for LambdaTest"""
+
+    # Add this attribute to make pytest ignore this class
+    __test__ = False  # pytest will not collect classes with __test__ = False
+
     # Constants at class level
     PROGRAM_LABEL = "tcdp"
     #
