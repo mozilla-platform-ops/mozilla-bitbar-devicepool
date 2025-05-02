@@ -283,6 +283,8 @@ class TestRunManagerLT(object):
                 except Exception as e:
                     logging.error(f"{logging_header} Error processing devices for {project_name}: {e}", exc_info=True)
 
+            # handy for debugging
+            #
             # logging.info(
             #     f"{logging_header} Updated. Active device counts: {pprint.pformat(active_device_count_by_project_dict)}"
             # )
@@ -296,22 +298,10 @@ class TestRunManagerLT(object):
 
             logging.info(
                 f"{logging_header} Updated. Active device counts: {pprint.pformat(active_device_count_by_project_dict)}, "
-                # more compact format
                 "Global device utilization: Total/Active/Busy/BusyPercentage: "
                 f"{global_device_utilization['total_devices']}/{global_device_utilization['active_devices']}/"
                 f"{global_device_utilization['busy_devices']}/{util_percent:.1f}%"
-                # f"Total: {global_device_utilization['total_devices']}, "
-                # f"Active: {global_device_utilization['active_devices']}, "
-                # f"Busy: {global_device_utilization['busy_devices']} ({util_percent:.1f}%), "
-                # f"Initiated: {global_device_utilization['initiated_jobs']}"
             )
-            # logging.info(
-            #     f"{logging_header} Global Device Utilization: "
-            #     f"Total: {global_device_utilization['total_devices']}, "
-            #     f"Active: {global_device_utilization['active_devices']}, "
-            #     f"Busy: {global_device_utilization['busy_devices']} ({util_percent:.1f}%), "
-            #     f"Initiated: {global_device_utilization['initiated_jobs']}"
-            # )
 
             self.shutdown_event.wait(self.LT_MONITOR_INTERVAL)
 
