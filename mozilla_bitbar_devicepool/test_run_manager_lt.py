@@ -650,7 +650,8 @@ def parse_args(action_array):
         help="Logging level. Defaults to INFO.",
     )
     parser.add_argument(
-        "--disable-logging-timestamps-dlt",
+        "--disable-logging-timestamps",
+        "-dlt",
         action="store_true",
         help="Disable logging timestamps.",
     )
