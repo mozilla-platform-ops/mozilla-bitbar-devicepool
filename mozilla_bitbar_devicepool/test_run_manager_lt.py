@@ -192,8 +192,9 @@ class TestRunManagerLT(object):
                 except Exception as e:
                     logging.error(f"{logging_header} Error fetching TC tasks for {project_name}: {e}", exc_info=True)
 
-            # logging.info(f"{logging_header} Updated data for {count_of_fetched_projects} queues.")
-            logging.info(f"{logging_header} Updated. Queue counts: {pprint.pformat(worker_type_to_count_dict)}")
+            logging.info(
+                f"{logging_header} Queue counts: {str(worker_type_to_count_dict).strip('{}').replace("'", '')}"
+            )
 
             # Wait for the specified interval or until shutdown is signaled
             self.shutdown_event.wait(self.TC_MONITOR_INTERVAL)
