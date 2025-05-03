@@ -441,7 +441,7 @@ class TestRunManagerLT(object):
             # logging.info(f"{logging_header} Calculated jobs_to_start: {jobs_to_start}")
 
             lt_blob_p1 = f"{len(self.config_object.config['device_groups'][project_name])}/{active_devices}/{busy_devices}/{cleanup_devices}"
-            lt_blob = f"LT Devs Config/Active/Busy/Cleanup: {lt_blob_p1:>9}"  # Updated label to include cleanup
+            lt_blob = f"LT Devs Config/Active/Busy/Cleanup: {lt_blob_p1:>11}"  # Updated label to include cleanup
 
             logging.info(
                 f"{logging_header} TC Jobs: {tc_job_count:>4}, {lt_blob:>41}, "
