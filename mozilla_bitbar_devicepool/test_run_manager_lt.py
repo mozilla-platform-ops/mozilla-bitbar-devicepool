@@ -99,14 +99,21 @@ class TestRunManagerLT(object):
 
         # Threading related initializations
         self.shared_data = {
-            # global values
+            # Only keep global values at root level
             "lt_g_initiated_jobs": 0,
-            "tc_job_count": 0,
-            "lt_active_devices": 0,
-            "lt_busy_devices": 0,
-            "lt_device_selector": None,  # Store selector for job starter
-            "current_project_name": None,  # Store project name for job starter
+            "lt_g_active_devices": 0,  # Renamed from lt_active_devices to lt_g_active_devices
+            # Initialize projects dictionary
+            "projects": {},
         }
+        # Initialize project-specific data
+        for project_name, project_config in self.config_object.config.get("projects", {}).items():
+            self.shared_data["projects"][project_name] = {
+                "lt_device_selector": project_config.get("lt_device_selector", None),
+                "tc_job_count": 0,
+                "lt_active_devices": 0,
+                "lt_busy_devices": 0,
+            }
+
         self.shared_data_lock = threading.Lock()
         self.shutdown_event = threading.Event()
 
@@ -158,20 +165,7 @@ class TestRunManagerLT(object):
         """Monitors Taskcluster pending tasks for all projects."""
         logging_header = f"[ {'TC Monitor':<{self.logging_padding}} ]"
 
-        # Initialize projects structure in shared data
-        with self.shared_data_lock:
-            if "projects" not in self.shared_data:
-                self.shared_data["projects"] = {}
-
-            # Initialize all projects
-            for project_name, project_config in self.config_object.config["projects"].items():
-                if project_name not in self.shared_data["projects"]:
-                    self.shared_data["projects"][project_name] = {
-                        "lt_device_selector": project_config.get("lt_device_selector", None),
-                        "tc_job_count": 0,
-                        "lt_active_devices": 0,
-                        "lt_busy_devices": 0,
-                    }
+        # No need to initialize projects structure as it's now done in __init__
 
         while not self.shutdown_event.is_set():
             count_of_fetched_projects = 0
@@ -186,7 +180,7 @@ class TestRunManagerLT(object):
                         count_of_fetched_projects += 1
                         worker_type_to_count_dict[tc_worker_type] = tc_job_count
                         with self.shared_data_lock:
-                            if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
+                            if project_name in self.shared_data["projects"]:
                                 self.shared_data["projects"][project_name]["tc_job_count"] = tc_job_count
                 except Exception as e:
                     logging.error(f"{logging_header} Error fetching TC tasks for {project_name}: {e}", exc_info=True)
@@ -290,9 +284,7 @@ class TestRunManagerLT(object):
                         # )
                         with self.shared_data_lock:
                             self.shared_data["lt_g_initiated_jobs"] = g_initiated_jobs
-                            self.shared_data["lt_active_devices"] = (
-                                g_active_devices  # Store global active devices count
-                            )
+                            self.shared_data["lt_g_active_devices"] = g_active_devices
                             if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
                                 self.shared_data["projects"][project_name]["lt_active_devices"] = (
                                     active_device_count  # Use count here
