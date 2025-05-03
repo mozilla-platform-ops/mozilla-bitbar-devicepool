@@ -297,21 +297,19 @@ class TestRunManagerLT(object):
 
                         active_device_count_by_project_dict[project_name] = active_device_count
 
-                        # Update shared data without lock
+                        # Update shared data
                         self.shared_data["lt_g_initiated_jobs"] = g_initiated_jobs
                         self.shared_data["lt_g_active_devices"] = g_active_devices
-                        self.shared_data["lt_g_cleanup_devices"] = g_cleanup_devices  # Update global cleanup count
+                        self.shared_data["lt_g_cleanup_devices"] = g_cleanup_devices
 
                         if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
                             self.shared_data["projects"][project_name]["lt_active_devices"] = active_device_count
                             self.shared_data["projects"][project_name]["lt_busy_devices"] = busy_devices
-                            self.shared_data["projects"][project_name]["lt_cleanup_devices"] = (
-                                cleanup_devices  # Update project cleanup count
-                            )
+                            self.shared_data["projects"][project_name]["lt_cleanup_devices"] = cleanup_devices
 
                             # Clear and update the available_devices list
                             available_devices = self.shared_data["projects"][project_name]["available_devices"]
-                            available_devices[:] = []  # Clear the list
+                            available_devices[:] = []
                             available_devices.extend(active_device_list)  # Update with new data
 
                 except Exception as e:
