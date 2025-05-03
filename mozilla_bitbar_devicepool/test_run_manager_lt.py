@@ -531,24 +531,24 @@ class TestRunManagerLT(object):
                             path=test_run_file,
                         )
 
-                        device_info = f"{device_udid}"
+                        # device_info = f"{device_udid}"
 
                         if self.debug_mode:
                             # logging.info(
                             #     f"{logging_header} Would run command: '{base_command_string}' in path '{test_run_dir}'..."
                             # )
                             # logging.info(f"{logging_header} Would target device: {device_info}")
-                            logging.info(
-                                f"{logging_header} WOULD BE launching job {i + 1}/{jobs_to_start} targeting device '{device_info}'"
-                            )
+                            # logging.info(
+                            #     f"{logging_header} WOULD BE launching job {i + 1}/{jobs_to_start} targeting device '{device_info}'"
+                            # )
                             time.sleep(0.1)  # Simulate tiny delay
                         else:
                             # Start process in background
                             # TODO: only print one line with number of jobs and all udid we'll be using?
-                            logging.info(
-                                f"{logging_header} Launching job {i + 1}/{jobs_to_start} targeting device '{device_info}'"
-                            )
-                            process = subprocess.Popen(
+                            # logging.info(
+                            #     f"{logging_header} Launching job {i + 1}/{jobs_to_start} targeting device '{device_info}'"
+                            # )
+                            _process = subprocess.Popen(
                                 base_command_string,
                                 shell=True,
                                 env=cmd_env,
@@ -557,7 +557,7 @@ class TestRunManagerLT(object):
                                 stdout=subprocess.DEVNULL,  # Discard output for background tasks
                                 stderr=subprocess.DEVNULL,
                             )
-                            logging.debug(f"{logging_header} Started background job {i + 1} with PID {process.pid}")
+                            # logging.debug(f"{logging_header} Started background job {i + 1} with PID {process.pid}")
                         processes_started += 1
 
                     except Exception as e:
@@ -572,6 +572,17 @@ class TestRunManagerLT(object):
                     # logging.info(
                     #     f"{logging_header} Launched {processes_started} background jobs in {round(outer_end_time - outer_start_time, 2)} seconds"
                     # )
+
+                # print a summary of number of jobs started and the udids
+                if processes_started > 0:
+                    if self.debug_mode:
+                        logging.info(
+                            f"{logging_header} Would have launched {processes_started} jobs targeting devices: {', '.join(assigned_device_udids)}"
+                        )
+                    else:
+                        logging.info(
+                            f"{logging_header} Launched {processes_started} jobs targeting devices: {', '.join(assigned_device_udids)}"
+                        )
 
                 # TODO: send a signal to the other threads to wake them up and have them gather?
                 # TODO: could also track next run for threads, and then sleep just a bit longer also
