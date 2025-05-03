@@ -322,13 +322,15 @@ class TestRunManagerLT(object):
                     global_device_utilization["busy_devices"] / global_device_utilization["total_devices"]
                 ) * 100
 
+            per_queue_string = f"Active device counts: {pprint.pformat(active_device_count_by_project_dict)}"
             logging.info(
-                f"{logging_header} Updated. Active device counts: {pprint.pformat(active_device_count_by_project_dict)}, "
+                f"{logging_header} "
                 "Global device utilization: Total/Active/Busy/Cleanup/BusyPercentage: "  # Added Cleanup to log
                 f"{global_device_utilization['total_devices']}/{global_device_utilization['active_devices']}/"
                 f"{global_device_utilization['busy_devices']}/{global_device_utilization['cleanup_devices']}/"  # Added cleanup count
                 f"{util_percent:.1f}%"
             )
+            logging.info(f"{logging_header} {per_queue_string}")
 
             self.shutdown_event.wait(self.LT_MONITOR_INTERVAL)
 
