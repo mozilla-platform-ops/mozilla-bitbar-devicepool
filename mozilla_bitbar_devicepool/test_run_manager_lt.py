@@ -687,6 +687,23 @@ def main():
     logging_setup.setup_logging(args.log_level, args.disable_logging_timestamps)
 
     if args.action == "start-test-run-manager":
+        banner = r"""
+      ___                        _____
+     /__/\                      /  /::\
+    |  |::\                    /  /:/\:\
+    |  |:|:\    ___     ___   /  /:/  \:\
+  __|__|:|\:\  /__/\   /  /\ /__/:/ \__\:|
+ /__/::::| \:\ \  \:\ /  /:/ \  \:\ /  /:/
+ \  \:\~~\__\/  \  \:\  /:/   \  \:\  /:/
+  \  \:\         \  \:\/:/     \  \:\/:/
+   \  \:\         \  \::/       \  \::/
+    \  \:\         \__\/         \__\/
+     \__\/
+
+    mozilla lambdatest devicepool
+        """  # noqa: W605
+        print(banner.lstrip("\n"))
+
         # logging is now properly configured
         trmlt = TestRunManagerLT(unit_testing_mode=args.ci_mode, debug_mode=args.debug)
 
