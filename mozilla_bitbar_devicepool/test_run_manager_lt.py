@@ -20,6 +20,13 @@ from mozilla_bitbar_devicepool.lambdatest import job_config, status
 from mozilla_bitbar_devicepool.lambdatest.job_tracker import JobTracker
 from mozilla_bitbar_devicepool.taskcluster import get_taskcluster_pending_tasks
 
+# TODO: add a semaphore file that makes that turns on --debug mode
+#    - main should check for the file every cycle and set the debug flag
+
+# TODO: longer term, networked locking for control of job starting for a single pool
+#  - high availability
+#  - for development, take over starting jobs for a particlar project
+
 
 class TestRunManagerLT(object):
     """Test Run Manager for LambdaTest"""
