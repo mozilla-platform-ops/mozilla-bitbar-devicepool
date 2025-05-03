@@ -105,6 +105,7 @@ class TestRunManagerLT(object):
         # Initialize shared data structure
         self.shared_data["lt_g_initiated_jobs"] = 0
         self.shared_data["lt_g_active_devices"] = 0
+        self.shared_data["lt_g_cleanup_devices"] = 0  # Add tracking for cleanup devices
         # Initialize projects dictionary as a nested Manager dict
         projects_dict = manager.dict()
 
@@ -115,6 +116,7 @@ class TestRunManagerLT(object):
             project_data["tc_job_count"] = 0
             project_data["lt_active_devices"] = 0
             project_data["lt_busy_devices"] = 0
+            project_data["lt_cleanup_devices"] = 0  # Add tracking for cleanup devices per project
             project_data["available_devices"] = manager.list()  # Use managed list
             projects_dict[project_name] = project_data
 
@@ -208,6 +210,7 @@ class TestRunManagerLT(object):
             "active_devices": 0,
             "busy_devices": 0,
             "initiated_jobs": 0,
+            "cleanup_devices": 0,  # Add cleanup devices to utilization tracking
         }
 
         # Initialize projects structure in shared data
@@ -224,6 +227,7 @@ class TestRunManagerLT(object):
                     project_data["tc_job_count"] = 0
                     project_data["lt_active_devices"] = 0
                     project_data["lt_busy_devices"] = 0
+                    project_data["lt_cleanup_devices"] = 0  # Add cleanup devices per project
                     project_data["available_devices"] = manager.list()  # Use managed list for device info
                     self.shared_data["projects"][project_name] = project_data
 
@@ -238,6 +242,7 @@ class TestRunManagerLT(object):
                 global_device_utilization["active_devices"] = 0
                 global_device_utilization["busy_devices"] = 0
                 global_device_utilization["initiated_jobs"] = 0
+                global_device_utilization["cleanup_devices"] = 0  # Reset cleanup count
 
                 # Count total devices across all device types
                 for device_type in device_list:
@@ -251,6 +256,8 @@ class TestRunManagerLT(object):
                             global_device_utilization["busy_devices"] += 1
                         elif state == self.LT_DEVICE_STATE_INITIATED:
                             global_device_utilization["initiated_jobs"] += 1
+                        elif state == self.LT_DEVICE_STATE_CLEANUP:
+                            global_device_utilization["cleanup_devices"] += 1  # Count cleanup devices
 
             except Exception as e:
                 logging.error(f"{logging_header} Error fetching device list: {e}", exc_info=True)
@@ -258,6 +265,7 @@ class TestRunManagerLT(object):
 
             g_initiated_jobs = global_device_utilization["initiated_jobs"]
             g_active_devices = global_device_utilization["active_devices"]
+            g_cleanup_devices = global_device_utilization["cleanup_devices"]  # Get global cleanup count
 
             # For each project, filter the device list based on the project's device_groups
             for project_name, project_config in self.config_object.config["projects"].items():
@@ -267,6 +275,7 @@ class TestRunManagerLT(object):
                     if lt_device_selector:
                         active_device_count = 0  # Rename to active_device_count for clarity
                         busy_devices = 0
+                        cleanup_devices = 0  # Track cleanup devices per project
                         active_device_list = []  # Rename to active_device_list for clarity
 
                         # Only continue if there's a device_groups config for this project
@@ -276,22 +285,29 @@ class TestRunManagerLT(object):
                             # Now iterate through all devices
                             for device_type in device_list:
                                 for udid, state in device_list[device_type].items():
-                                    # Only count the device if it's active AND in this project's device group
-                                    if state == self.LT_DEVICE_STATE_ACTIVE and udid in project_device_group:
-                                        active_device_count += 1  # Use the new variable name
-                                        active_device_list.append(udid)  # Use the new variable name
-                                    if state == self.LT_DEVICE_STATE_BUSY and udid in project_device_group:
-                                        busy_devices += 1
+                                    # Only count the device if it's in this project's device group
+                                    if udid in project_device_group:
+                                        if state == self.LT_DEVICE_STATE_ACTIVE:
+                                            active_device_count += 1
+                                            active_device_list.append(udid)
+                                        elif state == self.LT_DEVICE_STATE_BUSY:
+                                            busy_devices += 1
+                                        elif state == self.LT_DEVICE_STATE_CLEANUP:
+                                            cleanup_devices += 1  # Count cleanup devices for this project
 
                         active_device_count_by_project_dict[project_name] = active_device_count
 
                         # Update shared data without lock
                         self.shared_data["lt_g_initiated_jobs"] = g_initiated_jobs
                         self.shared_data["lt_g_active_devices"] = g_active_devices
+                        self.shared_data["lt_g_cleanup_devices"] = g_cleanup_devices  # Update global cleanup count
 
                         if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
                             self.shared_data["projects"][project_name]["lt_active_devices"] = active_device_count
                             self.shared_data["projects"][project_name]["lt_busy_devices"] = busy_devices
+                            self.shared_data["projects"][project_name]["lt_cleanup_devices"] = (
+                                cleanup_devices  # Update project cleanup count
+                            )
 
                             # Clear and update the available_devices list
                             available_devices = self.shared_data["projects"][project_name]["available_devices"]
@@ -310,9 +326,10 @@ class TestRunManagerLT(object):
 
             logging.info(
                 f"{logging_header} Updated. Active device counts: {pprint.pformat(active_device_count_by_project_dict)}, "
-                "Global device utilization: Total/Active/Busy/BusyPercentage: "
+                "Global device utilization: Total/Active/Busy/Cleanup/BusyPercentage: "  # Added Cleanup to log
                 f"{global_device_utilization['total_devices']}/{global_device_utilization['active_devices']}/"
-                f"{global_device_utilization['busy_devices']}/{util_percent:.1f}%"
+                f"{global_device_utilization['busy_devices']}/{global_device_utilization['cleanup_devices']}/"  # Added cleanup count
+                f"{util_percent:.1f}%"
             )
 
             self.shutdown_event.wait(self.LT_MONITOR_INTERVAL)
@@ -349,6 +366,7 @@ class TestRunManagerLT(object):
                 project_data["tc_job_count"] = 0
                 project_data["lt_active_devices"] = 0
                 project_data["lt_busy_devices"] = 0
+                project_data["lt_cleanup_devices"] = 0  # Add cleanup devices for new projects
                 project_data["available_devices"] = multiprocessing.Manager().list()
                 self.shared_data["projects"][project_name] = project_data
         except KeyError as e:
@@ -366,6 +384,7 @@ class TestRunManagerLT(object):
                 tc_job_count = project_data.get("tc_job_count", 0)
                 active_devices = project_data.get("lt_active_devices", 0)
                 busy_devices = project_data.get("lt_busy_devices", 0)
+                cleanup_devices = project_data.get("lt_cleanup_devices", 0)  # Get cleanup devices count
                 # Make a copy of the list to avoid modification issues
                 available_devices = list(project_data.get("available_devices", []))
 
@@ -400,13 +419,9 @@ class TestRunManagerLT(object):
 
             # logging.info(f"{logging_header} Calculated jobs_to_start: {jobs_to_start}")
 
-            lt_blob_p1 = (
-                f"{len(self.config_object.config['device_groups'][project_name])}/{active_devices}/{busy_devices}"
-            )
-            lt_blob = f"LT Devs Configured/Active/Busy: {lt_blob_p1:>9}"
-            # TODO: add back in 'LT G Init' once working
-            #  `LT G Init: {self.shared_data['lt_g_initiated_jobs']:> 3},`
-            # TODO: rework this for clarity (keep tc info together, etc)
+            lt_blob_p1 = f"{len(self.config_object.config['device_groups'][project_name])}/{active_devices}/{busy_devices}/{cleanup_devices}"
+            lt_blob = f"LT Devs Config/Active/Busy/Cleanup: {lt_blob_p1:>9}"  # Updated label to include cleanup
+
             logging.info(
                 f"{logging_header} TC Jobs: {tc_job_count:>4}, {lt_blob:>41}, "
                 f"Recently Started: {recently_started_jobs:>3}, Need Handling: {tc_jobs_not_handled:>3}, Jobs To Start: {jobs_to_start:>3}"
