@@ -14,7 +14,6 @@ import argparse
 import threading  # Added import
 import multiprocessing  # Add import for multiprocessing.Manager
 
-import pprint
 
 from mozilla_bitbar_devicepool import configuration_lt, logging_setup
 from mozilla_bitbar_devicepool.lambdatest import job_config, status
@@ -343,7 +342,8 @@ class TestRunManagerLT(object):
                     global_device_utilization["busy_devices"] / global_device_utilization["total_devices"]
                 ) * 100
 
-            per_queue_string = f"Active device counts: {pprint.pformat(active_device_count_by_project_dict)}"
+            formatted_active_device_count = str(active_device_count_by_project_dict).strip("{}").replace("'", "")
+            per_queue_string = f"Active device counts: {formatted_active_device_count}"
             logging.info(
                 f"{logging_header} "
                 "Global device utilization: Total/Active/Busy/Cleanup/BusyPercentage: "  # Added Cleanup to log
