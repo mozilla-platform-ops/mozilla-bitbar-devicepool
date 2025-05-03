@@ -555,11 +555,14 @@ class TestRunManagerLT(object):
 
                 # TODO: send a signal to the other threads to wake them up and have them gather?
                 # TODO: could also track next run for threads, and then sleep just a bit longer also
+                #
                 # avoid race with tc and lt threads, pause so we have updated data on next loop
-                # time.sleep(self.LT_MONITOR_INTERVAL)
-                # sleep doesn't work?
+                #
+                # disabled... i don't think we need this. if there are 30 jobs and max to start per turn is 10,
+                #    we can get some more jobs launched before the next LT_UPDATE
+                #
+                # update: not needed, but we end up loanching jobs too quickly without it
                 self.shutdown_event.wait(self.LT_MONITOR_INTERVAL)
-                # --- End Start Jobs ---
             else:
                 # logging.info(f"{logging_header} No jobs to start. Sleeping.")
                 pass
