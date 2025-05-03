@@ -545,7 +545,7 @@ class TestRunManagerLT(object):
                         shutil.rmtree(test_run_dir, ignore_errors=True)
 
                 # outer_end_time = time.time()
-                if processes_started > 0 and not self.unit_testing_mode:
+                if processes_started > 0 and not self.debug_mode:
                     # Pass the collected UDIDs when adding jobs to the tracker
                     self.add_jobs(processes_started, project_name, udids=assigned_device_udids)
                     # logging.info(
