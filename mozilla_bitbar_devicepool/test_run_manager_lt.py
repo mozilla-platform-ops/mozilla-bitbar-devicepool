@@ -211,7 +211,7 @@ class TestRunManagerLT(object):
             "active_devices": 0,
             "busy_devices": 0,
             "initiated_jobs": 0,
-            "cleanup_devices": 0,  # Add cleanup devices to utilization tracking
+            "cleanup_devices": 0,
         }
 
         # Initialize projects structure in shared data
@@ -228,8 +228,8 @@ class TestRunManagerLT(object):
                     project_data["tc_job_count"] = 0
                     project_data["lt_active_devices"] = 0
                     project_data["lt_busy_devices"] = 0
-                    project_data["lt_cleanup_devices"] = 0  # Add cleanup devices per project
-                    project_data["available_devices"] = manager.list()  # Use managed list for device info
+                    project_data["lt_cleanup_devices"] = 0
+                    project_data["available_devices"] = manager.list()
                     self.shared_data["projects"][project_name] = project_data
 
         while not self.shutdown_event.is_set():
@@ -242,8 +242,26 @@ class TestRunManagerLT(object):
                 global_device_utilization["total_devices"] = 0
                 global_device_utilization["active_devices"] = 0
                 global_device_utilization["busy_devices"] = 0
-                global_device_utilization["initiated_jobs"] = 0
-                global_device_utilization["cleanup_devices"] = 0  # Reset cleanup count
+                global_device_utilization["cleanup_devices"] = 0
+
+                # Get current initiated jobs from API instead of counting from device list
+                try:
+                    # Use status_object to get jobs list
+                    jobs_summary = self.status_object.get_job_summary()
+                    # logging.debug(f"{logging_header} Retrieved job list of length: {len(jobs_list) if jobs_list else 0}")
+
+                    # Count initiated jobs
+                    initiated_jobs_count = 0
+                    for job_status in jobs_summary:
+                        if job_status == self.LT_DEVICE_STATE_INITIATED:
+                            initiated_jobs_count += jobs_summary[job_status]
+
+                    logging.debug(f"{logging_header} Found {initiated_jobs_count} jobs in initiated state")
+                    global_device_utilization["initiated_jobs"] = initiated_jobs_count
+                except Exception as e:
+                    logging.error(f"{logging_header} Error fetching jobs list: {e}", exc_info=True)
+                    # Keep previous value if there's an error
+                    global_device_utilization["initiated_jobs"] = self.shared_data.get("lt_g_initiated_jobs", 0)
 
                 # Count total devices across all device types
                 for device_type in device_list:
@@ -255,10 +273,8 @@ class TestRunManagerLT(object):
                             global_device_utilization["active_devices"] += 1
                         elif state == self.LT_DEVICE_STATE_BUSY:
                             global_device_utilization["busy_devices"] += 1
-                        elif state == self.LT_DEVICE_STATE_INITIATED:
-                            global_device_utilization["initiated_jobs"] += 1
                         elif state == self.LT_DEVICE_STATE_CLEANUP:
-                            global_device_utilization["cleanup_devices"] += 1  # Count cleanup devices
+                            global_device_utilization["cleanup_devices"] += 1
 
             except Exception as e:
                 logging.error(f"{logging_header} Error fetching device list: {e}", exc_info=True)
@@ -266,7 +282,12 @@ class TestRunManagerLT(object):
 
             g_initiated_jobs = global_device_utilization["initiated_jobs"]
             g_active_devices = global_device_utilization["active_devices"]
-            g_cleanup_devices = global_device_utilization["cleanup_devices"]  # Get global cleanup count
+            g_cleanup_devices = global_device_utilization["cleanup_devices"]
+
+            # Update shared data with accurate job count
+            self.shared_data["lt_g_initiated_jobs"] = g_initiated_jobs
+            self.shared_data["lt_g_active_devices"] = g_active_devices
+            self.shared_data["lt_g_cleanup_devices"] = g_cleanup_devices
 
             # For each project, filter the device list based on the project's device_groups
             for project_name, project_config in self.config_object.config["projects"].items():
