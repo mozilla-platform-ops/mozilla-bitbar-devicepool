@@ -617,7 +617,7 @@ class TestRunManagerLT(object):
         if lt_monitor.is_alive():
             logging.warning(f"{logging_header} LT monitor thread did not exit cleanly.")
 
-    def calculate_jobs_to_start(self, tc_jobs_not_handled, available_devices_count, global_initiated, max_jobs=None):
+    def calculate_jobs_to_start(self, tc_jobs_not_handled, available_devices_count, _global_initiated, max_jobs=None):
         """
         Calculate the number of jobs to start based on pending TC jobs and available devices.
 
@@ -633,10 +633,10 @@ class TestRunManagerLT(object):
             max_jobs = self.max_jobs_to_start
 
         # short circuit if we have too many initiated jobs
-        if global_initiated > self.MAX_INITITATED_JOBS:
-            # logging.info(f"{logging_header} Too many initiated jobs, not starting any new jobs.")
-            jobs_to_start = 0
-            return jobs_to_start
+        # if _global_initiated > self.MAX_INITITATED_JOBS:
+        #     # logging.info(f"{logging_header} Too many initiated jobs, not starting any new jobs.")
+        #     jobs_to_start = 0
+        #     return jobs_to_start
 
         # Calculate the minimum of pending jobs, max jobs limit, and available devices
         jobs_to_start = min(tc_jobs_not_handled, max_jobs, available_devices_count)
