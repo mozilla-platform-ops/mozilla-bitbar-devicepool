@@ -102,7 +102,7 @@ def main():
     parser.add_argument("--verbose", "-v", action="store_true", help="Show more detailed output")
     args = parser.parse_args()
 
-    banner = r"""
+    banner = """
  __                __       __       __               __         __
 |  .---.-.--------|  |--.--|  .---.-|  |_.-----.-----|  |_   .--|  .-----.----.
 |  |  _  |        |  _  |  _  |  _  |   _|  -__|__ --|   _|  |  _  |  _  |   _|
