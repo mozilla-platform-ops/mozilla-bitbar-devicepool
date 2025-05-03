@@ -242,6 +242,29 @@ def lt_status_main():
     print("job summary:")
     pprint.pprint(status.get_job_summary())
 
+    # Check if there are busy devices and no running jobs
+    device_summary = status.get_device_state_summary()
+    busy_device_count = device_summary.get("busy", 0)
+    running_job_count = status.get_running_job_count()
+
+    if busy_device_count > 0 and running_job_count == 0:
+        # Collect UDIDs of busy devices
+        device_list = status.get_device_list()
+        busy_udids = []
+        for dev_type in device_list:
+            for udid, state in device_list[dev_type].items():
+                if state == "busy":
+                    busy_udids.append(f"{udid} ({dev_type})")
+
+        print(
+            "\n⚠️ WARNING: There are {0} busy devices but no running jobs. Devices may be stuck.".format(
+                busy_device_count
+            )
+        )
+        print("  Busy device UDIDs:")
+        for udid in busy_udids:
+            print(f"    - {udid}")
+
 
 if __name__ == "__main__":
     import os
