@@ -19,6 +19,9 @@ class ConfigurationLt(object):
         self.config = {}
         self.ci_mode = ci_mode
 
+        if self.ci_mode:
+            print("ConfigurationLt: Running in CI mode. Using fake credentials.")
+
     def load_file_config(self, config_path="config/lambdatest.yml"):
         # get this file's directory path
         this_dir = os.path.dirname(os.path.realpath(__file__))

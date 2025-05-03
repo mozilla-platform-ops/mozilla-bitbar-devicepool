@@ -52,6 +52,7 @@ class TestRunManagerLT(object):
     LT_DEVICE_STATE_ACTIVE = "active"
     LT_DEVICE_STATE_BUSY = "busy"
     LT_DEVICE_STATE_INITIATED = "initiated"
+    LT_DEVICE_STATE_CLEANUP = "cleanup"
     # background task control
     # TODO: making this work when False is going to require more work...
     #     - our loop is too fast and we end up
@@ -68,6 +69,7 @@ class TestRunManagerLT(object):
         max_jobs_to_start=MAX_JOBS_TO_START_AT_ONCE,
         exit_wait=5,
         no_job_sleep=60,
+        debug_mode=False,
         unit_testing_mode=False,
     ):
         self.interrupt_signal_count = 0
@@ -75,12 +77,17 @@ class TestRunManagerLT(object):
         self.no_job_sleep = no_job_sleep
         self.max_jobs_to_start = max_jobs_to_start
         self.state = self.STATE_RUNNING
+        self.debug_mode = debug_mode
         self.unit_testing_mode = unit_testing_mode
         self.logging_padding = 12  # Store the padding value as instance variable
         # Skip hyperexecute binary check in unit testing mode or when running tests
         self.config_object = configuration_lt.ConfigurationLt(ci_mode=self.unit_testing_mode)
         self.config_object.configure()
         self.status_object = status.Status(self.config_object.lt_username, self.config_object.lt_access_key)
+
+        if self.unit_testing_mode:
+            # Skip hyperexecute binary check in unit testing mode
+            logging.info("TestRunManagerLT: Unit testing mode enabled.")
 
         # Replace single job_tracker with a dictionary of job trackers per project
         self.job_trackers = {}
@@ -503,7 +510,7 @@ class TestRunManagerLT(object):
 
                         device_info = f"{device_udid}"
 
-                        if self.unit_testing_mode:
+                        if self.debug_mode:
                             # logging.info(
                             #     f"{logging_header} Would run command: '{base_command_string}' in path '{test_run_dir}'..."
                             # )
@@ -656,6 +663,11 @@ def parse_args(action_array):
         help="Run in debug mode without executing commands.",
     )
     parser.add_argument(
+        "--ci-mode",
+        action="store_true",
+        help="Run in CI testing mode without fake values and disabled bin checks.",
+    )
+    parser.add_argument(
         "--log-level",
         dest="log_level",
         choices=["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"],
@@ -676,12 +688,15 @@ def main():
     available_actions = ["start-test-run-manager"]
     args = parse_args(available_actions)
 
+    # if args.debug:
+    #     logging.warning("Running in debug mode. JFake values are used in many places!")
+
     # Configure logging explicitly
     logging_setup.setup_logging(args.log_level, args.disable_logging_timestamps)
 
     if args.action == "start-test-run-manager":
         # logging is now properly configured
-        trmlt = TestRunManagerLT(unit_testing_mode=args.debug)
+        trmlt = TestRunManagerLT(unit_testing_mode=args.ci_mode, debug_mode=args.debug)
 
         # Start the main run loop using the multithreaded runner
         trmlt.run_multithreaded()
