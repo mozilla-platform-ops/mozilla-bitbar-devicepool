@@ -635,6 +635,36 @@ class TestRunManagerLT(object):
         return jobs_to_start
 
 
+def get_git_version_info():
+    """
+    Returns a string with short git sha (if in a git client) and `-dirty` if there are uncommitted changes.
+    Returns empty string if not in a git repository or if git commands fail.
+    """
+    try:
+        # Check if we're in a git repository
+        subprocess.check_output(["git", "rev-parse", "--is-inside-work-tree"], stderr=subprocess.DEVNULL)
+
+        # Get the short SHA of the current commit
+        git_sha = (
+            subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], stderr=subprocess.DEVNULL).decode().strip()
+        )
+
+        # Check for uncommitted changes
+        status_output = (
+            subprocess.check_output(["git", "status", "--porcelain"], stderr=subprocess.DEVNULL).decode().strip()
+        )
+        is_dirty = len(status_output) > 0
+
+        # Format the output
+        result = git_sha
+        if is_dirty:
+            result += "-dirty"
+
+        return result
+    except (subprocess.SubprocessError, FileNotFoundError):
+        return ""  # Return empty string if not in a git repo or git is not available
+
+
 def parse_args(action_array):
     actions_str = ", ".join(action_array)
     # trim the last comma if more than one action
@@ -675,6 +705,9 @@ def parse_args(action_array):
     return parser.parse_args()
 
 
+# TODO: add a function returns a string with short git sha (if in a git client) and `-dirty` if there are uncommitted changes
+
+
 def main():
     # Parse command line arguments
     available_actions = ["start-test-run-manager"]
@@ -687,6 +720,7 @@ def main():
     logging_setup.setup_logging(args.log_level, args.disable_logging_timestamps)
 
     if args.action == "start-test-run-manager":
+        git_version_info = get_git_version_info()
         banner = r"""
       ___                        _____
      /__/\                      /  /::\
@@ -699,10 +733,11 @@ def main():
    \  \:\         \  \::/       \  \::/
     \  \:\         \__\/         \__\/
      \__\/
-
-    mozilla lambdatest devicepool
         """  # noqa: W605
+        name_line = f"  mozilla lambdatest devicepool ({git_version_info})"
         print(banner.lstrip("\n"))
+        print(name_line)
+        print()
 
         # logging is now properly configured
         trmlt = TestRunManagerLT(unit_testing_mode=args.ci_mode, debug_mode=args.debug)
