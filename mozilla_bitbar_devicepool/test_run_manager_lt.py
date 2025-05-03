@@ -12,6 +12,7 @@ import sys
 import subprocess
 import argparse
 import threading  # Added import
+import multiprocessing  # Add import for multiprocessing.Manager
 
 import pprint
 
@@ -97,24 +98,29 @@ class TestRunManagerLT(object):
         # Keep a default tracker for backward compatibility
         self.job_tracker = JobTracker(expiry_seconds=210)
 
-        # Threading related initializations
-        self.shared_data = {
-            # Only keep global values at root level
-            "lt_g_initiated_jobs": 0,
-            "lt_g_active_devices": 0,  # Renamed from lt_active_devices to lt_g_active_devices
-            # Initialize projects dictionary
-            "projects": {},
-        }
+        # Create a multiprocessing Manager for thread-safe shared data
+        manager = multiprocessing.Manager()
+        self.shared_data = manager.dict()
+
+        # Initialize shared data structure
+        self.shared_data["lt_g_initiated_jobs"] = 0
+        self.shared_data["lt_g_active_devices"] = 0
+        # Initialize projects dictionary as a nested Manager dict
+        projects_dict = manager.dict()
+
         # Initialize project-specific data
         for project_name, project_config in self.config_object.config.get("projects", {}).items():
-            self.shared_data["projects"][project_name] = {
-                "lt_device_selector": project_config.get("lt_device_selector", None),
-                "tc_job_count": 0,
-                "lt_active_devices": 0,
-                "lt_busy_devices": 0,
-            }
+            project_data = manager.dict()
+            project_data["lt_device_selector"] = project_config.get("lt_device_selector", None)
+            project_data["tc_job_count"] = 0
+            project_data["lt_active_devices"] = 0
+            project_data["lt_busy_devices"] = 0
+            project_data["available_devices"] = manager.list()  # Use managed list
+            projects_dict[project_name] = project_data
 
-        self.shared_data_lock = threading.Lock()
+        self.shared_data["projects"] = projects_dict
+
+        # No need for a lock with Manager objects
         self.shutdown_event = threading.Event()
 
         signal.signal(signal.SIGUSR2, self.handle_signal)
@@ -165,8 +171,6 @@ class TestRunManagerLT(object):
         """Monitors Taskcluster pending tasks for all projects."""
         logging_header = f"[ {'TC Monitor':<{self.logging_padding}} ]"
 
-        # No need to initialize projects structure as it's now done in __init__
-
         while not self.shutdown_event.is_set():
             count_of_fetched_projects = 0
             worker_type_to_count_dict = {}
@@ -179,9 +183,10 @@ class TestRunManagerLT(object):
                         tc_job_count = get_taskcluster_pending_tasks("proj-autophone", tc_worker_type, verbose=False)
                         count_of_fetched_projects += 1
                         worker_type_to_count_dict[tc_worker_type] = tc_job_count
-                        with self.shared_data_lock:
-                            if project_name in self.shared_data["projects"]:
-                                self.shared_data["projects"][project_name]["tc_job_count"] = tc_job_count
+
+                        # Update shared data without lock
+                        if project_name in self.shared_data["projects"]:
+                            self.shared_data["projects"][project_name]["tc_job_count"] = tc_job_count
                 except Exception as e:
                     logging.error(f"{logging_header} Error fetching TC tasks for {project_name}: {e}", exc_info=True)
 
@@ -206,20 +211,21 @@ class TestRunManagerLT(object):
         }
 
         # Initialize projects structure in shared data
-        with self.shared_data_lock:
-            if "projects" not in self.shared_data:
-                self.shared_data["projects"] = {}
+        # No need to lock since we're using Manager objects
+        if "projects" not in self.shared_data:
+            manager = multiprocessing.Manager()
+            self.shared_data["projects"] = manager.dict()
 
             # Initialize all projects
             for project_name, project_config in self.config_object.config["projects"].items():
                 if project_name not in self.shared_data["projects"]:
-                    self.shared_data["projects"][project_name] = {
-                        "lt_device_selector": project_config.get("lt_device_selector", None),
-                        "tc_job_count": 0,
-                        "lt_active_devices": 0,
-                        "lt_busy_devices": 0,
-                        "available_devices": [],  # List to store detailed device info
-                    }
+                    project_data = manager.dict()
+                    project_data["lt_device_selector"] = project_config.get("lt_device_selector", None)
+                    project_data["tc_job_count"] = 0
+                    project_data["lt_active_devices"] = 0
+                    project_data["lt_busy_devices"] = 0
+                    project_data["available_devices"] = manager.list()  # Use managed list for device info
+                    self.shared_data["projects"][project_name] = project_data
 
         while not self.shutdown_event.is_set():
             active_device_count_by_project_dict = {}
@@ -278,29 +284,22 @@ class TestRunManagerLT(object):
                                         busy_devices += 1
 
                         active_device_count_by_project_dict[project_name] = active_device_count
-                        # was helpful, but lots of output now
-                        # logging.info(
-                        #     f"{logging_header} Active devices for {project_name} ({len(active_device_list)}): {active_device_list}"
-                        # )
-                        with self.shared_data_lock:
-                            self.shared_data["lt_g_initiated_jobs"] = g_initiated_jobs
-                            self.shared_data["lt_g_active_devices"] = g_active_devices
-                            if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
-                                self.shared_data["projects"][project_name]["lt_active_devices"] = (
-                                    active_device_count  # Use count here
-                                )
-                                self.shared_data["projects"][project_name]["lt_busy_devices"] = busy_devices
-                                self.shared_data["projects"][project_name]["available_devices"] = (
-                                    active_device_list  # Use list here
-                                )
+
+                        # Update shared data without lock
+                        self.shared_data["lt_g_initiated_jobs"] = g_initiated_jobs
+                        self.shared_data["lt_g_active_devices"] = g_active_devices
+
+                        if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
+                            self.shared_data["projects"][project_name]["lt_active_devices"] = active_device_count
+                            self.shared_data["projects"][project_name]["lt_busy_devices"] = busy_devices
+
+                            # Clear and update the available_devices list
+                            available_devices = self.shared_data["projects"][project_name]["available_devices"]
+                            available_devices[:] = []  # Clear the list
+                            available_devices.extend(active_device_list)  # Update with new data
+
                 except Exception as e:
                     logging.error(f"{logging_header} Error processing devices for {project_name}: {e}", exc_info=True)
-
-            # handy for debugging
-            #
-            # logging.info(
-            #     f"{logging_header} Updated. Active device counts: {pprint.pformat(active_device_count_by_project_dict)}"
-            # )
 
             # Log global device utilization statistics
             util_percent = 0
@@ -339,18 +338,19 @@ class TestRunManagerLT(object):
             tc_client_key = current_project["TASKCLUSTER_ACCESS_TOKEN"]
             lt_device_selector = current_project["lt_device_selector"]
 
-            # Store selector for this project
-            with self.shared_data_lock:
-                if "projects" not in self.shared_data:
-                    self.shared_data["projects"] = {}
-                if project_name not in self.shared_data["projects"]:
-                    self.shared_data["projects"][project_name] = {
-                        "lt_device_selector": lt_device_selector,
-                        "tc_job_count": 0,
-                        "lt_active_devices": 0,
-                        "lt_busy_devices": 0,
-                        "available_devices": [],
-                    }
+            # Store selector for this project - no lock needed with Manager
+            if "projects" not in self.shared_data:
+                manager = multiprocessing.Manager()
+                self.shared_data["projects"] = manager.dict()
+
+            if project_name not in self.shared_data["projects"]:
+                project_data = multiprocessing.Manager().dict()
+                project_data["lt_device_selector"] = lt_device_selector
+                project_data["tc_job_count"] = 0
+                project_data["lt_active_devices"] = 0
+                project_data["lt_busy_devices"] = 0
+                project_data["available_devices"] = multiprocessing.Manager().list()
+                self.shared_data["projects"][project_name] = project_data
         except KeyError as e:
             logging.error(f"{logging_header} Missing config: {e}. Thread exiting.")
             return
@@ -360,23 +360,20 @@ class TestRunManagerLT(object):
             active_devices = 0
             available_devices = []
 
-            # Try to get device data for this project
-            with self.shared_data_lock:
-                if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
-                    project_data = self.shared_data["projects"][project_name]
-                    tc_job_count = project_data.get("tc_job_count", 0)
-                    active_devices = project_data.get("lt_active_devices", 0)
-                    busy_devices = project_data.get("lt_busy_devices", 0)
-                    available_devices = project_data.get(
-                        "available_devices", []
-                    ).copy()  # Copy to avoid modification issues
+            # Try to get device data for this project - no lock needed
+            if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
+                project_data = self.shared_data["projects"][project_name]
+                tc_job_count = project_data.get("tc_job_count", 0)
+                active_devices = project_data.get("lt_active_devices", 0)
+                busy_devices = project_data.get("lt_busy_devices", 0)
+                # Make a copy of the list to avoid modification issues
+                available_devices = list(project_data.get("available_devices", []))
 
             # If we don't have data yet, try to fetch it directly
             if tc_job_count == 0:
                 try:
                     tc_job_count = get_taskcluster_pending_tasks("proj-autophone", tc_worker_type, verbose=False)
-                    with self.shared_data_lock:
-                        self.shared_data["projects"][project_name]["tc_job_count"] = tc_job_count
+                    self.shared_data["projects"][project_name]["tc_job_count"] = tc_job_count
                 except Exception as e:
                     logging.error(f"{logging_header} {project_name}] Error fetching TC tasks: {e}")
 
@@ -466,9 +463,7 @@ class TestRunManagerLT(object):
                             # Keep track of the assigned UDID
                             assigned_device_udids.append(device_udid)
                             # update the shared data
-                            # TODO: needed? helps guard against race? or will we never hit that case?
-                            with self.shared_data_lock:
-                                self.shared_data["projects"][project_name]["available_devices"] = available_devices
+                            self.shared_data["projects"][project_name]["available_devices"] = available_devices
                             break
 
                     if not device_udid:
