@@ -390,21 +390,21 @@ class TestRunManagerLT(object):
 
         while not self.shutdown_event.is_set():
             tc_job_count = 0
-            active_devices = 0
-            available_devices = []
+            active_device_count = 0
+            active_devices = []
 
             if self.SHARED_PROJECTS in self.shared_data and project_name in self.shared_data[self.SHARED_PROJECTS]:
                 project_data = self.shared_data[self.SHARED_PROJECTS][project_name]
                 tc_job_count = project_data.get(self.PROJECT_TC_JOB_COUNT, 0)
-                active_devices = project_data.get(self.PROJECT_LT_ACTIVE_DEVICE_COUNT, 0)
+                active_device_count = project_data.get(self.PROJECT_LT_ACTIVE_DEVICE_COUNT, 0)
                 busy_devices = project_data.get(self.PROJECT_LT_BUSY_DEVICE_COUNT, 0)
                 cleanup_devices = project_data.get(self.PROJECT_LT_CLEANUP_DEVICE_COUNT, 0)
                 # Make a copy of the list to avoid modification issues
-                available_devices = list(project_data.get(self.PROJECT_LT_ACTIVE_DEVICES, []))
+                active_devices = list(project_data.get(self.PROJECT_LT_ACTIVE_DEVICES, []))
 
                 # Debug logging for all available device UDIDs
-                if self.DEBUG_DEVICE_SELECTION and available_devices:
-                    logging.debug(f"{logging_header} Available device UDIDs: {available_devices}")
+                if self.DEBUG_DEVICE_SELECTION and active_devices:
+                    logging.debug(f"{logging_header} Available device UDIDs: {active_devices}")
 
             # TODO: hmm, is this necessary? we should be getting this from the monitor thread
             # If we don't have data yet, try to fetch it directly
@@ -416,9 +416,9 @@ class TestRunManagerLT(object):
             #         logging.error(f"{logging_header} {project_name}] Error fetching TC tasks: {e}")
 
             # warn if the number of active devices and available devices don't match
-            if active_devices != len(available_devices):
+            if active_device_count != len(active_devices):
                 logging.warning(
-                    f"{logging_header} Active devices ({active_devices}) and available devices ({len(available_devices)}) mismatch!"
+                    f"{logging_header} Active devices ({active_device_count}) and available devices ({len(active_devices)}) mismatch!"
                 )
 
             # TODO: AJE999
@@ -426,7 +426,7 @@ class TestRunManagerLT(object):
             # TODO: warn if there is a mismatch (vs doing updating here)
             #
             # Add direct device refresh here for cases when active_devices > 0 but available_devices is empty
-            if active_devices > 0 and not available_devices:
+            if active_device_count > 0 and not active_devices:
                 try:
                     device_list = self.status_object.get_device_list()
                     if device_list and project_name in self.config_object.config.get("device_groups", {}):
@@ -434,16 +434,14 @@ class TestRunManagerLT(object):
                         for device_type in device_list:
                             for udid, state in device_list[device_type].items():
                                 if udid in project_device_group and state == self.LT_DEVICE_STATE_ACTIVE:
-                                    available_devices.append(udid)
+                                    active_devices.append(udid)
                                     logging.debug(f"{logging_header} Directly found active device: {udid}")
                     # Update the shared data with these devices
-                    if available_devices and project_name in self.shared_data[self.SHARED_PROJECTS]:
+                    if active_devices and project_name in self.shared_data[self.SHARED_PROJECTS]:
                         self.shared_data[self.SHARED_PROJECTS][project_name][self.PROJECT_LT_ACTIVE_DEVICES] = (
-                            available_devices
+                            active_devices
                         )
-                        logging.debug(
-                            f"{logging_header} Updated available devices with direct fetch: {available_devices}"
-                        )
+                        logging.debug(f"{logging_header} Updated available devices with direct fetch: {active_devices}")
                 except Exception as e:
                     logging.error(f"{logging_header} Error directly fetching devices: {e}")
 
@@ -467,16 +465,16 @@ class TestRunManagerLT(object):
                     f"{logging_header} Decision variables: TC Jobs:{tc_job_count}, "
                     # TODO: figure out why these two could be different
                     # TODO: log when they are different
-                    f"Active LT Devs:{active_devices}, Available Devices:{len(available_devices)}, "
-                    f"Device UDIDs:{available_devices}"
+                    f"Active LT Devs:{active_device_count}, Available Devices:{len(active_devices)}, "
+                    f"Device UDIDs:{active_devices}"
                 )
 
             jobs_to_start = self.calculate_jobs_to_start(
-                tc_jobs_not_handled, len(available_devices), self.shared_data[self.SHARED_LT_G_INITIATED_JOBS]
+                tc_jobs_not_handled, len(active_devices), self.shared_data[self.SHARED_LT_G_INITIATED_JOBS]
             )
             jobs_to_start = max(0, jobs_to_start)  # Ensure non-negative
 
-            lt_blob_p1 = f"{len(self.config_object.config['device_groups'][project_name])}/{active_devices}/{busy_devices}/{cleanup_devices}"
+            lt_blob_p1 = f"{len(self.config_object.config['device_groups'][project_name])}/{active_device_count}/{busy_devices}/{cleanup_devices}"
             lt_blob = f"LT Devs Config/Active/Busy/Cleanup: {lt_blob_p1:>11}"  # Updated label to include cleanup
 
             # Add global initiated jobs count to the log for better visibility
@@ -512,7 +510,7 @@ class TestRunManagerLT(object):
 
                     # Get next available device that hasn't been assigned yet
                     device_udid = None
-                    for d in available_devices:
+                    for d in active_devices:
                         # only use the udid if it's assigned to the project
                         device_project = self.config_object.get_project_for_udid(d)
                         in_device_group = device_project == project_name
@@ -544,19 +542,19 @@ class TestRunManagerLT(object):
                             )
 
                             # remove the device from available devices to avoid reusing it
-                            available_devices.remove(d)
+                            active_devices.remove(d)
                             # Keep track of the assigned UDID
                             assigned_device_udids.append(device_udid)
                             # update the shared data
                             self.shared_data[self.SHARED_PROJECTS][project_name][self.PROJECT_LT_ACTIVE_DEVICES] = (
-                                available_devices
+                                active_devices
                             )
                             break
 
                     if not device_udid:
                         if self.DEBUG_DEVICE_SELECTION:
                             logging.debug(
-                                f"{logging_header} No more available devices to assign! Available, but recently started: {available_devices}"
+                                f"{logging_header} No more available devices to assign! Available, but recently started: {active_devices}"
                             )
                         break
 
@@ -632,9 +630,9 @@ class TestRunManagerLT(object):
                 self.shutdown_event.wait(self.LT_MONITOR_INTERVAL)
             else:
                 # If no jobs to start but there are TC jobs and available devices, log debug info
-                if tc_job_count > 0 and len(available_devices) > 0:
+                if tc_job_count > 0 and len(active_devices) > 0:
                     logging.debug(
-                        f"{logging_header} Not starting jobs despite TC jobs ({tc_job_count}) and available devices ({len(available_devices)}). "
+                        f"{logging_header} Not starting jobs despite TC jobs ({tc_job_count}) and available devices ({len(active_devices)}). "
                         f"Check: Recently Started={recently_started_jobs}, Global Initiated={self.shared_data[self.SHARED_LT_G_INITIATED_JOBS]}/{self.MAX_INITITATED_JOBS}"
                     )
 
