@@ -4,6 +4,19 @@ import logging
 
 def setup_logging(level=logging.INFO, disable_timestamps=False):
     """Configure logging with timestamps and levels."""
+
+    # Assuming your setup function configures the root logger
+    logging.basicConfig(level=level)  # Or however you set the root level
+
+    # for requests, it gets too chatty
+    # TODO: make -vv show these or something
+
+    # Get the logger for 'requests' and set its level to INFO
+    logging.getLogger("requests").setLevel(logging.INFO)
+
+    # Often, 'requests' uses 'urllib3', so you might want to quiet it too
+    logging.getLogger("urllib3").setLevel(logging.INFO)
+
     if disable_timestamps:
         # Disable timestamps in the log messages
         logging.basicConfig(
