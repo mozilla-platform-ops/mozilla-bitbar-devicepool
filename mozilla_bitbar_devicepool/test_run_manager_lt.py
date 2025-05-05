@@ -208,7 +208,7 @@ class TestRunManagerLT(object):
         logging_header = f"[ {'LT Monitor':<{self.logging_padding}} ]"
 
         # Track global device utilization
-        global_device_utilization = {
+        local_device_stats = {
             "total_devices": 0,
             "active_devices": 0,
             "busy_devices": 0,
@@ -223,10 +223,10 @@ class TestRunManagerLT(object):
                 device_list = self.status_object.get_device_list()
 
                 # Reset global utilization counts for this cycle
-                global_device_utilization["total_devices"] = 0
-                global_device_utilization["active_devices"] = 0
-                global_device_utilization["busy_devices"] = 0
-                global_device_utilization["cleanup_devices"] = 0
+                local_device_stats["total_devices"] = 0
+                local_device_stats["active_devices"] = 0
+                local_device_stats["busy_devices"] = 0
+                local_device_stats["cleanup_devices"] = 0
 
                 # Get current initiated jobs from API instead of counting from device list
                 try:
@@ -247,37 +247,33 @@ class TestRunManagerLT(object):
                         job_states_str = ", ".join([f"{state}: {count}" for state, count in jobs_summary.items()])
                         logging.debug(f"{logging_header} Job state counts: {job_states_str}")
 
-                    global_device_utilization["initiated_jobs"] = initiated_jobs_count
+                    local_device_stats["initiated_jobs"] = initiated_jobs_count
                 except Exception as e:
                     logging.error(f"{logging_header} Error fetching jobs list: {e}", exc_info=True)
                     # Keep previous value if there's an error
-                    global_device_utilization["initiated_jobs"] = self.shared_data.get("lt_g_initiated_jobs", 0)
+                    local_device_stats["initiated_jobs"] = self.shared_data.get("lt_g_initiated_jobs", 0)
 
                 # Count total devices across all device types
                 for device_type in device_list:
-                    global_device_utilization["total_devices"] += len(device_list[device_type])
+                    local_device_stats["total_devices"] += len(device_list[device_type])
 
                     # Count devices by state
                     for udid, state in device_list[device_type].items():
                         if state == self.LT_DEVICE_STATE_ACTIVE:
-                            global_device_utilization["active_devices"] += 1
+                            local_device_stats["active_devices"] += 1
                         elif state == self.LT_DEVICE_STATE_BUSY:
-                            global_device_utilization["busy_devices"] += 1
+                            local_device_stats["busy_devices"] += 1
                         elif state == self.LT_DEVICE_STATE_CLEANUP:
-                            global_device_utilization["cleanup_devices"] += 1
+                            local_device_stats["cleanup_devices"] += 1
 
             except Exception as e:
                 logging.error(f"{logging_header} Error fetching device list: {e}", exc_info=True)
                 device_list = {}
 
-            g_initiated_jobs = global_device_utilization["initiated_jobs"]
-            g_active_devices = global_device_utilization["active_devices"]
-            g_cleanup_devices = global_device_utilization["cleanup_devices"]
-
-            # Update shared data with accurate job count
-            self.shared_data["lt_g_initiated_jobs"] = g_initiated_jobs
-            self.shared_data["lt_g_active_devices"] = g_active_devices
-            self.shared_data["lt_g_cleanup_devices"] = g_cleanup_devices
+            # Update shared data with accurate job count and device stats
+            self.shared_data["lt_g_initiated_jobs"] = local_device_stats["initiated_jobs"]
+            self.shared_data["lt_g_active_devices"] = local_device_stats["active_devices"]
+            self.shared_data["lt_g_cleanup_devices"] = local_device_stats["cleanup_devices"]
 
             # For each project, filter the device list based on the project's device_groups
             for project_name, project_config in self.config_object.config["projects"].items():
@@ -307,11 +303,8 @@ class TestRunManagerLT(object):
 
                         active_device_count_by_project_dict[project_name] = active_device_count
 
-                        # Update shared data
-                        self.shared_data["lt_g_initiated_jobs"] = g_initiated_jobs
-                        self.shared_data["lt_g_active_devices"] = g_active_devices
-                        self.shared_data["lt_g_cleanup_devices"] = g_cleanup_devices
-
+                        # Update shared data for the project
+                        # No need to update global counts here again, done above
                         if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
                             self.shared_data["projects"][project_name]["lt_active_devices"] = active_device_count
                             self.shared_data["projects"][project_name]["lt_busy_devices"] = busy_devices
@@ -332,18 +325,16 @@ class TestRunManagerLT(object):
 
             # Log global device utilization statistics
             util_percent = 0
-            if global_device_utilization["total_devices"] > 0:
-                util_percent = (
-                    global_device_utilization["busy_devices"] / global_device_utilization["total_devices"]
-                ) * 100
+            if local_device_stats["total_devices"] > 0:
+                util_percent = (local_device_stats["busy_devices"] / local_device_stats["total_devices"]) * 100
 
             formatted_active_device_count = str(active_device_count_by_project_dict).strip("{}").replace("'", "")
             per_queue_string = f"Active device counts: {formatted_active_device_count}"
             logging.info(
                 f"{logging_header} "
                 "Global device utilization: Total/Active/Busy/Cleanup/BusyPercentage: "  # Added Cleanup to log
-                f"{global_device_utilization['total_devices']}/{global_device_utilization['active_devices']}/"
-                f"{global_device_utilization['busy_devices']}/{global_device_utilization['cleanup_devices']}/"  # Added cleanup count
+                f"{local_device_stats['total_devices']}/{self.shared_data['lt_g_active_devices']}/"  # Use shared data value
+                f"{local_device_stats['busy_devices']}/{self.shared_data['lt_g_cleanup_devices']}/"  # Use shared data value
                 f"{util_percent:.1f}%"
             )
             logging.info(f"{logging_header} {per_queue_string}")
