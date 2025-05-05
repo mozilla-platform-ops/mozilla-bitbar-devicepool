@@ -541,7 +541,7 @@ class TestRunManagerLT(object):
                         if in_device_group:
                             # device in job tracker means it's already in use
                             if in_job_tracker:
-                                logging.debug(f"{logging_header} Device {d} is already in use, skipping.")
+                                logging.debug(f"{logging_header} Device {d} has had a job recently launched, skipping.")
                                 # skip to the next device
                                 continue
 
