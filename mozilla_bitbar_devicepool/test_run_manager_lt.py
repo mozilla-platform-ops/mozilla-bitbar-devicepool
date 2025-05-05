@@ -258,7 +258,7 @@ class TestRunManagerLT(object):
                         if job_status == self.LT_DEVICE_STATE_INITIATED:
                             initiated_jobs_count += jobs_summary[job_status]
 
-                    logging.debug(f"{logging_header} Found {initiated_jobs_count} jobs in initiated state")
+                    # logging.debug(f"{logging_header} Found {initiated_jobs_count} jobs in initiated state")
 
                     # Add more detailed breakdown of job states
                     if self.DEBUG_JOB_CALCULATION:
