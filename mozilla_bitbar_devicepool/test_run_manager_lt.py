@@ -601,7 +601,7 @@ class TestRunManagerLT(object):
             )
             job_starters.append(job_starter)
             job_starter.start()
-            logging.info(f"{logging_header} Started job starter thread for project: {project_name}")
+            logging.info(f"{logging_header} Started Job Starter thread 'JS {project_name}'.")
 
         # Keep main thread alive until shutdown is signaled
         logging.info(f"{logging_header} Waiting for shutdown signal...")
