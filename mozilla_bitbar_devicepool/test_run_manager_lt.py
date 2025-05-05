@@ -492,7 +492,7 @@ class TestRunManagerLT(object):
             # Add global initiated jobs count to the log for better visibility
             logging.info(
                 f"{logging_header} TC Jobs: {tc_job_count:>4}, {lt_blob:>41}, "
-                f"RecentlyStarted/NeedHandling/ToStart: {recently_started_jobs:>3}/{tc_jobs_not_handled:>3}/{jobs_to_start:>3}, "
+                f"RStarted/NeedH/ToStart: {recently_started_jobs:>3}/{tc_jobs_not_handled:>3}/{jobs_to_start:>3}, "
                 f"GInit/GInitMax {self.shared_data['lt_g_initiated_jobs']:>3}/{self.MAX_INITITATED_JOBS:>3}"
             )
 
