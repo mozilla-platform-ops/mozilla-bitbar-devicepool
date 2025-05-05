@@ -474,6 +474,8 @@ class TestRunManagerLT(object):
             if self.DEBUG_JOB_STARTER:
                 logging.debug(
                     f"{logging_header} Decision variables: TC Jobs:{tc_job_count}, "
+                    # TODO: figure out why these two could be different
+                    # TODO: log when they are different
                     f"Active LT Devs:{active_devices}, Available Devices:{len(available_devices)}, "
                     f"Device UDIDs:{available_devices}"
                 )
