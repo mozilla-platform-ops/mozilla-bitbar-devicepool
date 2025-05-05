@@ -3,7 +3,6 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import pytest
-from unittest.mock import patch, mock_open  # Import patch and mock_open
 from mozilla_bitbar_devicepool.configuration_lt import ConfigurationLt
 
 # Sample configuration data as a dictionary (for assertion)
@@ -31,43 +30,34 @@ some_other_top_level_key: value123
 """
 
 
-# Use patch to mock the 'open' built-in function
-@patch("builtins.open", new_callable=mock_open, read_data=SAMPLE_FILE_CONFIG_YAML)
-def test_load_file_config(mock_file_open):
+def test_load_file_config(tmp_path):
     """
-    Tests that load_file_config correctly loads configuration using a mocked file.
+    Tests that load_file_config correctly loads configuration from an actual file.
     """
+    # Create a temporary config file
+    config_dir = tmp_path / "config"
+    config_dir.mkdir()
+    config_file = config_dir / "config.yml"
+    config_file.write_text(SAMPLE_FILE_CONFIG_YAML)
+
     config_lt = ConfigurationLt()
 
-    # Call load_file_config. The path argument doesn't matter since open is mocked,
-    # but we pass one for completeness.
-    config_lt.load_file_config(config_path="dummy/path/config.yml")
+    # Call load_file_config with the path to the temporary file
+    config_lt.load_file_config(config_path=str(config_file))
 
     # Assert that the loaded config matches the sample data dictionary
     assert config_lt.get_config() == SAMPLE_FILE_CONFIG_DICT
-    # Verify open was called with the path constructed by the method
-    # Note: The exact path depends on where configuration_lt.py is relative to the project root
-    # We might need to adjust this assertion based on the actual path construction logic
-    # For now, let's just assert it was called once.
-    mock_file_open.assert_called_once()
-    # Example of checking the path if needed:
-    # expected_path = os.path.abspath(os.path.join(os.path.dirname(configuration_lt.__file__), "..", "dummy/path/config.yml"))
-    # mock_file_open.assert_called_once_with(expected_path)
 
 
-@patch("builtins.open")
-def test_load_file_config_file_not_found(mock_file_open):
+def test_load_file_config_file_not_found(tmp_path):
     """
     Tests that load_file_config raises FileNotFoundError when the file doesn't exist.
     """
-    # Configure the mock 'open' to raise FileNotFoundError when called
-    mock_file_open.side_effect = FileNotFoundError("File not found")
-
     config_lt = ConfigurationLt()
 
-    # Assert that FileNotFoundError is raised
-    with pytest.raises(FileNotFoundError):
-        config_lt.load_file_config(config_path="config/non_existent_config.yml")
+    # Define a path that does not exist within the temporary directory
+    non_existent_path = tmp_path / "non_existent_config.yml"
 
-    # Verify open was called (or attempted to be called)
-    mock_file_open.assert_called_once()
+    # Assert that FileNotFoundError is raised when trying to load a non-existent file
+    with pytest.raises(FileNotFoundError):
+        config_lt.load_file_config(config_path=str(non_existent_path))
