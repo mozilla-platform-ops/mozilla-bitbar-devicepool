@@ -201,7 +201,7 @@ class TestRunManagerLT(object):
             # Wait for the specified interval or until shutdown is signaled
             self.shutdown_event.wait(self.TC_MONITOR_INTERVAL)
 
-        logging.info("{logging_header} Thread stopped.")
+        logging.info(f"{logging_header} Thread stopped.")
 
     def _lambdatest_monitor_thread(self):
         """Monitors LambdaTest device status for all projects."""
