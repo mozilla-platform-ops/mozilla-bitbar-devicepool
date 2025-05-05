@@ -434,6 +434,7 @@ class TestRunManagerLT(object):
                     logging.error(f"{logging_header} {project_name}] Error fetching TC tasks: {e}")
 
             # TODO: ensure this is being done in the lt monitor thread
+            # TODO: warn if there is a mismatch (vs doing updating here)
             #
             # Add direct device refresh here for cases when active_devices > 0 but available_devices is empty
             if active_devices > 0 and not available_devices:
