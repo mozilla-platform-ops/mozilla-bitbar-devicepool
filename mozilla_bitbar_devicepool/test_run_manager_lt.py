@@ -565,7 +565,7 @@ class TestRunManagerLT(object):
                     if not device_udid:
                         if self.DEBUG_DEVICE_SELECTION:
                             logging.debug(
-                                f"{logging_header} No more available devices to assign! Available: {available_devices}"
+                                f"{logging_header} No more available devices to assign! Available, but recently started: {available_devices}"
                             )
                         break
 
