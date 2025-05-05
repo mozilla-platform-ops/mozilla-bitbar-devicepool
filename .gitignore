@@ -8,3 +8,4 @@ venv
 bitbar_env*
 lt_env*
 hyperexecute*
+.coverage*
