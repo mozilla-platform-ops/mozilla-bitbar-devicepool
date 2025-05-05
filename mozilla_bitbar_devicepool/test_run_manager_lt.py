@@ -72,6 +72,7 @@ class TestRunManagerLT(object):
     SHARED_LT_G_INITIATED_JOBS = "lt_g_initiated_jobs"
     SHARED_LT_G_ACTIVE_DEVICES = "lt_g_active_devices"
     SHARED_LT_G_CLEANUP_DEVICES = "lt_g_cleanup_devices"
+    # Shared data keys for project-specific data
     SHARED_PROJECTS = "projects"
     PROJECT_LT_DEVICE_SELECTOR = "lt_device_selector"
     PROJECT_TC_JOB_COUNT = "tc_job_count"
@@ -181,8 +182,6 @@ class TestRunManagerLT(object):
             return self.job_trackers[project_name].get_active_job_count()
         # For backward compatibility
         return self.job_tracker.get_active_job_count()
-
-    # --- Multithreaded Implementation ---
 
     def _taskcluster_monitor_thread(self):
         """Monitors Taskcluster pending tasks for all projects."""
