@@ -404,6 +404,12 @@ class TestRunManagerLT(object):
                 except Exception as e:
                     logging.error(f"{logging_header} {project_name}] Error fetching TC tasks: {e}")
 
+            # warn if the number of active devices and available devices don't match
+            if active_devices != len(available_devices):
+                logging.warning(
+                    f"{logging_header} Active devices ({active_devices}) and available devices ({len(available_devices)}) mismatch!"
+                )
+
             # TODO: AJE999
             # TODO: ensure this is being done in the lt monitor thread
             # TODO: warn if there is a mismatch (vs doing updating here)
