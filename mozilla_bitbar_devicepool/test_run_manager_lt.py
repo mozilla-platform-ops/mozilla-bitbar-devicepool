@@ -76,10 +76,13 @@ class TestRunManagerLT(object):
     SHARED_PROJECTS = "projects"
     PROJECT_LT_DEVICE_SELECTOR = "lt_device_selector"
     PROJECT_TC_JOB_COUNT = "tc_job_count"
-    PROJECT_LT_ACTIVE_DEVICES = "lt_active_devices"
-    PROJECT_LT_BUSY_DEVICES = "lt_busy_devices"
-    PROJECT_LT_CLEANUP_DEVICES = "lt_cleanup_devices"
-    PROJECT_AVAILABLE_DEVICES = "available_devices"
+    PROJECT_LT_ACTIVE_DEVICE_COUNT = "lt_active_device_count"
+    PROJECT_LT_BUSY_DEVICE_COUNT = "lt_busy_device_count"
+    PROJECT_LT_CLEANUP_DEVICE_COUNT = "lt_cleanup_device_count"
+    PROJECT_LT_AVAILABLE_DEVICES = "lt_available_devices"
+    # TODO: implement this
+    # active devices are ones that are not busy (via recent activity tracked by JobManager)
+    PROJECT_ACTIVE_DEVICES = "active_devices"
 
     def __init__(
         self,
@@ -130,10 +133,10 @@ class TestRunManagerLT(object):
             project_data = manager.dict()
             project_data[self.PROJECT_LT_DEVICE_SELECTOR] = project_config.get("lt_device_selector", None)
             project_data[self.PROJECT_TC_JOB_COUNT] = 0
-            project_data[self.PROJECT_LT_ACTIVE_DEVICES] = 0
-            project_data[self.PROJECT_LT_BUSY_DEVICES] = 0
-            project_data[self.PROJECT_LT_CLEANUP_DEVICES] = 0  # Add tracking for cleanup devices per project
-            project_data[self.PROJECT_AVAILABLE_DEVICES] = manager.list()  # Use managed list
+            project_data[self.PROJECT_LT_ACTIVE_DEVICE_COUNT] = 0
+            project_data[self.PROJECT_LT_BUSY_DEVICE_COUNT] = 0
+            project_data[self.PROJECT_LT_CLEANUP_DEVICE_COUNT] = 0  # Add tracking for cleanup devices per project
+            project_data[self.PROJECT_LT_AVAILABLE_DEVICES] = manager.list()  # Use managed list
             projects_dict[project_name] = project_data
 
         self.shared_data[self.SHARED_PROJECTS] = projects_dict
@@ -323,12 +326,12 @@ class TestRunManagerLT(object):
                             and project_name in self.shared_data[self.SHARED_PROJECTS]
                         ):
                             project_data = self.shared_data[self.SHARED_PROJECTS][project_name]
-                            project_data[self.PROJECT_LT_ACTIVE_DEVICES] = active_device_count
-                            project_data[self.PROJECT_LT_BUSY_DEVICES] = busy_devices
-                            project_data[self.PROJECT_LT_CLEANUP_DEVICES] = cleanup_devices
+                            project_data[self.PROJECT_LT_ACTIVE_DEVICE_COUNT] = active_device_count
+                            project_data[self.PROJECT_LT_BUSY_DEVICE_COUNT] = busy_devices
+                            project_data[self.PROJECT_LT_CLEANUP_DEVICE_COUNT] = cleanup_devices
 
                             # Clear and update the available_devices list
-                            available_devices = project_data[self.PROJECT_AVAILABLE_DEVICES]
+                            available_devices = project_data[self.PROJECT_LT_AVAILABLE_DEVICES]
                             available_devices[:] = []
                             available_devices.extend(active_device_list)  # Update with new data
 
@@ -393,11 +396,11 @@ class TestRunManagerLT(object):
             if self.SHARED_PROJECTS in self.shared_data and project_name in self.shared_data[self.SHARED_PROJECTS]:
                 project_data = self.shared_data[self.SHARED_PROJECTS][project_name]
                 tc_job_count = project_data.get(self.PROJECT_TC_JOB_COUNT, 0)
-                active_devices = project_data.get(self.PROJECT_LT_ACTIVE_DEVICES, 0)
-                busy_devices = project_data.get(self.PROJECT_LT_BUSY_DEVICES, 0)
-                cleanup_devices = project_data.get(self.PROJECT_LT_CLEANUP_DEVICES, 0)
+                active_devices = project_data.get(self.PROJECT_LT_ACTIVE_DEVICE_COUNT, 0)
+                busy_devices = project_data.get(self.PROJECT_LT_BUSY_DEVICE_COUNT, 0)
+                cleanup_devices = project_data.get(self.PROJECT_LT_CLEANUP_DEVICE_COUNT, 0)
                 # Make a copy of the list to avoid modification issues
-                available_devices = list(project_data.get(self.PROJECT_AVAILABLE_DEVICES, []))
+                available_devices = list(project_data.get(self.PROJECT_LT_AVAILABLE_DEVICES, []))
 
                 # Debug logging for all available device UDIDs
                 if self.DEBUG_DEVICE_SELECTION and available_devices:
@@ -435,7 +438,7 @@ class TestRunManagerLT(object):
                                     logging.debug(f"{logging_header} Directly found active device: {udid}")
                     # Update the shared data with these devices
                     if available_devices and project_name in self.shared_data[self.SHARED_PROJECTS]:
-                        self.shared_data[self.SHARED_PROJECTS][project_name][self.PROJECT_AVAILABLE_DEVICES] = (
+                        self.shared_data[self.SHARED_PROJECTS][project_name][self.PROJECT_LT_AVAILABLE_DEVICES] = (
                             available_devices
                         )
                         logging.debug(
@@ -545,7 +548,7 @@ class TestRunManagerLT(object):
                             # Keep track of the assigned UDID
                             assigned_device_udids.append(device_udid)
                             # update the shared data
-                            self.shared_data[self.SHARED_PROJECTS][project_name][self.PROJECT_AVAILABLE_DEVICES] = (
+                            self.shared_data[self.SHARED_PROJECTS][project_name][self.PROJECT_LT_AVAILABLE_DEVICES] = (
                                 available_devices
                             )
                             break
