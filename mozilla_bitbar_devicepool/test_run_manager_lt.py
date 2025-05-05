@@ -105,14 +105,14 @@ class TestRunManagerLT(object):
         manager = multiprocessing.Manager()
         self.shared_data = manager.dict()
 
-        # Initialize shared data structure
+        # Initialize shared data structure - Moved all initialization here
         self.shared_data["lt_g_initiated_jobs"] = 0
         self.shared_data["lt_g_active_devices"] = 0
         self.shared_data["lt_g_cleanup_devices"] = 0  # Add tracking for cleanup devices
         # Initialize projects dictionary as a nested Manager dict
         projects_dict = manager.dict()
 
-        # Initialize project-specific data
+        # Initialize project-specific data for all projects defined in config
         for project_name, project_config in self.config_object.config.get("projects", {}).items():
             project_data = manager.dict()
             project_data["lt_device_selector"] = project_config.get("lt_device_selector", None)
@@ -215,24 +215,6 @@ class TestRunManagerLT(object):
             "initiated_jobs": 0,
             "cleanup_devices": 0,
         }
-
-        # Initialize projects structure in shared data
-        # No need to lock since we're using Manager objects
-        if "projects" not in self.shared_data:
-            manager = multiprocessing.Manager()
-            self.shared_data["projects"] = manager.dict()
-
-            # Initialize all projects
-            for project_name, project_config in self.config_object.config["projects"].items():
-                if project_name not in self.shared_data["projects"]:
-                    project_data = manager.dict()
-                    project_data["lt_device_selector"] = project_config.get("lt_device_selector", None)
-                    project_data["tc_job_count"] = 0
-                    project_data["lt_active_devices"] = 0
-                    project_data["lt_busy_devices"] = 0
-                    project_data["lt_cleanup_devices"] = 0
-                    project_data["available_devices"] = manager.list()
-                    self.shared_data["projects"][project_name] = project_data
 
         while not self.shutdown_event.is_set():
             active_device_count_by_project_dict = {}
@@ -388,19 +370,10 @@ class TestRunManagerLT(object):
             tc_client_key = current_project["TASKCLUSTER_ACCESS_TOKEN"]
             lt_device_selector = current_project["lt_device_selector"]
 
-            if "projects" not in self.shared_data:
-                manager = multiprocessing.Manager()
-                self.shared_data["projects"] = manager.dict()
-
-            if project_name not in self.shared_data["projects"]:
-                project_data = multiprocessing.Manager().dict()
-                project_data["lt_device_selector"] = lt_device_selector
-                project_data["tc_job_count"] = 0
-                project_data["lt_active_devices"] = 0
-                project_data["lt_busy_devices"] = 0
-                project_data["lt_cleanup_devices"] = 0
-                project_data["available_devices"] = multiprocessing.Manager().list()
-                self.shared_data["projects"][project_name] = project_data
+            # Check if project exists in shared_data, log error if not (shouldn't happen if config is consistent)
+            if project_name not in self.shared_data.get("projects", {}):
+                logging.error(f"{logging_header} Project '{project_name}' not found in shared_data. Thread exiting.")
+                return
 
         except KeyError as e:
             logging.error(f"{logging_header} Missing config: {e}. Thread exiting.")
