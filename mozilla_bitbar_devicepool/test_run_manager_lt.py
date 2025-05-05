@@ -691,7 +691,7 @@ class TestRunManagerLT(object):
         # Debug output for the actual calculation
         if self.DEBUG_JOB_CALCULATION:
             logging.debug(
-                f"Job start calculation: min({tc_jobs_not_handled}, {max_jobs}, {available_devices_count}) = {jobs_to_start}"
+                f"Job start calculation (min(tc_jobs_not_handled, max_jobs, available_devices_count)): min({tc_jobs_not_handled}, {max_jobs}, {available_devices_count}) = {jobs_to_start}"
             )
 
         # Ensure the result is not negative
