@@ -377,9 +377,6 @@ class TestRunManagerLT(object):
 
         logging_header = f"[ {'JS ' + project_name:<{self.logging_padding}} ]"
 
-        # logging.info(
-        #     f"{logging_header} {len(self.config_object.config['device_groups'][project_name])} devices configured.]"
-        # )
         project_source_dir = os.path.dirname(os.path.realpath(__file__))
         project_root_dir = os.path.abspath(os.path.join(project_source_dir, ".."))
         user_script_golden_dir = os.path.join(project_source_dir, "lambdatest", "user_script")
@@ -402,9 +399,10 @@ class TestRunManagerLT(object):
                 project_data["tc_job_count"] = 0
                 project_data["lt_active_devices"] = 0
                 project_data["lt_busy_devices"] = 0
-                project_data["lt_cleanup_devices"] = 0  # Add cleanup devices for new projects
+                project_data["lt_cleanup_devices"] = 0
                 project_data["available_devices"] = multiprocessing.Manager().list()
                 self.shared_data["projects"][project_name] = project_data
+
         except KeyError as e:
             logging.error(f"{logging_header} Missing config: {e}. Thread exiting.")
             return
@@ -420,7 +418,7 @@ class TestRunManagerLT(object):
                 tc_job_count = project_data.get("tc_job_count", 0)
                 active_devices = project_data.get("lt_active_devices", 0)
                 busy_devices = project_data.get("lt_busy_devices", 0)
-                cleanup_devices = project_data.get("lt_cleanup_devices", 0)  # Get cleanup devices count
+                cleanup_devices = project_data.get("lt_cleanup_devices", 0)
                 # Make a copy of the list to avoid modification issues
                 available_devices = list(project_data.get("available_devices", []))
 
@@ -437,8 +435,29 @@ class TestRunManagerLT(object):
                     logging.error(f"{logging_header} {project_name}] Error fetching TC tasks: {e}")
 
             if not available_devices:
-                # normal case... do nohting
-                pass
+                # Debug information about the problem
+                if active_devices > 0:
+                    logging.debug(
+                        f"{logging_header} No available devices in shared data, but {active_devices} active devices reported."
+                    )
+                    # Try to refresh device data directly from status object
+                    try:
+                        device_list = self.status_object.get_device_list()
+                        if device_list and project_name in self.config_object.config.get("device_groups", {}):
+                            project_device_group = self.config_object.config["device_groups"][project_name]
+                            for device_type in device_list:
+                                for udid, state in device_list[device_type].items():
+                                    if udid in project_device_group and state == self.LT_DEVICE_STATE_ACTIVE:
+                                        available_devices.append(udid)
+                                        logging.debug(f"{logging_header} Directly found active device: {udid}")
+                        # Update the shared data with these devices
+                        if available_devices and project_name in self.shared_data["projects"]:
+                            self.shared_data["projects"][project_name]["available_devices"] = available_devices
+                            logging.debug(
+                                f"{logging_header} Updated available devices with direct fetch: {available_devices}"
+                            )
+                    except Exception as e:
+                        logging.error(f"{logging_header} Error directly fetching devices: {e}")
 
             # Get count of recently started jobs that are still in startup phase for this project
             # Use the project-specific job tracker
@@ -454,19 +473,18 @@ class TestRunManagerLT(object):
 
             tc_jobs_not_handled = tc_job_count - recently_started_jobs
 
-            # logging.info(
-            #     f"{logging_header} TC Jobs: {tc_job_count}, Active LT Devs: {active_devices}, "
-            #     f"Recently Started: {recently_started_jobs}, Need Handling: {tc_jobs_not_handled}"
-            # )
-
-            # TODO: make jobs_to_start consider JobTracker or figure out how to short circuit sooner if no free devices
+            # Debug log with all key variables for easier debugging
+            if self.DEBUG_JOB_STARTER:
+                logging.debug(
+                    f"{logging_header} Decision variables: TC Jobs:{tc_job_count}, "
+                    f"Active LT Devs:{active_devices}, Available Devices:{len(available_devices)}, "
+                    f"Device UDIDs:{available_devices}"
+                )
 
             jobs_to_start = self.calculate_jobs_to_start(
                 tc_jobs_not_handled, len(available_devices), self.shared_data["lt_g_initiated_jobs"]
             )
             jobs_to_start = max(0, jobs_to_start)  # Ensure non-negative
-
-            # logging.info(f"{logging_header} Calculated jobs_to_start: {jobs_to_start}")
 
             lt_blob_p1 = f"{len(self.config_object.config['device_groups'][project_name])}/{active_devices}/{busy_devices}/{cleanup_devices}"
             lt_blob = f"LT Devs Config/Active/Busy/Cleanup: {lt_blob_p1:>11}"  # Updated label to include cleanup
