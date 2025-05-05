@@ -69,6 +69,7 @@ class TestRunManagerLT(object):
     DEBUG_JOB_CALCULATION = True  # Enable detailed debugging for job calculation
 
     # Shared data keys (Constants)
+    SHARED_SESSION_STARTED_JOBS = "session_started_jobs"
     SHARED_LT_G_INITIATED_JOBS = "lt_g_initiated_jobs"
     SHARED_LT_G_ACTIVE_DEVICES = "lt_g_active_devices"
     SHARED_LT_G_CLEANUP_DEVICES = "lt_g_cleanup_devices"
@@ -127,6 +128,7 @@ class TestRunManagerLT(object):
         self.shared_data[self.SHARED_LT_G_CLEANUP_DEVICES] = 0  # Add tracking for cleanup devices
         # Initialize projects dictionary as a nested Manager dict
         projects_dict = manager.dict()
+        self.shared_data[self.SHARED_SESSION_STARTED_JOBS] = 0
 
         # Initialize project-specific data for all projects defined in config
         for project_name, project_config in self.config_object.config.get("projects", {}).items():
@@ -353,12 +355,13 @@ class TestRunManagerLT(object):
                 util_percent = (local_device_stats["busy_devices"] / local_device_stats["total_devices"]) * 100
 
             formatted_active_device_count = str(active_device_count_by_project_dict).strip("{}").replace("'", "")
-            per_queue_string = f"API Active device counts: {formatted_active_device_count}"  # Clarify this is from API
+            per_queue_string = f"API Active device counts: {formatted_active_device_count}"
             logging.info(
                 f"{logging_header} "
-                "Global device utilization: Total/Active/Busy/Cleanup/BusyPercentage: "  # Added Cleanup to log
-                f"{local_device_stats['total_devices']}/{self.shared_data[self.SHARED_LT_G_ACTIVE_DEVICES]}/"  # Use shared data value
-                f"{local_device_stats['busy_devices']}/{self.shared_data[self.SHARED_LT_G_CLEANUP_DEVICES]}/"  # Use shared data value
+                f"Session started jobs: {self.shared_data[self.SHARED_SESSION_STARTED_JOBS]}, "
+                "Global device utilization: Total/Active/Busy/Cleanup/BusyPercentage: "
+                f"{local_device_stats['total_devices']}/{self.shared_data[self.SHARED_LT_G_ACTIVE_DEVICES]}/"
+                f"{local_device_stats['busy_devices']}/{self.shared_data[self.SHARED_LT_G_CLEANUP_DEVICES]}/"
                 f"{util_percent:.1f}%"
             )
             logging.info(f"{logging_header} {per_queue_string}")
@@ -399,6 +402,7 @@ class TestRunManagerLT(object):
             project_busy_devices_api = 0
             project_cleanup_devices_api = 0
 
+            # TODO: is this if needed? should exist
             if self.SHARED_PROJECTS in self.shared_data and project_name in self.shared_data[self.SHARED_PROJECTS]:
                 project_data = self.shared_data[self.SHARED_PROJECTS][project_name]
                 tc_job_count = project_data.get(self.PROJECT_TC_JOB_COUNT, 0)
@@ -558,6 +562,7 @@ class TestRunManagerLT(object):
                                 stderr=subprocess.DEVNULL,
                             )
                         processes_started += 1
+                        self.shared_data[self.SHARED_SESSION_STARTED_JOBS] += 1
 
                     except Exception as e:
                         logging.error(f"{logging_header} Error starting job {i + 1}: {e}", exc_info=True)
