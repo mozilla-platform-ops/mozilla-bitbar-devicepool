@@ -648,6 +648,7 @@ class TestRunManagerLT(object):
                 f"MaxJobsToStartAtOnce: {max_jobs}"
             )
 
+        # TODO: move global_initiated out of this function and consider it in 'job start' threads separately
         # Inspect global initiated jobs threshold
         if global_initiated > self.MAX_INITITATED_JOBS:
             if self.DEBUG_JOB_CALCULATION:
