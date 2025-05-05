@@ -290,22 +290,20 @@ class TestRunManagerLT(object):
                         cleanup_devices = 0  # Track cleanup devices per project
                         active_device_list = []  # Rename to active_device_list for clarity
 
-                        # Only continue if there's a device_groups config for this project
-                        if project_name in self.config_object.config.get("device_groups", {}):
-                            project_device_group = self.config_object.config["device_groups"][project_name]
-
-                            # Now iterate through all devices
-                            for device_type in device_list:
-                                for udid, state in device_list[device_type].items():
-                                    # Only count the device if it's in this project's device group
-                                    if udid in project_device_group:
-                                        if state == self.LT_DEVICE_STATE_ACTIVE:
-                                            active_device_count += 1
-                                            active_device_list.append(udid)
-                                        elif state == self.LT_DEVICE_STATE_BUSY:
-                                            busy_devices += 1
-                                        elif state == self.LT_DEVICE_STATE_CLEANUP:
-                                            cleanup_devices += 1  # Count cleanup devices for this project
+                        # Now iterate through all devices
+                        for device_type in device_list:
+                            for udid, state in device_list[device_type].items():
+                                # Only count the device if it's in this project's device group
+                                # Use get_project_for_udid to determine the project for the device
+                                device_project = self.config_object.get_project_for_udid(udid)
+                                if device_project == project_name:
+                                    if state == self.LT_DEVICE_STATE_ACTIVE:
+                                        active_device_count += 1
+                                        active_device_list.append(udid)
+                                    elif state == self.LT_DEVICE_STATE_BUSY:
+                                        busy_devices += 1
+                                    elif state == self.LT_DEVICE_STATE_CLEANUP:
+                                        cleanup_devices += 1  # Count cleanup devices for this project
 
                         active_device_count_by_project_dict[project_name] = active_device_count
 
@@ -497,13 +495,15 @@ class TestRunManagerLT(object):
                     device_udid = None
                     for d in available_devices:
                         # only use the udid if it's assigned to the project
-                        in_device_group = d in self.config_object.config["device_groups"][project_name]
+                        device_project = self.config_object.get_project_for_udid(d)
+                        in_device_group = device_project == project_name
                         in_job_tracker = d in self.get_job_tracker(project_name).get_active_udids()
 
                         # Debug device selection process
                         if self.DEBUG_DEVICE_SELECTION:
                             logging.debug(
-                                f"{logging_header} Device {d} - In device group: {in_device_group}, "
+                                f"{logging_header} Device {d} - Belongs to project: {device_project}, "
+                                f"Current project: {project_name}, In device group: {in_device_group}, "
                                 f"In job tracker: {in_job_tracker}"
                             )
 
