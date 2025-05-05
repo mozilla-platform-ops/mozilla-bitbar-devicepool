@@ -237,7 +237,6 @@ class TestRunManagerLT(object):
 
         while not self.shutdown_event.is_set():
             active_device_count_by_project_dict = {}
-            # Get entire device list once - we'll filter it for each project
             try:
                 device_list = self.status_object.get_device_list()
 
@@ -247,19 +246,15 @@ class TestRunManagerLT(object):
                 local_device_stats["busy_devices"] = 0
                 local_device_stats["cleanup_devices"] = 0
 
-                # Get current initiated jobs from API instead of counting from device list
                 try:
                     # Use status_object to get jobs list
                     jobs_summary = self.status_object.get_job_summary()
-                    # logging.debug(f"{logging_header} Retrieved job list of length: {len(jobs_list) if jobs_list else 0}")
 
                     # Count initiated jobs
                     initiated_jobs_count = 0
                     for job_status in jobs_summary:
                         if job_status == self.LT_DEVICE_STATE_INITIATED:
                             initiated_jobs_count += jobs_summary[job_status]
-
-                    # logging.debug(f"{logging_header} Found {initiated_jobs_count} jobs in initiated state")
 
                     # Add more detailed breakdown of job states
                     if self.DEBUG_JOB_CALCULATION:
@@ -269,6 +264,7 @@ class TestRunManagerLT(object):
                     local_device_stats["initiated_jobs"] = initiated_jobs_count
                 except Exception as e:
                     logging.error(f"{logging_header} Error fetching jobs list: {e}", exc_info=True)
+                    # TODO: needed?
                     # Keep previous value if there's an error
                     local_device_stats["initiated_jobs"] = self.shared_data.get(self.SHARED_LT_G_INITIATED_JOBS, 0)
 
@@ -300,18 +296,15 @@ class TestRunManagerLT(object):
                     # TODO: should we gate on this any longer? i think no
                     lt_device_selector = project_config.get("lt_device_selector")
                     if lt_device_selector:
-                        project_active_device_count_api = (
-                            0  # Count of devices reported as 'active' by API for this project
-                        )
+                        project_active_device_count_api = 0
                         project_busy_devices_api = 0
-                        project_cleanup_devices_api = 0  # Track cleanup devices per project
-                        project_active_devices_api_list = []  # List of UDIDs reported as 'active' by API for this project
+                        project_cleanup_devices_api = 0
+                        project_active_devices_api_list = []
 
                         # Now iterate through all devices
                         for device_type in device_list:
                             for udid, state in device_list[device_type].items():
                                 # Only count the device if it's in this project's device group
-                                # Use get_project_for_udid to determine the project for the device
                                 device_project = self.config_object.get_project_for_udid(udid)
                                 if device_project == project_name:
                                     if state == self.LT_DEVICE_STATE_ACTIVE:
@@ -320,32 +313,27 @@ class TestRunManagerLT(object):
                                     elif state == self.LT_DEVICE_STATE_BUSY:
                                         project_busy_devices_api += 1
                                     elif state == self.LT_DEVICE_STATE_CLEANUP:
-                                        project_cleanup_devices_api += 1  # Count cleanup devices for this project
+                                        project_cleanup_devices_api += 1
 
                         active_device_count_by_project_dict[project_name] = project_active_device_count_api
 
                         # Update shared data for the project
-                        # No need to update global counts here again, done above
-                        if (
-                            self.SHARED_PROJECTS in self.shared_data
-                            and project_name in self.shared_data[self.SHARED_PROJECTS]
-                        ):
-                            project_data = self.shared_data[self.SHARED_PROJECTS][project_name]
-                            project_data[self.PROJECT_LT_ACTIVE_DEVICE_COUNT] = project_active_device_count_api
-                            project_data[self.PROJECT_LT_BUSY_DEVICE_COUNT] = project_busy_devices_api
-                            project_data[self.PROJECT_LT_CLEANUP_DEVICE_COUNT] = project_cleanup_devices_api
+                        project_data = self.shared_data[self.SHARED_PROJECTS][project_name]
+                        project_data[self.PROJECT_LT_ACTIVE_DEVICE_COUNT] = project_active_device_count_api
+                        project_data[self.PROJECT_LT_BUSY_DEVICE_COUNT] = project_busy_devices_api
+                        project_data[self.PROJECT_LT_CLEANUP_DEVICE_COUNT] = project_cleanup_devices_api
 
-                            # Clear and update the PROJECT_LT_ACTIVE_DEVICES list with API reported active devices
-                            shared_active_devices_list = project_data[self.PROJECT_LT_ACTIVE_DEVICES]
-                            shared_active_devices_list[:] = []  # Clear the managed list
-                            shared_active_devices_list.extend(
-                                project_active_devices_api_list
-                            )  # Update with new data from API
+                        # Clear and update the PROJECT_LT_ACTIVE_DEVICES list with API reported active devices
+                        shared_active_devices_list = project_data[self.PROJECT_LT_ACTIVE_DEVICES]
+                        shared_active_devices_list[:] = []  # Clear the managed list
+                        shared_active_devices_list.extend(
+                            project_active_devices_api_list
+                        )  # Update with new data from API
 
-                            # Log the available device list after updating for debugging
-                            logging.debug(
-                                f"{logging_header} Updated API active devices for {project_name}: {list(shared_active_devices_list)}"
-                            )
+                        # Log the available device list after updating for debugging
+                        logging.debug(
+                            f"{logging_header} Updated API active devices for {project_name}: {list(shared_active_devices_list)}"
+                        )
 
                 except Exception as e:
                     logging.error(f"{logging_header} Error processing devices for {project_name}: {e}", exc_info=True)
