@@ -462,7 +462,7 @@ class TestRunManagerLT(object):
             jobs_to_start = max(0, jobs_to_start)  # Ensure non-negative
 
             lt_blob_p1 = f"{len(self.config_object.config['device_groups'][project_name])}/{project_active_device_count_api}/{project_busy_devices_api}/{project_cleanup_devices_api}"
-            lt_blob = f"LT Devs Config/APIActive/Busy/Cleanup: {lt_blob_p1:>11}"  # Clarified label
+            lt_blob = f"LT Devs Config/Active/Busy/Cleanup: {lt_blob_p1:>11}"  # Clarified label
 
             # Add global initiated jobs count to the log for better visibility
             logging.info(
