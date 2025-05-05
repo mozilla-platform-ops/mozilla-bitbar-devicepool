@@ -10,11 +10,10 @@ def setup_logging(level=logging.INFO, disable_timestamps=False):
 
     # for requests, it gets too chatty
     # TODO: make -vv show these or something
-
-    # Get the logger for 'requests' and set its level to INFO
+    #
+    # Get the logger for 'requests' (and others) and set its level to INFO
     logging.getLogger("requests").setLevel(logging.INFO)
-
-    # Often, 'requests' uses 'urllib3', so you might want to quiet it too
+    logging.getLogger("requests_cache").setLevel(logging.INFO)
     logging.getLogger("urllib3").setLevel(logging.INFO)
 
     if disable_timestamps:
