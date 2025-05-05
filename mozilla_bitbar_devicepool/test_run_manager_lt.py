@@ -357,7 +357,7 @@ class TestRunManagerLT(object):
 
             self.shutdown_event.wait(self.LT_MONITOR_INTERVAL)
 
-        logging.info("LambdaTest monitor thread stopped.")
+        logging.info(f"{local_device_stats} Thread stopped.")
 
     def _job_starter_thread(self, project_name):
         """Starts jobs based on monitored data for a specific project."""
