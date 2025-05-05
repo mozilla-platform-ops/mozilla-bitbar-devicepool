@@ -173,7 +173,7 @@ class TestRunManagerLT(object):
             self.job_trackers[project_name] = JobTracker(expiry_seconds=210)
         return self.job_trackers[project_name]
 
-    def add_jobs(self, count, project_name=None, udids=None):
+    def add_jobs_to_tracker(self, project_name=None, udids=None):
         """Add jobs to the specified project tracker or default tracker if no project specified."""
         if project_name and project_name in self.job_trackers:
             self.job_trackers[project_name].add_job_udids(udids)
@@ -462,7 +462,7 @@ class TestRunManagerLT(object):
             jobs_to_start = max(0, jobs_to_start)  # Ensure non-negative
 
             lt_blob_p1 = f"{len(self.config_object.config['device_groups'][project_name])}/{project_active_device_count_api}/{project_busy_devices_api}/{project_cleanup_devices_api}"
-            lt_blob = f"LT Devs Config/Active/Busy/Cleanup: {lt_blob_p1:>11}"  # Clarified label
+            lt_blob = f"LT Devs Config/Active/Busy/Cleanup: {lt_blob_p1:>11}"
 
             # Add global initiated jobs count to the log for better visibility
             logging.info(
@@ -472,20 +472,11 @@ class TestRunManagerLT(object):
             )
 
             if jobs_to_start > 0:
-                # --- Start Jobs (using background task logic) ---
                 lt_app_url = "lt://proverbial-android"  # Eternal APK
 
                 cmd_env = os.environ.copy()
                 cmd_env["LT_USERNAME"] = self.config_object.lt_username
                 cmd_env["LT_ACCESS_KEY"] = self.config_object.lt_access_key
-
-                # done below where udid is known
-                #
-                # labels_csv = f"{self.PROGRAM_LABEL},{project_name}"
-                # # TODO: add the udid to labels
-                # labels_arg = f"--labels '{labels_csv}'"
-                # extra_flags = "--exclude-external-binaries"
-                # base_command_string = f"{project_root_dir}/hyperexecute --no-track {labels_arg} {extra_flags}"
 
                 processes_started = 0
                 assigned_device_udids = []  # Track UDIDs of devices assigned in this loop
@@ -522,7 +513,6 @@ class TestRunManagerLT(object):
                         )
                         break  # Exit the loop if no more devices are available
 
-                    # --- Proceed with starting the job for device_udid ---
                     test_run_dir = f"/tmp/mozilla-lt-devicepool-job-dir.{project_name}.{time.time_ns()}"  # Project-specific unique dir
                     test_run_file = os.path.join(test_run_dir, "hyperexecute.yaml")
 
@@ -542,8 +532,8 @@ class TestRunManagerLT(object):
                             tc_worker_type,
                             lt_app_url,
                             lt_device_selector,
-                            udid=device_udid,  # Use selected device UDID
-                            concurrency=1,  # Each job is separate
+                            udid=device_udid,
+                            concurrency=1,
                             path=test_run_file,
                         )
 
@@ -566,12 +556,11 @@ class TestRunManagerLT(object):
 
                     except Exception as e:
                         logging.error(f"{logging_header} Error starting job {i + 1}: {e}", exc_info=True)
-                        # Clean up potentially partially created dir
                         shutil.rmtree(test_run_dir, ignore_errors=True)
 
                 if processes_started > 0 and not self.debug_mode:
                     # Pass the collected UDIDs when adding jobs to the tracker
-                    self.add_jobs(processes_started, project_name, udids=assigned_device_udids)
+                    self.add_jobs_to_tracker(project_name, udids=assigned_device_udids)
 
                 # print a summary of number of jobs started and the udids
                 if processes_started > 0:
