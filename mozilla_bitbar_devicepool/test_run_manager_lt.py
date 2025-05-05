@@ -426,6 +426,7 @@ class TestRunManagerLT(object):
                 if self.DEBUG_DEVICE_SELECTION and available_devices:
                     logging.debug(f"{logging_header} Available device UDIDs: {available_devices}")
 
+            # TODO: hmm, is this necessary? we should be getting this from the monitor thread
             # If we don't have data yet, try to fetch it directly
             if tc_job_count == 0:
                 try:
@@ -434,30 +435,27 @@ class TestRunManagerLT(object):
                 except Exception as e:
                     logging.error(f"{logging_header} {project_name}] Error fetching TC tasks: {e}")
 
-            if not available_devices:
-                # Debug information about the problem
-                if active_devices > 0:
-                    logging.debug(
-                        f"{logging_header} No available devices in shared data, but {active_devices} active devices reported."
-                    )
-                    # Try to refresh device data directly from status object
-                    try:
-                        device_list = self.status_object.get_device_list()
-                        if device_list and project_name in self.config_object.config.get("device_groups", {}):
-                            project_device_group = self.config_object.config["device_groups"][project_name]
-                            for device_type in device_list:
-                                for udid, state in device_list[device_type].items():
-                                    if udid in project_device_group and state == self.LT_DEVICE_STATE_ACTIVE:
-                                        available_devices.append(udid)
-                                        logging.debug(f"{logging_header} Directly found active device: {udid}")
-                        # Update the shared data with these devices
-                        if available_devices and project_name in self.shared_data["projects"]:
-                            self.shared_data["projects"][project_name]["available_devices"] = available_devices
-                            logging.debug(
-                                f"{logging_header} Updated available devices with direct fetch: {available_devices}"
-                            )
-                    except Exception as e:
-                        logging.error(f"{logging_header} Error directly fetching devices: {e}")
+            # TODO: ensure this is being done in the lt monitor thread
+            #
+            # Add direct device refresh here for cases when active_devices > 0 but available_devices is empty
+            if active_devices > 0 and not available_devices:
+                try:
+                    device_list = self.status_object.get_device_list()
+                    if device_list and project_name in self.config_object.config.get("device_groups", {}):
+                        project_device_group = self.config_object.config["device_groups"][project_name]
+                        for device_type in device_list:
+                            for udid, state in device_list[device_type].items():
+                                if udid in project_device_group and state == self.LT_DEVICE_STATE_ACTIVE:
+                                    available_devices.append(udid)
+                                    logging.debug(f"{logging_header} Directly found active device: {udid}")
+                    # Update the shared data with these devices
+                    if available_devices and project_name in self.shared_data["projects"]:
+                        self.shared_data["projects"][project_name]["available_devices"] = available_devices
+                        logging.debug(
+                            f"{logging_header} Updated available devices with direct fetch: {available_devices}"
+                        )
+                except Exception as e:
+                    logging.error(f"{logging_header} Error directly fetching devices: {e}")
 
             # Get count of recently started jobs that are still in startup phase for this project
             # Use the project-specific job tracker
@@ -738,7 +736,6 @@ class TestRunManagerLT(object):
                 f"Job calculation - TC jobs not handled: {tc_jobs_not_handled}, "
                 f"Available devices: {available_devices_count}, "
                 f"Global initiated: {_global_initiated}, "
-                f"Max inititated jobs threshold: {self.MAX_INITITATED_JOBS}, "
                 f"Max jobs to start at once: {max_jobs}"
             )
 
