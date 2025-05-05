@@ -297,10 +297,12 @@ class TestRunManagerLT(object):
                     # TODO: should we gate on this any longer? i think no
                     lt_device_selector = project_config.get("lt_device_selector")
                     if lt_device_selector:
-                        active_device_count = 0  # Rename to active_device_count for clarity
-                        busy_devices = 0
-                        cleanup_devices = 0  # Track cleanup devices per project
-                        active_device_list = []  # Rename to active_device_list for clarity
+                        project_active_device_count_api = (
+                            0  # Count of devices reported as 'active' by API for this project
+                        )
+                        project_busy_devices_api = 0
+                        project_cleanup_devices_api = 0  # Track cleanup devices per project
+                        project_active_devices_api_list = []  # List of UDIDs reported as 'active' by API for this project
 
                         # Now iterate through all devices
                         for device_type in device_list:
@@ -310,14 +312,14 @@ class TestRunManagerLT(object):
                                 device_project = self.config_object.get_project_for_udid(udid)
                                 if device_project == project_name:
                                     if state == self.LT_DEVICE_STATE_ACTIVE:
-                                        active_device_count += 1
-                                        active_device_list.append(udid)
+                                        project_active_device_count_api += 1
+                                        project_active_devices_api_list.append(udid)
                                     elif state == self.LT_DEVICE_STATE_BUSY:
-                                        busy_devices += 1
+                                        project_busy_devices_api += 1
                                     elif state == self.LT_DEVICE_STATE_CLEANUP:
-                                        cleanup_devices += 1  # Count cleanup devices for this project
+                                        project_cleanup_devices_api += 1  # Count cleanup devices for this project
 
-                        active_device_count_by_project_dict[project_name] = active_device_count
+                        active_device_count_by_project_dict[project_name] = project_active_device_count_api
 
                         # Update shared data for the project
                         # No need to update global counts here again, done above
@@ -326,18 +328,20 @@ class TestRunManagerLT(object):
                             and project_name in self.shared_data[self.SHARED_PROJECTS]
                         ):
                             project_data = self.shared_data[self.SHARED_PROJECTS][project_name]
-                            project_data[self.PROJECT_LT_ACTIVE_DEVICE_COUNT] = active_device_count
-                            project_data[self.PROJECT_LT_BUSY_DEVICE_COUNT] = busy_devices
-                            project_data[self.PROJECT_LT_CLEANUP_DEVICE_COUNT] = cleanup_devices
+                            project_data[self.PROJECT_LT_ACTIVE_DEVICE_COUNT] = project_active_device_count_api
+                            project_data[self.PROJECT_LT_BUSY_DEVICE_COUNT] = project_busy_devices_api
+                            project_data[self.PROJECT_LT_CLEANUP_DEVICE_COUNT] = project_cleanup_devices_api
 
-                            # Clear and update the available_devices list
-                            available_devices = project_data[self.PROJECT_LT_ACTIVE_DEVICES]
-                            available_devices[:] = []
-                            available_devices.extend(active_device_list)  # Update with new data
+                            # Clear and update the PROJECT_LT_ACTIVE_DEVICES list with API reported active devices
+                            shared_active_devices_list = project_data[self.PROJECT_LT_ACTIVE_DEVICES]
+                            shared_active_devices_list[:] = []  # Clear the managed list
+                            shared_active_devices_list.extend(
+                                project_active_devices_api_list
+                            )  # Update with new data from API
 
                             # Log the available device list after updating for debugging
                             logging.debug(
-                                f"{logging_header} Updated available devices for {project_name}: {list(available_devices)}"
+                                f"{logging_header} Updated API active devices for {project_name}: {list(shared_active_devices_list)}"
                             )
 
                 except Exception as e:
@@ -349,7 +353,7 @@ class TestRunManagerLT(object):
                 util_percent = (local_device_stats["busy_devices"] / local_device_stats["total_devices"]) * 100
 
             formatted_active_device_count = str(active_device_count_by_project_dict).strip("{}").replace("'", "")
-            per_queue_string = f"Active device counts: {formatted_active_device_count}"
+            per_queue_string = f"API Active device counts: {formatted_active_device_count}"  # Clarify this is from API
             logging.info(
                 f"{logging_header} "
                 "Global device utilization: Total/Active/Busy/Cleanup/BusyPercentage: "  # Added Cleanup to log
@@ -390,97 +394,76 @@ class TestRunManagerLT(object):
 
         while not self.shutdown_event.is_set():
             tc_job_count = 0
-            active_device_count = 0
-            active_devices = []
+            project_active_device_count_api = 0
+            project_active_devices_api_list = []  # Devices reported as 'active' by LT API for this project
+            project_busy_devices_api = 0
+            project_cleanup_devices_api = 0
 
             if self.SHARED_PROJECTS in self.shared_data and project_name in self.shared_data[self.SHARED_PROJECTS]:
                 project_data = self.shared_data[self.SHARED_PROJECTS][project_name]
                 tc_job_count = project_data.get(self.PROJECT_TC_JOB_COUNT, 0)
-                active_device_count = project_data.get(self.PROJECT_LT_ACTIVE_DEVICE_COUNT, 0)
-                busy_devices = project_data.get(self.PROJECT_LT_BUSY_DEVICE_COUNT, 0)
-                cleanup_devices = project_data.get(self.PROJECT_LT_CLEANUP_DEVICE_COUNT, 0)
-                # Make a copy of the list to avoid modification issues
-                active_devices = list(project_data.get(self.PROJECT_LT_ACTIVE_DEVICES, []))
+                project_active_device_count_api = project_data.get(self.PROJECT_LT_ACTIVE_DEVICE_COUNT, 0)
+                project_busy_devices_api = project_data.get(self.PROJECT_LT_BUSY_DEVICE_COUNT, 0)
+                project_cleanup_devices_api = project_data.get(self.PROJECT_LT_CLEANUP_DEVICE_COUNT, 0)
+                # Make a copy of the list from shared data
+                project_active_devices_api_list = list(project_data.get(self.PROJECT_LT_ACTIVE_DEVICES, []))
 
-                # Debug logging for all available device UDIDs
-                if self.DEBUG_DEVICE_SELECTION and active_devices:
-                    logging.debug(f"{logging_header} Available device UDIDs: {active_devices}")
+            # Get count of recently started jobs (and their UDIDs) from the project-specific job tracker
+            job_tracker = self.get_job_tracker(project_name)
+            recently_started_jobs_count = job_tracker.get_active_job_count()
+            job_tracker_active_udids = job_tracker.get_active_udids()  # UDIDs tracked by job tracker
 
-            # TODO: hmm, is this necessary? we should be getting this from the monitor thread
-            # If we don't have data yet, try to fetch it directly
-            # if tc_job_count == 0:
-            #     try:
-            #         tc_job_count = get_taskcluster_pending_tasks("proj-autophone", tc_worker_type, verbose=False)
-            #         self.shared_data[self.SHARED_PROJECTS][project_name][self.PROJECT_TC_JOB_COUNT] = tc_job_count
-            #     except Exception as e:
-            #         logging.error(f"{logging_header} {project_name}] Error fetching TC tasks: {e}")
+            # Calculate devices truly available for starting jobs: API Active minus JobTracker Active
+            available_devices_for_job_start = [
+                udid for udid in project_active_devices_api_list if udid not in job_tracker_active_udids
+            ]
+            available_devices_for_job_start_count = len(available_devices_for_job_start)
 
-            # warn if the number of active devices and available devices don't match
-            if active_device_count != len(active_devices):
-                logging.warning(
-                    f"{logging_header} Active devices ({active_device_count}) and available devices ({len(active_devices)}) mismatch!"
-                )
-
-            # TODO: AJE999
-            # TODO: ensure this is being done in the lt monitor thread
-            # TODO: warn if there is a mismatch (vs doing updating here)
-            #
-            # Add direct device refresh here for cases when active_devices > 0 but available_devices is empty
-            if active_device_count > 0 and not active_devices:
-                try:
-                    device_list = self.status_object.get_device_list()
-                    if device_list and project_name in self.config_object.config.get("device_groups", {}):
-                        project_device_group = self.config_object.config["device_groups"][project_name]
-                        for device_type in device_list:
-                            for udid, state in device_list[device_type].items():
-                                if udid in project_device_group and state == self.LT_DEVICE_STATE_ACTIVE:
-                                    active_devices.append(udid)
-                                    logging.debug(f"{logging_header} Directly found active device: {udid}")
-                    # Update the shared data with these devices
-                    if active_devices and project_name in self.shared_data[self.SHARED_PROJECTS]:
-                        self.shared_data[self.SHARED_PROJECTS][project_name][self.PROJECT_LT_ACTIVE_DEVICES] = (
-                            active_devices
-                        )
-                        logging.debug(f"{logging_header} Updated available devices with direct fetch: {active_devices}")
-                except Exception as e:
-                    logging.error(f"{logging_header} Error directly fetching devices: {e}")
-
-            # Get count of recently started jobs that are still in startup phase for this project
-            # Use the project-specific job tracker
-            recently_started_jobs = self.get_active_job_count(project_name)
-
-            # Debug logging for job tracker
-            if self.DEBUG_JOB_STARTER:
-                active_udids = self.get_job_tracker(project_name).get_active_udids()
+            # Debug logging for job tracker and available devices calculation
+            if self.DEBUG_JOB_STARTER or self.DEBUG_DEVICE_SELECTION:
                 logging.debug(
-                    f"{logging_header} Job tracker for {project_name} has {recently_started_jobs} active jobs "
-                    f"for devices: {active_udids if active_udids else 'none'}"
+                    f"{logging_header} Job tracker has {recently_started_jobs_count} active jobs "
+                    f"for devices: {job_tracker_active_udids if job_tracker_active_udids else 'none'}"
+                )
+                logging.debug(f"{logging_header} API Active Devices: {project_active_devices_api_list}")
+                logging.debug(f"{logging_header} Available for Job Start: {available_devices_for_job_start}")
+
+            # Warn if the API count and the list length from shared data don't match (indicates potential sync issue)
+            if project_active_device_count_api != len(project_active_devices_api_list):
+                logging.warning(
+                    f"{logging_header} API active device count ({project_active_device_count_api}) and "
+                    f"shared list length ({len(project_active_devices_api_list)}) mismatch!"
                 )
 
-            tc_jobs_not_handled = tc_job_count - recently_started_jobs
+            # Remove the direct device refresh logic here - the monitor thread is responsible
+            # if project_active_device_count_api > 0 and not project_active_devices_api_list:
+            #    logging.warning(f"{logging_header} API reports {project_active_device_count_api} active devices, but shared list is empty. Waiting for monitor update.")
+
+            tc_jobs_not_handled = tc_job_count - recently_started_jobs_count
 
             # Debug log with all key variables for easier debugging
             if self.DEBUG_JOB_STARTER:
                 logging.debug(
                     f"{logging_header} Decision variables: TC Jobs:{tc_job_count}, "
-                    # TODO: figure out why these two could be different
-                    # TODO: log when they are different
-                    f"Active LT Devs:{active_device_count}, Available Devices:{len(active_devices)}, "
-                    f"Device UDIDs:{active_devices}"
+                    f"API Active LT Devs:{project_active_device_count_api}, "
+                    f"Available for Start:{available_devices_for_job_start_count}, "
+                    f"Device UDIDs (Available):{available_devices_for_job_start}"
                 )
 
             jobs_to_start = self.calculate_jobs_to_start(
-                tc_jobs_not_handled, len(active_devices), self.shared_data[self.SHARED_LT_G_INITIATED_JOBS]
+                tc_jobs_not_handled,
+                available_devices_for_job_start_count,  # Use the calculated available count
+                self.shared_data[self.SHARED_LT_G_INITIATED_JOBS],
             )
             jobs_to_start = max(0, jobs_to_start)  # Ensure non-negative
 
-            lt_blob_p1 = f"{len(self.config_object.config['device_groups'][project_name])}/{active_device_count}/{busy_devices}/{cleanup_devices}"
-            lt_blob = f"LT Devs Config/Active/Busy/Cleanup: {lt_blob_p1:>11}"  # Updated label to include cleanup
+            lt_blob_p1 = f"{len(self.config_object.config['device_groups'][project_name])}/{project_active_device_count_api}/{project_busy_devices_api}/{project_cleanup_devices_api}"
+            lt_blob = f"LT Devs Config/APIActive/Busy/Cleanup: {lt_blob_p1:>11}"  # Clarified label
 
             # Add global initiated jobs count to the log for better visibility
             logging.info(
                 f"{logging_header} TC Jobs: {tc_job_count:>4}, {lt_blob:>41}, "
-                f"RStarted/NeedH/ToStart: {recently_started_jobs}/{tc_jobs_not_handled}/{jobs_to_start}, "
+                f"RStarted/NeedH/Avail/ToStart: {recently_started_jobs_count}/{tc_jobs_not_handled}/{available_devices_for_job_start_count}/{jobs_to_start}, "  # Added Avail count
                 f"GInit/GInitMax {self.shared_data[self.SHARED_LT_G_INITIATED_JOBS]}/{self.MAX_INITITATED_JOBS}"
             )
 
@@ -492,72 +475,50 @@ class TestRunManagerLT(object):
                 cmd_env["LT_USERNAME"] = self.config_object.lt_username
                 cmd_env["LT_ACCESS_KEY"] = self.config_object.lt_access_key
 
-                labels_csv = f"{self.PROGRAM_LABEL},{project_name}"
-                # TODO: add the udid to labels
-                labels_arg = f"--labels '{labels_csv}'"
-                extra_flags = "--exclude-external-binaries"
-                base_command_string = f"{project_root_dir}/hyperexecute --no-track {labels_arg} {extra_flags}"
+                # done below where udid is known
+                #
+                # labels_csv = f"{self.PROGRAM_LABEL},{project_name}"
+                # # TODO: add the udid to labels
+                # labels_arg = f"--labels '{labels_csv}'"
+                # extra_flags = "--exclude-external-binaries"
+                # base_command_string = f"{project_root_dir}/hyperexecute --no-track {labels_arg} {extra_flags}"
 
                 processes_started = 0
-                assigned_device_udids = []  # Track UDIDs of assigned devices
+                assigned_device_udids = []  # Track UDIDs of devices assigned in this loop
 
-                # Track which devices we've assigned
+                # Create a mutable copy to iterate and modify for selection
+                devices_to_assign_from = list(available_devices_for_job_start)
 
                 for i in range(jobs_to_start):
                     if self.shutdown_event.is_set():
                         logging.info(f"{logging_header} Shutdown signaled during job starting loop.")
                         break
 
-                    # Get next available device that hasn't been assigned yet
+                    # Get next available device that hasn't been assigned yet in this loop
                     device_udid = None
-                    for d in active_devices:
-                        # only use the udid if it's assigned to the project
-                        device_project = self.config_object.get_project_for_udid(d)
-                        in_device_group = device_project == project_name
-                        in_job_tracker = d in self.get_job_tracker(project_name).get_active_udids()
+                    if devices_to_assign_from:
+                        # Simple selection: take the first one
+                        device_udid = devices_to_assign_from.pop(0)
 
                         # Debug device selection process
                         if self.DEBUG_DEVICE_SELECTION:
-                            logging.debug(
-                                f"{logging_header} Device {d} - Belongs to project: {device_project}, "
-                                f"Current project: {project_name}, In device group: {in_device_group}, "
-                                f"In job tracker: {in_job_tracker}"
-                            )
+                            logging.debug(f"{logging_header} Selecting device {device_udid} for job {i + 1}")
 
-                        # only use the udid if it's assigned to the project
-                        if in_device_group:
-                            # device in job tracker means it's already in use
-                            if in_job_tracker:
-                                logging.debug(f"{logging_header} Device {d} has had a job recently launched, skipping.")
-                                # skip to the next device
-                                continue
+                        # add the udid to labels
+                        labels_csv = f"{self.PROGRAM_LABEL},{project_name},{device_udid}"
+                        labels_arg = f"--labels '{labels_csv}'"
+                        extra_flags = "--exclude-external-binaries"
+                        base_command_string = f"{project_root_dir}/hyperexecute --no-track {labels_arg} {extra_flags}"
+                        # Keep track of the assigned UDID for this loop
+                        assigned_device_udids.append(device_udid)
+                    else:
+                        # This shouldn't happen if jobs_to_start was calculated correctly based on available_devices_for_job_start_count
+                        logging.warning(
+                            f"{logging_header} Ran out of devices to assign mid-loop! Should have started {jobs_to_start}, assigned {len(assigned_device_udids)}."
+                        )
+                        break  # Exit the loop if no more devices are available
 
-                            device_udid = d
-
-                            # add the udid to labels
-                            labels_csv = f"{self.PROGRAM_LABEL},{project_name},{device_udid}"
-                            labels_arg = f"--labels '{labels_csv}'"
-                            base_command_string = (
-                                f"{project_root_dir}/hyperexecute --no-track {labels_arg} {extra_flags}"
-                            )
-
-                            # remove the device from available devices to avoid reusing it
-                            active_devices.remove(d)
-                            # Keep track of the assigned UDID
-                            assigned_device_udids.append(device_udid)
-                            # update the shared data
-                            self.shared_data[self.SHARED_PROJECTS][project_name][self.PROJECT_LT_ACTIVE_DEVICES] = (
-                                active_devices
-                            )
-                            break
-
-                    if not device_udid:
-                        if self.DEBUG_DEVICE_SELECTION:
-                            logging.debug(
-                                f"{logging_header} No more available devices to assign! Available, but recently started: {active_devices}"
-                            )
-                        break
-
+                    # --- Proceed with starting the job for device_udid ---
                     test_run_dir = f"/tmp/mozilla-lt-devicepool-job-dir.{project_name}.{time.time_ns()}"  # Project-specific unique dir
                     test_run_file = os.path.join(test_run_dir, "hyperexecute.yaml")
 
@@ -570,14 +531,14 @@ class TestRunManagerLT(object):
                             os.path.join(test_run_dir, "user_script"),
                         )
 
-                        # Write config with specific device IP
+                        # Write config with specific device UDID
                         job_config.write_config(
                             tc_client_id,
                             tc_client_key,
                             tc_worker_type,
                             lt_app_url,
                             lt_device_selector,
-                            udid=device_udid,  # Use device UDID if available
+                            udid=device_udid,  # Use selected device UDID
                             concurrency=1,  # Each job is separate
                             path=test_run_file,
                         )
@@ -630,10 +591,10 @@ class TestRunManagerLT(object):
                 self.shutdown_event.wait(self.LT_MONITOR_INTERVAL)
             else:
                 # If no jobs to start but there are TC jobs and available devices, log debug info
-                if tc_job_count > 0 and len(active_devices) > 0:
+                if tc_job_count > 0 and available_devices_for_job_start_count > 0:
                     logging.debug(
-                        f"{logging_header} Not starting jobs despite TC jobs ({tc_job_count}) and available devices ({len(active_devices)}). "
-                        f"Check: Recently Started={recently_started_jobs}, Global Initiated={self.shared_data[self.SHARED_LT_G_INITIATED_JOBS]}/{self.MAX_INITITATED_JOBS}"
+                        f"{logging_header} Not starting jobs despite TC jobs ({tc_job_count}) and available devices ({available_devices_for_job_start_count}). "
+                        f"Check: Recently Started={recently_started_jobs_count}, Global Initiated={self.shared_data[self.SHARED_LT_G_INITIATED_JOBS]}/{self.MAX_INITITATED_JOBS}"
                     )
 
             # Wait before next check or until shutdown
