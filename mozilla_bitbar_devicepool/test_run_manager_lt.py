@@ -375,11 +375,6 @@ class TestRunManagerLT(object):
             tc_client_key = current_project["TASKCLUSTER_ACCESS_TOKEN"]
             lt_device_selector = current_project["lt_device_selector"]
 
-            # Check if project exists in shared_data, log error if not (shouldn't happen if config is consistent)
-            if project_name not in self.shared_data.get(self.SHARED_PROJECTS, {}):
-                logging.error(f"{logging_header} Project '{project_name}' not found in shared_data. Thread exiting.")
-                return
-
         except KeyError as e:
             logging.error(f"{logging_header} Missing config: {e}. Thread exiting.")
             return
@@ -387,19 +382,17 @@ class TestRunManagerLT(object):
         while not self.shutdown_event.is_set():
             tc_job_count = 0
             project_active_device_count_api = 0
-            project_active_devices_api_list = []  # Devices reported as 'active' by LT API for this project
+            project_active_devices_api_list = []
             project_busy_devices_api = 0
             project_cleanup_devices_api = 0
 
-            # TODO: is this if needed? should exist
-            if self.SHARED_PROJECTS in self.shared_data and project_name in self.shared_data[self.SHARED_PROJECTS]:
-                project_data = self.shared_data[self.SHARED_PROJECTS][project_name]
-                tc_job_count = project_data.get(self.PROJECT_TC_JOB_COUNT, 0)
-                project_active_device_count_api = project_data.get(self.PROJECT_LT_ACTIVE_DEVICE_COUNT, 0)
-                project_busy_devices_api = project_data.get(self.PROJECT_LT_BUSY_DEVICE_COUNT, 0)
-                project_cleanup_devices_api = project_data.get(self.PROJECT_LT_CLEANUP_DEVICE_COUNT, 0)
-                # Make a copy of the list from shared data
-                project_active_devices_api_list = list(project_data.get(self.PROJECT_LT_ACTIVE_DEVICES, []))
+            project_data = self.shared_data[self.SHARED_PROJECTS][project_name]
+            tc_job_count = project_data.get(self.PROJECT_TC_JOB_COUNT, 0)
+            project_active_device_count_api = project_data.get(self.PROJECT_LT_ACTIVE_DEVICE_COUNT, 0)
+            project_busy_devices_api = project_data.get(self.PROJECT_LT_BUSY_DEVICE_COUNT, 0)
+            project_cleanup_devices_api = project_data.get(self.PROJECT_LT_CLEANUP_DEVICE_COUNT, 0)
+            # Make a copy of the list from shared data
+            project_active_devices_api_list = list(project_data.get(self.PROJECT_LT_ACTIVE_DEVICES, []))
 
             # Get count of recently started jobs (and their UDIDs) from the project-specific job tracker
             job_tracker = self.get_job_tracker(project_name)
@@ -428,10 +421,6 @@ class TestRunManagerLT(object):
                     f"shared list length ({len(project_active_devices_api_list)}) mismatch!"
                 )
 
-            # Remove the direct device refresh logic here - the monitor thread is responsible
-            # if project_active_device_count_api > 0 and not project_active_devices_api_list:
-            #    logging.warning(f"{logging_header} API reports {project_active_device_count_api} active devices, but shared list is empty. Waiting for monitor update.")
-
             tc_jobs_not_handled = tc_job_count - recently_started_jobs_count
 
             # Debug log with all key variables for easier debugging
@@ -445,10 +434,10 @@ class TestRunManagerLT(object):
 
             jobs_to_start = self.calculate_jobs_to_start(
                 tc_jobs_not_handled,
-                available_devices_for_job_start_count,  # Use the calculated available count
+                available_devices_for_job_start_count,
                 self.shared_data[self.SHARED_LT_G_INITIATED_JOBS],
             )
-            jobs_to_start = max(0, jobs_to_start)  # Ensure non-negative
+            jobs_to_start = max(0, jobs_to_start)
 
             lt_blob_p1 = f"{len(self.config_object.config['device_groups'][project_name])}/{project_active_device_count_api}/{project_busy_devices_api}/{project_cleanup_devices_api}"
             lt_blob = f"LT Devs Config/Active/Busy/Cleanup: {lt_blob_p1:>11}"
@@ -461,6 +450,7 @@ class TestRunManagerLT(object):
             )
 
             if jobs_to_start > 0:
+                # TODO: not used any longer, remove eventually
                 lt_app_url = "lt://proverbial-android"  # Eternal APK
 
                 cmd_env = os.environ.copy()
@@ -468,7 +458,7 @@ class TestRunManagerLT(object):
                 cmd_env["LT_ACCESS_KEY"] = self.config_object.lt_access_key
 
                 processes_started = 0
-                assigned_device_udids = []  # Track UDIDs of devices assigned in this loop
+                assigned_device_udids = []
 
                 # Create a mutable copy to iterate and modify for selection
                 devices_to_assign_from = list(available_devices_for_job_start)
