@@ -63,6 +63,10 @@ class TestRunManagerLT(object):
     TC_MONITOR_INTERVAL = 30  # seconds
     LT_MONITOR_INTERVAL = 30  # seconds
     JOB_STARTER_INTERVAL = 10  # seconds
+    # Debug constants - set higher log levels for specific areas
+    DEBUG_JOB_STARTER = True  # Enable detailed debugging for job starter
+    DEBUG_DEVICE_SELECTION = True  # Enable detailed debugging for device selection
+    DEBUG_JOB_CALCULATION = True  # Enable detailed debugging for job calculation
 
     def __init__(
         self,
@@ -255,6 +259,12 @@ class TestRunManagerLT(object):
                             initiated_jobs_count += jobs_summary[job_status]
 
                     logging.debug(f"{logging_header} Found {initiated_jobs_count} jobs in initiated state")
+
+                    # Add more detailed breakdown of job states
+                    if self.DEBUG_JOB_CALCULATION:
+                        job_states_str = ", ".join([f"{state}: {count}" for state, count in jobs_summary.items()])
+                        logging.debug(f"{logging_header} Job state counts: {job_states_str}")
+
                     global_device_utilization["initiated_jobs"] = initiated_jobs_count
                 except Exception as e:
                     logging.error(f"{logging_header} Error fetching jobs list: {e}", exc_info=True)
@@ -409,6 +419,10 @@ class TestRunManagerLT(object):
                 # Make a copy of the list to avoid modification issues
                 available_devices = list(project_data.get("available_devices", []))
 
+                # Debug logging for all available device UDIDs
+                if self.DEBUG_DEVICE_SELECTION and available_devices:
+                    logging.debug(f"{logging_header} Available device UDIDs: {available_devices}")
+
             # If we don't have data yet, try to fetch it directly
             if tc_job_count == 0:
                 try:
@@ -424,6 +438,15 @@ class TestRunManagerLT(object):
             # Get count of recently started jobs that are still in startup phase for this project
             # Use the project-specific job tracker
             recently_started_jobs = self.get_active_job_count(project_name)
+
+            # Debug logging for job tracker
+            if self.DEBUG_JOB_STARTER:
+                active_udids = self.get_job_tracker(project_name).get_active_udids()
+                logging.debug(
+                    f"{logging_header} Job tracker for {project_name} has {recently_started_jobs} active jobs "
+                    f"for devices: {active_udids if active_udids else 'none'}"
+                )
+
             tc_jobs_not_handled = tc_job_count - recently_started_jobs
 
             # logging.info(
@@ -443,10 +466,13 @@ class TestRunManagerLT(object):
             lt_blob_p1 = f"{len(self.config_object.config['device_groups'][project_name])}/{active_devices}/{busy_devices}/{cleanup_devices}"
             lt_blob = f"LT Devs Config/Active/Busy/Cleanup: {lt_blob_p1:>11}"  # Updated label to include cleanup
 
+            # Add global initiated jobs count to the log for better visibility
             logging.info(
                 f"{logging_header} TC Jobs: {tc_job_count:>4}, {lt_blob:>41}, "
-                f"Recently Started: {recently_started_jobs:>3}, Need Handling: {tc_jobs_not_handled:>3}, Jobs To Start: {jobs_to_start:>3}"
+                f"Recently Started: {recently_started_jobs:>3}, Need Handling: {tc_jobs_not_handled:>3}, Jobs To Start: {jobs_to_start:>3}, "
+                f"Global Initiated: {self.shared_data['lt_g_initiated_jobs']:>3}/{self.MAX_INITITATED_JOBS:>3}"
             )
+
             if jobs_to_start > 0:
                 # --- Start Jobs (using background task logic) ---
                 # logging.info(f"{logging_header} Starting {jobs_to_start} jobs in background...")
@@ -478,10 +504,21 @@ class TestRunManagerLT(object):
                     device_udid = None
                     for d in available_devices:
                         # only use the udid if it's assigned to the project
-                        if d in self.config_object.config["device_groups"][project_name]:
+                        in_device_group = d in self.config_object.config["device_groups"][project_name]
+                        in_job_tracker = d in self.get_job_tracker(project_name).get_active_udids()
+
+                        # Debug device selection process
+                        if self.DEBUG_DEVICE_SELECTION:
+                            logging.debug(
+                                f"{logging_header} Device {d} - In device group: {in_device_group}, "
+                                f"In job tracker: {in_job_tracker}"
+                            )
+
+                        # only use the udid if it's assigned to the project
+                        if in_device_group:
                             # device in job tracker means it's already in use
-                            if d in self.get_job_tracker(project_name).get_active_udids():
-                                logging.info(f"{logging_header} Device {d} is already in use, skipping.")
+                            if in_job_tracker:
+                                logging.debug(f"{logging_header} Device {d} is already in use, skipping.")
                                 # skip to the next device
                                 continue
 
@@ -503,8 +540,10 @@ class TestRunManagerLT(object):
                             break
 
                     if not device_udid:
-                        # TODO: mention this? or basically expected.
-                        # logging.warning(f"{logging_header} No more available devices to assign!")
+                        if self.DEBUG_DEVICE_SELECTION:
+                            logging.debug(
+                                f"{logging_header} No more available devices to assign! Available: {available_devices}"
+                            )
                         break
 
                     test_run_dir = f"/tmp/mozilla-lt-devicepool-job-dir.{project_name}.{time.time_ns()}"  # Project-specific unique dir
@@ -595,8 +634,12 @@ class TestRunManagerLT(object):
                 # update: not needed, but we end up loanching jobs too quickly without it
                 self.shutdown_event.wait(self.LT_MONITOR_INTERVAL)
             else:
-                # logging.info(f"{logging_header} No jobs to start. Sleeping.")
-                pass
+                # If no jobs to start but there are TC jobs and available devices, log debug info
+                if tc_job_count > 0 and len(available_devices) > 0:
+                    logging.debug(
+                        f"{logging_header} Not starting jobs despite TC jobs ({tc_job_count}) and available devices ({len(available_devices)}). "
+                        f"Check: Recently Started={recently_started_jobs}, Global Initiated={self.shared_data['lt_g_initiated_jobs']}/{self.MAX_INITITATED_JOBS}"
+                    )
 
             # Wait before next check or until shutdown
             self.shutdown_event.wait(self.JOB_STARTER_INTERVAL)
@@ -666,14 +709,35 @@ class TestRunManagerLT(object):
         if max_jobs is None:
             max_jobs = self.max_jobs_to_start
 
-        # short circuit if we have too many initiated jobs
-        # if _global_initiated > self.MAX_INITITATED_JOBS:
-        #     # logging.info(f"{logging_header} Too many initiated jobs, not starting any new jobs.")
-        #     jobs_to_start = 0
-        #     return jobs_to_start
+        # Debug output for job calculation
+        if self.DEBUG_JOB_CALCULATION:
+            logging.debug(
+                f"Job calculation - TC jobs not handled: {tc_jobs_not_handled}, "
+                f"Available devices: {available_devices_count}, "
+                f"Global initiated: {_global_initiated}, "
+                f"Max inititated jobs threshold: {self.MAX_INITITATED_JOBS}, "
+                f"Max jobs to start at once: {max_jobs}"
+            )
+
+        # Inspect global initiated jobs threshold
+        if _global_initiated > self.MAX_INITITATED_JOBS:
+            if self.DEBUG_JOB_CALCULATION:
+                logging.debug(
+                    f"Not starting new jobs: Global initiated jobs ({_global_initiated}) > "
+                    f"MAX_INITITATED_JOBS ({self.MAX_INITITATED_JOBS})"
+                )
+            jobs_to_start = 0
+            return jobs_to_start
 
         # Calculate the minimum of pending jobs, max jobs limit, and available devices
         jobs_to_start = min(tc_jobs_not_handled, max_jobs, available_devices_count)
+
+        # Debug output for the actual calculation
+        if self.DEBUG_JOB_CALCULATION:
+            logging.debug(
+                f"Job start calculation: min({tc_jobs_not_handled}, {max_jobs}, {available_devices_count}) = {jobs_to_start}"
+            )
+
         # Ensure the result is not negative
         jobs_to_start = max(0, jobs_to_start)
 
