@@ -49,7 +49,7 @@ class JobTracker:
         for udid in udids:
             self.job_timestamps[udid] = now
 
-        self.logger.debug(f"Added {len(udids)} job(s) with UDIDs at timestamp {now}")
+        self.logger.debug(f"Added {len(udids)} job(s) with UDIDs {', '.join(udids).lstrip(' ')} at timestamp {now}")
 
     def get_active_job_count(self):
         """
