@@ -1,5 +1,7 @@
 # TODO: stop using lt_device_selector. is it needed if udid is specified? need to test.
 #   - extra messy for testing pools...
+global:
+  contract_device_count: 30
 projects:
   defaults:
     SCRIPT_REPO_COMMIT: master
