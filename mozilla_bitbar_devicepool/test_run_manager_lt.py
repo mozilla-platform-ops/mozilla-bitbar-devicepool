@@ -110,6 +110,7 @@ class TestRunManagerLT(object):
             # Skip hyperexecute binary check in unit testing mode
             logging.info("TestRunManagerLT: Unit testing mode enabled.")
 
+        # TODO: this in not thread-safe per-se, but only one thread will be using it (JS per project)
         # Replace single job_tracker with a dictionary of job trackers per project
         self.job_trackers = {}
         # Initialize job trackers for each project in config
