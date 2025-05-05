@@ -397,12 +397,12 @@ class TestRunManagerLT(object):
 
             # TODO: hmm, is this necessary? we should be getting this from the monitor thread
             # If we don't have data yet, try to fetch it directly
-            if tc_job_count == 0:
-                try:
-                    tc_job_count = get_taskcluster_pending_tasks("proj-autophone", tc_worker_type, verbose=False)
-                    self.shared_data["projects"][project_name]["tc_job_count"] = tc_job_count
-                except Exception as e:
-                    logging.error(f"{logging_header} {project_name}] Error fetching TC tasks: {e}")
+            # if tc_job_count == 0:
+            #     try:
+            #         tc_job_count = get_taskcluster_pending_tasks("proj-autophone", tc_worker_type, verbose=False)
+            #         self.shared_data["projects"][project_name]["tc_job_count"] = tc_job_count
+            #     except Exception as e:
+            #         logging.error(f"{logging_header} {project_name}] Error fetching TC tasks: {e}")
 
             # warn if the number of active devices and available devices don't match
             if active_devices != len(available_devices):
