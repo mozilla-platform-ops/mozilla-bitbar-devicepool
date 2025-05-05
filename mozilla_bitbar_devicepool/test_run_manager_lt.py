@@ -342,6 +342,11 @@ class TestRunManagerLT(object):
                             available_devices[:] = []
                             available_devices.extend(active_device_list)  # Update with new data
 
+                            # Log the available device list after updating for debugging
+                            logging.debug(
+                                f"{logging_header} Updated available devices for {project_name}: {list(available_devices)}"
+                            )
+
                 except Exception as e:
                     logging.error(f"{logging_header} Error processing devices for {project_name}: {e}", exc_info=True)
 
