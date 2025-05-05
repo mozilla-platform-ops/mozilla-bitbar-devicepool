@@ -433,6 +433,7 @@ class TestRunManagerLT(object):
                 except Exception as e:
                     logging.error(f"{logging_header} {project_name}] Error fetching TC tasks: {e}")
 
+            # TODO: AJE999
             # TODO: ensure this is being done in the lt monitor thread
             # TODO: warn if there is a mismatch (vs doing updating here)
             #
@@ -497,7 +498,6 @@ class TestRunManagerLT(object):
 
             if jobs_to_start > 0:
                 # --- Start Jobs (using background task logic) ---
-                # logging.info(f"{logging_header} Starting {jobs_to_start} jobs in background...")
                 lt_app_url = "lt://proverbial-android"  # Eternal APK
 
                 cmd_env = os.environ.copy()
@@ -510,12 +510,10 @@ class TestRunManagerLT(object):
                 extra_flags = "--exclude-external-binaries"
                 base_command_string = f"{project_root_dir}/hyperexecute --no-track {labels_arg} {extra_flags}"
 
-                # outer_start_time = time.time()
                 processes_started = 0
                 assigned_device_udids = []  # Track UDIDs of assigned devices
 
                 # Track which devices we've assigned
-                # assigned_devices = []
 
                 for i in range(jobs_to_start):
                     if self.shutdown_event.is_set():
@@ -592,23 +590,11 @@ class TestRunManagerLT(object):
                             path=test_run_file,
                         )
 
-                        # device_info = f"{device_udid}"
-
                         if self.debug_mode:
-                            # logging.info(
-                            #     f"{logging_header} Would run command: '{base_command_string}' in path '{test_run_dir}'..."
-                            # )
-                            # logging.info(f"{logging_header} Would target device: {device_info}")
-                            # logging.info(
-                            #     f"{logging_header} WOULD BE launching job {i + 1}/{jobs_to_start} targeting device '{device_info}'"
-                            # )
-                            time.sleep(0.1)  # Simulate tiny delay
+                            # Simulate tiny delay if in debug mode
+                            time.sleep(0.1)
                         else:
                             # Start process in background
-                            # TODO: only print one line with number of jobs and all udid we'll be using?
-                            # logging.info(
-                            #     f"{logging_header} Launching job {i + 1}/{jobs_to_start} targeting device '{device_info}'"
-                            # )
                             _process = subprocess.Popen(
                                 base_command_string,
                                 shell=True,
@@ -618,7 +604,6 @@ class TestRunManagerLT(object):
                                 stdout=subprocess.DEVNULL,  # Discard output for background tasks
                                 stderr=subprocess.DEVNULL,
                             )
-                            # logging.debug(f"{logging_header} Started background job {i + 1} with PID {process.pid}")
                         processes_started += 1
 
                     except Exception as e:
@@ -626,13 +611,9 @@ class TestRunManagerLT(object):
                         # Clean up potentially partially created dir
                         shutil.rmtree(test_run_dir, ignore_errors=True)
 
-                # outer_end_time = time.time()
                 if processes_started > 0 and not self.debug_mode:
                     # Pass the collected UDIDs when adding jobs to the tracker
                     self.add_jobs(processes_started, project_name, udids=assigned_device_udids)
-                    # logging.info(
-                    #     f"{logging_header} Launched {processes_started} background jobs in {round(outer_end_time - outer_start_time, 2)} seconds"
-                    # )
 
                 # print a summary of number of jobs started and the udids
                 if processes_started > 0:
