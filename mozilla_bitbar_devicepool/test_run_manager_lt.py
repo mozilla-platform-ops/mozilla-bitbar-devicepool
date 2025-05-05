@@ -81,9 +81,9 @@ class TestRunManagerLT(object):
     PROJECT_LT_BUSY_DEVICE_COUNT = "lt_busy_device_count"
     PROJECT_LT_CLEANUP_DEVICE_COUNT = "lt_cleanup_device_count"
     PROJECT_LT_ACTIVE_DEVICES = "lt_active_devices"
-    # TODO: implement this
+    # TODO: start using this or remove it
     # available devices are ones that are not busy (via recent activity tracked by JobManager)
-    PROJECT_AVAILABLE_DEVICES = "available_devices"
+    # PROJECT_AVAILABLE_DEVICES = "available_devices"
 
     def __init__(
         self,
