@@ -669,10 +669,10 @@ class TestRunManagerLT(object):
         # Debug output for job calculation
         if self.DEBUG_JOB_CALCULATION:
             logging.debug(
-                f"Job calculation - TC jobs not handled: {tc_jobs_not_handled}, "
-                f"Available devices: {available_devices_count}, "
-                f"Global initiated: {global_initiated}, "
-                f"Max jobs to start at once: {max_jobs}"
+                f"Job calculation - TCJobsNotHandled: {tc_jobs_not_handled}, "
+                f"AvailableDevices: {available_devices_count}, "
+                f"GlobalInitiated: {global_initiated}, "
+                f"MaxJobsToStartAtOnce: {max_jobs}"
             )
 
         # Inspect global initiated jobs threshold
