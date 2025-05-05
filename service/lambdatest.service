@@ -14,3 +14,7 @@ User=bitbar
 
 [Install]
 WantedBy=multi-user.target
+
+# install with:
+#   $ cp service/lambdatest.service /etc/systemd/system/lambdatest.service
+#   $ sudo systemctl daemon-reload
