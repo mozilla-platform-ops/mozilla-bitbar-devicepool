@@ -68,6 +68,18 @@ class TestRunManagerLT(object):
     DEBUG_DEVICE_SELECTION = True  # Enable detailed debugging for device selection
     DEBUG_JOB_CALCULATION = True  # Enable detailed debugging for job calculation
 
+    # Shared data keys (Constants)
+    SHARED_LT_G_INITIATED_JOBS = "lt_g_initiated_jobs"
+    SHARED_LT_G_ACTIVE_DEVICES = "lt_g_active_devices"
+    SHARED_LT_G_CLEANUP_DEVICES = "lt_g_cleanup_devices"
+    SHARED_PROJECTS = "projects"
+    PROJECT_LT_DEVICE_SELECTOR = "lt_device_selector"
+    PROJECT_TC_JOB_COUNT = "tc_job_count"
+    PROJECT_LT_ACTIVE_DEVICES = "lt_active_devices"
+    PROJECT_LT_BUSY_DEVICES = "lt_busy_devices"
+    PROJECT_LT_CLEANUP_DEVICES = "lt_cleanup_devices"
+    PROJECT_AVAILABLE_DEVICES = "available_devices"
+
     def __init__(
         self,
         max_jobs_to_start=MAX_JOBS_TO_START_AT_ONCE,
@@ -106,24 +118,24 @@ class TestRunManagerLT(object):
         self.shared_data = manager.dict()
 
         # Initialize shared data structure - Moved all initialization here
-        self.shared_data["lt_g_initiated_jobs"] = 0
-        self.shared_data["lt_g_active_devices"] = 0
-        self.shared_data["lt_g_cleanup_devices"] = 0  # Add tracking for cleanup devices
+        self.shared_data[self.SHARED_LT_G_INITIATED_JOBS] = 0
+        self.shared_data[self.SHARED_LT_G_ACTIVE_DEVICES] = 0
+        self.shared_data[self.SHARED_LT_G_CLEANUP_DEVICES] = 0  # Add tracking for cleanup devices
         # Initialize projects dictionary as a nested Manager dict
         projects_dict = manager.dict()
 
         # Initialize project-specific data for all projects defined in config
         for project_name, project_config in self.config_object.config.get("projects", {}).items():
             project_data = manager.dict()
-            project_data["lt_device_selector"] = project_config.get("lt_device_selector", None)
-            project_data["tc_job_count"] = 0
-            project_data["lt_active_devices"] = 0
-            project_data["lt_busy_devices"] = 0
-            project_data["lt_cleanup_devices"] = 0  # Add tracking for cleanup devices per project
-            project_data["available_devices"] = manager.list()  # Use managed list
+            project_data[self.PROJECT_LT_DEVICE_SELECTOR] = project_config.get("lt_device_selector", None)
+            project_data[self.PROJECT_TC_JOB_COUNT] = 0
+            project_data[self.PROJECT_LT_ACTIVE_DEVICES] = 0
+            project_data[self.PROJECT_LT_BUSY_DEVICES] = 0
+            project_data[self.PROJECT_LT_CLEANUP_DEVICES] = 0  # Add tracking for cleanup devices per project
+            project_data[self.PROJECT_AVAILABLE_DEVICES] = manager.list()  # Use managed list
             projects_dict[project_name] = project_data
 
-        self.shared_data["projects"] = projects_dict
+        self.shared_data[self.SHARED_PROJECTS] = projects_dict
 
         # No need for a lock with Manager objects
         self.shutdown_event = threading.Event()
@@ -190,8 +202,10 @@ class TestRunManagerLT(object):
                         worker_type_to_count_dict[tc_worker_type] = tc_job_count
 
                         # Update shared data without lock
-                        if project_name in self.shared_data["projects"]:
-                            self.shared_data["projects"][project_name]["tc_job_count"] = tc_job_count
+                        if project_name in self.shared_data[self.SHARED_PROJECTS]:
+                            self.shared_data[self.SHARED_PROJECTS][project_name][self.PROJECT_TC_JOB_COUNT] = (
+                                tc_job_count
+                            )
                 except Exception as e:
                     logging.error(f"{logging_header} Error fetching TC tasks for {project_name}: {e}", exc_info=True)
 
@@ -251,7 +265,7 @@ class TestRunManagerLT(object):
                 except Exception as e:
                     logging.error(f"{logging_header} Error fetching jobs list: {e}", exc_info=True)
                     # Keep previous value if there's an error
-                    local_device_stats["initiated_jobs"] = self.shared_data.get("lt_g_initiated_jobs", 0)
+                    local_device_stats["initiated_jobs"] = self.shared_data.get(self.SHARED_LT_G_INITIATED_JOBS, 0)
 
                 # Count total devices across all device types
                 for device_type in device_list:
@@ -271,9 +285,9 @@ class TestRunManagerLT(object):
                 device_list = {}
 
             # Update shared data with accurate job count and device stats
-            self.shared_data["lt_g_initiated_jobs"] = local_device_stats["initiated_jobs"]
-            self.shared_data["lt_g_active_devices"] = local_device_stats["active_devices"]
-            self.shared_data["lt_g_cleanup_devices"] = local_device_stats["cleanup_devices"]
+            self.shared_data[self.SHARED_LT_G_INITIATED_JOBS] = local_device_stats["initiated_jobs"]
+            self.shared_data[self.SHARED_LT_G_ACTIVE_DEVICES] = local_device_stats["active_devices"]
+            self.shared_data[self.SHARED_LT_G_CLEANUP_DEVICES] = local_device_stats["cleanup_devices"]
 
             # For each project, filter the device list based on the project's device_groups
             for project_name, project_config in self.config_object.config["projects"].items():
@@ -305,13 +319,17 @@ class TestRunManagerLT(object):
 
                         # Update shared data for the project
                         # No need to update global counts here again, done above
-                        if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
-                            self.shared_data["projects"][project_name]["lt_active_devices"] = active_device_count
-                            self.shared_data["projects"][project_name]["lt_busy_devices"] = busy_devices
-                            self.shared_data["projects"][project_name]["lt_cleanup_devices"] = cleanup_devices
+                        if (
+                            self.SHARED_PROJECTS in self.shared_data
+                            and project_name in self.shared_data[self.SHARED_PROJECTS]
+                        ):
+                            project_data = self.shared_data[self.SHARED_PROJECTS][project_name]
+                            project_data[self.PROJECT_LT_ACTIVE_DEVICES] = active_device_count
+                            project_data[self.PROJECT_LT_BUSY_DEVICES] = busy_devices
+                            project_data[self.PROJECT_LT_CLEANUP_DEVICES] = cleanup_devices
 
                             # Clear and update the available_devices list
-                            available_devices = self.shared_data["projects"][project_name]["available_devices"]
+                            available_devices = project_data[self.PROJECT_AVAILABLE_DEVICES]
                             available_devices[:] = []
                             available_devices.extend(active_device_list)  # Update with new data
 
@@ -333,8 +351,8 @@ class TestRunManagerLT(object):
             logging.info(
                 f"{logging_header} "
                 "Global device utilization: Total/Active/Busy/Cleanup/BusyPercentage: "  # Added Cleanup to log
-                f"{local_device_stats['total_devices']}/{self.shared_data['lt_g_active_devices']}/"  # Use shared data value
-                f"{local_device_stats['busy_devices']}/{self.shared_data['lt_g_cleanup_devices']}/"  # Use shared data value
+                f"{local_device_stats['total_devices']}/{self.shared_data[self.SHARED_LT_G_ACTIVE_DEVICES]}/"  # Use shared data value
+                f"{local_device_stats['busy_devices']}/{self.shared_data[self.SHARED_LT_G_CLEANUP_DEVICES]}/"  # Use shared data value
                 f"{util_percent:.1f}%"
             )
             logging.info(f"{logging_header} {per_queue_string}")
@@ -360,7 +378,7 @@ class TestRunManagerLT(object):
             lt_device_selector = current_project["lt_device_selector"]
 
             # Check if project exists in shared_data, log error if not (shouldn't happen if config is consistent)
-            if project_name not in self.shared_data.get("projects", {}):
+            if project_name not in self.shared_data.get(self.SHARED_PROJECTS, {}):
                 logging.error(f"{logging_header} Project '{project_name}' not found in shared_data. Thread exiting.")
                 return
 
@@ -373,14 +391,14 @@ class TestRunManagerLT(object):
             active_devices = 0
             available_devices = []
 
-            if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
-                project_data = self.shared_data["projects"][project_name]
-                tc_job_count = project_data.get("tc_job_count", 0)
-                active_devices = project_data.get("lt_active_devices", 0)
-                busy_devices = project_data.get("lt_busy_devices", 0)
-                cleanup_devices = project_data.get("lt_cleanup_devices", 0)
+            if self.SHARED_PROJECTS in self.shared_data and project_name in self.shared_data[self.SHARED_PROJECTS]:
+                project_data = self.shared_data[self.SHARED_PROJECTS][project_name]
+                tc_job_count = project_data.get(self.PROJECT_TC_JOB_COUNT, 0)
+                active_devices = project_data.get(self.PROJECT_LT_ACTIVE_DEVICES, 0)
+                busy_devices = project_data.get(self.PROJECT_LT_BUSY_DEVICES, 0)
+                cleanup_devices = project_data.get(self.PROJECT_LT_CLEANUP_DEVICES, 0)
                 # Make a copy of the list to avoid modification issues
-                available_devices = list(project_data.get("available_devices", []))
+                available_devices = list(project_data.get(self.PROJECT_AVAILABLE_DEVICES, []))
 
                 # Debug logging for all available device UDIDs
                 if self.DEBUG_DEVICE_SELECTION and available_devices:
@@ -391,7 +409,7 @@ class TestRunManagerLT(object):
             # if tc_job_count == 0:
             #     try:
             #         tc_job_count = get_taskcluster_pending_tasks("proj-autophone", tc_worker_type, verbose=False)
-            #         self.shared_data["projects"][project_name]["tc_job_count"] = tc_job_count
+            #         self.shared_data[self.SHARED_PROJECTS][project_name][self.PROJECT_TC_JOB_COUNT] = tc_job_count
             #     except Exception as e:
             #         logging.error(f"{logging_header} {project_name}] Error fetching TC tasks: {e}")
 
@@ -417,8 +435,10 @@ class TestRunManagerLT(object):
                                     available_devices.append(udid)
                                     logging.debug(f"{logging_header} Directly found active device: {udid}")
                     # Update the shared data with these devices
-                    if available_devices and project_name in self.shared_data["projects"]:
-                        self.shared_data["projects"][project_name]["available_devices"] = available_devices
+                    if available_devices and project_name in self.shared_data[self.SHARED_PROJECTS]:
+                        self.shared_data[self.SHARED_PROJECTS][project_name][self.PROJECT_AVAILABLE_DEVICES] = (
+                            available_devices
+                        )
                         logging.debug(
                             f"{logging_header} Updated available devices with direct fetch: {available_devices}"
                         )
@@ -450,7 +470,7 @@ class TestRunManagerLT(object):
                 )
 
             jobs_to_start = self.calculate_jobs_to_start(
-                tc_jobs_not_handled, len(available_devices), self.shared_data["lt_g_initiated_jobs"]
+                tc_jobs_not_handled, len(available_devices), self.shared_data[self.SHARED_LT_G_INITIATED_JOBS]
             )
             jobs_to_start = max(0, jobs_to_start)  # Ensure non-negative
 
@@ -461,7 +481,7 @@ class TestRunManagerLT(object):
             logging.info(
                 f"{logging_header} TC Jobs: {tc_job_count:>4}, {lt_blob:>41}, "
                 f"RStarted/NeedH/ToStart: {recently_started_jobs}/{tc_jobs_not_handled}/{jobs_to_start}, "
-                f"GInit/GInitMax {self.shared_data['lt_g_initiated_jobs']}/{self.MAX_INITITATED_JOBS}"
+                f"GInit/GInitMax {self.shared_data[self.SHARED_LT_G_INITIATED_JOBS]}/{self.MAX_INITITATED_JOBS}"
             )
 
             if jobs_to_start > 0:
@@ -526,7 +546,9 @@ class TestRunManagerLT(object):
                             # Keep track of the assigned UDID
                             assigned_device_udids.append(device_udid)
                             # update the shared data
-                            self.shared_data["projects"][project_name]["available_devices"] = available_devices
+                            self.shared_data[self.SHARED_PROJECTS][project_name][self.PROJECT_AVAILABLE_DEVICES] = (
+                                available_devices
+                            )
                             break
 
                     if not device_udid:
@@ -611,7 +633,7 @@ class TestRunManagerLT(object):
                 if tc_job_count > 0 and len(available_devices) > 0:
                     logging.debug(
                         f"{logging_header} Not starting jobs despite TC jobs ({tc_job_count}) and available devices ({len(available_devices)}). "
-                        f"Check: Recently Started={recently_started_jobs}, Global Initiated={self.shared_data['lt_g_initiated_jobs']}/{self.MAX_INITITATED_JOBS}"
+                        f"Check: Recently Started={recently_started_jobs}, Global Initiated={self.shared_data[self.SHARED_LT_G_INITIATED_JOBS]}/{self.MAX_INITITATED_JOBS}"
                     )
 
             # Wait before next check or until shutdown
@@ -667,13 +689,14 @@ class TestRunManagerLT(object):
         if lt_monitor.is_alive():
             logging.warning(f"{logging_header} LT monitor thread did not exit cleanly.")
 
-    def calculate_jobs_to_start(self, tc_jobs_not_handled, available_devices_count, _global_initiated, max_jobs=None):
+    def calculate_jobs_to_start(self, tc_jobs_not_handled, available_devices_count, global_initiated, max_jobs=None):
         """
         Calculate the number of jobs to start based on pending TC jobs and available devices.
 
         Args:
             tc_jobs_not_handled (int): Number of Taskcluster jobs that are not yet handled
             available_devices_count (int): Number of available devices
+            global_initiated (int): Current count of globally initiated jobs
             max_jobs (int, optional): Maximum jobs to start, defaults to self.max_jobs_to_start
 
         Returns:
@@ -687,15 +710,15 @@ class TestRunManagerLT(object):
             logging.debug(
                 f"Job calculation - TC jobs not handled: {tc_jobs_not_handled}, "
                 f"Available devices: {available_devices_count}, "
-                f"Global initiated: {_global_initiated}, "
+                f"Global initiated: {global_initiated}, "
                 f"Max jobs to start at once: {max_jobs}"
             )
 
         # Inspect global initiated jobs threshold
-        if _global_initiated > self.MAX_INITITATED_JOBS:
+        if global_initiated > self.MAX_INITITATED_JOBS:
             if self.DEBUG_JOB_CALCULATION:
                 logging.debug(
-                    f"Not starting new jobs: Global initiated jobs ({_global_initiated}) > "
+                    f"Not starting new jobs: Global initiated jobs ({global_initiated}) > "
                     f"MAX_INITITATED_JOBS ({self.MAX_INITITATED_JOBS})"
                 )
             jobs_to_start = 0
