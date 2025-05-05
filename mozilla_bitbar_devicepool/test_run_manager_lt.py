@@ -388,7 +388,6 @@ class TestRunManagerLT(object):
             tc_client_key = current_project["TASKCLUSTER_ACCESS_TOKEN"]
             lt_device_selector = current_project["lt_device_selector"]
 
-            # Store selector for this project - no lock needed with Manager
             if "projects" not in self.shared_data:
                 manager = multiprocessing.Manager()
                 self.shared_data["projects"] = manager.dict()
@@ -412,7 +411,6 @@ class TestRunManagerLT(object):
             active_devices = 0
             available_devices = []
 
-            # Try to get device data for this project - no lock needed
             if "projects" in self.shared_data and project_name in self.shared_data["projects"]:
                 project_data = self.shared_data["projects"][project_name]
                 tc_job_count = project_data.get("tc_job_count", 0)
