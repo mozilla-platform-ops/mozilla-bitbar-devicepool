@@ -93,6 +93,23 @@ class ConfigurationLt(object):
         # remove the defaults project
         del projects_config["defaults"]
 
+    def get_project_for_udid(self, udid):
+        """
+        Finds the project name associated with a given device UDID.
+
+        Args:
+            udid (str): The UDID of the device to look up.
+
+        Returns:
+            str or None: The name of the project the device belongs to,
+                         or None if the UDID is not found in any device group.
+        """
+        device_groups = self.config.get("device_groups", {})
+        for project_name, udid_list in device_groups.items():
+            if udid in udid_list:
+                return project_name
+        return None
+
     def configure(self):
         # TODO?: add filespath?
 
