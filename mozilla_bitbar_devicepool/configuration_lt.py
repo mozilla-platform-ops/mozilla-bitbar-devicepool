@@ -83,9 +83,6 @@ class ConfigurationLt(object):
             # Set the default project values.
             projects_config[project_name] = apply_dict_defaults(project_config, project_defaults)
 
-        # TODO?: remove 'defaults' from CONFIG['projects']?
-        #   - would save later code from having to exclude it
-
         # massage device_groups into a more usable format
         for item in project_device_groups:
             project_device_groups[item] = project_device_groups[item].split(" ")
