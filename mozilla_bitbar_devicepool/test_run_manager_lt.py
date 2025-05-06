@@ -114,9 +114,9 @@ class TestRunManagerLT(object):
         self.shared_data[self.SHARED_LT_G_INITIATED_JOBS] = 0
         self.shared_data[self.SHARED_LT_G_ACTIVE_DEVICES] = 0
         self.shared_data[self.SHARED_LT_G_CLEANUP_DEVICES] = 0  # Add tracking for cleanup devices
+        self.shared_data[self.SHARED_SESSION_STARTED_JOBS] = 0
         # Initialize projects dictionary as a nested Manager dict
         projects_dict = manager.dict()
-        self.shared_data[self.SHARED_SESSION_STARTED_JOBS] = 0
 
         # Initialize project-specific data for all projects defined in config
         for project_name, _project_config in self.config_object.config.get("projects", {}).items():
