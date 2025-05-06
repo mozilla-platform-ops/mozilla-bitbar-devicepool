@@ -110,6 +110,24 @@ class ConfigurationLt(object):
                 return project_name
         return None
 
+    def get_device_count_for_project(self, project_name):
+        """
+        Returns the number of devices associated with a given project.
+
+        Args:
+            project_name (str): The name of the project to look up.
+
+        Returns:
+            int: The number of devices associated with the project.
+        """
+        device_groups = self.config.get("device_groups", {})
+        import pprint
+
+        pprint.pprint(device_groups)
+        if project_name in device_groups:
+            return len(device_groups[project_name])
+        return 0
+
     def configure(self):
         # TODO?: add filespath?
 
@@ -133,13 +151,25 @@ class ConfigurationLt(object):
         # expand the configuration
         self.expand_configuration()
 
-    def configure_with_config_path(self, config_path="config/lambdatest.yml"):
-        self.config_path = config_path
-        self.load_file_config(config_path)
-        self.set_lt_api_key()
-        self.set_lt_username()
-        self.load_tc_env_vars()
-        self.expand_configuration()
+    # def configure_with_config_blob(self, config_blob):
+    #     # Revert to original assignment
+    #     self.config = config_blob
+
+    #     # import pprint # Debug print removed for clarity
+    #     # pprint.pprint(self.config)
+
+    #     self.set_lt_api_key()
+    #     self.set_lt_username()
+    #     self.load_tc_env_vars()
+    #     self.expand_configuration()
+
+    # def configure_with_config_path(self, config_path="config/lambdatest.yml"):
+    #     self.config_path = config_path
+    #     self.load_file_config(config_path)
+    #     self.set_lt_api_key()
+    #     self.set_lt_username()
+    #     self.load_tc_env_vars()
+    #     self.expand_configuration()
 
 
 if __name__ == "__main__":
