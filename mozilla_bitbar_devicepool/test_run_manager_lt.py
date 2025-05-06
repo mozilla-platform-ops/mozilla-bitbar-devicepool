@@ -294,6 +294,7 @@ class TestRunManagerLT(object):
             for project_name, project_config in self.config_object.config["projects"].items():
                 try:
                     # TODO: should we gate on this any longer? i think no
+                    #  - are we already checking this in configuration_lt
                     lt_device_selector = project_config.get("lt_device_selector")
                     if lt_device_selector:
                         project_active_device_count_api = 0
