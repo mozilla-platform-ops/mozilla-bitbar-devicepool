@@ -119,7 +119,7 @@ def configure(bitbar_configpath, filespath=None, update_bitbar=False):
     except ConfigurationFileException as e:
         logger.warning(e.message)
         sys.exit(1)
-    _expand_configuration()
+    expand_configuration()
     try:
         configuration_preflight()
     except ConfigurationFileException as e:
@@ -134,7 +134,7 @@ def configure(bitbar_configpath, filespath=None, update_bitbar=False):
     logger.info("configure: configuration took {} seconds".format(diff))
 
 
-def _expand_configuration():
+def expand_configuration():
     """Materializes the configuration. Sets default values when none are specified."""
     projects_config = CONFIG["projects"]
     project_defaults = projects_config["defaults"]
