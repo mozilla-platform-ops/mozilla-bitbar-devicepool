@@ -99,6 +99,7 @@ class TestRunManagerLT(object):
         # Replace single job_tracker with a dictionary of job trackers per project
         self.job_trackers = {}
         # Initialize job trackers for each project in config
+        # TODO: configuration lt call to get projects?
         for project_name in self.config_object.config.get("projects", {}):
             self.job_trackers[project_name] = JobTracker(expiry_seconds=210)
         # Keep a default tracker for backward compatibility
@@ -119,7 +120,6 @@ class TestRunManagerLT(object):
         # Initialize project-specific data for all projects defined in config
         for project_name, project_config in self.config_object.config.get("projects", {}).items():
             project_data = manager.dict()
-            project_data[self.PROJECT_LT_DEVICE_SELECTOR] = project_config.get("lt_device_selector", None)
             project_data[self.PROJECT_TC_JOB_COUNT] = 0
             project_data[self.PROJECT_LT_ACTIVE_DEVICE_COUNT] = 0
             project_data[self.PROJECT_LT_BUSY_DEVICE_COUNT] = 0
