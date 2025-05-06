@@ -439,7 +439,6 @@ class TestRunManagerLT(object):
             )
             jobs_to_start = max(0, jobs_to_start)
 
-            # TODO: why is len(self.config_object.config['device_groups'][project_name]) not 34 for a55-perf?
             lt_blob_p1 = f"{len(self.config_object.config['device_groups'][project_name])}/{project_active_device_count_api}/{project_busy_devices_api}/{project_cleanup_devices_api}"
             lt_blob = f"LT Devs Config/Active/Busy/Cleanup: {lt_blob_p1:>11}"
 
