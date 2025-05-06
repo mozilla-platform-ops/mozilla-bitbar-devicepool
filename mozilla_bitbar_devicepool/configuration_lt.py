@@ -133,6 +133,14 @@ class ConfigurationLt(object):
         # expand the configuration
         self.expand_configuration()
 
+    def configure_with_config_path(self, config_path="config/lambdatest.yml"):
+        self.config_path = config_path
+        self.load_file_config(config_path)
+        self.set_lt_api_key()
+        self.set_lt_username()
+        self.load_tc_env_vars()
+        self.expand_configuration()
+
 
 if __name__ == "__main__":
     clt = ConfigurationLt()
