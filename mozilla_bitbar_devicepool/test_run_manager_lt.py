@@ -571,8 +571,8 @@ class TestRunManagerLT(object):
         logging.info(f"{logging_header} Thread stopped.")
 
     def run_multithreaded(self):
-        logging_header = f"[ {'Main':<{self.logging_padding}} ]"
         """Runs the manager with separate threads for monitoring and job starting for each project."""
+        logging_header = f"[ {'Main':<{self.logging_padding}} ]"
         logging.info(f"{logging_header} Starting Test Run Manager in multithreaded mode...")
 
         # Create monitor threads
