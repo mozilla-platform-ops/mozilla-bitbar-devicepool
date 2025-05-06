@@ -6,6 +6,8 @@
 from mozilla_bitbar_devicepool import TESTDROID
 from mozilla_bitbar_devicepool.util.template import get_filter
 
+from testdroid import Testdroid
+
 
 def get_devices(**kwargs):
     """Return list of matching Bitbar devices.
@@ -78,3 +80,26 @@ def get_offline_devices(device_model=None):
             if problem["type"] == "OFFLINE":
                 offline_devices.append(device_problem["deviceModelName"])
     return offline_devices
+
+
+# main
+if __name__ == "__main__":
+    import os
+    import pprint
+
+    # from mozilla_bitbar_devicepool.bitbar.devices import get_device
+
+    TESTDROID_URL = os.environ.get("TESTDROID_URL")
+    TESTDROID_APIKEY = os.environ.get("TESTDROID_APIKEY")
+    if TESTDROID_URL and TESTDROID_APIKEY:
+        TESTDROID = Testdroid(apikey=TESTDROID_APIKEY, url=TESTDROID_URL)
+    else:
+        TESTDROID = None
+
+    print(TESTDROID)
+    response = TESTDROID.get("/api/v2/device-groups", payload={"limit": 0, "filter": filter})
+    pprint.pprint(response)
+
+    print("*********")
+
+    pprint.pprint(get_device(17))
