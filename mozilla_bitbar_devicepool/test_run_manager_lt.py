@@ -118,7 +118,7 @@ class TestRunManagerLT(object):
         self.shared_data[self.SHARED_SESSION_STARTED_JOBS] = 0
 
         # Initialize project-specific data for all projects defined in config
-        for project_name, project_config in self.config_object.config.get("projects", {}).items():
+        for project_name, _project_config in self.config_object.config.get("projects", {}).items():
             project_data = manager.dict()
             project_data[self.PROJECT_TC_JOB_COUNT] = 0
             project_data[self.PROJECT_LT_ACTIVE_DEVICE_COUNT] = 0
