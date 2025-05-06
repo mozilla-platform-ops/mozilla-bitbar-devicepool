@@ -37,9 +37,8 @@ class TestRunManagerLT(object):
     # Constants at class level
     PROGRAM_LABEL = "tcdp"
     # TODO: increase this to 10, 20, 30 once we're more confident
-    MAX_JOBS_TO_START_AT_ONCE = 10
-    # keep around the total number of devices online?
-    MAX_INITITATED_JOBS = 40
+    MAX_JOBS_TO_START_IN_ONE_CYCLE = 10
+    GLOBAL_MAX_INITITATED_JOBS = 40
 
     # Threading constants
     TC_MONITOR_INTERVAL = 30  # seconds
@@ -75,7 +74,7 @@ class TestRunManagerLT(object):
 
     def __init__(
         self,
-        max_jobs_to_start=MAX_JOBS_TO_START_AT_ONCE,
+        max_jobs_to_start=MAX_JOBS_TO_START_IN_ONE_CYCLE,
         exit_wait=5,
         no_job_sleep=60,
         debug_mode=False,
@@ -434,7 +433,7 @@ class TestRunManagerLT(object):
             logging.info(
                 f"{logging_header} TC Jobs: {tc_job_count:>4}, {lt_blob:>41}, "
                 f"RStarted/NeedH/Avail/ToStart: {recently_started_jobs_count}/{tc_jobs_not_handled}/{available_devices_for_job_start_count}/{jobs_to_start}, "  # Added Avail count
-                f"GInit/GInitMax {self.shared_data[self.SHARED_LT_G_INITIATED_JOBS]}/{self.MAX_INITITATED_JOBS}"
+                f"GInit/GInitMax {self.shared_data[self.SHARED_LT_G_INITIATED_JOBS]}/{self.GLOBAL_MAX_INITITATED_JOBS}"
             )
 
             if jobs_to_start > 0:
@@ -555,7 +554,7 @@ class TestRunManagerLT(object):
                 if tc_job_count > 0 and available_devices_for_job_start_count > 0:
                     logging.debug(
                         f"{logging_header} Not starting jobs despite TC jobs ({tc_job_count}) and available devices ({available_devices_for_job_start_count}). "
-                        f"Check: Recently Started={recently_started_jobs_count}, Global Initiated={self.shared_data[self.SHARED_LT_G_INITIATED_JOBS]}/{self.MAX_INITITATED_JOBS}"
+                        f"Check: Recently Started={recently_started_jobs_count}, Global Initiated={self.shared_data[self.SHARED_LT_G_INITIATED_JOBS]}/{self.GLOBAL_MAX_INITITATED_JOBS}"
                     )
 
             # Wait before next check or until shutdown
@@ -638,11 +637,11 @@ class TestRunManagerLT(object):
 
         # TODO: move global_initiated out of this function and consider it in 'job start' threads separately
         # Inspect global initiated jobs threshold
-        if global_initiated > self.MAX_INITITATED_JOBS:
+        if global_initiated > self.GLOBAL_MAX_INITITATED_JOBS:
             if self.DEBUG_JOB_CALCULATION:
                 logging.debug(
                     f"Not starting new jobs: Global initiated jobs ({global_initiated}) > "
-                    f"MAX_INITITATED_JOBS ({self.MAX_INITITATED_JOBS})"
+                    f"GLOBAL_MAX_INITITATED_JOBS ({self.GLOBAL_MAX_INITITATED_JOBS})"
                 )
             jobs_to_start = 0
             return jobs_to_start
