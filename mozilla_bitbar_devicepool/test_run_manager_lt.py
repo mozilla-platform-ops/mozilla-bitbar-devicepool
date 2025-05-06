@@ -573,7 +573,7 @@ class TestRunManagerLT(object):
             # Wait before next check or until shutdown
             self.shutdown_event.wait(self.JOB_STARTER_INTERVAL)
 
-        logging.info(f"{logging_header} stopped.")
+        logging.info(f"{logging_header} Thread stopped.")
 
     def run_multithreaded(self):
         logging_header = f"[ {'Main':<{self.logging_padding}} ]"
