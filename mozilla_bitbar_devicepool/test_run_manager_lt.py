@@ -560,7 +560,7 @@ class TestRunManagerLT(object):
                 # disabled... i don't think we need this. if there are 30 jobs and max to start per turn is 10,
                 #    we can get some more jobs launched before the next LT_UPDATE
                 #
-                # update: not needed, but we end up loanching jobs too quickly without it
+                # update: not needed, but we end up launching jobs too quickly without it
                 self.shutdown_event.wait(self.LT_MONITOR_INTERVAL)
             else:
                 # If no jobs to start but there are TC jobs and available devices, log debug info
