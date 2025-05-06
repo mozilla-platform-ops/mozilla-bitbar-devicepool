@@ -36,14 +36,6 @@ class TestRunManagerLT(object):
 
     # Constants at class level
     PROGRAM_LABEL = "tcdp"
-    #
-    STATE_STOP = "STATE_STOP"
-    STATE_RUNNING = "STATE_RUNNING"
-    #
-    MODE_NO_OP = "MODE_NO_OP"
-    MODE_RUN_NOTRACK = "MODE_RUN_NOTRACK"
-    MODE_RUN_NOTRACK_WITH_CONCURRENCY = "MODE_RUN_NOTRACK_WITH_CONCURRENCY"
-    MODE_RUN_NOTRACK_BACKGROUND_TASKS = "MODE_RUN_NOTRACK_BACKGROUND_TASKS"
     # TODO: increase this to 10, 20, 30 once we're more confident
     MAX_JOBS_TO_START_AT_ONCE = 10
     # keep around the total number of devices online?
@@ -91,7 +83,6 @@ class TestRunManagerLT(object):
         self.exit_wait = exit_wait
         self.no_job_sleep = no_job_sleep
         self.max_jobs_to_start = max_jobs_to_start
-        self.state = self.STATE_RUNNING
         self.debug_mode = debug_mode
         self.unit_testing_mode = unit_testing_mode
         self.logging_padding = 12  # Store the padding value as instance variable
