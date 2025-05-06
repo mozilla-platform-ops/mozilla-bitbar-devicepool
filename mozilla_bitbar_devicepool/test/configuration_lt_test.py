@@ -138,6 +138,8 @@ def test_get_device_count_for_project(configured_lt_instance):
     # Test with a project that has devices
     assert configured_lt_instance.get_device_count_for_project("a55-perf") == 33
 
+    assert configured_lt_instance.get_device_count_for_project("a55-alpha") == 1
+
     # Test with a project that has no devices
     assert configured_lt_instance.get_device_count_for_project("non_existent_project") == 0
 
@@ -149,6 +151,9 @@ def test_get_project_for_udid(configured_lt_instance):
     """
     # Test with a device that exists
     assert configured_lt_instance.get_project_for_udid("R5CX4089QNL") == "a55-perf"
+
+    assert configured_lt_instance.get_project_for_udid("R5CXC1HZKLR") == "a55-alpha"
+    assert configured_lt_instance.get_project_for_udid("RZ8NB0WJ47H") == "test-1"
 
     # Test with a device that does not exist
     assert configured_lt_instance.get_project_for_udid("non_existent_device") is None
