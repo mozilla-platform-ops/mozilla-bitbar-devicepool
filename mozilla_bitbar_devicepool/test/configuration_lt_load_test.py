@@ -122,7 +122,7 @@ device_groups:
 
 def test_load_file_config(tmp_path):
     """
-    Tests that load_file_config correctly loads configuration from an actual file.
+    Tests that _load_file_config correctly loads configuration from an actual file.
     """
     # Create a temporary config file
     config_dir = tmp_path / "config"
@@ -132,8 +132,8 @@ def test_load_file_config(tmp_path):
 
     config_lt = ConfigurationLt()
 
-    # Call load_file_config with the path to the temporary file
-    config_lt.load_file_config(config_path=str(config_file))
+    # Call _load_file_config with the path to the temporary file
+    config_lt._load_file_config(config_path=str(config_file))
 
     # Assert that the loaded config matches the sample data dictionary
     assert config_lt.get_config() == SAMPLE_FILE_CONFIG_DICT
@@ -141,7 +141,7 @@ def test_load_file_config(tmp_path):
 
 def test_load_file_config_file_not_found(tmp_path):
     """
-    Tests that load_file_config raises FileNotFoundError when the file doesn't exist.
+    Tests that _load_file_config raises FileNotFoundError when the file doesn't exist.
     """
     config_lt = ConfigurationLt()
 
@@ -150,4 +150,4 @@ def test_load_file_config_file_not_found(tmp_path):
 
     # Assert that FileNotFoundError is raised when trying to load a non-existent file
     with pytest.raises(FileNotFoundError):
-        config_lt.load_file_config(config_path=str(non_existent_path))
+        config_lt._load_file_config(config_path=str(non_existent_path))

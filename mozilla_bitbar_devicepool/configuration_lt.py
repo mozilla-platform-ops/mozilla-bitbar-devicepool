@@ -22,7 +22,7 @@ class ConfigurationLt(object):
         if self.ci_mode:
             print("ConfigurationLt: Running in CI mode. Using fake credentials.")
 
-    def load_file_config(self, config_path="config/lambdatest.yml"):
+    def _load_file_config(self, config_path="config/lambdatest.yml"):
         # get this file's directory path
         this_dir = os.path.dirname(os.path.realpath(__file__))
         # get the absolute path
@@ -35,7 +35,7 @@ class ConfigurationLt(object):
     def get_config(self):
         return self.config
 
-    def set_lt_api_key(self):
+    def _set_lt_api_key(self):
         # load from os environment
         if self.ci_mode:
             self.lt_api_key = "fake123"
@@ -45,7 +45,7 @@ class ConfigurationLt(object):
         self.lt_access_key = os.environ.get("LT_ACCESS_KEY")
         # self.config["lt_access_key"] = self.lt_api_key
 
-    def set_lt_username(self):
+    def _set_lt_username(self):
         # load from os environment
         if self.ci_mode:
             self.lt_username = "fake123"
@@ -55,7 +55,7 @@ class ConfigurationLt(object):
         self.lt_username = os.environ.get("LT_USERNAME")
         # self.config["lt_username"] = self.lt_username
 
-    def load_tc_env_vars(self):
+    def _load_tc_env_vars(self):
         for project_name in self.config["projects"]:
             if project_name == "defaults":
                 continue
@@ -69,7 +69,7 @@ class ConfigurationLt(object):
                 raise ValueError(f"Environment variable {taskcluster_access_token_name} not found")
             data["TASKCLUSTER_ACCESS_TOKEN"] = os.environ[taskcluster_access_token_name]
 
-    def expand_configuration(self):
+    def _expand_configuration(self):
         """Materializes the configuration. Sets default values when none are specified."""
         projects_config = self.config["projects"]
         project_defaults = projects_config["defaults"]
@@ -140,36 +140,36 @@ class ConfigurationLt(object):
                 raise FileNotFoundError("hyperexecute binary not found on the system PATH")
 
         # load the data we need
-        self.load_file_config()
-        self.load_tc_env_vars()
-        self.set_lt_api_key()
-        self.set_lt_username()
+        self._load_file_config()
+        self._load_tc_env_vars()
+        self._set_lt_api_key()
+        self._set_lt_username()
 
         # debug print
         # print(self.get_config())
 
         # expand the configuration
-        self.expand_configuration()
+        self._expand_configuration()
 
     # def configure_with_config_blob(self, config_blob):
     #     # Revert to original assignment
     #     self.config = config_blob
-
+    #
     #     # import pprint # Debug print removed for clarity
     #     # pprint.pprint(self.config)
-
-    #     self.set_lt_api_key()
-    #     self.set_lt_username()
-    #     self.load_tc_env_vars()
-    #     self.expand_configuration()
-
+    #
+    #     self._set_lt_api_key()
+    #     self._set_lt_username()
+    #     self._load_tc_env_vars()
+    #     self._expand_configuration()
+    #
     # def configure_with_config_path(self, config_path="config/lambdatest.yml"):
     #     self.config_path = config_path
-    #     self.load_file_config(config_path)
-    #     self.set_lt_api_key()
-    #     self.set_lt_username()
-    #     self.load_tc_env_vars()
-    #     self.expand_configuration()
+    #     self._load_file_config(config_path)
+    #     self._set_lt_api_key()
+    #     self._set_lt_username()
+    #     self._load_tc_env_vars()
+    #     self._expand_configuration()
 
 
 if __name__ == "__main__":

@@ -31,7 +31,7 @@ def configured_lt_instance():
     config_lt.config["projects"]["projectA"]["TASKCLUSTER_ACCESS_TOKEN"] = "fake_token_A"
     config_lt.config["projects"]["projectB"]["TASKCLUSTER_ACCESS_TOKEN"] = "fake_token_B"
     # Expand the configuration (which modifies the config dict)
-    config_lt.expand_configuration()
+    config_lt._expand_configuration()
     return config_lt
 
 
