@@ -154,6 +154,7 @@ class TestRunManagerLT(object):
                 os._exit(1)  # Use os._exit for immediate termination
 
     # Helper methods for project-specific job trackers
+
     def get_job_tracker(self, project_name):
         """Get the job tracker for a specific project, creating it if it doesn't exist."""
         if project_name not in self.job_trackers:
@@ -174,6 +175,8 @@ class TestRunManagerLT(object):
             return self.job_trackers[project_name].get_active_job_count()
         # For backward compatibility
         return self.job_tracker.get_active_job_count()
+
+    # Thread functions
 
     def _taskcluster_monitor_thread(self):
         """Monitors Taskcluster pending tasks for all projects."""
@@ -562,6 +565,7 @@ class TestRunManagerLT(object):
 
         logging.info(f"{logging_header} Thread stopped.")
 
+    # main thread
     def run_multithreaded(self):
         """Runs the manager with separate threads for monitoring and job starting for each project."""
         logging_header = f"[ {'Main':<{self.logging_padding}} ]"
@@ -609,6 +613,8 @@ class TestRunManagerLT(object):
             logging.warning(f"{logging_header} TC monitor thread did not exit cleanly.")
         if lt_monitor.is_alive():
             logging.warning(f"{logging_header} LT monitor thread did not exit cleanly.")
+
+    # Helper methods
 
     def calculate_jobs_to_start(self, tc_jobs_not_handled, available_devices_count, global_initiated, max_jobs=None):
         """
@@ -689,6 +695,9 @@ def get_git_version_info():
         return result
     except (subprocess.SubprocessError, FileNotFoundError):
         return ""  # Return empty string if not in a git repo or git is not available
+
+
+# Main and main helpers
 
 
 def parse_args(action_array):
