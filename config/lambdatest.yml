@@ -46,14 +46,12 @@ device_groups:
     R5CXC1ASA3P
     R5CXC1ASLHH
     R5CXC1HZK0W
-    R5CY128X71B
     R5CY21T22NH
     RZCX31FDGJE
     RZCX50TW03H
     RZCX71ZVF6J
     RZCX821GXDJ
     RZCX821GYPX
-    RZCXA0H3T9P
     RZCY10LGB6W
     RZCY10Y4HWD
     RZCY10Y4QVX
@@ -68,5 +66,4 @@ device_groups:
     # the only device with a power meter
     R5CXC1HZKLR
   test-1:
-    # a51
-    RZ8NB0WJ47H
+    # no devices yet
