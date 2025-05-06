@@ -55,4 +55,9 @@ def test_get_device_count_for_project(configured_lt_instance):  # Use the fixtur
     assert configured_lt_instance.get_device_count_for_project("projectA") == 2
     assert configured_lt_instance.get_device_count_for_project("projectB") == 2
     assert configured_lt_instance.get_device_count_for_project("projectC") == 26
+    #
     assert configured_lt_instance.get_device_count_for_project("non_existent_project") == 0
+    # being crazy now
+    test_str = "udid5 udid6 udid7 udid8 udid9 udid10 udid11 udid12 udid13 udid14 udid15 udid16 udid17 udid18 udid19 udid20 udid21 udid22 udid23 udid24 udid25 udid26 udid27 udid28 udid29 udid30"
+    test_str_arr = test_str.split(" ")
+    assert configured_lt_instance.get_device_count_for_project("projectC") == len(test_str_arr)
