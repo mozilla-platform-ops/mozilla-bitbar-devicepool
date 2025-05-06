@@ -125,7 +125,7 @@ class ConfigurationLt(object):
             return len(device_groups[project_name])
         return 0
 
-    def configure(self, config_blob=None):
+    def configure(self, config_blob=None, config_path=None):
         # TODO?: add filespath?
 
         # Check for hyperexecute binary on path using a shell command
@@ -136,9 +136,14 @@ class ConfigurationLt(object):
             except subprocess.CalledProcessError:
                 raise FileNotFoundError("hyperexecute binary not found on the system PATH")
 
+        if config_blob and config_path:
+            raise ValueError("Cannot specify both config_blob and config_path")
+
         # load the data we need
         if config_blob:
             self.config = config_blob
+        elif config_path:
+            self._load_file_config(config_path)
         else:
             self._load_file_config()
 

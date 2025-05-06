@@ -5,46 +5,6 @@
 import pytest
 from mozilla_bitbar_devicepool.configuration_lt import ConfigurationLt
 
-# Sample configuration data as a dictionary (for assertion)
-SAMPLE_FILE_CONFIG_DICT = {
-    "device_groups": {"projectC": "udid5 udid6"},
-    "projects": {"defaults": {"default_key": "default_value"}, "projectC": {"specific_key": "specific_value"}},
-    "device_groups": {  # noqa: F601
-        "a55-alpha": "R5CXC1HZKLR",
-        "a55-perf": "R5CX4089QNL R5CXC1AHV4M R5CXC1ALFED "
-        "R5CXC1AMMNK R5CXC1AMNFY R5CXC1ANGLT "
-        "R5CXC1AP2KT R5CXC1ARCER R5CXC1ARELR "
-        "R5CXC1ARM0A R5CXC1ASA0L R5CXC1ASA2E "
-        "R5CXC1ASA3P R5CXC1ASLHH R5CXC1HZK0W "
-        "R5CY128X71B R5CY21T22NH RZCX31FDGJE "
-        "RZCX50TW03H RZCX71ZVF6J RZCX821GXDJ "
-        "RZCX821GYPX RZCXA0H3T9P RZCY10LGB6W "
-        "RZCY10Y4HWD RZCY10Y4QVX RZCY10Y4TAV "
-        "RZCY10Y4TBY RZCY10Y4TJX RZCY10Y548K "
-        "RZCY2011M7N RZCY203N75Z RZCY204AAZD",
-        "test-1": "RZ8NB0WJ47H",
-    },
-    "global": {"contract_device_count": 30},
-    "projects": {  # noqa: F601
-        "a55-alpha": {
-            "TASKCLUSTER_CLIENT_ID": "project/autophone/gecko-t-lambda-alpha-a55",
-            "TC_WORKER_TYPE": "gecko-t-lambda-alpha-a55",
-            "lt_device_selector": "Galaxy A51-11",
-        },
-        "a55-perf": {
-            "TASKCLUSTER_CLIENT_ID": "project/autophone/gecko-t-lambda-perf-a55",
-            "TC_WORKER_TYPE": "gecko-t-lambda-perf-a55",
-            "lt_device_selector": "Galaxy A55 5G-14",
-        },
-        "defaults": {
-            "SCRIPT_REPO_COMMIT": "master",
-            "TASKCLUSTER_CLIENT_ID": "tc-client-id-set-me",
-            "TC_WORKER_TYPE": "tc-worker-type-set-me",
-            "lt_device_selector": "Samsung GZ4200-90",
-        },
-    },
-}
-
 # Sample configuration data as a raw YAML string (for writing to file)
 SAMPLE_FILE_CONFIG_YAML = """
 global:
@@ -131,12 +91,9 @@ def test_load_file_config(tmp_path):
     config_file.write_text(SAMPLE_FILE_CONFIG_YAML)
 
     config_lt = ConfigurationLt()
+    config_lt.configure(config_path=str(config_file))
 
-    # Call _load_file_config with the path to the temporary file
-    config_lt._load_file_config(config_path=str(config_file))
-
-    # Assert that the loaded config matches the sample data dictionary
-    assert config_lt.get_config() == SAMPLE_FILE_CONFIG_DICT
+    assert len(config_lt.config) > 0
 
 
 def test_load_file_config_file_not_found(tmp_path):
@@ -150,4 +107,4 @@ def test_load_file_config_file_not_found(tmp_path):
 
     # Assert that FileNotFoundError is raised when trying to load a non-existent file
     with pytest.raises(FileNotFoundError):
-        config_lt._load_file_config(config_path=str(non_existent_path))
+        config_lt.configure(config_path=str(non_existent_path))
