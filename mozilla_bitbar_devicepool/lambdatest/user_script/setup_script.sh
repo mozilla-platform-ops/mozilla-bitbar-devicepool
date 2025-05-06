@@ -29,7 +29,6 @@ echo "[extensions]" > ~/.hgrc
 echo "sparse =" >> ~/.hgrc
 
 # profgen
-# TODO: get this from a real location
 wget -O cmdlinetools.zip --no-check-certificate "https://android-packages.s3.us-west-2.amazonaws.com/commandlinetools-linux-13114758_latest.zip"
 unzip cmdlinetools.zip
 
