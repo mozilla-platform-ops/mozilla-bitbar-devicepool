@@ -40,11 +40,7 @@ class TestRunManagerLT(object):
     MAX_JOBS_TO_START_AT_ONCE = 10
     # keep around the total number of devices online?
     MAX_INITITATED_JOBS = 40
-    # lt api device states
-    LT_DEVICE_STATE_ACTIVE = "active"
-    LT_DEVICE_STATE_BUSY = "busy"
-    LT_DEVICE_STATE_INITIATED = "initiated"
-    LT_DEVICE_STATE_CLEANUP = "cleanup"
+
     # Threading constants
     TC_MONITOR_INTERVAL = 30  # seconds
     LT_MONITOR_INTERVAL = 30  # seconds
@@ -53,6 +49,12 @@ class TestRunManagerLT(object):
     DEBUG_JOB_STARTER = True  # Enable detailed debugging for job starter
     DEBUG_DEVICE_SELECTION = True  # Enable detailed debugging for device selection
     DEBUG_JOB_CALCULATION = True  # Enable detailed debugging for job calculation
+
+    # lt api device states
+    LT_DEVICE_STATE_ACTIVE = "active"
+    LT_DEVICE_STATE_BUSY = "busy"
+    LT_DEVICE_STATE_INITIATED = "initiated"
+    LT_DEVICE_STATE_CLEANUP = "cleanup"
 
     # Shared data keys (Constants)
     SHARED_SESSION_STARTED_JOBS = "session_started_jobs"
