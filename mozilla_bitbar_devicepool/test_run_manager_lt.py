@@ -188,7 +188,12 @@ class TestRunManagerLT(object):
             # For each project, get taskcluster job count
             for project_name, project_config in self.config_object.config["projects"].items():
                 try:
+                    # print(project_config)
+                    # print(type(project_config))
                     tc_worker_type = project_config.get("TC_WORKER_TYPE")
+                    if not tc_worker_type:
+                        # this project isn't configured, skip
+                        continue
                     if tc_worker_type:
                         # TODO: Make provisioner name dynamic if needed
                         tc_job_count = get_taskcluster_pending_tasks("proj-autophone", tc_worker_type, verbose=False)
@@ -294,6 +299,9 @@ class TestRunManagerLT(object):
                         # Now iterate through all devices
                         for device_type in device_list:
                             for udid, state in device_list[device_type].items():
+                                if udid is None:
+                                    # empty device list
+                                    continue
                                 # Only count the device if it's in this project's device group
                                 device_project = self.config_object.get_project_for_udid(udid)
                                 if device_project == project_name:

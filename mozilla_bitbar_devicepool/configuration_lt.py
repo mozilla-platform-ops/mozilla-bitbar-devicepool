@@ -85,7 +85,11 @@ class ConfigurationLt(object):
 
         # massage device_groups into a more usable format
         for item in project_device_groups:
-            project_device_groups[item] = project_device_groups[item].split(" ")
+            if project_device_groups[item] is not None:
+                project_device_groups[item] = project_device_groups[item].split(" ")
+            else:
+                # if we don't have a entry in projects, skip it
+                projects_config[item] = {}
 
         # remove the defaults project
         del projects_config["defaults"]
@@ -103,6 +107,9 @@ class ConfigurationLt(object):
         """
         device_groups = self.config.get("device_groups", {})
         for project_name, udid_list in device_groups.items():
+            if not udid_list:
+                # if the project has no phones, skip it
+                continue
             if udid in udid_list:
                 return project_name
         return None
