@@ -53,12 +53,6 @@ class TestRunManagerLT(object):
     LT_DEVICE_STATE_BUSY = "busy"
     LT_DEVICE_STATE_INITIATED = "initiated"
     LT_DEVICE_STATE_CLEANUP = "cleanup"
-    # background task control
-    # TODO: making this work when False is going to require more work...
-    #     - our loop is too fast and we end up
-    #       - overwriting dirs (handled within loop with path per job)
-    #       - starting too many jobs... we don't detect that they've started yet (TODO: check state name they are in)
-    WAIT_FOR_BACKGROUND_TASKS = True
     # Threading constants
     TC_MONITOR_INTERVAL = 30  # seconds
     LT_MONITOR_INTERVAL = 30  # seconds
