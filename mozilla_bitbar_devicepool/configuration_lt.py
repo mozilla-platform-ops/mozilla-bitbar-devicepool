@@ -125,7 +125,7 @@ class ConfigurationLt(object):
             return len(device_groups[project_name])
         return 0
 
-    def configure(self):
+    def configure(self, config_blob=None):
         # TODO?: add filespath?
 
         # Check for hyperexecute binary on path using a shell command
@@ -137,7 +137,11 @@ class ConfigurationLt(object):
                 raise FileNotFoundError("hyperexecute binary not found on the system PATH")
 
         # load the data we need
-        self._load_file_config()
+        if config_blob:
+            self.config = config_blob
+        else:
+            self._load_file_config()
+
         self._load_tc_env_vars()
         self._set_lt_api_key()
         self._set_lt_username()
@@ -147,26 +151,6 @@ class ConfigurationLt(object):
 
         # expand the configuration
         self._expand_configuration()
-
-    # def configure_with_config_blob(self, config_blob):
-    #     # Revert to original assignment
-    #     self.config = config_blob
-    #
-    #     # import pprint # Debug print removed for clarity
-    #     # pprint.pprint(self.config)
-    #
-    #     self._set_lt_api_key()
-    #     self._set_lt_username()
-    #     self._load_tc_env_vars()
-    #     self._expand_configuration()
-    #
-    # def configure_with_config_path(self, config_path="config/lambdatest.yml"):
-    #     self.config_path = config_path
-    #     self._load_file_config(config_path)
-    #     self._set_lt_api_key()
-    #     self._set_lt_username()
-    #     self._load_tc_env_vars()
-    #     self._expand_configuration()
 
 
 if __name__ == "__main__":

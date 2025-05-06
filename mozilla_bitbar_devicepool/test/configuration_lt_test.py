@@ -25,13 +25,7 @@ SAMPLE_CONFIG = {
 def configured_lt_instance():
     """Fixture to provide a configured ConfigurationLt instance for tests."""
     config_lt = ConfigurationLt(ci_mode=True)
-    # Use a deep copy to ensure each test gets a fresh config
-    config_lt.config = copy.deepcopy(SAMPLE_CONFIG)
-    # Manually set required env vars for expansion within the copied config
-    config_lt.config["projects"]["projectA"]["TASKCLUSTER_ACCESS_TOKEN"] = "fake_token_A"
-    config_lt.config["projects"]["projectB"]["TASKCLUSTER_ACCESS_TOKEN"] = "fake_token_B"
-    # Expand the configuration (which modifies the config dict)
-    config_lt._expand_configuration()
+    config_lt.configure(copy.deepcopy(SAMPLE_CONFIG))
     return config_lt
 
 
