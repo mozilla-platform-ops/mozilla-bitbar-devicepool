@@ -37,15 +37,19 @@ def test_calculate_jobs_to_start_no_devices(test_manager):
 
 
 def test_calculate_jobs_to_start_max_initiated_jobs(test_manager):
-    """Test that no jobs are started if global_initiated exceeds MAX_INITITATED_JOBS."""
-    # When global_initiated exceeds MAX_INITITATED_JOBS
-    assert test_manager.calculate_jobs_to_start(5, 10, test_manager.MAX_INITITATED_JOBS + 1, 10) == 0
+    """Test that no jobs are started if global_initiated exceeds GLOBAL_MAX_INITITATED_JOBS."""
+    # Define the constant locally for clarity and isolation, using a representative value.
+    # This avoids depending on the exact value defined in the TestRunManagerLT class.
+    GLOBAL_MAX_INITITATED_JOBS = 40
+
+    # When global_initiated exceeds GLOBAL_MAX_INITITATED_JOBS
+    assert test_manager.calculate_jobs_to_start(5, 10, GLOBAL_MAX_INITITATED_JOBS + 1, 10) == 0
 
     # When global_initiated equals MAX_INITITATED_JOBS (should still allow jobs)
-    assert test_manager.calculate_jobs_to_start(5, 10, test_manager.MAX_INITITATED_JOBS, 10) == 5
+    assert test_manager.calculate_jobs_to_start(5, 10, GLOBAL_MAX_INITITATED_JOBS, 10) == 5
 
-    # When global_initiated is just below MAX_INITITATED_JOBS
-    assert test_manager.calculate_jobs_to_start(5, 10, test_manager.MAX_INITITATED_JOBS - 1, 10) == 5
+    # When global_initiated is just below GLOBAL_MAX_INITITATED_JOBS
+    assert test_manager.calculate_jobs_to_start(5, 10, GLOBAL_MAX_INITITATED_JOBS - 1, 10) == 5
 
 
 def test_calculate_jobs_to_start_default_max_jobs(test_manager):
