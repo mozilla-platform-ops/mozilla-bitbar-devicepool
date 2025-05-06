@@ -744,9 +744,6 @@ def parse_args(action_array):
     return parser.parse_args()
 
 
-# TODO: add a function returns a string with short git sha (if in a git client) and `-dirty` if there are uncommitted changes
-
-
 def main():
     # Parse command line arguments
     available_actions = ["start-test-run-manager"]
