@@ -95,10 +95,8 @@ wget -O taskcluster-proxy https://github.com/taskcluster/taskcluster/releases/do
 wget -O start-worker https://github.com/taskcluster/taskcluster/releases/download/v${TC_VERSION}/start-worker-linux-amd64
 
 
+# copy inline files into place
 #
-# inline files (snapshots of jmaher's files from above)
-#
-
 # TODO: eventually move these to their own repo like mozilla-bitbar-docker?
 
 ls -la
@@ -124,8 +122,8 @@ chmod +x entrypoint.py
 chmod +x run_gw.py
 chmod +x script.py
 
-#
 cd /home/ltuser
+
 # robust checkout plugin: update sha1 to latest when building a new image
 wget https://hg.mozilla.org/mozilla-central/raw-file/260e22f03e984e0ced16b6c5ff63201cdef0a1f6/testing/mozharness/external_tools/robustcheckout.py
 wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/refs/heads/master/scripts/tooltool.py
