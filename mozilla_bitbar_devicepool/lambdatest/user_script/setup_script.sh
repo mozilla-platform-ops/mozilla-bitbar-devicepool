@@ -3,6 +3,14 @@
 set -e
 set -x
 
+# variables
+
+usbreset_log_file=/tmp/usbreset.log
+usbreset_log_file2=/tmp/usbreset-pass2.log
+POWER_METER_DEVICE_ID="0483:fffe"
+TC_VERSION=83.5.6
+
+
 # functions
 
 # Function to get the currently focused window
@@ -42,23 +50,34 @@ sudo cp -R cmdline-tools/bin/* /home/ltuser/taskcluster/android-sdk-linux/tools/
 sudo cp -R cmdline-tools/lib/* /home/ltuser/taskcluster/android-sdk-linux/tools/lib/
 
 ### for power meter jobs
-POWER_METER_DEVICE_ID="0483:fffe"
 
 # AJE: usbutils intalled above
 # list everything (ignore exit code)
 usbreset || true
 
 # list everthing (and capture output)
-usbreset 2>&1 | tee /tmp/usbreset.log
+usbreset 2>&1 | tee $usbreset_log_file
 # if the power meter is present issue reset commands
-if grep -q "$POWER_METER_DEVICE_ID" /tmp/usbreset.log; then
+if grep -q "$POWER_METER_DEVICE_ID" $usbreset_log_file; then
     echo "Found power meter, resetting..."
     # reset the power meter
     usbreset $POWER_METER_DEVICE_ID
     sleep 2
-    usbreset $POWER_METER_DEVICE_ID
+    usbreset $POWER_METER_DEVICE_ID 2>&1 | tee $usbreset_log_file2
 else
     echo "Power meter not found, skipping reset."
+fi
+
+# if /tmp/usbreset-pass2.log contains `permission denied` then exit 1 with message
+#
+# example bad output:
+#   Resetting Korona YK003C in Application Mode ... can't open [Permission denied]
+#
+if grep -qi "permission denied" $usbreset_log_file2; then
+    echo "Permission denied on power meter, please check permissions."
+    # show the output of pass2.log
+    cat $usbreset_log_file2
+    exit 1
 fi
 
 rm -Rf taskcluster/
@@ -70,7 +89,6 @@ cd /home/ltuser/
 # TODO?: this can already exist, `-p` for now, but how to manage this?
 mkdir -p taskcluster
 cd taskcluster
-TC_VERSION=83.5.6
 wget -O generic-worker https://github.com/taskcluster/taskcluster/releases/download/v${TC_VERSION}/generic-worker-insecure-linux-amd64
 wget -O livelog https://github.com/taskcluster/taskcluster/releases/download/v${TC_VERSION}/livelog-linux-amd64
 wget -O taskcluster-proxy https://github.com/taskcluster/taskcluster/releases/download/v${TC_VERSION}/taskcluster-proxy-linux-amd64
