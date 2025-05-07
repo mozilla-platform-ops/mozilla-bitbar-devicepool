@@ -9,7 +9,7 @@ usbreset_log_file=/tmp/usbreset.log
 usbreset_log_file2=/tmp/usbreset-pass2.log
 POWER_METER_DEVICE_ID="0483:fffe"
 TC_VERSION=83.5.6
-POWER_METER_FAST_FAIL=1
+POWER_METER_FAST_FAIL=0
 
 
 # functions
