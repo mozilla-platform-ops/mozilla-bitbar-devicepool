@@ -9,6 +9,7 @@ usbreset_log_file=/tmp/usbreset.log
 usbreset_log_file2=/tmp/usbreset-pass2.log
 POWER_METER_DEVICE_ID="0483:fffe"
 TC_VERSION=83.5.6
+POWER_METER_FAST_FAIL=1
 
 
 # functions
@@ -73,11 +74,14 @@ fi
 # example bad output:
 #   Resetting Korona YK003C in Application Mode ... can't open [Permission denied]
 #
-if grep -qi "permission denied" $usbreset_log_file2; then
-    echo "Permission denied on power meter, please check permissions."
-    # show the output of pass2.log
-    cat $usbreset_log_file2
-    exit 1
+# if POWER_METER_FAST_FAIL is set to 1, then fail if permission denied
+if [ "$POWER_METER_FAST_FAIL" -eq 1 ]; then
+    if grep -qi "permission denied" $usbreset_log_file2; then
+        echo "Permission denied on power meter, please check permissions."
+        # show the output of pass2.log
+        cat $usbreset_log_file2
+        exit 1
+    fi
 fi
 
 rm -Rf taskcluster/

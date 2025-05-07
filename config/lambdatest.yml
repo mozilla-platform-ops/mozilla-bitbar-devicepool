@@ -65,6 +65,11 @@ device_groups:
   a55-alpha:
     # currently has power meter devices in it
     R5CXC1HZKLR
+    # these devices are all attached to the same power meter
+    # working on fixing that.
     # RZCY203N75Z also has a power meter
+    # R5CXC1ARM0A also has a power meter
+    # R5CXC1HZK0W also has a power meter
+    # R5CXC1AP2KT also has a power meter
   test-1:
     # no devices yet
