@@ -63,7 +63,8 @@ device_groups:
     RZCY203N75Z
     RZCY204AAZD
   a55-alpha:
-    # the only device with a power meter
+    # currently has power meter devices in it
     R5CXC1HZKLR
+    # RZCY203N75Z also has a power meter
   test-1:
     # no devices yet
