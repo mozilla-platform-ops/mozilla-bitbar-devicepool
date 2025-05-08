@@ -281,51 +281,49 @@ class TestRunManagerLT(object):
             # For each project, filter the device list based on the project's device_groups
             for project_name, project_config in self.config_object.config["projects"].items():
                 try:
-                    # TODO: should we gate on this any longer? i think no
-                    #  - are we already checking this in configuration_lt
-                    lt_device_selector = project_config.get("lt_device_selector")
-                    if lt_device_selector:
-                        project_active_device_count_api = 0
-                        project_busy_devices_api = 0
-                        project_cleanup_devices_api = 0
-                        project_active_devices_api_list = []
+                    if not self.config_object.is_project_fully_configured(project_name):
+                        # logging.warning(f"{logging_header} Project '{project_name}' is not fully configured. Skipping.")
+                        continue
 
-                        # Now iterate through all devices
-                        for device_type in device_list:
-                            for udid, state in device_list[device_type].items():
-                                if udid is None:
-                                    # empty device list
-                                    continue
-                                # Only count the device if it's in this project's device group
-                                device_project = self.config_object.get_project_for_udid(udid)
-                                if device_project == project_name:
-                                    if state == self.LT_DEVICE_STATE_ACTIVE:
-                                        project_active_device_count_api += 1
-                                        project_active_devices_api_list.append(udid)
-                                    elif state == self.LT_DEVICE_STATE_BUSY:
-                                        project_busy_devices_api += 1
-                                    elif state == self.LT_DEVICE_STATE_CLEANUP:
-                                        project_cleanup_devices_api += 1
+                    project_active_device_count_api = 0
+                    project_busy_devices_api = 0
+                    project_cleanup_devices_api = 0
+                    project_active_devices_api_list = []
 
-                        active_device_count_by_project_dict[project_name] = project_active_device_count_api
+                    # Now iterate through all devices
+                    for device_type in device_list:
+                        for udid, state in device_list[device_type].items():
+                            if udid is None:
+                                # empty device list
+                                continue
+                            # Only count the device if it's in this project's device group
+                            device_project = self.config_object.get_project_for_udid(udid)
+                            if device_project == project_name:
+                                if state == self.LT_DEVICE_STATE_ACTIVE:
+                                    project_active_device_count_api += 1
+                                    project_active_devices_api_list.append(udid)
+                                elif state == self.LT_DEVICE_STATE_BUSY:
+                                    project_busy_devices_api += 1
+                                elif state == self.LT_DEVICE_STATE_CLEANUP:
+                                    project_cleanup_devices_api += 1
 
-                        # Update shared data for the project
-                        project_data = self.shared_data[self.SHARED_PROJECTS][project_name]
-                        project_data[self.PROJECT_LT_ACTIVE_DEVICE_COUNT] = project_active_device_count_api
-                        project_data[self.PROJECT_LT_BUSY_DEVICE_COUNT] = project_busy_devices_api
-                        project_data[self.PROJECT_LT_CLEANUP_DEVICE_COUNT] = project_cleanup_devices_api
+                    active_device_count_by_project_dict[project_name] = project_active_device_count_api
 
-                        # Clear and update the PROJECT_LT_ACTIVE_DEVICES list with API reported active devices
-                        shared_active_devices_list = project_data[self.PROJECT_LT_ACTIVE_DEVICES]
-                        shared_active_devices_list[:] = []  # Clear the managed list
-                        shared_active_devices_list.extend(
-                            project_active_devices_api_list
-                        )  # Update with new data from API
+                    # Update shared data for the project
+                    project_data = self.shared_data[self.SHARED_PROJECTS][project_name]
+                    project_data[self.PROJECT_LT_ACTIVE_DEVICE_COUNT] = project_active_device_count_api
+                    project_data[self.PROJECT_LT_BUSY_DEVICE_COUNT] = project_busy_devices_api
+                    project_data[self.PROJECT_LT_CLEANUP_DEVICE_COUNT] = project_cleanup_devices_api
 
-                        # Log the available device list after updating for debugging
-                        logging.debug(
-                            f"{logging_header} Updated API active devices for {project_name}: {list(shared_active_devices_list)}"
-                        )
+                    # Clear and update the PROJECT_LT_ACTIVE_DEVICES list with API reported active devices
+                    shared_active_devices_list = project_data[self.PROJECT_LT_ACTIVE_DEVICES]
+                    shared_active_devices_list[:] = []  # Clear the managed list
+                    shared_active_devices_list.extend(project_active_devices_api_list)  # Update with new data from API
+
+                    # Log the available device list after updating for debugging
+                    logging.debug(
+                        f"{logging_header} Updated API active devices for {project_name}: {list(shared_active_devices_list)}"
+                    )
 
                 except Exception as e:
                     logging.error(f"{logging_header} Error processing devices for {project_name}: {e}", exc_info=True)
