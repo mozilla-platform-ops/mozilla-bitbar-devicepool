@@ -360,16 +360,11 @@ class TestRunManagerLT(object):
         project_root_dir = os.path.abspath(os.path.join(project_source_dir, ".."))
         user_script_golden_dir = os.path.join(project_source_dir, "lambdatest", "user_script")
 
-        try:
-            current_project = self.config_object.config["projects"][project_name]
-            tc_worker_type = current_project["TC_WORKER_TYPE"]
-            tc_client_id = current_project["TASKCLUSTER_CLIENT_ID"]
-            tc_client_key = current_project["TASKCLUSTER_ACCESS_TOKEN"]
-            lt_device_selector = current_project["lt_device_selector"]
-
-        except KeyError as e:
-            logging.error(f"{logging_header} Missing config: {e}. Thread exiting.")
-            return
+        current_project = self.config_object.config["projects"][project_name]
+        tc_worker_type = current_project["TC_WORKER_TYPE"]
+        tc_client_id = current_project["TASKCLUSTER_CLIENT_ID"]
+        tc_client_key = current_project["TASKCLUSTER_ACCESS_TOKEN"]
+        lt_device_selector = current_project["lt_device_selector"]
 
         while not self.shutdown_event.is_set():
             tc_job_count = 0
@@ -614,6 +609,11 @@ class TestRunManagerLT(object):
         # Create and start a job starter thread for each project
         job_starters = []
         for project_name in self.config_object.config["projects"]:
+            if not self.config_object.is_project_fully_configured(project_name):
+                logging.warning(
+                    f"{logging_header} Project '{project_name}' is not fully configured. Not starting thread."
+                )
+                continue
             job_starter = threading.Thread(
                 target=self._job_starter_thread, args=(project_name,), name=f"Job Starter - {project_name}"
             )
