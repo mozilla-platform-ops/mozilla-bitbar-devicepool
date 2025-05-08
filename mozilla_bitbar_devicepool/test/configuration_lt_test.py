@@ -11,12 +11,9 @@ global:
   contract_device_count: 30
 projects:
   defaults:
-    SCRIPT_REPO_COMMIT: master
-    # fake values. inheriting projects below should set reasonable values.
-    lt_device_selector: "Samsung GZ4200-90"
-    TASKCLUSTER_CLIENT_ID: tc-client-id-set-me
-    # env var with key is looked for at this with underscores: `tc_worker_type_set_me`
-    TC_WORKER_TYPE: tc-worker-type-set-me
+    # not used yet
+    # SCRIPT_REPO_COMMIT: master
+    TEST_1: blah
   a55-alpha:
     # lt_device_selector: "Galaxy A55 5G-14"
     # swapped for testing
@@ -29,9 +26,9 @@ projects:
     # lt_device_selector: "Galaxy A51-11"
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-a55
     TC_WORKER_TYPE: gecko-t-lambda-perf-a55
-  # test-1:
+  test-1:
   #     SCRIPT_REPO_COMMIT: future_commit
-  #     lt_device_selector: "Galaxy A51-11"
+    lt_device_selector: "Galaxy A51-11"
   #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1
   #     TC_WORKER_TYPE: gecko-t-lambda-gw-test-1
   #     # override SCRIPT_REPO_COMMIT with a test commit

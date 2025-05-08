@@ -60,6 +60,8 @@ class ConfigurationLt(object):
 
     def _load_tc_env_vars(self):
         for project_name in self.config["projects"]:
+            if not self.is_project_fully_configured(project_name):
+                continue
             if project_name == "defaults":
                 continue
             data = self.config["projects"][project_name]
@@ -157,17 +159,19 @@ class ConfigurationLt(object):
         else:
             self._load_file_config()
 
+        # expand the configuration (i.e. set defaults)
+        self._expand_configuration()
+
+        # set this flag so downstream jobs can short-circuit if a project isn't configured
+        self._set_fully_configured_projects()
+
+        #
         self._load_tc_env_vars()
         self._set_lt_api_key()
         self._set_lt_username()
 
-        self._set_fully_configured_projects()
-
         # debug print
         # print(self.get_config())
-
-        # expand the configuration
-        self._expand_configuration()
 
     def is_project_fully_configured(self, project_name):
         """
@@ -192,6 +196,8 @@ class ConfigurationLt(object):
         1. It exists in the projects configuration (not 'defaults')
         2. It has at least one device assigned in device_groups
         3. It has a lt_device_selector configured in the project configuration
+        4. It has a TC_WORKER_TYPE set in the project configuration
+        5. It has a TASKCLUSTER_CLIENT_ID set in the project configuration
 
         Sets self.fully_configured_projects to a list of project names that are fully configured.
         """
@@ -200,6 +206,7 @@ class ConfigurationLt(object):
         device_groups = self.config.get("device_groups", {})
 
         for project_name in projects_config:
+            project_config = projects_config[project_name]
             if project_name == "defaults":
                 continue
 
@@ -212,12 +219,28 @@ class ConfigurationLt(object):
 
             # Check if the project has lt_device_selector configured
             has_device_selector = (
-                "lt_device_selector" in projects_config[project_name]
-                and projects_config[project_name]["lt_device_selector"] is not None
+                "lt_device_selector" in project_config and project_config["lt_device_selector"] is not None
+            )
+
+            # Check if the project has TC_WORKER_TYPE configured
+            has_worker_type = "TC_WORKER_TYPE" in project_config and project_config["TC_WORKER_TYPE"] is not None
+
+            # Check if the project has TASKCLUSTER_CLIENT_ID configured
+            has_client_id = (
+                "TASKCLUSTER_CLIENT_ID" in project_config and project_config["TASKCLUSTER_CLIENT_ID"] is not None
+            )
+
+            # show a summary of decisions on a single line
+            print(
+                f"Project: {project_name}, "
+                f"Devices: {has_devices}, "
+                f"Device Selector: {has_device_selector}, "
+                f"Worker Type: {has_worker_type}, "
+                f"Client ID: {has_client_id}"
             )
 
             # A project is fully configured if it has both devices assigned and a device selector
-            if has_devices and has_device_selector:
+            if has_devices and has_device_selector and has_worker_type and has_client_id:
                 self.fully_configured_projects.append(project_name)
 
         sorted(self.fully_configured_projects)
