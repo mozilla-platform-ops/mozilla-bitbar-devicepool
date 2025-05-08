@@ -104,6 +104,24 @@ def configured_lt_instance(sample_file_config):
     return config_lt
 
 
+def test_configure(configured_lt_instance):
+    """
+    Tests that the configure method correctly loads the configuration.
+    """
+    # test that defaults are set in projects
+    assert configured_lt_instance.config["projects"]["a55-alpha"]["TEST_1"] == "blah"
+
+    # test the device group massaging
+    #
+    # check that it's a list
+    assert isinstance(configured_lt_instance.config["device_groups"]["a55-perf"], list)
+    # check that the list is not empty
+    assert len(configured_lt_instance.config["device_groups"]["a55-perf"]) > 0
+    # check that the list contains a few of the expected devices
+    assert "R5CX4089QNL" in configured_lt_instance.config["device_groups"]["a55-perf"]
+    assert "R5CXC1AHV4M" in configured_lt_instance.config["device_groups"]["a55-perf"]
+
+
 def test_load_file_config(sample_file_config):
     """
     Tests that _load_file_config correctly loads configuration from an actual file.
