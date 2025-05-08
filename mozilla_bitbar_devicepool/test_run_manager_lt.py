@@ -606,10 +606,7 @@ class TestRunManagerLT(object):
 
         # Create and start a job starter thread for each project
         job_starters = []
-        for project_name in self.config_object.config["projects"]:
-            if not self.config_object.is_project_fully_configured(project_name):
-                logging.info(f"{logging_header} Project '{project_name}' is not fully configured. Not starting thread.")
-                continue
+        for project_name in self.config_object.get_fully_configured_projects():
             job_starter = threading.Thread(
                 target=self._job_starter_thread, args=(project_name,), name=f"Job Starter - {project_name}"
             )
