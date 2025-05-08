@@ -518,16 +518,34 @@ class TestRunManagerLT(object):
                             # Simulate tiny delay if in debug mode
                             time.sleep(0.1)
                         else:
-                            # Start process in background
-                            _process = subprocess.Popen(
-                                base_command_string,
-                                shell=True,
-                                env=cmd_env,
-                                cwd=test_run_dir,
-                                start_new_session=True,
-                                stdout=subprocess.DEVNULL,  # Discard output for background tasks
-                                stderr=subprocess.DEVNULL,
-                            )
+                            # Check if hyperexecute exists before executing
+                            hyperexecute_path = os.path.join(project_root_dir, "hyperexecute")
+                            max_retry = 5
+                            retry_count = 0
+
+                            while retry_count < max_retry:
+                                if os.path.exists(hyperexecute_path) and os.access(hyperexecute_path, os.X_OK):
+                                    # Start process in background
+                                    _process = subprocess.Popen(
+                                        base_command_string,
+                                        shell=True,
+                                        env=cmd_env,
+                                        cwd=test_run_dir,
+                                        start_new_session=True,
+                                        stdout=subprocess.DEVNULL,  # Discard output for background tasks
+                                        stderr=subprocess.DEVNULL,
+                                    )
+                                    break
+                                else:
+                                    logging.warning(
+                                        f"{logging_header} hyperexecute binary not found or not executable, retry {retry_count + 1}/{max_retry}"
+                                    )
+                                    time.sleep(2)  # Wait for 2 seconds before retrying
+                                    retry_count += 1
+
+                            if retry_count >= max_retry:
+                                raise FileNotFoundError(f"hyperexecute binary not found after {max_retry} retries")
+
                         processes_started += 1
                         self.shared_data[self.SHARED_SESSION_STARTED_JOBS] += 1
 
