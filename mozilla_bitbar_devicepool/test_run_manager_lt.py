@@ -187,24 +187,18 @@ class TestRunManagerLT(object):
             worker_type_to_count_dict = {}
             # For each project, get taskcluster job count
             for project_name, project_config in self.config_object.config["projects"].items():
+                if not self.config_object.is_project_fully_configured(project_name):
+                    # logging.warning(f"{logging_header} Project '{project_name}' is not fully configured. Skipping.")
+                    continue
                 try:
-                    # print(project_config)
-                    # print(type(project_config))
                     tc_worker_type = project_config.get("TC_WORKER_TYPE")
-                    if not tc_worker_type:
-                        # this project isn't configured, skip
-                        continue
-                    if tc_worker_type:
-                        # TODO: Make provisioner name dynamic if needed
-                        tc_job_count = get_taskcluster_pending_tasks("proj-autophone", tc_worker_type, verbose=False)
-                        count_of_fetched_projects += 1
-                        worker_type_to_count_dict[tc_worker_type] = tc_job_count
+                    tc_job_count = get_taskcluster_pending_tasks("proj-autophone", tc_worker_type, verbose=False)
+                    count_of_fetched_projects += 1
+                    worker_type_to_count_dict[tc_worker_type] = tc_job_count
 
-                        # Update shared data without lock
-                        if project_name in self.shared_data[self.SHARED_PROJECTS]:
-                            self.shared_data[self.SHARED_PROJECTS][project_name][self.PROJECT_TC_JOB_COUNT] = (
-                                tc_job_count
-                            )
+                    # Update shared data without lock
+                    if project_name in self.shared_data[self.SHARED_PROJECTS]:
+                        self.shared_data[self.SHARED_PROJECTS][project_name][self.PROJECT_TC_JOB_COUNT] = tc_job_count
                 except Exception as e:
                     logging.error(f"{logging_header} Error fetching TC tasks for {project_name}: {e}", exc_info=True)
 
