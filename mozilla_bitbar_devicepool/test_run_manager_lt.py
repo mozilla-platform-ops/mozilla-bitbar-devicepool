@@ -535,6 +535,9 @@ class TestRunManagerLT(object):
                                         stdout=subprocess.DEVNULL,  # Discard output for background tasks
                                         stderr=subprocess.DEVNULL,
                                     )
+                                    # Add a small delay between job launches to avoid race conditions
+                                    #   - e.g. when multiple jobs run at once and decide to update
+                                    time.sleep(2)
                                     break
                                 else:
                                     logging.warning(
