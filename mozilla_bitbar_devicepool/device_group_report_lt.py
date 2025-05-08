@@ -34,6 +34,10 @@ class DeviceGroupReportLt:
         pprint.pprint(output_dict, indent=2)
 
         print("")
+        print("device types")
+        pprint.pprint(self.get_device_types(), indent=2)
+
+        print("")
         print(f"total devices: {sum(output_dict.values())}")
 
         # Add device types information if needed
@@ -53,6 +57,31 @@ class DeviceGroupReportLt:
                     return_dict[project_name] = device_selector
 
         return return_dict
+
+    def get_device_types(self):
+        """
+        Count the number of devices of each type based on lt_device_selector in device_groups.
+
+        Returns:
+            dict: Dictionary with device types as keys and their counts as values
+        """
+        # Create a ConfigurationLt instance to access the config
+        config_object = self.config_object
+
+        device_types = {}
+
+        # iterate through the 'projects' in the config
+        for project_name, project_config in config_object.config.get("projects", {}).items():
+            devices_for_project = config_object.config.get("device_groups", {})[project_name]
+            # no need to worry about the 'defaults' project, already handled in configure()
+            lt_device_selector = project_config.get("lt_device_selector")
+            if lt_device_selector:
+                # project is ready for use
+                device_types[lt_device_selector] = len(devices_for_project)
+        # Sort the device types by their counts in descending order
+        device_types = dict(sorted(device_types.items(), key=lambda item: item[1], reverse=True))
+
+        return device_types
 
 
 def main():
