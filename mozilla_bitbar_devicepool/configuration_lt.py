@@ -138,8 +138,6 @@ class ConfigurationLt(object):
         return 0
 
     def configure(self, config_blob=None, config_path=None):
-        # TODO?: add filespath?
-
         # Check for hyperexecute binary on path using a shell command
         if not self.ci_mode:
             cmd = "where" if sys.platform == "win32" else "which"
@@ -231,13 +229,13 @@ class ConfigurationLt(object):
             )
 
             # show a summary of decisions on a single line
-            print(
-                f"Project: {project_name}, "
-                f"Devices: {has_devices}, "
-                f"Device Selector: {has_device_selector}, "
-                f"Worker Type: {has_worker_type}, "
-                f"Client ID: {has_client_id}"
-            )
+            # print(
+            #     f"Project: {project_name}, "
+            #     f"Devices: {has_devices}, "
+            #     f"Device Selector: {has_device_selector}, "
+            #     f"Worker Type: {has_worker_type}, "
+            #     f"Client ID: {has_client_id}"
+            # )
 
             # A project is fully configured if it has both devices assigned and a device selector
             if has_devices and has_device_selector and has_worker_type and has_client_id:
