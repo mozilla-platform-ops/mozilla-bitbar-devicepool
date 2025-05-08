@@ -536,7 +536,11 @@ class TestRunManagerLT(object):
                                         stderr=subprocess.DEVNULL,
                                     )
                                     # Add a small delay between job launches to avoid race conditions
-                                    #   - e.g. when multiple jobs run at once and decide to update
+                                    #   - when multiple jobs run at once and decide to update.
+                                    #   - lots of jobs being started at once can swamp USB.
+                                    # TODO: if USB issues are resolved, remove this sleep and potentially run with
+                                    #     `--disable-updates` option, and then have main thread run without the option occasionally
+                                    #     to update (with locking)
                                     time.sleep(2)
                                     break
                                 else:
