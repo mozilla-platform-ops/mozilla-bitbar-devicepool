@@ -245,10 +245,10 @@ class ConfigurationLt(object):
 
         sorted(self.fully_configured_projects)
 
-        if not self.quiet:
-            configured_count = len(self.fully_configured_projects)
-            total_count = len(projects_config) - 1  # Exclude defaults
-            print(f"Fully configured projects: {configured_count}/{total_count}")
+        # if not self.quiet:
+        #     configured_count = len(self.fully_configured_projects)
+        #     total_count = len(projects_config) - 1  # Exclude defaults
+        #     print(f"Fully configured projects: {configured_count}/{total_count}")
 
 
 if __name__ == "__main__":
