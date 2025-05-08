@@ -21,8 +21,9 @@ def main():
 
     config_array_of_udids = []
     for project, udid_arr in config["device_groups"].items():
-        for udid in udid_arr:
-            config_array_of_udids.append(udid)
+        if udid_arr is not None:
+            for udid in udid_arr:
+                config_array_of_udids.append(udid)
 
     # pprint.pprint(config_array_of_udids)
     # pprint.pprint(len(config_array_of_udids))
