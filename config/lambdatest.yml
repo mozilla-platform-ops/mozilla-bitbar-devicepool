@@ -62,6 +62,9 @@ device_groups:
     RZCY2011M7N
     RZCY203N75Z
     RZCY204AAZD
+    # these were removed from the pool (were extras, over contract)
+    # RZCXA0H3T9P
+    # R5CY128X71B
   a55-alpha:
     # currently has power meter devices in it
     R5CXC1HZKLR
