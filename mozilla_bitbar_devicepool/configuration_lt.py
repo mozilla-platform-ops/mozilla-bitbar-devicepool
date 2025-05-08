@@ -19,6 +19,8 @@ class ConfigurationLt(object):
         self.config = {}
         self.ci_mode = ci_mode
         self.quiet = quiet
+        # for tracking if lt_device_selector is set and devices are configured
+        self.fully_configured_projects = {}
 
         if self.ci_mode and not self.quiet:
             print("ConfigurationLt: Running in CI mode. Using fake credentials.")
@@ -159,11 +161,55 @@ class ConfigurationLt(object):
         self._set_lt_api_key()
         self._set_lt_username()
 
+        self._set_fully_configured_projects()
+
         # debug print
         # print(self.get_config())
 
         # expand the configuration
         self._expand_configuration()
+
+    def _set_fully_configured_projects(self):
+        """
+        Identifies which projects are fully configured for LambdaTest execution.
+        A project is considered fully configured when:
+        1. It exists in the projects configuration (not 'defaults')
+        2. It has at least one device assigned in device_groups
+        3. It has a lt_device_selector configured in the project configuration
+
+        Sets self.fully_configured_projects to a list of project names that are fully configured.
+        """
+        self.fully_configured_projects = []
+        projects_config = self.config.get("projects", {})
+        device_groups = self.config.get("device_groups", {})
+
+        for project_name in projects_config:
+            if project_name == "defaults":
+                continue
+
+            # Check if the project has devices assigned
+            has_devices = (
+                project_name in device_groups
+                and device_groups[project_name] is not None
+                and len(device_groups[project_name]) > 0
+            )
+
+            # Check if the project has lt_device_selector configured
+            has_device_selector = (
+                "lt_device_selector" in projects_config[project_name]
+                and projects_config[project_name]["lt_device_selector"] is not None
+            )
+
+            # A project is fully configured if it has both devices assigned and a device selector
+            if has_devices and has_device_selector:
+                self.fully_configured_projects.append(project_name)
+
+        sorted(self.fully_configured_projects)
+
+        if not self.quiet:
+            configured_count = len(self.fully_configured_projects)
+            total_count = len(projects_config) - 1  # Exclude defaults
+            print(f"Fully configured projects: {configured_count}/{total_count}")
 
 
 if __name__ == "__main__":

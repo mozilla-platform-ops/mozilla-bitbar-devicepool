@@ -77,6 +77,7 @@ device_groups:
   test-1:
     # a51
     RZ8NB0WJ47H
+  test-2:
 """
 
 
@@ -157,3 +158,16 @@ def test_get_project_for_udid(configured_lt_instance):
     # Test with a device that does not exist
     assert configured_lt_instance.get_project_for_udid("non_existent_device") is None
     # TODO: have option that makes it raise on invalid device name
+
+
+def test_fully_configured(configured_lt_instance):
+    """
+    Tests that the fully_configured method correctly identifies if the configuration is complete.
+    """
+    # Test with a fully configured instance
+    assert configured_lt_instance.fully_configured_projects == ["a55-alpha", "a55-perf"]
+
+    # Test with an instance that is not fully configured
+    # Create a new instance without configuration
+    # incomplete_config_lt = ConfigurationLt()
+    # assert incomplete_config_lt.fully_configured() is False
