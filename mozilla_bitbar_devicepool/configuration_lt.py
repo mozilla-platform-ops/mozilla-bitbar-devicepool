@@ -12,14 +12,15 @@ from mozilla_bitbar_devicepool.util.template import apply_dict_defaults
 
 
 class ConfigurationLt(object):
-    def __init__(self, ci_mode=False):
+    def __init__(self, ci_mode=False, quiet=False):
         # TODO?: mash all values into 'config'?
         self.lt_access_key = None
         self.lt_username = None
         self.config = {}
         self.ci_mode = ci_mode
+        self.quiet = quiet
 
-        if self.ci_mode:
+        if self.ci_mode and not self.quiet:
             print("ConfigurationLt: Running in CI mode. Using fake credentials.")
 
     def _load_file_config(self, config_path="config/lambdatest.yml"):

@@ -12,13 +12,8 @@ class DeviceGroupReportLt:
         self.verbose = verbose
         self.config_path = config_path
         # Using ConfigurationLt to handle config loading
-        self.config_object = ConfigurationLt(ci_mode=True)  # ci_mode=True to avoid credentials check
+        self.config_object = ConfigurationLt(ci_mode=True, quiet=True)  # ci_mode=True to avoid credentials check
         self.config_object.configure(config_path=self.config_path)
-
-        # Optional: Set up LT API access
-        # self.status_object = None
-        # if "LT_USERNAME" in os.environ and "LT_ACCESS_KEY" in os.environ:
-        #     self.status_object = status.Status(os.environ["LT_USERNAME"], os.environ["LT_ACCESS_KEY"])
 
     def show_report(self, verbose=False):
         config_summary_dict = self.get_config_projects_and_device_types()
