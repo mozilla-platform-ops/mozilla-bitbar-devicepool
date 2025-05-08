@@ -169,6 +169,22 @@ class ConfigurationLt(object):
         # expand the configuration
         self._expand_configuration()
 
+    def is_project_fully_configured(self, project_name):
+        """
+        Checks if a project is fully configured for LambdaTest execution.
+
+        A project is considered fully configured when it's present in
+        self.fully_configured_projects (see _set_fully_configured_projects
+        for full details).
+
+        Args:
+            project_name (str): The name of the project to check.
+
+        Returns:
+            bool: True if the project is fully configured, False otherwise.
+        """
+        return project_name in self.fully_configured_projects
+
     def _set_fully_configured_projects(self):
         """
         Identifies which projects are fully configured for LambdaTest execution.
