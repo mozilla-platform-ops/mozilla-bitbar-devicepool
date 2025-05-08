@@ -1,105 +1,70 @@
-import pprint
-import os
-import yaml
 import argparse
+import pprint
 
+from mozilla_bitbar_devicepool.configuration_lt import ConfigurationLt
+
+# from mozilla_bitbar_devicepool.lambdatest import status
 from mozilla_bitbar_devicepool.util import misc
-
-from mozilla_bitbar_devicepool.lambdatest.api import get_devices
 
 
 class DeviceGroupReportLt:
     def __init__(self, config_path=None, verbose=False):
-        self.lt_username = os.environ["LT_USERNAME"]
-        self.lt_api_key = os.environ["LT_ACCESS_KEY"]
         self.verbose = verbose
-        if not config_path:
-            # get the path of this file
-            filename_path = os.path.abspath(__file__)
-            root_dir = os.path.abspath(os.path.join(filename_path, "..", ".."))
-            self.config_path = os.path.join(root_dir, "config", "lambdatest.yml")
-            if verbose:
-                print("INFO: Using config file at '%s'." % self.config_path)
-        else:
-            self.config_path = config_path
+        self.config_path = config_path
+        # Using ConfigurationLt to handle config loading
+        self.config_object = ConfigurationLt(ci_mode=True)  # ci_mode=True to avoid credentials check
+        self.config_object.configure(config_path=self.config_path)
+
+        # Optional: Set up LT API access
+        # self.status_object = None
+        # if "LT_USERNAME" in os.environ and "LT_ACCESS_KEY" in os.environ:
+        #     self.status_object = status.Status(os.environ["LT_USERNAME"], os.environ["LT_ACCESS_KEY"])
 
     def show_report(self, verbose=False):
         config_summary_dict = self.get_config_projects_and_device_types()
-        api_device_summary_dict = self.get_lt_device_report()
 
         if verbose:
             print("config summary")
             pprint.pprint(config_summary_dict)
-            print("")
-            print("api summary")
-            pprint.pprint(api_device_summary_dict)
 
         output_dict = {}
-        for lt_project in config_summary_dict:
-            project_lt_device_selector = config_summary_dict[lt_project]
-            count_for_device_type = api_device_summary_dict[project_lt_device_selector]["count"]
-            output_dict[lt_project] = count_for_device_type
+        for project_name, device_groups in self.config_object.config.get("device_groups", {}).items():
+            if device_groups is not None:
+                # Count devices in each project
+                device_count = len(device_groups)
+                output_dict[project_name] = device_count
 
         print("")
         print("pool summary")
         pprint.pprint(output_dict, indent=2)
 
         print("")
-        print("device types")
-
-        output_dict_2 = {}
-        for project in api_device_summary_dict:
-            device_name = api_device_summary_dict[project]["name"]
-            os_version = api_device_summary_dict[project]["os_version"]
-            count = api_device_summary_dict[project]["count"]
-            output_dict_2[f"{device_name}-{os_version}"] = count
-        pprint.pprint(output_dict_2, indent=2)
-
-        print("")
         print(f"total devices: {sum(output_dict.values())}")
 
+        # Add device types information if needed
+        if verbose and hasattr(self, "status_object") and self.status_object:
+            print("\nDevice types from LambdaTest API:")
+            device_list = self.status_object.get_device_list()
+            pprint.pprint(device_list)
+
     def get_config_projects_and_device_types(self):
+        """Extract project names and their device selectors from config"""
         return_dict = {}
 
-        # open the config file
-        with open(self.config_path, "r") as stream:
-            try:
-                conf_yaml = yaml.safe_load(stream)
-            except yaml.YAMLError as exc:
-                print(exc)
+        for project_name, project_config in self.config_object.config.get("projects", {}).items():
+            if project_name != "defaults":
+                device_selector = project_config.get("lt_device_selector")
+                if device_selector:
+                    return_dict[project_name] = device_selector
 
-        for project in conf_yaml["projects"]:
-            if project != "defaults":
-                project_name = project
-                device_selector = conf_yaml["projects"][project]["lt_device_selector"]
-                return_dict[project_name] = device_selector
         return return_dict
-
-    def get_lt_device_report(self):
-        devices = get_devices(self.lt_username, self.lt_api_key)
-        result_dict = {}
-        for device in devices["data"]["private_cloud_devices"]:
-            name = device["name"]
-            os_version = device["os_version"]
-            udid = device["udid"]
-            # if device is not in the result_dict, add it
-            if f"{name}-{os_version}" not in result_dict:
-                result_dict[f"{name}-{os_version}"] = {
-                    "name": name,
-                    "os_version": os_version,
-                    "udids": [udid],
-                    "count": 1,
-                }
-            else:
-                result_dict[f"{name}-{os_version}"]["count"] += 1
-                result_dict[f"{name}-{os_version}"]["udids"].append(udid)
-        return result_dict
 
 
 def main():
     # Parse command line arguments
     parser = argparse.ArgumentParser(description="LambdaTest device group report")
     parser.add_argument("--verbose", "-v", action="store_true", help="Show more detailed output")
+    parser.add_argument("--config", "-c", help="Path to configuration file")
     args = parser.parse_args()
 
     banner = """
@@ -113,5 +78,9 @@ def main():
     print(f"  generated on {misc.get_utc_date_string()} ({misc.get_git_info()})")
     print()
 
-    device_group_report_lt = DeviceGroupReportLt(verbose=args.verbose)
+    device_group_report_lt = DeviceGroupReportLt(config_path=args.config, verbose=args.verbose)
     device_group_report_lt.show_report(verbose=args.verbose)
+
+
+if __name__ == "__main__":
+    main()
