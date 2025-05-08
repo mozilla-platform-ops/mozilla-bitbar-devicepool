@@ -131,7 +131,7 @@ class DeviceGroupReport:
                         self.device_dict["g5"] = self.device_dict.get("g5", 0) + 1
 
     def main(self):
-        banner = """
+        banner = r"""
    __   _ __  __                 __
   / /  (_) /_/ /  ___ _____  ___/ /__ _____
  / _ \/ / __/ _ \/ _ `/ __/ / _  / _ `/ __/
