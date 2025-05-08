@@ -248,6 +248,15 @@ class ConfigurationLt(object):
         #     total_count = len(projects_config) - 1  # Exclude defaults
         #     print(f"Fully configured projects: {configured_count}/{total_count}")
 
+    def get_fully_configured_projects(self):
+        """
+        Returns a list of project names that are fully configured for LambdaTest execution.
+
+        Returns:
+            list: The names of projects that are fully configured.
+        """
+        return self.fully_configured_projects
+
 
 if __name__ == "__main__":
     clt = ConfigurationLt()

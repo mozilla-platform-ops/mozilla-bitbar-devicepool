@@ -175,12 +175,12 @@ def test_get_project_for_udid(configured_lt_instance):
     # TODO: have option that makes it raise on invalid device name
 
 
-def test_fully_configured(configured_lt_instance):
+def test_get_fully_configured_projects(configured_lt_instance):
     """
     Tests that the fully_configured method correctly identifies if the configuration is complete.
     """
     # Test with a fully configured instance
-    assert configured_lt_instance.fully_configured_projects == ["a55-alpha", "a55-perf"]
+    assert configured_lt_instance.get_fully_configured_projects() == ["a55-alpha", "a55-perf"]
 
     # Test with an instance that is not fully configured
     # Create a new instance without configuration
