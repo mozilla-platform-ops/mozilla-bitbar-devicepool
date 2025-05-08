@@ -171,3 +171,21 @@ def test_fully_configured(configured_lt_instance):
     # Create a new instance without configuration
     # incomplete_config_lt = ConfigurationLt()
     # assert incomplete_config_lt.fully_configured() is False
+
+
+def test_is_project_fully_configured(configured_lt_instance):
+    """
+    Tests that the is_project_fully_configured method correctly identifies if a specific project is fully configured.
+    """
+    # Test with a fully configured project
+    assert configured_lt_instance.is_project_fully_configured("a55-alpha") is True
+
+    # Test with a partially configured project
+    assert configured_lt_instance.is_project_fully_configured("a55-perf") is True
+
+    # Test with a project that is not fully configured
+    assert configured_lt_instance.is_project_fully_configured("test-1") is False
+    assert configured_lt_instance.is_project_fully_configured("test-2") is False
+
+    # Test with a non-existent project
+    assert configured_lt_instance.is_project_fully_configured("non_existent_project") is False
