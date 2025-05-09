@@ -59,13 +59,13 @@ class TestStatus:
         }
         assert result == expected
 
-    # @patch("mozilla_bitbar_devicepool.lambdatest.status.get_jobs")
-    # def test_get_job_summary(self, mock_get_jobs, status_instance, mock_jobs_data):
-    #     mock_get_jobs.return_value = mock_jobs_data
-    #     result = status_instance.get_job_summary(jobs=50)
-    #     mock_get_jobs.assert_called_once_with("test_user", "test_key", label_filter_arr=None, jobs=50)
-    #     expected = {"running": 2, "completed": 1, "initiated": 1}
-    #     assert result == expected
+    @patch("mozilla_bitbar_devicepool.lambdatest.status.get_jobs")
+    def test_get_job_summary(self, mock_get_jobs, status_instance, mock_jobs_data):
+        mock_get_jobs.return_value = mock_jobs_data
+        result = status_instance.get_job_summary(jobs=50)
+        mock_get_jobs.assert_called_once_with("test_user", "test_key", label_filter_arr=None, jobs=50)
+        expected = {"running": 2, "completed": 2, "failed": 1, "aborted": 1, "lambda_error": 1, "timeout": 1}
+        assert result == expected
 
     # @patch("mozilla_bitbar_devicepool.lambdatest.status.get_jobs")
     # def test_get_initiated_job_count(self, mock_get_jobs, status_instance, mock_jobs_data):
