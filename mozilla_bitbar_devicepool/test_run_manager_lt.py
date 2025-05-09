@@ -104,8 +104,6 @@ class TestRunManagerLT(object):
         # TODO: configuration lt call to get projects?
         for project_name in self.config_object.config.get("projects", {}):
             self.job_trackers[project_name] = JobTracker(expiry_seconds=210)
-        # Keep a default tracker for backward compatibility
-        self.job_tracker = JobTracker(expiry_seconds=210)
 
         # Create a multiprocessing Manager for thread-safe shared data
         manager = multiprocessing.Manager()
@@ -167,15 +165,14 @@ class TestRunManagerLT(object):
         if project_name and project_name in self.job_trackers:
             self.job_trackers[project_name].add_job_udids(udids)
         else:
-            # For backward compatibility
-            self.job_tracker.add_job_udids(udids)
+            raise Exception("Should never be here 1. No project name or job tracker found.")
 
     def get_active_job_count(self, project_name=None):
         """Get active job count from the specified project tracker or default tracker."""
         if project_name and project_name in self.job_trackers:
             return self.job_trackers[project_name].get_active_job_count()
-        # For backward compatibility
-        return self.job_tracker.get_active_job_count()
+        else:
+            raise Exception("Should never be here 2. No project name or job tracker found.")
 
     # Thread functions
 
