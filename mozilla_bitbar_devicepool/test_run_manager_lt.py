@@ -160,24 +160,23 @@ class TestRunManagerLT(object):
             self.job_trackers[project_name] = JobTracker(expiry_seconds=210)
         return self.job_trackers[project_name]
 
-    def add_jobs_to_tracker(self, project_name=None, udids=None):
-        """Add jobs to the specified project tracker or default tracker if no project specified."""
-        if project_name and project_name in self.job_trackers:
+    def add_jobs_to_tracker(self, project_name, udids):
+        """Add jobs to the specified project tracker."""
+        if project_name in self.job_trackers:
             self.job_trackers[project_name].add_job_udids(udids)
         else:
-            raise Exception("Should never be here 1. No project name or job tracker found.")
+            raise Exception(f"No job tracker found for project '{project_name}' (1).")
 
-    def get_active_job_count(self, project_name=None):
-        """Get active job count from the specified project tracker or default tracker."""
-        if project_name and project_name in self.job_trackers:
+    def get_active_job_count(self, project_name):
+        """Get active job count from the specified project tracker."""
+        if project_name in self.job_trackers:
             return self.job_trackers[project_name].get_active_job_count()
         else:
-            raise Exception("Should never be here 2. No project name or job tracker found.")
+            raise Exception(f"No job tracker found for project '{project_name}' (2).")
 
     # Thread functions
 
     def _taskcluster_monitor_thread(self):
-        """Monitors Taskcluster pending tasks for all projects."""
         logging_header = f"[ {'TC Monitor':<{self.logging_padding}} ]"
 
         while not self.shutdown_event.is_set():
@@ -547,7 +546,7 @@ class TestRunManagerLT(object):
 
                 if processes_started > 0 and not self.debug_mode:
                     # Pass the collected UDIDs when adding jobs to the tracker
-                    self.add_jobs_to_tracker(project_name, udids=assigned_device_udids)
+                    self.add_jobs_to_tracker(project_name, assigned_device_udids)
 
                 # print a summary of number of jobs started and the udids
                 if processes_started > 0:
