@@ -102,8 +102,8 @@ class Status:
         return initiated_job_count
 
     # TODO: write this so we don't need get_initiated_job_count and get_running_job_count
-    def get_job_count(self, state_filter=None, label_filter=None, jobs=100):
-        pass
+    # def get_job_count(self, state_filter=None, label_filter=None, jobs=100):
+    #     pass
 
     # includes concurrent shards
     def get_running_job_count(self, label_filter_arr=None, jobs=100):
