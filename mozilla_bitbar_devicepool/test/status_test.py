@@ -16,6 +16,16 @@ def mock_jobs_data():
 
 
 @pytest.fixture
+def mock_jobs_data_with_initiated():
+    # load this from a file (test_data/lt_get_jobs_1.txt) and use it
+    this_file_dir = os.path.dirname(os.path.abspath(__file__))
+    data_path = os.path.join(this_file_dir, "test_data", "lt_get_jobs_2.txt")
+    with open(data_path) as f:
+        # evaluate it as a dict and return it
+        return eval(f.read())
+
+
+@pytest.fixture
 def mock_devices_data():
     this_file_dir = os.path.dirname(os.path.abspath(__file__))
     data_path = os.path.join(this_file_dir, "test_data", "lt_get_devices_1.txt")
@@ -67,13 +77,13 @@ class TestStatus:
         expected = {"running": 2, "completed": 2, "failed": 1, "aborted": 1, "lambda_error": 1, "timeout": 1}
         assert result == expected
 
-    # @patch("mozilla_bitbar_devicepool.lambdatest.status.get_jobs")
-    # def test_get_initiated_job_count(self, mock_get_jobs, status_instance, mock_jobs_data):
-    #     mock_get_jobs.return_value = mock_jobs_data
-    #     result = status_instance.get_initiated_job_count(jobs=50)
-    #     mock_get_jobs.assert_called_once_with("test_user", "test_key", label_filter_arr=None, jobs=50)
-    #     # The initiated job has Tasks=3
-    #     assert result == 3
+    @patch("mozilla_bitbar_devicepool.lambdatest.status.get_jobs")
+    def test_get_initiated_job_count(self, mock_get_jobs, status_instance, mock_jobs_data_with_initiated):
+        mock_get_jobs.return_value = mock_jobs_data_with_initiated
+        result = status_instance.get_initiated_job_count(jobs=50)
+        mock_get_jobs.assert_called_once_with("test_user", "test_key", label_filter_arr=None, jobs=50)
+        # The initiated job has Tasks=3
+        assert result == 2
 
     # @patch("mozilla_bitbar_devicepool.lambdatest.status.get_jobs")
     # def test_get_running_job_count(self, mock_get_jobs, status_instance, mock_jobs_data):
