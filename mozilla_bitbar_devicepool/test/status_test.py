@@ -139,68 +139,87 @@ class TestStatus:
         }
         assert result == expected
 
-    # @patch("mozilla_bitbar_devicepool.lambdatest.status.get_devices")
-    # def test_get_device_list_with_filter(self, mock_get_devices, status_instance, mock_devices_data):
-    #     mock_get_devices.return_value = mock_devices_data
-    #     result = status_instance.get_device_list(device_type_and_os_filter="Galaxy A55 5G-14")
-    #     mock_get_devices.assert_called_once_with("test_user", "test_key")
-    #     expected = {"Galaxy A55 5G": {"RXYA1821": "online", "RXYA1823": "busy"}}
-    #     assert result == expected
+    @patch("mozilla_bitbar_devicepool.lambdatest.status.get_devices")
+    def test_get_device_list_with_filter(self, mock_get_devices, status_instance, mock_devices_data):
+        mock_get_devices.return_value = mock_devices_data
+        result = status_instance.get_device_list(device_type_and_os_filter="Galaxy A55 5G-14")
+        mock_get_devices.assert_called_once_with("test_user", "test_key")
+        expected = {"Galaxy A55 5G": {"RXYA1821": "online", "RXYA1823": "busy"}}
+        assert result == expected
 
-    # @patch("mozilla_bitbar_devicepool.lambdatest.status.get_devices")
-    # def test_get_device_state_summary(self, mock_get_devices, status_instance, mock_devices_data):
-    #     mock_get_devices.return_value = mock_devices_data
-    #     result = status_instance.get_device_state_summary()
-    #     expected = {"online": 2, "busy": 1}
-    #     assert result == expected
+    @patch("mozilla_bitbar_devicepool.lambdatest.status.get_devices")
+    def test_get_device_state_summary(self, mock_get_devices, status_instance, mock_devices_data):
+        mock_get_devices.return_value = mock_devices_data
+        result = status_instance.get_device_state_summary()
+        expected = {"online": 2, "busy": 1}
+        assert result == expected
 
-    # @patch("mozilla_bitbar_devicepool.lambdatest.status.get_devices")
-    # def test_get_device_state_summary_with_filter(self, mock_get_devices, status_instance, mock_devices_data):
-    #     mock_get_devices.return_value = mock_devices_data
-    #     result = status_instance.get_device_state_summary(device_type_and_os_filter="Galaxy A55 5G-14")
-    #     expected = {"online": 1, "busy": 1}
-    #     assert result == expected
+    @patch("mozilla_bitbar_devicepool.lambdatest.status.get_devices")
+    def test_get_device_state_summary_with_filter(self, mock_get_devices, status_instance, mock_devices_data):
+        mock_get_devices.return_value = mock_devices_data
+        result = status_instance.get_device_state_summary(device_type_and_os_filter="Galaxy A55 5G-14")
+        expected = {
+            "Galaxy A55 5G": {
+                "RZCXA0H3T9P": "active",
+                "R5CY128X71B": "active",
+                "R5CXC1AP2KT": "active",
+                "R5CXC1AMMNK": "active",
+                "R5CXC1ANGLT": "active",
+                "R5CXC1ASA0L": "active",
+                "R5CXC1ASLHH": "active",
+                "RZCX821GXDJ": "active",
+                "RZCY10LGB6W": "active",
+                "RZCY10Y4HWD": "active",
+                "RZCY10Y4QVX": "active",
+                "RZCY10Y4TAV": "active",
+                "RZCY10Y4TBY": "active",
+                "RZCY10Y4TJX": "active",
+                "RZCY10Y548K": "active",
+                "R5CXC1AHV4M": "active",
+                "R5CXC1ALFED": "active",
+                "R5CXC1ARCER": "active",
+                "R5CXC1ARELR": "active",
+                "R5CX4089QNL": "active",
+                "R5CXC1AMNFY": "active",
+                "R5CY21T22NH": "active",
+                "RZCX31FDGJE": "active",
+                "RZCX50TW03H": "active",
+                "RZCX71ZVF6J": "active",
+                "RZCY204AAZD": "active",
+                "R5CXC1ASA3P": "busy",
+                "R5CXC1HZKLR": "busy",
+                "RZCY2011M7N": "busy",
+                "RZCY203N75Z": "busy",
+                "R5CXC1ARM0A": "busy",
+                "R5CXC1ASA2E": "busy",
+                "R5CXC1HZK0W": "busy",
+                "RZCX821GYPX": "faulty",
+            }
+        }
+        assert result == expected
 
-    # @patch("mozilla_bitbar_devicepool.lambdatest.status.get_devices")
-    # def test_get_device_state_summary_by_device(self, mock_get_devices, status_instance, mock_devices_data):
-    #     mock_get_devices.return_value = mock_devices_data
-    #     result = status_instance.get_device_state_summary_by_device()
-    #     expected = {"Galaxy A55 5G": {"online": 1, "busy": 1}, "Galaxy A51": {"online": 1}}
-    #     assert result == expected
+    @patch("mozilla_bitbar_devicepool.lambdatest.status.get_devices")
+    def test_get_device_state_summary_by_device(self, mock_get_devices, status_instance, mock_devices_data):
+        mock_get_devices.return_value = mock_devices_data
+        result = status_instance.get_device_state_summary_by_device()
+        expected = {"Galaxy A55 5G": {"online": 1, "busy": 1}, "Galaxy A51": {"online": 1}}
+        assert result == expected
 
-    # @patch("mozilla_bitbar_devicepool.lambdatest.status.get_devices")
-    # def test_get_device_state_count(self, mock_get_devices, status_instance, mock_devices_data):
-    #     mock_get_devices.return_value = mock_devices_data
-    #     result = status_instance.get_device_state_count("Galaxy A55 5G-14", "online")
-    #     assert result == 1
+    @patch("mozilla_bitbar_devicepool.lambdatest.status.get_devices")
+    def test_get_device_state_count(self, mock_get_devices, status_instance, mock_devices_data):
+        mock_get_devices.return_value = mock_devices_data
+        result = status_instance.get_device_state_count("Galaxy A55 5G-14", "online")
+        assert result == 1
 
-    #     result = status_instance.get_device_state_count("Galaxy A55 5G-14", "busy")
-    #     assert result == 1
+        result = status_instance.get_device_state_count("Galaxy A55 5G-14", "busy")
+        assert result == 1
 
-    #     # Test with a non-existent state
-    #     result = status_instance.get_device_state_count("Galaxy A55 5G-14", "offline")
-    #     assert result == 0
+        # Test with a non-existent state
+        result = status_instance.get_device_state_count("Galaxy A55 5G-14", "offline")
+        assert result == 0
 
-    # @patch("mozilla_bitbar_devicepool.lambdatest.status.get_devices")
-    # def test_empty_response(self, mock_get_devices, status_instance):
-    #     mock_get_devices.return_value = None
-    #     result = status_instance.get_device_list()
-    #     assert result == {}
-
-    # @patch("mozilla_bitbar_devicepool.lambdatest.status.Status")
-    # @patch("os.environ", {"LT_USERNAME": "test_user", "LT_ACCESS_KEY": "test_key"})
-    # def test_lt_status_main(self, mock_status):
-    #     status_instance = MagicMock()
-    #     mock_status.return_value = status_instance
-
-    #     status_instance.get_device_state_summary.return_value = {"online": 2, "busy": 1}
-    #     status_instance.get_running_job_count.return_value = 1
-
-    #     # No warning should be printed as there are running jobs
-    #     lt_status_main()
-
-    #     # Test busy devices with no running jobs scenario
-    #     status_instance.get_running_job_count.return_value = 0
-    #     status_instance.get_device_list.return_value = {"Galaxy A55 5G": {"RXYA1823": "busy"}}
-
-    #     lt_status_main()
+    @patch("mozilla_bitbar_devicepool.lambdatest.status.get_devices")
+    def test_empty_response(self, mock_get_devices, status_instance):
+        mock_get_devices.return_value = None
+        result = status_instance.get_device_list()
+        assert result == {}
