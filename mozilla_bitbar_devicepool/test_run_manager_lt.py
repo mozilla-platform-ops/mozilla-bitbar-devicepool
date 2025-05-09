@@ -29,6 +29,9 @@ from mozilla_bitbar_devicepool.taskcluster import get_taskcluster_pending_tasks
 #  - for development, take over starting jobs for a particlar project
 
 
+import sentry_sdk
+
+
 class TestRunManagerLT(object):
     """Test Run Manager for LambdaTest"""
 
@@ -728,6 +731,19 @@ def parse_args(action_array):
 
 
 def main():
+    sentry_dsn = os.getenv("SENTRY_DSN")
+    if sentry_dsn:
+        # Sentry DSN is set, initialize Sentry SDK
+        sentry_sdk.init(
+            dsn=sentry_dsn,
+            # Add data like request headers and IP for users,
+            # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
+            send_default_pii=True,
+        )
+    else:
+        # Sentry DSN is not set, disable Sentry
+        logging.warning("SENTRY_DSN is not set. Sentry SDK will not be initialized.")
+
     # Parse command line arguments
     available_actions = ["start-test-run-manager"]
     args = parse_args(available_actions)
