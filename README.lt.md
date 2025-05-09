@@ -11,6 +11,16 @@
 
 See https://www.lambdatest.com/support/docs/hyperexecute-cli-run-tests-on-hyperexecute-grid/.
 
+## testing
+
+```bash
+# activate venv
+. ./.venv/bin/activate
+
+# pytest-watch with coverage and double verbose
+pytest-watch -- -vv --cov
+```
+
 ## execution loop overview
 
 ```bash
