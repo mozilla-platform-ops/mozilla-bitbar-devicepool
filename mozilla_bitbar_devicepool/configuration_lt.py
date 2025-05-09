@@ -22,6 +22,8 @@ class ConfigurationLt(object):
         # for tracking if lt_device_selector is set and devices are configured
         self.fully_configured_projects = {}
 
+        self.global_contract_device_count = -1
+
         if self.ci_mode and not self.quiet:
             print("ConfigurationLt: Running in CI mode. Using fake credentials.")
 
@@ -183,9 +185,35 @@ class ConfigurationLt(object):
         self._load_tc_env_vars()
         self._set_lt_api_key()
         self._set_lt_username()
+        self._set_global_contract_device_count()
 
         # debug print
         # print(self.get_config())
+
+    def _set_global_contract_device_count(self):
+        """
+        Sets the global contract device count based on the configuration.
+
+        The global contract device count is set to the value of the
+        "global.contract_device_count" key in the configuration.
+        """
+        pprint.pprint(self.config)
+        if "global" not in self.config:
+            # logging.warning("global not found in configuration. ")
+            return
+        if "contract_device_count" in self.config["global"]:
+            contract_device_count = self.config["global"]["contract_device_count"]
+            if not isinstance(contract_device_count, int):
+                raise ValueError("global.contract_device_count must be an integer")
+            if contract_device_count < 0:
+                raise ValueError("global.contract_device_count must be a positive integer")
+            self.global_contract_device_count = contract_device_count
+            # logging.info(
+            #     f"global.contract_device_count set to {contract_device_count} in configuration.")
+        else:
+            # logging.warning(
+            #     "global.contract_device_count not found in configuration. ")
+            pass
 
     def is_project_fully_configured(self, project_name):
         """

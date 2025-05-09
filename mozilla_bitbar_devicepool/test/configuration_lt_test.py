@@ -79,7 +79,7 @@ device_groups:
 
 SAMPLE_FILE_CONFIG_YAML_2 = """
 global:
-  contract_device_count: 30
+  contract_device_count: 1319
 projects:
   defaults:
     # not used yet
@@ -285,3 +285,10 @@ def test_get_total_device_count_2(configured_lt_instance2):
     """
     # Test with a fully configured instance
     assert configured_lt_instance2.get_total_device_count() == 5
+
+
+def test_global_contract_device_count(configured_lt_instance2):
+    """
+    Tests that the global.contract_device_count is correctly set in the configuration.
+    """
+    assert configured_lt_instance2.global_contract_device_count == 1319
