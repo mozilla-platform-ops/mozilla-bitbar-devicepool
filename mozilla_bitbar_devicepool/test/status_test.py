@@ -195,44 +195,7 @@ class TestStatus:
     def test_get_device_state_summary_with_filter(self, mock_get_devices, status_instance, mock_devices_data):
         mock_get_devices.return_value = mock_devices_data
         result = status_instance.get_device_state_summary(device_type_and_os_filter="Galaxy A55 5G-14")
-        expected = {
-            "Galaxy A55 5G": {
-                "RZCXA0H3T9P": "active",
-                "R5CY128X71B": "active",
-                "R5CXC1AP2KT": "active",
-                "R5CXC1AMMNK": "active",
-                "R5CXC1ANGLT": "active",
-                "R5CXC1ASA0L": "active",
-                "R5CXC1ASLHH": "active",
-                "RZCX821GXDJ": "active",
-                "RZCY10LGB6W": "active",
-                "RZCY10Y4HWD": "active",
-                "RZCY10Y4QVX": "active",
-                "RZCY10Y4TAV": "active",
-                "RZCY10Y4TBY": "active",
-                "RZCY10Y4TJX": "active",
-                "RZCY10Y548K": "active",
-                "R5CXC1AHV4M": "active",
-                "R5CXC1ALFED": "active",
-                "R5CXC1ARCER": "active",
-                "R5CXC1ARELR": "active",
-                "R5CX4089QNL": "active",
-                "R5CXC1AMNFY": "active",
-                "R5CY21T22NH": "active",
-                "RZCX31FDGJE": "active",
-                "RZCX50TW03H": "active",
-                "RZCX71ZVF6J": "active",
-                "RZCY204AAZD": "active",
-                "R5CXC1ASA3P": "busy",
-                "R5CXC1HZKLR": "busy",
-                "RZCY2011M7N": "busy",
-                "RZCY203N75Z": "busy",
-                "R5CXC1ARM0A": "busy",
-                "R5CXC1ASA2E": "busy",
-                "R5CXC1HZK0W": "busy",
-                "RZCX821GYPX": "faulty",
-            }
-        }
+        expected = {"active": 26, "busy": 7, "faulty": 1}
         assert result == expected
 
     @patch("mozilla_bitbar_devicepool.lambdatest.status.get_devices")
@@ -246,10 +209,10 @@ class TestStatus:
     def test_get_device_state_count(self, mock_get_devices, status_instance, mock_devices_data):
         mock_get_devices.return_value = mock_devices_data
         result = status_instance.get_device_state_count("Galaxy A55 5G-14", "online")
-        assert result == 1
+        assert result == 0
 
         result = status_instance.get_device_state_count("Galaxy A55 5G-14", "busy")
-        assert result == 1
+        assert result == 7
 
         # Test with a non-existent state
         result = status_instance.get_device_state_count("Galaxy A55 5G-14", "offline")
