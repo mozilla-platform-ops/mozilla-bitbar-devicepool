@@ -329,9 +329,10 @@ class TestRunManagerLT(object):
                     logging.error(f"{logging_header} Error processing devices for {project_name}: {e}", exc_info=True)
 
             # Log global device utilization statistics
+            global_total_device_count = self.config_object.get_total_device_count()
             util_percent = 0
-            if local_device_stats["total_devices"] > 0:
-                util_percent = (local_device_stats["busy_devices"] / local_device_stats["total_devices"]) * 100
+            if global_total_device_count > 0:
+                util_percent = (local_device_stats["busy_devices"] / global_total_device_count) * 100
 
             formatted_active_device_count = str(active_device_count_by_project_dict).strip("{}").replace("'", "")
             per_queue_string = f"Active device counts: {formatted_active_device_count}"
@@ -339,7 +340,7 @@ class TestRunManagerLT(object):
                 f"{logging_header} "
                 f"Session started jobs: {self.shared_data[self.SHARED_SESSION_STARTED_JOBS]}, "
                 "Global device utilization: Total/Active/Busy/Cleanup/BusyPercentage: "
-                f"{local_device_stats['total_devices']}/{self.shared_data[self.SHARED_LT_G_ACTIVE_DEVICES]}/"
+                f"{global_total_device_count}/{self.shared_data[self.SHARED_LT_G_ACTIVE_DEVICES]}/"
                 f"{local_device_stats['busy_devices']}/{self.shared_data[self.SHARED_LT_G_CLEANUP_DEVICES]}/"
                 f"{util_percent:.1f}%"
             )
