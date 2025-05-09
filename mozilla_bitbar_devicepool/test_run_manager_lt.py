@@ -594,14 +594,18 @@ class TestRunManagerLT(object):
         logging_header = f"[ {'Main':<{self.logging_padding}} ]"
         logging.info(f"{logging_header} Starting Test Run Manager in multithreaded mode...")
 
+        thread_started_count = 0
+
         # Create monitor threads
         tc_monitor = threading.Thread(target=self._taskcluster_monitor_thread, name="TC Monitor")
         lt_monitor = threading.Thread(target=self._lambdatest_monitor_thread, name="LT Monitor")
 
         # Start monitor threads
         tc_monitor.start()
+        thread_started_count += 1
         logging.info(f"{logging_header} Started TC Monitor thread.")
         lt_monitor.start()
+        thread_started_count += 1
         logging.info(f"{logging_header} Started LT Monitor thread.")
 
         # Give monitors a moment to potentially fetch initial data
@@ -615,10 +619,11 @@ class TestRunManagerLT(object):
             )
             job_starters.append(job_starter)
             job_starter.start()
+            thread_started_count += 1
             logging.info(f"{logging_header} Started Job Starter thread 'JS {project_name}'.")
 
         # Keep main thread alive until shutdown is signaled
-        logging.info(f"{logging_header} Waiting for shutdown signal...")
+        logging.info(f"{logging_header} {thread_started_count} threads started. Waiting for shutdown signal...")
         self.shutdown_event.wait()
         logging.info(f"{logging_header} Shutdown signal received. Waiting for threads to join...")
 
