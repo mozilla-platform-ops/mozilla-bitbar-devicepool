@@ -3,33 +3,29 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 
+import argparse
+import logging
+import multiprocessing  # Add import for multiprocessing.Manager
+import os
 import shutil
 import signal
-import logging
-import time
-import os
-import sys
 import subprocess
-import argparse
+import sys
 import threading  # Added import
-import multiprocessing  # Add import for multiprocessing.Manager
+import time
 
+# TODO: add a semaphore file that makes that turns on --debug mode
+#    - main should check for the file every cycle and set the debug flag
+# TODO: longer term, networked locking for control of job starting for a single pool
+#  - high availability
+#  - for development, take over starting jobs for a particlar project
+import sentry_sdk
 
-from mozilla_bitbar_devicepool.util import misc
 from mozilla_bitbar_devicepool import configuration_lt, logging_setup
 from mozilla_bitbar_devicepool.lambdatest import job_config, status
 from mozilla_bitbar_devicepool.lambdatest.job_tracker import JobTracker
 from mozilla_bitbar_devicepool.taskcluster import get_taskcluster_pending_tasks
-
-# TODO: add a semaphore file that makes that turns on --debug mode
-#    - main should check for the file every cycle and set the debug flag
-
-# TODO: longer term, networked locking for control of job starting for a single pool
-#  - high availability
-#  - for development, take over starting jobs for a particlar project
-
-
-import sentry_sdk
+from mozilla_bitbar_devicepool.util import misc
 
 
 class TestRunManagerLT(object):
@@ -74,9 +70,6 @@ class TestRunManagerLT(object):
     PROJECT_LT_BUSY_DEVICE_COUNT = "lt_busy_device_count"
     PROJECT_LT_CLEANUP_DEVICE_COUNT = "lt_cleanup_device_count"
     PROJECT_LT_ACTIVE_DEVICES = "lt_active_devices"
-    # TODO: start using this or remove it
-    # available devices are ones that are not busy (via recent activity tracked by JobManager)
-    # PROJECT_AVAILABLE_DEVICES = "available_devices"
 
     def __init__(
         self,
