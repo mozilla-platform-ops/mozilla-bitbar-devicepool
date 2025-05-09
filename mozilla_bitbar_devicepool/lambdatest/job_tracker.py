@@ -26,20 +26,6 @@ class JobTracker:
         self.job_timestamps = {}  # Changed to dict mapping UDIDs to timestamps
         self.logger = logging.getLogger(__name__)
 
-    def add_jobs(self, count, udids=None):
-        """
-        Backward compatibility method that calls add_job_udids.
-        If udids are not provided, this method does nothing as we require UDIDs.
-
-        Args:
-            count (int): Number of jobs (unused, kept for compatibility)
-            udids (list): List of UDIDs to track
-        """
-        if udids:
-            self.add_job_udids(udids)
-        else:
-            self.logger.warning("add_jobs called without UDIDs, cannot track jobs")
-
     def add_job_udids(self, udids):
         """
         Record that jobs with specific UDIDs were started at the current time.
@@ -47,9 +33,6 @@ class JobTracker:
         Args:
             udids (list): List of UDIDs associated with jobs
         """
-        if not udids:
-            return
-
         now = time.time()
 
         # Store timestamp for each UDID
@@ -105,6 +88,13 @@ class JobTracker:
         # Remove expired timestamps
         for udid in expired_udids:
             del self.job_timestamps[udid]
+
+    # for testing only
+    def _force_expire(self, udid_list):
+        """Force expiration of jobs for testing purposes."""
+        for udid in udid_list:
+            if udid in self.job_timestamps:
+                del self.job_timestamps[udid]
 
     def clear(self):
         """Clear all tracked jobs."""
