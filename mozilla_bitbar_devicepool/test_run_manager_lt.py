@@ -15,6 +15,7 @@ import threading  # Added import
 import multiprocessing  # Add import for multiprocessing.Manager
 
 
+from mozilla_bitbar_devicepool.util import misc
 from mozilla_bitbar_devicepool import configuration_lt, logging_setup
 from mozilla_bitbar_devicepool.lambdatest import job_config, status
 from mozilla_bitbar_devicepool.lambdatest.job_tracker import JobTracker
@@ -687,36 +688,6 @@ class TestRunManagerLT(object):
         return jobs_to_start
 
 
-def get_git_version_info():
-    """
-    Returns a string with short git sha (if in a git client) and `-dirty` if there are uncommitted changes.
-    Returns empty string if not in a git repository or if git commands fail.
-    """
-    try:
-        # Check if we're in a git repository
-        subprocess.check_output(["git", "rev-parse", "--is-inside-work-tree"], stderr=subprocess.DEVNULL)
-
-        # Get the short SHA of the current commit
-        git_sha = (
-            subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], stderr=subprocess.DEVNULL).decode().strip()
-        )
-
-        # Check for uncommitted changes
-        status_output = (
-            subprocess.check_output(["git", "status", "--porcelain"], stderr=subprocess.DEVNULL).decode().strip()
-        )
-        is_dirty = len(status_output) > 0
-
-        # Format the output
-        result = git_sha
-        if is_dirty:
-            result += "-dirty"
-
-        return result
-    except (subprocess.SubprocessError, FileNotFoundError):
-        return ""  # Return empty string if not in a git repo or git is not available
-
-
 # Main and main helpers
 
 
@@ -772,7 +743,7 @@ def main():
     logging_setup.setup_logging(args.log_level, args.disable_logging_timestamps)
 
     if args.action == "start-test-run-manager":
-        git_version_info = get_git_version_info()
+        git_version_info = misc.get_git_info()
         banner = r"""
       ___                        _____
      /__/\                      /  /::\
