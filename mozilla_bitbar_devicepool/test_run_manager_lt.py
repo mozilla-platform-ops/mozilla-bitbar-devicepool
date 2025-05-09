@@ -43,7 +43,7 @@ class TestRunManagerLT(object):
     # TODO: increase this to 10, 20, 30 once we're more confident
     MAX_JOBS_TO_START_IN_ONE_CYCLE = 10
     GLOBAL_MAX_INITITATED_JOBS = 40
-    # roughly the time it takes for a LT job to start, install deps, start g-w, and pickup a job
+    # roughly the time it takes for a LT job to start, install deps, start g-w, and pickup a TC job
     JOB_TRACKER_EXPIRY_SECONDS = 210  # seconds
 
     # Threading constants
