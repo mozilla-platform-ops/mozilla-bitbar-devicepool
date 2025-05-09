@@ -99,6 +99,22 @@ class ConfigurationLt(object):
         # remove the defaults project
         del projects_config["defaults"]
 
+    def get_total_device_count(self):
+        """
+        Returns the total number of devices across all projects.
+
+        Returns:
+            int: The total number of devices.
+        """
+        device_groups = self.config.get("device_groups", {})
+        total_count = 0
+        for project_name, udid_list in device_groups.items():
+            if not udid_list:
+                # if the project has no phones, skip it
+                continue
+            total_count += len(udid_list)
+        return total_count
+
     def get_project_for_udid(self, udid):
         """
         Finds the project name associated with a given device UDID.

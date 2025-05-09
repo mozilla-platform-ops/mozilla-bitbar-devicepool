@@ -77,6 +77,47 @@ device_groups:
   test-2:
 """
 
+SAMPLE_FILE_CONFIG_YAML_2 = """
+global:
+  contract_device_count: 30
+projects:
+  defaults:
+    # not used yet
+    # SCRIPT_REPO_COMMIT: master
+    TEST_1: blah
+  a55-alpha:
+    # lt_device_selector: "Galaxy A55 5G-14"
+    # swapped for testing
+    lt_device_selector: "Galaxy A51-11"
+    TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-alpha-a55
+    TC_WORKER_TYPE: gecko-t-lambda-alpha-a55
+  a55-perf:
+    lt_device_selector: "Galaxy A55 5G-14"
+    # swapped for testing
+    # lt_device_selector: "Galaxy A51-11"
+    TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-a55
+    TC_WORKER_TYPE: gecko-t-lambda-perf-a55
+  test-1:
+  #     SCRIPT_REPO_COMMIT: future_commit
+    lt_device_selector: "Galaxy A51-11"
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1
+  #     TC_WORKER_TYPE: gecko-t-lambda-gw-test-1
+  #     # override SCRIPT_REPO_COMMIT with a test commit
+device_groups:
+  # this block is not used yet (not possible with LT API), future goal. see lt_device_selector in projects.
+  a55-perf:
+    R5CX4089QNL
+    R5CXC1AHV4M
+    R5CXC1ALFED
+  a55-alpha:
+    # the only device with a power meter
+    R5CXC1HZKLR
+  test-1:
+    # a51
+    RZ8NB0WJ47H
+  test-2:
+"""
+
 
 # create a fixture using SAMPLE_FILE_CONFIG_YAML
 @pytest.fixture
@@ -93,6 +134,20 @@ def sample_file_config(tmp_path):
     return str(config_file)
 
 
+@pytest.fixture
+def sample_file_config_2(tmp_path):
+    """
+    Fixture to create a temporary YAML file with sample configuration data.
+    """
+    # Create a temporary config file
+    config_dir = tmp_path / "config2"
+    config_dir.mkdir()
+    config_file = config_dir / "config.yml"
+    config_file.write_text(SAMPLE_FILE_CONFIG_YAML_2)
+
+    return str(config_file)
+
+
 # TODO: create a fixture for configured_lt_instance
 @pytest.fixture
 def configured_lt_instance(sample_file_config):
@@ -101,6 +156,16 @@ def configured_lt_instance(sample_file_config):
     """
     config_lt = ConfigurationLt(ci_mode=True)
     config_lt.configure(config_path=sample_file_config)
+    return config_lt
+
+
+@pytest.fixture
+def configured_lt_instance2(sample_file_config_2):
+    """
+    Fixture to create a configured instance of ConfigurationLt.
+    """
+    config_lt = ConfigurationLt(ci_mode=True)
+    config_lt.configure(config_path=sample_file_config_2)
     return config_lt
 
 
@@ -204,3 +269,19 @@ def test_is_project_fully_configured(configured_lt_instance):
 
     # Test with a non-existent project
     assert configured_lt_instance.is_project_fully_configured("non_existent_project") is False
+
+
+def test_get_total_device_count(configured_lt_instance, configured_lt_instance2):
+    """
+    Tests that the get_total_device_count method correctly counts the total number of devices across all projects.
+    """
+    # Test with a fully configured instance
+    assert configured_lt_instance.get_total_device_count() == 35
+
+
+def test_get_total_device_count_2(configured_lt_instance2):
+    """
+    Tests that the get_total_device_count method correctly counts the total number of devices across all projects.
+    """
+    # Test with a fully configured instance
+    assert configured_lt_instance2.get_total_device_count() == 5
