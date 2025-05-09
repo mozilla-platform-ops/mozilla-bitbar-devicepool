@@ -4,7 +4,7 @@
 
 import pprint
 
-from mozilla_bitbar_devicepool.lambdatest.api import get_jobs, get_devices
+from mozilla_bitbar_devicepool.lambdatest.api import get_devices, get_jobs
 
 # idea: uses api data to build a status/state
 #   - a presentation layer for data from api.py
@@ -268,8 +268,8 @@ def lt_status_main():
 
 if __name__ == "__main__":  # pragma: no cover
     import os
-    import sys
     import pprint
+    import sys
 
     lt_username = os.environ["LT_USERNAME"]
     lt_api_key = os.environ["LT_ACCESS_KEY"]

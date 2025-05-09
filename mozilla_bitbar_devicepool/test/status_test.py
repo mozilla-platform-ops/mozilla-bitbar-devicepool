@@ -1,7 +1,9 @@
-import pytest
-from unittest.mock import patch
-from mozilla_bitbar_devicepool.lambdatest.status import Status
 import os
+from unittest.mock import patch
+
+import pytest
+
+from mozilla_bitbar_devicepool.lambdatest.status import Status
 
 
 # Sample mock data

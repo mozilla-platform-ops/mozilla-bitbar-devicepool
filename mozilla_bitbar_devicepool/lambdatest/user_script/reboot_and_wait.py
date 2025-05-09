@@ -1,8 +1,7 @@
-import subprocess
-import time
-import sys
 import os
-
+import subprocess
+import sys
+import time
 
 # TODO: pull most of this code out into a library/class
 # TODO: consider using mozdevice pip for many of these functions

@@ -3,10 +3,11 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
-import yaml
+import pprint
 import subprocess
 import sys
-import pprint
+
+import yaml
 
 from mozilla_bitbar_devicepool.util.template import apply_dict_defaults
 

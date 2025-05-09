@@ -3,12 +3,13 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import base64
-import pprint
 import os
-import requests_cache
-import requests.adapters
-from urllib3.util import Retry
+import pprint
 from datetime import timedelta
+
+import requests.adapters
+import requests_cache
+from urllib3.util import Retry
 
 # Create a cached session with 10 second expiry
 # Only requests using this session will be cached

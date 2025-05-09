@@ -1,7 +1,8 @@
+import uuid as uuidlib
 from datetime import datetime, timezone
+
 import git
 import humanhash
-import uuid as uuidlib
 
 
 # Get the current date in UTC in an ISO formatted string

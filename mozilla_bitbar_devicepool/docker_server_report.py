@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-import sys
 import pprint
+import sys
 
 import termplotlib as tpl
 

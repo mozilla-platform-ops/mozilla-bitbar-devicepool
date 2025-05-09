@@ -1,4 +1,5 @@
 import pytest
+
 from mozilla_bitbar_devicepool.test_run_manager_lt import TestRunManagerLT
 
 

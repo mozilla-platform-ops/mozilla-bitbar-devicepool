@@ -3,6 +3,7 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import pytest
+
 from mozilla_bitbar_devicepool.configuration_lt import ConfigurationLt
 
 # Sample configuration data as a raw YAML string (for writing to file)
