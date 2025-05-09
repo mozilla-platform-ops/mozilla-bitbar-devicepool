@@ -43,6 +43,8 @@ class TestRunManagerLT(object):
     # TODO: increase this to 10, 20, 30 once we're more confident
     MAX_JOBS_TO_START_IN_ONE_CYCLE = 10
     GLOBAL_MAX_INITITATED_JOBS = 40
+    # roughly the time it takes for a LT job to start, install deps, start g-w, and pickup a job
+    JOB_TRACKER_EXPIRY_SECONDS = 210  # seconds
 
     # Threading constants
     TC_MONITOR_INTERVAL = 30  # seconds
@@ -106,7 +108,7 @@ class TestRunManagerLT(object):
         # Initialize job trackers for each project in config
         # TODO: configuration lt call to get projects?
         for project_name in self.config_object.config.get("projects", {}):
-            self.job_trackers[project_name] = JobTracker(expiry_seconds=210)
+            self.job_trackers[project_name] = self.get_job_tracker(project_name)
 
         # Create a multiprocessing Manager for thread-safe shared data
         manager = multiprocessing.Manager()
@@ -160,7 +162,7 @@ class TestRunManagerLT(object):
     def get_job_tracker(self, project_name):
         """Get the job tracker for a specific project, creating it if it doesn't exist."""
         if project_name not in self.job_trackers:
-            self.job_trackers[project_name] = JobTracker(expiry_seconds=210)
+            self.job_trackers[project_name] = JobTracker(expiry_seconds=self.JOB_TRACKER_EXPIRY_SECONDS)
         return self.job_trackers[project_name]
 
     def add_jobs_to_tracker(self, project_name, udids):
