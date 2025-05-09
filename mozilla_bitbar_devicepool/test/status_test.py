@@ -202,7 +202,7 @@ class TestStatus:
     def test_get_device_state_summary_by_device(self, mock_get_devices, status_instance, mock_devices_data):
         mock_get_devices.return_value = mock_devices_data
         result = status_instance.get_device_state_summary_by_device()
-        expected = {"Galaxy A55 5G": {"online": 1, "busy": 1}, "Galaxy A51": {"online": 1}}
+        expected = {"Galaxy A51": {"active": 1}, "Galaxy A55 5G": {"active": 26, "busy": 7, "faulty": 1}}
         assert result == expected
 
     @patch("mozilla_bitbar_devicepool.lambdatest.status.get_devices")
