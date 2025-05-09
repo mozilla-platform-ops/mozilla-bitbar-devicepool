@@ -182,6 +182,6 @@ class DeviceGroupReport:
         print("total devices: %s" % result["total_devices"])
 
 
-def main():
+def main():  # pragma: no cover
     device_group_report = DeviceGroupReport()
     device_group_report.main()

@@ -46,7 +46,7 @@ def get_taskcluster_pending_tasks(provisioner_id, worker_type, verbose=False):
 
 
 # main
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     # Example usage
     provisioner_id = "proj-autophone"
     worker_type = "t-lambda-alpha-a55"
