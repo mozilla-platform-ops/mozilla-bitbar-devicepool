@@ -7,6 +7,10 @@
 - rename to mozilla-tc-devicepool or
             mozilla-taskcluster-devicepool
 
+## getting the hyperexecute binary
+
+See https://www.lambdatest.com/support/docs/hyperexecute-cli-run-tests-on-hyperexecute-grid/.
+
 ## execution loop overview
 
 ```bash
