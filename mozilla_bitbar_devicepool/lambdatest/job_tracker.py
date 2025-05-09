@@ -6,10 +6,12 @@ import time
 import logging
 
 
+# TODO: rename to DeviceJobTracker?
 class JobTracker:
     """
-    Tracks recently started jobs and automatically expires them after a set duration.
-    Used to avoid starting too many jobs before existing ones have had time to claim tasks.
+    Tracks devices with recently started jobs and automatically expires them after a set duration.
+    Used to avoid starting another job on a device that we've already assigned, but hasn't claimed
+    a TC task yet.
     """
 
     # Default 3.5 minutes (210 seconds)
