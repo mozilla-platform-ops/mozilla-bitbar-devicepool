@@ -31,6 +31,7 @@ journalctl -u lambdatest -f -n "${LINES_TO_SHOW}" | \
         grep --line-buffered -v DEBUG | \
         GREP_COLOR=$GREP_COLOR_RED grep ${GREP_OPTIONS} --color=always -E '.*WARNING.*|^' | \
         GREP_COLOR=$GREP_COLOR_YELLOW grep ${GREP_OPTIONS} --color=always -E '.*Main.*|^' | \
+        GREP_COLOR=$GREP_COLOR_CYAN grep ${GREP_OPTIONS} --color=always -E '.*Global.*|^' | \
         GREP_COLOR=$GREP_COLOR_GREEN grep ${GREP_OPTIONS} --color=always -E '.*Launched.*|^' | \
-        GREP_COLOR=$GREP_COLOR_PURPLE grep ${GREP_OPTIONS} --color=always -E '.*LT Monitor.*|^' | \
-        GREP_COLOR=$GREP_COLOR_BLUE grep ${GREP_OPTIONS} --color=always -E '.*TC Monitor.*|^'
+        GREP_COLOR=$GREP_COLOR_BLUE grep ${GREP_OPTIONS} --color=always -E '.*LT Monitor.*|^' | \
+        GREP_COLOR=$GREP_COLOR_PURPLE grep ${GREP_OPTIONS} --color=always -E '.*TC Monitor.*|^'
