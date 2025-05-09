@@ -744,6 +744,8 @@ def main():
         # Sentry DSN is not set, disable Sentry
         logging.warning("SENTRY_DSN is not set. Sentry SDK will not be initialized.")
 
+    # TODO: log in sentry when a particular git sha (version?) has run X jobs.
+
     # Parse command line arguments
     available_actions = ["start-test-run-manager"]
     args = parse_args(available_actions)
