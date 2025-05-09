@@ -1,53 +1,26 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from mozilla_bitbar_devicepool.lambdatest.status import Status, lt_status_main
+import os
 
 
 # Sample mock data
 @pytest.fixture
 def mock_jobs_data():
-    return {
-        "data": [
-            {
-                "job_number": "1",
-                "status": "running",
-                "job_label": "test-label-1",
-                "Tasks": "1",
-            },
-            {
-                "job_number": "2",
-                "status": "completed",
-                "job_label": "test-label-2",
-                "Tasks": "1",
-            },
-            {
-                "job_number": "3",
-                "status": "initiated",
-                "job_label": "test-label-3",
-                "Tasks": "3",
-            },
-            {
-                "job_number": "4",
-                "status": "running",
-                "job_label": "test-label-4",
-                "Tasks": "2",
-                "job_summary": {"scenario_stage_summary": {"status_counts_excluding_retries": {"in_progress": "1"}}},
-            },
-        ]
-    }
+    # load this from a file (test_data/lt_get_jobs_1.txt) and use it
+    this_file_dir = os.path.dirname(os.path.abspath(__file__))
+    data_path = os.path.join(this_file_dir, "test_data", "lt_get_jobs_shortened.txt")
+    with open(data_path) as f:
+        # evaluate it as a dict and return it
+        return eval(f.read())
 
 
 @pytest.fixture
 def mock_devices_data():
-    return {
-        "data": {
-            "private_cloud_devices": [
-                {"name": "Galaxy A55 5G", "udid": "RXYA1821", "status": "online", "fullOsVersion": "14"},
-                {"name": "Galaxy A55 5G", "udid": "RXYA1823", "status": "busy", "fullOsVersion": "14"},
-                {"name": "Galaxy A51", "udid": "DB123212", "status": "online", "fullOsVersion": "12"},
-            ]
-        }
-    }
+    this_file_dir = os.path.dirname(os.path.abspath(__file__))
+    data_path = os.path.join(this_file_dir, "test_data", "lt_get_devices_1.txt")
+    with open(data_path) as f:
+        return eval(f.read())
 
 
 @pytest.fixture
