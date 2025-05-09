@@ -197,7 +197,6 @@ class ConfigurationLt(object):
         The global contract device count is set to the value of the
         "global.contract_device_count" key in the configuration.
         """
-        pprint.pprint(self.config)
         if "global" not in self.config:
             # logging.warning("global not found in configuration. ")
             return
