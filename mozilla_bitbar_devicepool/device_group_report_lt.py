@@ -106,5 +106,5 @@ def main():
     device_group_report_lt.show_report(verbose=args.verbose)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()

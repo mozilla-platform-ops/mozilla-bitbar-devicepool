@@ -8,9 +8,7 @@ license = "MPL-2.0"
 readme = "README.md"
 repository = "https://github.com/mozilla-platform-ops/mozilla-bitbar-devicepool"
 packages = [{include = "mozilla_bitbar_devicepool"}]
-classifiers = [
-        "Operating System :: OS Independent",
-]
+classifiers = ["Operating System :: OS Independent"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -61,3 +59,6 @@ line-length = 120
 DEP001 = ["google", "mozdevice", "script"]
 DEP003 = ["google", "mozdevice"]
 DEP004 = ["mozdevice"]
+
+[tool.pytest.ini_options]
+norecursedirs = "mozilla_bitbar_devicepool/lambdatest/user_script"

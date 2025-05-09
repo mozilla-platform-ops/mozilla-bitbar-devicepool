@@ -266,7 +266,7 @@ def lt_status_main():
             print(f"    - {udid}")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     import os
     import sys
     import pprint

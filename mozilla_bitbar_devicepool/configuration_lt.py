@@ -274,7 +274,7 @@ class ConfigurationLt(object):
         return self.fully_configured_projects
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     clt = ConfigurationLt()
     clt.configure()
     pprint.pprint(clt.get_config())

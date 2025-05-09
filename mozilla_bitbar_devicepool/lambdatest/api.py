@@ -108,7 +108,7 @@ def get_devices(lt_username, lt_api_key, timeout=(10, 30)):
     return response.json()  # list of jobs
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     lt_username = os.environ["LT_USERNAME"]
     lt_api_key = os.environ["LT_ACCESS_KEY"]
 
