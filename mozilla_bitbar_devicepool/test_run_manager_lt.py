@@ -206,7 +206,7 @@ class TestRunManagerLT(object):
             formatted_wttcd = str(worker_type_to_count_dict).strip("{}").replace("'", "")
             logging.info(f"{logging_header} Queue counts: {formatted_wttcd}")
 
-            # Wait for the specified interval or until shutdown is signaled
+            # normal thread sleep
             self.shutdown_event.wait(self.TC_MONITOR_INTERVAL)
 
         logging.info(f"{logging_header} Thread stopped.")
@@ -349,6 +349,7 @@ class TestRunManagerLT(object):
             # )
             logging.info(f"{logging_header} {per_queue_string}")
 
+            # normal thread sleep
             self.shutdown_event.wait(self.LT_MONITOR_INTERVAL)
 
         logging.info(f"{logging_header} Thread stopped.")
@@ -538,7 +539,8 @@ class TestRunManagerLT(object):
                                     logging.warning(
                                         f"{logging_header} hyperexecute binary not found or not executable, retry {retry_count + 1}/{max_retry}"
                                     )
-                                    self.shutdown_event.wait(2)  # Wait for 2 seconds before retrying
+                                    # Wait for 2 seconds before retrying
+                                    self.shutdown_event.wait(2)
                                     retry_count += 1
 
                             if retry_count >= max_retry:
@@ -591,10 +593,13 @@ class TestRunManagerLT(object):
 
     # TODO: rename to reporting thread
     def _sentry_thread(self):
-        """Runs the Monitor thread for error reporting."""
-        logging_header = f"[ {'Monitor':<{self.logging_padding}} ]"
+        """Runs the Reporting thread for error reporting."""
+        logging_header = f"[ {'Reporting':<{self.logging_padding}} ]"
         logging.info(f"{logging_header} Thread startiing...")
         build_good_notification_sent = False
+
+        # wait for lt monitor thread to do initial population of data
+        self.shutdown_event.wait(10)
 
         # main loop
         while not self.shutdown_event.is_set():
@@ -637,6 +642,7 @@ class TestRunManagerLT(object):
                         )
                         sentry_sdk.capture_message("Build Confidence: Build surpassed job start threshold.")
                     build_good_notification_sent = True
+            # normal thread sleep
             self.shutdown_event.wait(self.SENTRY_INTERVAL)
         logging.info(f"{logging_header} Thread stopped.")
 
@@ -665,7 +671,7 @@ class TestRunManagerLT(object):
         thread_started_count += 1
         logging.info(f"{logging_header} Started Sentry thread.")
 
-        # Give monitors a moment to potentially fetch initial data
+        # Give monitors/utility threads a moment to potentially fetch initial data
         time.sleep(2)
 
         # Create and start a job starter thread for each project
