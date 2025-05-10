@@ -33,6 +33,7 @@ pytest-watch = "^4.2.0"
 pytest-cov = "^4.0.0"
 deptry = "^0.23.0"
 mozdevice = "^4.2.0"
+pytest-mock = "^3.14.0"
 
 [tool.poetry.scripts]
 # TODO: rework all of these (tcdp-lt, tcdp-bb?)

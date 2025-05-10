@@ -1,9 +1,10 @@
+import git  # Add this import
 import pytest
 
 from mozilla_bitbar_devicepool.util import misc, template
 
 
-class TestMisc:
+class TestUtilTemplate:
     def test_lookup_key_value(self):
         dict_list = [{"key1": "value1"}, {"key2": "value2"}]
         result = template.lookup_key_value(dict_list, "key1")
@@ -23,3 +24,22 @@ class TestMisc:
         defaults_dict = {"key1": {"subkey1": "aaa", "subkey2": "dddd"}}
         result = template.apply_dict_defaults(input_dict, defaults_dict)
         assert result == {"key1": {"subkey1": "aaa", "subkey2": "dddd", "subkey3": "value1"}}
+
+
+class TestUtilMisc:
+    def test_get_utc_date_string(self):
+        result = misc.get_utc_date_string()
+        assert isinstance(result, str)
+        assert "+00:00" in result
+        assert result.endswith("+00:00")
+
+    def test_get_git_info(self, mocker):
+        mock_repo = mocker.patch("git.Repo")
+        mock_repo.return_value.head.object.hexsha = "1234567890abcdef"
+        mock_repo.return_value.is_dirty.return_value = False
+        result = misc.get_git_info()
+        assert result == "1234567"
+
+    def test_humanhash_from_string(self):
+        result = misc.humanhash_from_string("hello world")
+        assert isinstance(result, str)
