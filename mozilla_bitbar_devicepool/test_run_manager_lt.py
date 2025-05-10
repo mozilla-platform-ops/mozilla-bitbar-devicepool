@@ -42,6 +42,8 @@ class TestRunManagerLT(object):
     GLOBAL_MAX_INITITATED_JOBS = 40
     # roughly the time it takes for a LT job to start, install deps, start g-w, and pickup a TC job
     JOB_TRACKER_EXPIRY_SECONDS = 210  # seconds
+    #
+    GOOD_BUILD_JOB_STARTED_THRESHOLD = 30
 
     # Threading constants
     TC_MONITOR_INTERVAL = 30  # seconds
@@ -582,6 +584,30 @@ class TestRunManagerLT(object):
 
         logging.info(f"{logging_header} Thread stopped.")
 
+    def _sentry_thread(self):
+        """Runs the Sentry thread for error reporting."""
+        logging_header = f"[ {'Sentry':<{self.logging_padding}} ]"
+        logging.info(f"{logging_header} Sentry thread reporting for duty...")
+        build_good_notification_sent = False
+        git_info = misc.get_git_info()
+        verbiage = f"This build ({git_info}) has started {self.shared_data[self.SHARED_SESSION_STARTED_JOBS]} jobs!"
+
+        # main loop
+        while not self.shutdown_event.is_set():
+            if build_good_notification_sent is False:
+                if self.shared_data[self.SHARED_SESSION_STARTED_JOBS] >= self.GOOD_BUILD_JOB_STARTED_THRESHOLD:
+                    git_info = misc.get_git_info()
+                    verbiage = f"This build ({git_info}) has started {self.shared_data[self.SHARED_SESSION_STARTED_JOBS]} jobs!"
+
+                    logging.info(f"{logging_header} {verbiage}")
+                    # TODO: send more structured data to sentry
+                    sentry_sdk.capture_message(
+                        f"{verbiage} Please be nicer to it.",
+                    )
+                    build_good_notification_sent = True
+            self.shutdown_event.wait(5)
+        logging.info(f"{logging_header} Sentry thread stopped.")
+
     # main thread
     def run_multithreaded(self):
         """Runs the manager with separate threads for monitoring and job starting for each project."""
@@ -601,6 +627,11 @@ class TestRunManagerLT(object):
         lt_monitor.start()
         thread_started_count += 1
         logging.info(f"{logging_header} Started LT Monitor thread.")
+        # start sentry (notification?) thread
+        sentry_thread = threading.Thread(target=self._sentry_thread, name="Sentry Thread")
+        sentry_thread.start()
+        thread_started_count += 1
+        logging.info(f"{logging_header} Started Sentry thread.")
 
         # Give monitors a moment to potentially fetch initial data
         time.sleep(2)
