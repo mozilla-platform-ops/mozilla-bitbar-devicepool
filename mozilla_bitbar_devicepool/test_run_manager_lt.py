@@ -502,7 +502,7 @@ class TestRunManagerLT(object):
 
                         if self.debug_mode:
                             # Simulate tiny delay if in debug mode
-                            time.sleep(0.1)
+                            self.shutdown_event.wait(0.1)
                         else:
                             # Check if hyperexecute exists before executing
                             hyperexecute_path = os.path.join(project_root_dir, "hyperexecute")
@@ -527,13 +527,13 @@ class TestRunManagerLT(object):
                                     # TODO: if USB issues are resolved, remove this sleep and potentially run with
                                     #     `--disable-updates` option, and then have main thread run without the option occasionally
                                     #     to update (with locking)
-                                    time.sleep(2)
+                                    self.shutdown_event.wait(2)
                                     break
                                 else:
                                     logging.warning(
                                         f"{logging_header} hyperexecute binary not found or not executable, retry {retry_count + 1}/{max_retry}"
                                     )
-                                    time.sleep(2)  # Wait for 2 seconds before retrying
+                                    self.shutdown_event.wait(2)  # Wait for 2 seconds before retrying
                                     retry_count += 1
 
                             if retry_count >= max_retry:
