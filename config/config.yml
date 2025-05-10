@@ -371,9 +371,9 @@ device_groups:
     pixel5-03:
     pixel5-04:
     pixel5-05:
-    pixel5-06:
+    # pixel5-06:  # 5/9/25: removed, contract downsizing
     pixel5-07:
-    pixel5-08:
+    # pixel5-08:  # 5/9/25: removed, contract downsizing
     pixel5-09:
     pixel5-10:
     pixel5-11:
