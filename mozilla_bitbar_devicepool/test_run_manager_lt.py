@@ -45,6 +45,12 @@ class TestRunManagerLT(object):
     #
     GOOD_BUILD_JOB_STARTED_THRESHOLD = 35
 
+    # thread name constants
+    TC_THREAD_NAME = "TC API"
+    LT_THREAD_NAME = "LT API"
+    JOB_STARTER_THREAD_NAME = "JS"
+    MONITOR_THREAD_NAME = "Monitor"
+
     # Threading constants
     TC_MONITOR_INTERVAL = 30  # seconds
     LT_MONITOR_INTERVAL = 30  # seconds
@@ -655,21 +661,21 @@ class TestRunManagerLT(object):
         thread_started_count = 0
 
         # Create monitor threads
-        tc_monitor = threading.Thread(target=self._taskcluster_monitor_thread, name="TC Monitor")
-        lt_monitor = threading.Thread(target=self._lambdatest_monitor_thread, name="LT Monitor")
+        tc_monitor = threading.Thread(target=self._taskcluster_monitor_thread, name=self.TC_THREAD_NAME)
+        lt_monitor = threading.Thread(target=self._lambdatest_monitor_thread, name=self.LT_THREAD_NAME)
 
         # Start monitor threads
         tc_monitor.start()
         thread_started_count += 1
-        logging.info(f"{logging_header} Started TC Monitor thread.")
+        logging.info(f"{logging_header} Started {self.TC_THREAD_NAME} thread.")
         lt_monitor.start()
         thread_started_count += 1
-        logging.info(f"{logging_header} Started LT Monitor thread.")
+        logging.info(f"{logging_header} Started {self.LT_THREAD_NAME} thread.")
         # start sentry (notification?) thread
-        sentry_thread = threading.Thread(target=self._sentry_thread, name="Sentry Thread")
+        sentry_thread = threading.Thread(target=self._sentry_thread, name=self.MONITOR_THREAD_NAME)
         sentry_thread.start()
         thread_started_count += 1
-        logging.info(f"{logging_header} Started Sentry thread.")
+        logging.info(f"{logging_header} Started {self.MONITOR_THREAD_NAME} thread.")
 
         # Give monitors/utility threads a moment to potentially fetch initial data
         time.sleep(2)
@@ -726,15 +732,15 @@ class TestRunManagerLT(object):
 
         # double check all threads are dead
         if tc_monitor.is_alive():
-            logging.warning(f"{logging_header} TC monitor thread did not exit cleanly.")
+            logging.warning(f"{logging_header} {self.TC_THREAD_NAME} thread did not exit cleanly.")
         if lt_monitor.is_alive():
-            logging.warning(f"{logging_header} LT monitor thread did not exit cleanly.")
+            logging.warning(f"{logging_header} {self.LT_THREAD_NAME} thread did not exit cleanly.")
         if sentry_thread.is_alive():
-            logging.warning(f"{logging_header} Sentry thread did not exit cleanly.")
+            logging.warning(f"{logging_header} {self.MONITOR_THREAD_NAME} thread did not exit cleanly.")
         # check if all js threads have exited
         for i, job_starter in enumerate(job_starters):
             if job_starter.is_alive():
-                logging.warning(f"{logging_header} Job starter thread {i} did not exit cleanly.")
+                logging.warning(f"{logging_header} '{job_starter.name}' did not exit cleanly.")
 
     # Helper methods
 
