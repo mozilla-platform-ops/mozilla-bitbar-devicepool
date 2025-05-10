@@ -608,11 +608,12 @@ class TestRunManagerLT(object):
                             "build_report",
                             {
                                 "action_type": "job_started_threshold_reached",
+                                "message": verbiage,
                                 "jobs": self.shared_data[self.SHARED_SESSION_STARTED_JOBS],
                                 "build_git_info": git_info,
                             },
                         )
-                        sentry_sdk.capture_message(verbiage)
+                        sentry_sdk.capture_message("Build Confidence: Build surpassed job start threshold.")
                     build_good_notification_sent = True
             self.shutdown_event.wait(5)
         logging.info(f"{logging_header} Sentry thread stopped.")
