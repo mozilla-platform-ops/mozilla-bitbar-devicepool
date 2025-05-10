@@ -39,7 +39,7 @@ def humanhash_from_string(value, **params):
 
 
 # main
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     print(get_utc_date_string())
     print(get_git_info())
     print(humanhash_from_string("hello world"))
