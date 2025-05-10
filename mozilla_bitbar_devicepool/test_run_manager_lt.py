@@ -676,6 +676,12 @@ class TestRunManagerLT(object):
             logging.warning(f"{logging_header} TC monitor thread did not exit cleanly.")
         if lt_monitor.is_alive():
             logging.warning(f"{logging_header} LT monitor thread did not exit cleanly.")
+        if sentry_thread.is_alive():
+            logging.warning(f"{logging_header} Sentry thread did not exit cleanly.")
+        # check if all js threads have exited
+        for i, job_starter in enumerate(job_starters):
+            if job_starter.is_alive():
+                logging.warning(f"{logging_header} Job starter thread {i} did not exit cleanly.")
 
     # Helper methods
 
