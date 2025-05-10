@@ -43,7 +43,7 @@ class TestRunManagerLT(object):
     # roughly the time it takes for a LT job to start, install deps, start g-w, and pickup a TC job
     JOB_TRACKER_EXPIRY_SECONDS = 210  # seconds
     #
-    GOOD_BUILD_JOB_STARTED_THRESHOLD = 30
+    GOOD_BUILD_JOB_STARTED_THRESHOLD = 35
 
     # Threading constants
     TC_MONITOR_INTERVAL = 30  # seconds
