@@ -590,6 +590,7 @@ class TestRunManagerLT(object):
         logging_header = f"[ {'Sentry':<{self.logging_padding}} ]"
         logging.info(f"{logging_header} Sentry thread reporting for duty...")
         build_good_notification_sent = False
+        celebration_emojis = "🎉🎈🤡🎊"
 
         # main loop
         while not self.shutdown_event.is_set():
@@ -600,7 +601,7 @@ class TestRunManagerLT(object):
                         f"Build ({git_info}) has started {self.shared_data[self.SHARED_SESSION_STARTED_JOBS]} jobs!"
                     )
                     # send a normal logging message
-                    logging.info(f"{logging_header} {verbiage}")
+                    logging.info(f"{logging_header} {celebration_emojis} {verbiage}")
                     # send a sentry event
                     with sentry_sdk.push_scope() as scope:
                         scope.set_context(
