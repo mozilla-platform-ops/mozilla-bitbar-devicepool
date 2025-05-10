@@ -672,6 +672,18 @@ class TestRunManagerLT(object):
                 logging.warning(f"{logging_header} Job starter thread {i} did not exit cleanly.")
 
         logging.info(f"{logging_header} All threads joined. Exiting.")
+
+        # TODO: warn if any of the JobTrackers still have active jobs (and mention how long before the the youngest job expires)
+        # for project_name, job_tracker in self.job_trackers.items():
+        #     if job_tracker.has_active_jobs():
+        #         youngest_job = job_tracker.get_youngest_job()
+        #         time_left = youngest_job.get_time_left()
+        #         logging.warning(
+        #             f"{logging_header} JobTracker for project '{project_name}' still has active jobs. "
+        #             f"Youngest job expires in {time_left}."
+        #         )
+
+        # double check all threads are dead
         if tc_monitor.is_alive():
             logging.warning(f"{logging_header} TC monitor thread did not exit cleanly.")
         if lt_monitor.is_alive():
