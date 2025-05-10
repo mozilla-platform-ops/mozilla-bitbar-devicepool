@@ -584,6 +584,7 @@ class TestRunManagerLT(object):
 
         logging.info(f"{logging_header} Thread stopped.")
 
+    # TODO: rename to reporting thread
     def _sentry_thread(self):
         """Runs the Sentry thread for error reporting."""
         logging_header = f"[ {'Sentry':<{self.logging_padding}} ]"
