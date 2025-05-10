@@ -162,3 +162,122 @@ class TestJobTracker:
         assert tracker.get_active_udids() == []
         assert tracker.is_udid_active("device1") is False
         assert tracker.is_udid_active("device2") is False
+
+    def test_has_active_jobs(self, monkeypatch):
+        """Test that has_active_jobs correctly reports if there are active jobs."""
+        tracker = JobTracker(expiry_seconds=10)
+
+        # Test with empty tracker
+        assert tracker.has_active_jobs() is False
+
+        # Test with active jobs
+        tracker.add_job_udids(["device1", "device2"])
+        assert tracker.has_active_jobs() is True
+
+        # Test after jobs expire
+        current_time = time.time()
+        monkeypatch.setattr(time, "time", lambda: current_time + 11)
+        assert tracker.has_active_jobs() is False
+
+    def test_get_newest_job_time(self, monkeypatch):
+        """Test that get_newest_job_time returns the most recent timestamp."""
+        tracker = JobTracker(expiry_seconds=10)
+
+        # Test with empty tracker
+        assert tracker.get_newest_job_time() is None
+
+        # Control time
+        current_time = 1000.0
+        monkeypatch.setattr(time, "time", lambda: current_time)
+
+        # Add initial job
+        tracker.add_job_udids(["device1"])
+        assert tracker.get_newest_job_time() == current_time
+
+        # Add jobs at different times
+        current_time += 5
+        monkeypatch.setattr(time, "time", lambda: current_time)
+        tracker.add_job_udids(["device2"])
+        assert tracker.get_newest_job_time() == current_time
+
+        # Add earlier job (should not change newest time)
+        current_time -= 3
+        monkeypatch.setattr(time, "time", lambda: current_time)
+        tracker.add_job_udids(["device3"])
+        assert tracker.get_newest_job_time() == current_time + 3
+
+        # After all jobs expire
+        current_time += 60
+        monkeypatch.setattr(time, "time", lambda: current_time)
+        assert tracker.get_newest_job_time() is None
+
+    def test_get_time_remaining_seconds(self, monkeypatch):
+        """Test that get_time_remaining_seconds calculates correct remaining time."""
+        tracker = JobTracker(expiry_seconds=10)
+
+        # Test with empty tracker
+        assert tracker.get_time_remaining_seconds() == 0
+
+        # Control time
+        current_time = 1000.0
+        monkeypatch.setattr(time, "time", lambda: current_time)
+
+        # Add a job
+        tracker.add_job_udids(["device1"])
+
+        # Check time immediately after adding job
+        assert tracker.get_time_remaining_seconds() == 10
+
+        # Check halfway through expiry
+        monkeypatch.setattr(time, "time", lambda: current_time + 5)
+        assert tracker.get_time_remaining_seconds() == 5
+
+        # Check at expiry boundary
+        monkeypatch.setattr(time, "time", lambda: current_time + 10)
+        assert tracker.get_time_remaining_seconds() == 0
+
+        # Check after expiry
+        monkeypatch.setattr(time, "time", lambda: current_time + 15)
+        assert tracker.get_time_remaining_seconds() == 0
+
+        # Add new job and test again
+        monkeypatch.setattr(time, "time", lambda: current_time + 20)
+        tracker.add_job_udids(["device2"])
+        assert tracker.get_time_remaining_seconds() == 10
+
+    def test_format_time_remaining(self, monkeypatch):
+        """Test that format_time_remaining correctly formats the time."""
+        tracker = JobTracker(expiry_seconds=10)
+
+        # Control time
+        current_time = 1000.0
+        monkeypatch.setattr(time, "time", lambda: current_time)
+
+        # Test with empty tracker
+        assert tracker.format_time_remaining() == "0m 0s"
+
+        # Add a job
+        tracker.add_job_udids(["device1"])
+
+        # Test formatting different times
+        assert tracker.format_time_remaining() == "0m 10s"
+
+        # Test 1 minute 5 seconds
+        tracker = JobTracker(expiry_seconds=65)
+        tracker.add_job_udids(["device1"])
+        assert tracker.format_time_remaining() == "1m 5s"
+
+        # Test 2 minutes exactly
+        tracker = JobTracker(expiry_seconds=120)
+        tracker.add_job_udids(["device1"])
+        assert tracker.format_time_remaining() == "2m 0s"
+
+        # Test halfway expired
+        tracker = JobTracker(expiry_seconds=120)
+        tracker.add_job_udids(["device1"])
+        monkeypatch.setattr(time, "time", lambda: current_time + 60)
+        assert tracker.format_time_remaining() == "1m 0s"
+
+        # Test fully expired
+        monkeypatch.setattr(time, "time", lambda: current_time + 120)
+        assert tracker.format_time_remaining() == "0m 0s"
