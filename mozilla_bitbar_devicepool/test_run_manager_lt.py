@@ -598,12 +598,21 @@ class TestRunManagerLT(object):
                 if self.shared_data[self.SHARED_SESSION_STARTED_JOBS] >= self.GOOD_BUILD_JOB_STARTED_THRESHOLD:
                     git_info = misc.get_git_info()
                     verbiage = f"This build ({git_info}) has started {self.shared_data[self.SHARED_SESSION_STARTED_JOBS]} jobs!"
-
+                    # send a normal logging message
                     logging.info(f"{logging_header} {verbiage}")
-                    # TODO: send more structured data to sentry
-                    sentry_sdk.capture_message(
-                        f"{verbiage} Please be nicer to it.",
-                    )
+                    # send a sentry event
+                    with sentry_sdk.push_scope() as scope:
+                        scope.set_context(
+                            "build_report",
+                            {
+                                "action_type": "job_started_threshold_reached",
+                                "jobs": self.shared_data[self.SHARED_SESSION_STARTED_JOBS],
+                                "build_git_info": git_info,
+                            },
+                        )
+                        sentry_sdk.capture_message(
+                            f"{verbiage} Please be nicer to it.",
+                        )
                     build_good_notification_sent = True
             self.shutdown_event.wait(5)
         logging.info(f"{logging_header} Sentry thread stopped.")
