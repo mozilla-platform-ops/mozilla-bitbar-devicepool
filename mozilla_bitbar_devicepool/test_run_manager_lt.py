@@ -187,7 +187,7 @@ class TestRunManagerLT(object):
     # Thread functions
 
     def _taskcluster_monitor_thread(self):
-        logging_header = f"[ {'TC Monitor':<{self.logging_padding}} ]"
+        logging_header = self.format_logging_header(self.TC_THREAD_NAME)
 
         while not self.shutdown_event.is_set():
             count_of_fetched_projects = 0
@@ -219,7 +219,7 @@ class TestRunManagerLT(object):
 
     def _lambdatest_monitor_thread(self):
         """Monitors LambdaTest device status for all projects."""
-        logging_header = f"[ {'LT Monitor':<{self.logging_padding}} ]"
+        logging_header = self.format_logging_header(self.LT_THREAD_NAME)
 
         # Track global device utilization
         local_device_stats = {
@@ -362,8 +362,7 @@ class TestRunManagerLT(object):
 
     def _job_starter_thread(self, project_name):
         """Starts jobs based on monitored data for a specific project."""
-
-        logging_header = f"[ {'JS ' + project_name:<{self.logging_padding}} ]"
+        logging_header = self.format_logging_header(f"{self.JOB_STARTER_THREAD_NAME} {project_name}")
 
         project_source_dir = os.path.dirname(os.path.realpath(__file__))
         project_root_dir = os.path.abspath(os.path.join(project_source_dir, ".."))
@@ -599,8 +598,9 @@ class TestRunManagerLT(object):
 
     # TODO: rename to reporting thread
     def _sentry_thread(self):
-        """Runs the Reporting thread for error reporting."""
-        logging_header = f"[ {'Reporting':<{self.logging_padding}} ]"
+        """Runs the Monitoring thread for monitoring and reporting."""
+        logging_header = self.format_logging_header(self.MONITOR_THREAD_NAME)
+
         logging.info(f"{logging_header} Thread startiing...")
         build_good_notification_sent = False
 
@@ -683,13 +683,12 @@ class TestRunManagerLT(object):
         # Create and start a job starter thread for each project
         job_starters = []
         for project_name in self.config_object.get_fully_configured_projects():
-            job_starter = threading.Thread(
-                target=self._job_starter_thread, args=(project_name,), name=f"Job Starter - {project_name}"
-            )
+            thread_name = f"{self.JOB_STARTER_THREAD_NAME} {project_name}"
+            job_starter = threading.Thread(target=self._job_starter_thread, args=(project_name,), name=thread_name)
             job_starters.append(job_starter)
             job_starter.start()
             thread_started_count += 1
-            logging.info(f"{logging_header} Started Job Starter thread 'JS {project_name}'.")
+            logging.info(f"{logging_header} Started Job Starter thread '{thread_name}'.")
 
         # Keep main thread alive until shutdown is signaled
         logging.info(f"{logging_header} {thread_started_count} threads started. Waiting for shutdown signal...")
@@ -793,6 +792,23 @@ class TestRunManagerLT(object):
         jobs_to_start = max(0, jobs_to_start)
 
         return jobs_to_start
+
+    def format_logging_header(self, thread_name, padding=None):
+        """
+        Create a consistently formatted logging header with proper padding.
+
+        Args:
+            thread_name (str): The name of the thread or component to display in the header
+            padding (int): Optional padding width. If not provided, uses self.logging_padding
+
+        Returns:
+            str: A formatted logging header string like "[ Thread_Name     ]"
+        """
+        if padding is None:
+            # Use instance attribute if available
+            padding = getattr(self, "logging_padding", 30)
+
+        return f"[ {thread_name:<{padding}} ]"
 
 
 # Main and main helpers
