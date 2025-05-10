@@ -231,8 +231,8 @@ device_groups:
     #
     # testing android 13
     # a51-02: # running android 13, 2/26/25: removed
-    a55-77:
-    a55-78:
+    # a55-77:  # 5/9/25: removed, contract downsizing
+    # a55-78:  # 5/9/25: removed, contract downsizing
   test-2:
     s21-01:
     # motog5-40:  # disabled due to a51 device increases (3/29/22)
@@ -293,7 +293,7 @@ device_groups:
     a55-08:
     a55-09:
     a55-10:
-    a55-11:
+    # a55-11:  # 5/9/25: removed, contract downsizing
     a55-12:
     a55-13:
     a55-14:
@@ -303,9 +303,9 @@ device_groups:
     a55-18:
     a55-19:
     a55-20:
-    a55-21:
+    # a55-21:  # 5/9/25: removed, contract downsizing
     a55-22:
-    a55-23:
+    # a55-23:  # 5/9/25: removed, contract downsizing
     a55-24:
     a55-25:
     a55-26:
@@ -340,25 +340,25 @@ device_groups:
     a55-55:
     a55-56:
     a55-57:
-    a55-58:
-    a55-59:
-    a55-60:
-    a55-61:
-    a55-62:
+    # a55-58:  # 5/9/25: removed, contract downsizing
+    # a55-59:  # 5/9/25: removed, contract downsizing
+    # a55-60:  # 5/9/25: removed, contract downsizing
+    # a55-61:  # 5/9/25: removed, contract downsizing
+    # a55-62:  # 5/9/25: removed, contract downsizing
     a55-63:
     a55-64:
     a55-65:
     a55-66:
     a55-67:
     a55-68:
-    a55-69:
+    # a55-69:  # 5/9/25: removed, contract downsizing
     a55-70:
     a55-71:
     a55-72:
-    a55-73:
-    a55-74:
-    a55-75:
-    a55-76:
+    # a55-73:  # 5/9/25: removed, contract downsizing
+    # a55-74:  # 5/9/25: removed, contract downsizing
+    # a55-75:  # 5/9/25: removed, contract downsizing
+    # a55-76:  # 5/9/25: removed, contract downsizing
   s24-unit:
   s24-perf:
     s24-01:
