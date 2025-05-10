@@ -693,6 +693,8 @@ class TestRunManagerLT(object):
             logging.info(
                 f"{logging_header} Time required for all active JobTrackers {job_trackers_still_active} to expire: {time_required_for_all_job_trackers_expire} seconds"
             )
+            # TODO: wait until all jobtrackers expire
+            # time.sleep(time_required_for_all_job_trackers_expire)
 
         # double check all threads are dead
         if tc_monitor.is_alive():
