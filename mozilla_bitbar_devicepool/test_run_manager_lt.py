@@ -590,15 +590,15 @@ class TestRunManagerLT(object):
         logging_header = f"[ {'Sentry':<{self.logging_padding}} ]"
         logging.info(f"{logging_header} Sentry thread reporting for duty...")
         build_good_notification_sent = False
-        git_info = misc.get_git_info()
-        verbiage = f"This build ({git_info}) has started {self.shared_data[self.SHARED_SESSION_STARTED_JOBS]} jobs!"
 
         # main loop
         while not self.shutdown_event.is_set():
             if build_good_notification_sent is False:
                 if self.shared_data[self.SHARED_SESSION_STARTED_JOBS] >= self.GOOD_BUILD_JOB_STARTED_THRESHOLD:
                     git_info = misc.get_git_info()
-                    verbiage = f"This build ({git_info}) has started {self.shared_data[self.SHARED_SESSION_STARTED_JOBS]} jobs!"
+                    verbiage = (
+                        f"Build ({git_info}) has started {self.shared_data[self.SHARED_SESSION_STARTED_JOBS]} jobs!"
+                    )
                     # send a normal logging message
                     logging.info(f"{logging_header} {verbiage}")
                     # send a sentry event
@@ -611,9 +611,7 @@ class TestRunManagerLT(object):
                                 "build_git_info": git_info,
                             },
                         )
-                        sentry_sdk.capture_message(
-                            f"{verbiage} Please be nicer to it.",
-                        )
+                        sentry_sdk.capture_message(verbiage)
                     build_good_notification_sent = True
             self.shutdown_event.wait(5)
         logging.info(f"{logging_header} Sentry thread stopped.")
