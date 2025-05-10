@@ -49,12 +49,13 @@ class TestRunManagerLT(object):
     TC_MONITOR_INTERVAL = 30  # seconds
     LT_MONITOR_INTERVAL = 30  # seconds
     JOB_STARTER_INTERVAL = 10  # seconds
+    SENTRY_INTERVAL = 30  # seconds
     # Debug constants - set higher log levels for specific areas
     DEBUG_JOB_STARTER = True  # Enable detailed debugging for job starter
     DEBUG_DEVICE_SELECTION = True  # Enable detailed debugging for device selection
     DEBUG_JOB_CALCULATION = True  # Enable detailed debugging for job calculation
 
-    # lt api device states
+    # lt api device state data keys (constants)
     LT_DEVICE_STATE_ACTIVE = "active"
     LT_DEVICE_STATE_BUSY = "busy"
     LT_DEVICE_STATE_INITIATED = "initiated"
@@ -65,6 +66,7 @@ class TestRunManagerLT(object):
     SHARED_LT_G_INITIATED_JOBS = "lt_g_initiated_jobs"
     SHARED_LT_G_ACTIVE_DEVICES = "lt_g_active_devices"
     SHARED_LT_G_CLEANUP_DEVICES = "lt_g_cleanup_devices"
+    SHARED_LT_G_BUSY_DEVICES = "lt_g_busy_devices"
     # Shared data keys for project-specific data
     SHARED_PROJECTS = "projects"
     PROJECT_LT_DEVICE_SELECTOR = "lt_device_selector"
@@ -113,7 +115,8 @@ class TestRunManagerLT(object):
         # Initialize shared data structure - Moved all initialization here
         self.shared_data[self.SHARED_LT_G_INITIATED_JOBS] = 0
         self.shared_data[self.SHARED_LT_G_ACTIVE_DEVICES] = 0
-        self.shared_data[self.SHARED_LT_G_CLEANUP_DEVICES] = 0  # Add tracking for cleanup devices
+        self.shared_data[self.SHARED_LT_G_CLEANUP_DEVICES] = 0
+        self.shared_data[self.SHARED_LT_G_BUSY_DEVICES] = 0
         self.shared_data[self.SHARED_SESSION_STARTED_JOBS] = 0
         # Initialize projects dictionary as a nested Manager dict
         projects_dict = manager.dict()
@@ -124,7 +127,7 @@ class TestRunManagerLT(object):
             project_data[self.PROJECT_TC_JOB_COUNT] = 0
             project_data[self.PROJECT_LT_ACTIVE_DEVICE_COUNT] = 0
             project_data[self.PROJECT_LT_BUSY_DEVICE_COUNT] = 0
-            project_data[self.PROJECT_LT_CLEANUP_DEVICE_COUNT] = 0  # Add tracking for cleanup devices per project
+            project_data[self.PROJECT_LT_CLEANUP_DEVICE_COUNT] = 0
             project_data[self.PROJECT_LT_ACTIVE_DEVICES] = manager.list()  # Use managed list
             projects_dict[project_name] = project_data
 
@@ -275,6 +278,7 @@ class TestRunManagerLT(object):
             self.shared_data[self.SHARED_LT_G_INITIATED_JOBS] = local_device_stats["initiated_jobs"]
             self.shared_data[self.SHARED_LT_G_ACTIVE_DEVICES] = local_device_stats["active_devices"]
             self.shared_data[self.SHARED_LT_G_CLEANUP_DEVICES] = local_device_stats["cleanup_devices"]
+            self.shared_data[self.SHARED_LT_G_BUSY_DEVICES] = local_device_stats["busy_devices"]
 
             # For each project, filter the device list based on the project's device_groups
             for project_name, project_config in self.config_object.config["projects"].items():
@@ -334,14 +338,15 @@ class TestRunManagerLT(object):
 
             formatted_active_device_count = str(active_device_count_by_project_dict).strip("{}").replace("'", "")
             per_queue_string = f"Active device counts: {formatted_active_device_count}"
-            logging.info(
-                f"{logging_header} "
-                f"Session started jobs: {self.shared_data[self.SHARED_SESSION_STARTED_JOBS]}, "
-                "Global device utilization: Total/Active/Busy/Cleanup/BusyPercentage: "
-                f"{global_total_device_count}/{self.shared_data[self.SHARED_LT_G_ACTIVE_DEVICES]}/"
-                f"{local_device_stats['busy_devices']}/{self.shared_data[self.SHARED_LT_G_CLEANUP_DEVICES]}/"
-                f"{util_percent:.1f}%"
-            )
+            # TODO: move this to sentry/monitoring thread (can include if build is 'good')
+            # logging.info(
+            #     f"{logging_header} "
+            #     f"Session started jobs: {self.shared_data[self.SHARED_SESSION_STARTED_JOBS]}, "
+            #     "Global device utilization: Total/Active/Busy/Cleanup/BusyPercentage: "
+            #     f"{global_total_device_count}/{self.shared_data[self.SHARED_LT_G_ACTIVE_DEVICES]}/"
+            #     f"{local_device_stats['busy_devices']}/{self.shared_data[self.SHARED_LT_G_CLEANUP_DEVICES]}/"
+            #     f"{util_percent:.1f}%"
+            # )
             logging.info(f"{logging_header} {per_queue_string}")
 
             self.shutdown_event.wait(self.LT_MONITOR_INTERVAL)
@@ -586,14 +591,31 @@ class TestRunManagerLT(object):
 
     # TODO: rename to reporting thread
     def _sentry_thread(self):
-        """Runs the Sentry thread for error reporting."""
-        logging_header = f"[ {'Sentry':<{self.logging_padding}} ]"
-        logging.info(f"{logging_header} Sentry thread reporting for duty...")
+        """Runs the Monitor thread for error reporting."""
+        logging_header = f"[ {'Monitor':<{self.logging_padding}} ]"
+        logging.info(f"{logging_header} Thread startiing...")
         build_good_notification_sent = False
-        celebration_emojis = "🎉🎈🤡🎊"
 
         # main loop
         while not self.shutdown_event.is_set():
+            # calculate global info
+            global_total_device_count = self.config_object.get_total_device_count()
+            util_percent = 0
+            busy_device_count = self.shared_data[self.SHARED_LT_G_BUSY_DEVICES]
+            if global_total_device_count > 0:
+                util_percent = (busy_device_count / global_total_device_count) * 100
+
+            # show global info
+            logging.info(
+                f"{logging_header} "
+                f"Session started jobs: {self.shared_data[self.SHARED_SESSION_STARTED_JOBS]}, "
+                "Global device utilization: Total/Active/Busy/Cleanup/BusyPercentage: "
+                f"{global_total_device_count}/{self.shared_data[self.SHARED_LT_G_ACTIVE_DEVICES]}/"
+                f"{busy_device_count}/{self.shared_data[self.SHARED_LT_G_CLEANUP_DEVICES]}/"
+                f"{util_percent:.1f}%"
+            )
+
+            # show good build notification
             if build_good_notification_sent is False:
                 if self.shared_data[self.SHARED_SESSION_STARTED_JOBS] >= self.GOOD_BUILD_JOB_STARTED_THRESHOLD:
                     git_info = misc.get_git_info()
@@ -601,7 +623,7 @@ class TestRunManagerLT(object):
                         f"Build ({git_info}) has started {self.shared_data[self.SHARED_SESSION_STARTED_JOBS]} jobs!"
                     )
                     # send a normal logging message
-                    logging.info(f"{logging_header} {celebration_emojis} {verbiage}")
+                    logging.info(f"{logging_header} {verbiage}")
                     # send a sentry event
                     with sentry_sdk.push_scope() as scope:
                         scope.set_context(
@@ -615,8 +637,8 @@ class TestRunManagerLT(object):
                         )
                         sentry_sdk.capture_message("Build Confidence: Build surpassed job start threshold.")
                     build_good_notification_sent = True
-            self.shutdown_event.wait(5)
-        logging.info(f"{logging_header} Sentry thread stopped.")
+            self.shutdown_event.wait(self.SENTRY_INTERVAL)
+        logging.info(f"{logging_header} Thread stopped.")
 
     # main thread
     def run_multithreaded(self):
