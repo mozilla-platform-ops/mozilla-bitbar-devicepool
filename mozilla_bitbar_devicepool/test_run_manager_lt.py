@@ -673,15 +673,26 @@ class TestRunManagerLT(object):
 
         logging.info(f"{logging_header} All threads joined. Exiting.")
 
-        # TODO: warn if any of the JobTrackers still have active jobs (and mention how long before the the youngest job expires)
-        # for project_name, job_tracker in self.job_trackers.items():
-        #     if job_tracker.has_active_jobs():
-        #         youngest_job = job_tracker.get_youngest_job()
-        #         time_left = youngest_job.get_time_left()
-        #         logging.warning(
-        #             f"{logging_header} JobTracker for project '{project_name}' still has active jobs. "
-        #             f"Youngest job expires in {time_left}."
-        #         )
+        # Warn if any of the JobTrackers still have active jobs
+        time_required_for_all_job_trackers_expire = 0
+        job_trackers_still_active = 0
+        for project_name, job_tracker in self.job_trackers.items():
+            if job_tracker.has_active_jobs():
+                active_count = job_tracker.get_active_job_count()
+                job_trackers_still_active += active_count
+                time_remaining = job_tracker.format_time_remaining()
+                time_required_for_all_job_trackers_expire = max(
+                    time_required_for_all_job_trackers_expire, job_tracker.get_time_remaining_seconds()
+                )
+                logging.debug(
+                    f"{logging_header} JobTracker for project '{project_name}' still has {active_count} active job(s). "
+                    f"Jobs will expire in {time_remaining}."
+                )
+        # warn how long we would need to wait for all JobTracker jobs to expire
+        if job_trackers_still_active > 0:
+            logging.info(
+                f"{logging_header} Time required for all active JobTrackers {job_trackers_still_active} to expire: {time_required_for_all_job_trackers_expire} seconds"
+            )
 
         # double check all threads are dead
         if tc_monitor.is_alive():

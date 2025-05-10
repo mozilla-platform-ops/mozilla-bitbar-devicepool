@@ -76,6 +76,31 @@ class JobTracker:
         self._clean_expired()
         return udid in self.job_timestamps
 
+    def has_active_jobs(self):
+        """Check if there are any active jobs that haven't expired."""
+        self._clean_expired()
+        return len(self.job_timestamps) > 0
+
+    def get_newest_job_time(self):
+        """Get the timestamp of the most recently added job."""
+        self._clean_expired()
+        if not self.job_timestamps:
+            return None
+        return max(self.job_timestamps.values())
+
+    def get_time_remaining_seconds(self):
+        """Get seconds remaining until all jobs expire."""
+        newest_time = self.get_newest_job_time()
+        if newest_time is None:
+            return 0
+        return max(0, int((newest_time + self.expiry_seconds) - time.time()))
+
+    def format_time_remaining(self):
+        """Format the time remaining in a human-readable way."""
+        seconds = self.get_time_remaining_seconds()
+        minutes, seconds = divmod(seconds, 60)
+        return f"{minutes}m {seconds}s"
+
     def _clean_expired(self):
         """Remove job entries older than expiry_seconds."""
         now = time.time()
