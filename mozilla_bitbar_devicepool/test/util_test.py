@@ -39,6 +39,25 @@ class TestUtilMisc:
         mock_repo.return_value.is_dirty.return_value = False
         result = misc.get_git_info()
         assert result == "1234567"
+        # test dirty repo
+        mock_repo.return_value.is_dirty.return_value = True
+        result = misc.get_git_info()
+        assert result == "1234567-dirty"
+        # TODO: work on these tests
+        #
+        # # test empty repo
+        # mock_repo.side_effect = git.exc.InvalidGitRepositoryError
+        # result = misc.get_git_info()
+        # assert result == "None"
+        # # test no repo
+        # mock_repo.side_effect = git.exc.NoSuchPathError
+        # result = misc.get_git_info()
+        # assert result == "None"
+        # # test no git
+        # mock_repo.side_effect = git.exc.GitCommandError
+        # mock_repo.return_value = None
+        # result = misc.get_git_info()
+        # assert result == "None"
 
     def test_humanhash_from_string(self):
         result = misc.humanhash_from_string("hello world")
