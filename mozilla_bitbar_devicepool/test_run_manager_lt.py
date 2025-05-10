@@ -724,7 +724,7 @@ class TestRunManagerLT(object):
         # warn how long we would need to wait for all JobTracker jobs to expire
         if job_trackers_still_active > 0:
             logging.info(
-                f"{logging_header} Active JobTrackers (recently started jobs). Time required for all active JobTrackers {job_trackers_still_active} to expire: {time_required_for_all_job_trackers_expire} seconds"
+                f"{logging_header} Active JobTrackers (recently started jobs). Time required for all active JobTrackers ({job_trackers_still_active}) to expire: {time_required_for_all_job_trackers_expire} seconds"
             )
             # TODO: wait until all jobtrackers expire
             # time.sleep(time_required_for_all_job_trackers_expire)
