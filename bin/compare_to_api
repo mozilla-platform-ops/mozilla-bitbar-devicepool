@@ -9,7 +9,6 @@ try:
     from testdroid import Testdroid
 
     from mozilla_bitbar_devicepool.bitbar.devices import get_devices
-
     from mozilla_bitbar_devicepool.device_group_report import DeviceGroupReport
 except ImportError:
     print("ERROR: Please install dependencies (`poetry install`)!")
