@@ -2,6 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import os
+
 import pytest
 
 from mozilla_bitbar_devicepool.configuration_lt import ConfigurationLt
@@ -19,19 +21,19 @@ projects:
     # lt_device_selector: "Galaxy A55 5G-14"
     # swapped for testing
     lt_device_selector: "Galaxy A51-11"
-    TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-alpha-a55
-    TC_WORKER_TYPE: gecko-t-lambda-alpha-a55
+    TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-alpha-a55_z
+    TC_WORKER_TYPE: gecko-t-lambda-alpha-a55_zz
   a55-perf:
     lt_device_selector: "Galaxy A55 5G-14"
     # swapped for testing
     # lt_device_selector: "Galaxy A51-11"
-    TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-a55
-    TC_WORKER_TYPE: gecko-t-lambda-perf-a55
+    TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-a55_yy
+    TC_WORKER_TYPE: gecko-t-lambda-perf-a55_y
   test-1:
   #     SCRIPT_REPO_COMMIT: future_commit
     lt_device_selector: "Galaxy A51-11"
-  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1
-  #     TC_WORKER_TYPE: gecko-t-lambda-gw-test-1
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1_t
+  #     TC_WORKER_TYPE: gecko-t-lambda-gw-test-1_tt
   #     # override SCRIPT_REPO_COMMIT with a test commit
 device_groups:
   # this block is not used yet (not possible with LT API), future goal. see lt_device_selector in projects.
@@ -193,6 +195,12 @@ def test_load_file_config(sample_file_config):
     Tests that _load_file_config correctly loads configuration from an actual file.
     """
     config_lt = ConfigurationLt()
+
+    #
+    os.environ["gecko_t_lambda_alpha_a55_zz"] = "fake_client_id"
+    os.environ["gecko_t_lambda_perf_a55_y"] = "fake_client_id"
+    os.environ["LT_ACCESS_KEY"] = "not_a_real_lt_key"
+    os.environ["LT_USERNAME"] = "bro"
 
     config_lt.configure(config_path=sample_file_config)
     assert len(config_lt.config) > 0
