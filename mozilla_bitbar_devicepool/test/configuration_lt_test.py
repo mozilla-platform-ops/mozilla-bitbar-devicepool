@@ -194,13 +194,13 @@ def test_load_file_config(sample_file_config):
     """
     Tests that _load_file_config correctly loads configuration from an actual file.
     """
-    config_lt = ConfigurationLt()
+    config_lt = ConfigurationLt(ci_mode=True)
 
     #
-    os.environ["gecko_t_lambda_alpha_a55_zz"] = "fake_client_id"
-    os.environ["gecko_t_lambda_perf_a55_y"] = "fake_client_id"
-    os.environ["LT_ACCESS_KEY"] = "not_a_real_lt_key"
-    os.environ["LT_USERNAME"] = "bro"
+    # os.environ["gecko_t_lambda_alpha_a55_zz"] = "fake_client_id"
+    # os.environ["gecko_t_lambda_perf_a55_y"] = "fake_client_id"
+    # os.environ["LT_ACCESS_KEY"] = "not_a_real_lt_key"
+    # os.environ["LT_USERNAME"] = "bro"
 
     config_lt.configure(config_path=sample_file_config)
     assert len(config_lt.config) > 0
