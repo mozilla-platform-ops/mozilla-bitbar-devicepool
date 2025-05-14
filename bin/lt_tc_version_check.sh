@@ -93,3 +93,6 @@ else
     alert "Latest version is greater than configured version!"
     echo "  Rerun this script with '--change' to update the version."
 fi
+
+# TODO: generate a link to the changelog deeplinking to the current version
+# https://github.com/taskcluster/taskcluster/blob/main/CHANGELOG.md#v83101
