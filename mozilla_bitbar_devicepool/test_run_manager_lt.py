@@ -612,7 +612,7 @@ class TestRunManagerLT(object):
         while not self.shutdown_event.is_set():
             # calculate global info
             global_total_device_count = self.config_object.get_total_device_count()
-            global_contract_amount = self.config.self.global_contract_device_count
+            global_contract_amount = self.config_object.global_contract_device_count
             util_percent = 0
             busy_device_count = self.shared_data[self.SHARED_LT_G_BUSY_DEVICES]
             # TODO: make this global_contract_amount?
