@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 
 import git
 import humanhash
+import sentry_sdk
 
 
 # Get the current date in UTC in an ISO formatted string
@@ -56,3 +57,10 @@ if __name__ == "__main__":  # pragma: no cover
     print(humanhash_from_string("hello world", words=6))
     print(humanhash_from_string("hello world", words=7))
     print(humanhash_from_string("hello world", words=8))
+
+
+def report_handled_exception_to_sentry(exc, level="warning"):
+    with sentry_sdk.push_scope() as scope:
+        scope.set_level(level)
+        scope.set_tag("handled", True)  # optional: for filtering in Sentry UI
+        sentry_sdk.capture_exception(exc)

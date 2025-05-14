@@ -262,6 +262,7 @@ class TestRunManagerLT(object):
                     # TODO: needed?
                     # Keep previous value if there's an error
                     local_device_stats["initiated_jobs"] = self.shared_data.get(self.SHARED_LT_G_INITIATED_JOBS, 0)
+                    misc.report_handled_exception_to_sentry(e)
 
                 # Count total devices across all device types
                 for device_type in device_list:
