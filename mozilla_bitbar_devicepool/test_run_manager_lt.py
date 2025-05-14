@@ -598,7 +598,7 @@ class TestRunManagerLT(object):
         logging.info(f"{logging_header} Thread stopped.")
 
     # TODO: rename to reporting thread
-    def _sentry_thread(self):
+    def _monitor_thread(self):
         """Runs the Monitoring thread for monitoring and reporting."""
         logging_header = self.format_logging_header(self.MONITOR_THREAD_NAME)
 
@@ -673,7 +673,7 @@ class TestRunManagerLT(object):
         thread_started_count += 1
         logging.info(f"{logging_header} Started {self.LT_THREAD_NAME} thread.")
         # start sentry (notification?) thread
-        sentry_thread = threading.Thread(target=self._sentry_thread, name=self.MONITOR_THREAD_NAME)
+        sentry_thread = threading.Thread(target=self._monitor_thread, name=self.MONITOR_THREAD_NAME)
         sentry_thread.start()
         thread_started_count += 1
         logging.info(f"{logging_header} Started {self.MONITOR_THREAD_NAME} thread.")
