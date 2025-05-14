@@ -612,17 +612,19 @@ class TestRunManagerLT(object):
         while not self.shutdown_event.is_set():
             # calculate global info
             global_total_device_count = self.config_object.get_total_device_count()
+            global_contract_amount = self.config.self.global_contract_device_count
             util_percent = 0
             busy_device_count = self.shared_data[self.SHARED_LT_G_BUSY_DEVICES]
+            # TODO: make this global_contract_amount?
             if global_total_device_count > 0:
-                util_percent = (busy_device_count / global_total_device_count) * 100
+                util_percent = (busy_device_count / global_contract_amount) * 100
 
             # show global info
             logging.info(
                 f"{logging_header} "
                 f"Session started jobs: {self.shared_data[self.SHARED_SESSION_STARTED_JOBS]}, "
-                "Global device utilization: Total/Active/Busy/Cleanup/BusyPercentage: "
-                f"{global_total_device_count}/{self.shared_data[self.SHARED_LT_G_ACTIVE_DEVICES]}/"
+                "Global device utilization: Total/Contract/Active/Busy/Cleanup/BusyPercentage: "
+                f"{global_total_device_count}/{global_contract_amount}/{self.shared_data[self.SHARED_LT_G_ACTIVE_DEVICES]}/"
                 f"{busy_device_count}/{self.shared_data[self.SHARED_LT_G_CLEANUP_DEVICES]}/"
                 f"{util_percent:.1f}%"
             )
