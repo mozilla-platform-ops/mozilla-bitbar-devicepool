@@ -903,8 +903,12 @@ def main():
         print(name_line)
         print()
 
-        # logging is now properly configured
-        trmlt = TestRunManagerLT(unit_testing_mode=args.ci_mode, debug_mode=args.debug)
+        try:
+            trmlt = TestRunManagerLT(unit_testing_mode=args.ci_mode, debug_mode=args.debug)
+        except ValueError as e:
+            logging.error(f"Error initializing TestRunManagerLT. Missing environment variables? {e}")
+            misc.report_handled_exception_to_sentry(e)
+            sys.exit(1)
 
         # Start the main run loop using the multithreaded runner
         trmlt.run_multithreaded()
