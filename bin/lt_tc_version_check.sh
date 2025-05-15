@@ -96,3 +96,5 @@ fi
 
 # TODO: generate a link to the changelog deeplinking to the current version
 # https://github.com/taskcluster/taskcluster/blob/main/CHANGELOG.md#v83101
+#
+# or use https://docs.taskcluster.net/docs/changelog?version=v83.4.0&audience=WORKER-DEPLOYERS
