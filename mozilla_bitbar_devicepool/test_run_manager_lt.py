@@ -207,7 +207,7 @@ class TestRunManagerLT(object):
                     if project_name in self.shared_data[self.SHARED_PROJECTS]:
                         self.shared_data[self.SHARED_PROJECTS][project_name][self.PROJECT_TC_JOB_COUNT] = tc_job_count
                 except Exception as e:
-                    logging.error(f"{logging_header} Error fetching TC tasks for {project_name}: {e}", exc_info=True)
+                    logging.warning(f"{logging_header} Error fetching TC tasks for {project_name}: {e}", exc_info=True)
 
             formatted_wttcd = str(worker_type_to_count_dict).strip("{}").replace("'", "")
             logging.info(f"{logging_header} Queue counts: {formatted_wttcd}")
@@ -258,7 +258,7 @@ class TestRunManagerLT(object):
 
                     local_device_stats["initiated_jobs"] = initiated_jobs_count
                 except Exception as e:
-                    logging.error(f"{logging_header} Error fetching jobs list: {e}", exc_info=True)
+                    logging.warning(f"{logging_header} Error fetching jobs list: {e}", exc_info=True)
                     # TODO: needed?
                     # Keep previous value if there's an error
                     local_device_stats["initiated_jobs"] = self.shared_data.get(self.SHARED_LT_G_INITIATED_JOBS, 0)
@@ -278,7 +278,7 @@ class TestRunManagerLT(object):
                             local_device_stats["cleanup_devices"] += 1
 
             except Exception as e:
-                logging.error(f"{logging_header} Error fetching device list: {e}", exc_info=True)
+                logging.warning(f"{logging_header} Error fetching device list: {e}", exc_info=True)
                 device_list = {}
 
             # Update shared data with accurate job count and device stats
@@ -335,7 +335,7 @@ class TestRunManagerLT(object):
                     )
 
                 except Exception as e:
-                    logging.error(f"{logging_header} Error processing devices for {project_name}: {e}", exc_info=True)
+                    logging.warning(f"{logging_header} Error processing devices for {project_name}: {e}", exc_info=True)
 
             # Log global device utilization statistics
             global_total_device_count = self.config_object.get_total_device_count()
@@ -556,7 +556,7 @@ class TestRunManagerLT(object):
                         self.shared_data[self.SHARED_SESSION_STARTED_JOBS] += 1
 
                     except Exception as e:
-                        logging.error(f"{logging_header} Error starting job {i + 1}: {e}", exc_info=True)
+                        logging.warning(f"{logging_header} Error starting job {i + 1}: {e}", exc_info=True)
                         shutil.rmtree(test_run_dir, ignore_errors=True)
 
                 if processes_started > 0 and not self.debug_mode:
@@ -906,7 +906,7 @@ def main():
         try:
             trmlt = TestRunManagerLT(unit_testing_mode=args.ci_mode, debug_mode=args.debug)
         except ValueError as e:
-            logging.error(f"Error initializing TestRunManagerLT. Missing environment variables? {e}")
+            logging.warning(f"Error initializing TestRunManagerLT. Missing environment variables? {e}")
             misc.report_handled_exception_to_sentry(e)
             sys.exit(1)
 
@@ -916,14 +916,14 @@ def main():
     elif args.action is None:
         # No action was provided
         # list the available actions
-        logging.error("No action provided.")
-        logging.error("Available actions:")
+        logging.warning("No action provided.")
+        logging.warning("Available actions:")
         for action in available_actions:
-            logging.error(f"  {action}")
+            logging.warning(f"  {action}")
         sys.exit(1)
     else:
         # This should not happen with argparse choices, but just in case
-        logging.error(f"Unknown action: {args.action}")
+        logging.warning(f"Unknown action: {args.action}")
         sys.exit(1)
 
 
