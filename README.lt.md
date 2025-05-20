@@ -21,6 +21,13 @@ See https://www.lambdatest.com/support/docs/hyperexecute-cli-run-tests-on-hypere
 pytest-watch -- -vv --cov
 ```
 
+## installation / deployment
+
+```
+sudo cp service/lambdatest.service /etc/systemd/system/lambdatest.service
+sudo systemctl daemon-reload
+```
+
 ## execution loop overview
 
 ```bash
