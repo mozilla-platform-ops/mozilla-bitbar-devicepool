@@ -4,7 +4,8 @@ Description=Lambdatest Testrun manager service
 [Service]
 Type=simple
 ExecStart=/bin/bash /home/bitbar/mozilla-bitbar-devicepool/bin/start_ltdp.sh
-ExecStop=/bin/bash /home/bitbar/mozilla-bitbar-devicepool/bin/stop_ltdp.sh
+# disable execstop, let systemd track the pid and manage shutdown
+#ExecStop=/bin/bash /home/bitbar/mozilla-bitbar-devicepool/bin/stop_ltdp.sh
 Restart=always
 # restart process 24 hours to avoid any funk building up
 #  - disabled to find long-term bugs
