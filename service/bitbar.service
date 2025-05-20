@@ -13,8 +13,8 @@ WorkingDirectory=/home/bitbar/mozilla-bitbar-devicepool
 User=bitbar
 # send USR2 to politely exit
 KillSignal=SIGUSR2
-# send SIGKILL after 30s
-TimeoutStopSec=30
+# send SIGKILL after 60s
+TimeoutStopSec=60s
 
 [Install]
 WantedBy=multi-user.target
