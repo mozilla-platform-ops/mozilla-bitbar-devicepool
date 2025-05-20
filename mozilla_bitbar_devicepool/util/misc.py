@@ -59,6 +59,9 @@ if __name__ == "__main__":  # pragma: no cover
     print(humanhash_from_string("hello world", words=8))
 
 
+# TODO: is this still needed?
+#   - this is really controlled by sentry detecting the logging level
+#     we use in the exception handler.
 def report_handled_exception_to_sentry(exc, level="warning"):
     with sentry_sdk.push_scope() as scope:
         scope.set_level(level)
