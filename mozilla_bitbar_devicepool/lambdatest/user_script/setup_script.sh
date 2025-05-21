@@ -54,20 +54,20 @@ sudo cp -R cmdline-tools/lib/* /home/ltuser/taskcluster/android-sdk-linux/tools/
 
 # AJE: usbutils intalled above
 # list everything (ignore exit code)
-usbreset || true
+# usbreset || true
 
 # list everthing (and capture output)
-usbreset 2>&1 | tee $usbreset_log_file
+# usbreset 2>&1 | tee $usbreset_log_file
 # if the power meter is present issue reset commands
-if grep -q "$POWER_METER_DEVICE_ID" $usbreset_log_file; then
-    echo "Found power meter, resetting..."
-    # reset the power meter
-    usbreset $POWER_METER_DEVICE_ID
-    sleep 2
-    usbreset $POWER_METER_DEVICE_ID 2>&1 | tee $usbreset_log_file2
-else
-    echo "Power meter not found, skipping reset."
-fi
+# if grep -q "$POWER_METER_DEVICE_ID" $usbreset_log_file; then
+#     echo "Found power meter, resetting..."
+#     # reset the power meter
+#     usbreset $POWER_METER_DEVICE_ID
+#     sleep 2
+#     usbreset $POWER_METER_DEVICE_ID 2>&1 | tee $usbreset_log_file2
+# else
+#     echo "Power meter not found, skipping reset."
+# fi
 
 # if /tmp/usbreset-pass2.log contains `permission denied` then exit 1 with message
 #
