@@ -350,11 +350,11 @@ device_groups:
     a55-65:
     a55-66:
     a55-67:
-    a55-68:
+    # a55-68:  # 5/21/25: removed, contract downsizing
     # a55-69:  # 5/9/25: removed, contract downsizing
-    a55-70:
-    a55-71:
-    a55-72:
+    # a55-70:  # 5/21/25: removed, contract downsizing
+    # a55-71:  # 5/21/25: removed, contract downsizing
+    # a55-72:  # 5/21/25: removed, contract downsizing
     # a55-73:  # 5/9/25: removed, contract downsizing
     # a55-74:  # 5/9/25: removed, contract downsizing
     # a55-75:  # 5/9/25: removed, contract downsizing
