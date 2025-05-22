@@ -67,3 +67,13 @@ def report_handled_exception_to_sentry(exc, level="warning"):
         scope.set_level(level)
         scope.set_tag("handled", True)  # optional: for filtering in Sentry UI
         sentry_sdk.capture_exception(exc)
+
+
+def pluralize(word, count):
+    """
+    Returns the pluralized form of a word based on the count.
+    """
+    if count == 1:
+        return word
+    else:
+        return f"{word}s"

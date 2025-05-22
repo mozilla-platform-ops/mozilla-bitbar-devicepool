@@ -62,3 +62,20 @@ class TestUtilMisc:
     def test_humanhash_from_string(self):
         result = misc.humanhash_from_string("hello world")
         assert isinstance(result, str)
+
+    def test_pluralize(self):
+        result = misc.pluralize("test", 1)
+        assert result == "test"
+        result = misc.pluralize("test", 2)
+        assert result == "tests"
+        result = misc.pluralize("test", 0)
+        assert result == "tests"
+        result = misc.pluralize("test", -1)
+        assert result == "tests"
+        result = misc.pluralize("test", 1.5)
+        assert result == "tests"
+        result = misc.pluralize("test", 0.5)
+        assert result == "tests"
+        result = misc.pluralize("test", -0.5)
+        assert result == "tests"
+        result = misc.pluralize("test", 1.0)

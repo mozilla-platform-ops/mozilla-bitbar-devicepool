@@ -565,13 +565,14 @@ class TestRunManagerLT(object):
 
                 # print a summary of number of jobs started and the udids
                 if processes_started > 0:
+                    job_pluralized = misc.pluralize("job", processes_started)
                     if self.debug_mode:
                         logging.info(
-                            f"{logging_header} Would have launched {processes_started} jobs targeting devices: {', '.join(assigned_device_udids)}"
+                            f"{logging_header} Would have launched {processes_started} {job_pluralized} targeting devices: {', '.join(assigned_device_udids)}"
                         )
                     else:
                         logging.info(
-                            f"{logging_header} Launched {processes_started} jobs targeting devices: {', '.join(assigned_device_udids)}"
+                            f"{logging_header} Launched {processes_started} {job_pluralized} targeting devices: {', '.join(assigned_device_udids)}"
                         )
 
                 # TODO: send a signal to the other threads to wake them up and have them gather?
