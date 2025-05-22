@@ -675,9 +675,9 @@ class TestRunManagerLT(object):
         lt_monitor.start()
         thread_started_count += 1
         logging.info(f"{logging_header} Started {self.LT_THREAD_NAME} thread.")
-        # start sentry (notification?) thread
-        sentry_thread = threading.Thread(target=self._monitor_thread, name=self.MONITOR_THREAD_NAME)
-        sentry_thread.start()
+        # start monitoring thread
+        monitoring_thread = threading.Thread(target=self._monitor_thread, name=self.MONITOR_THREAD_NAME)
+        monitoring_thread.start()
         thread_started_count += 1
         logging.info(f"{logging_header} Started {self.MONITOR_THREAD_NAME} thread.")
 
@@ -738,7 +738,7 @@ class TestRunManagerLT(object):
             logging.warning(f"{logging_header} {self.TC_THREAD_NAME} thread did not exit cleanly.")
         if lt_monitor.is_alive():
             logging.warning(f"{logging_header} {self.LT_THREAD_NAME} thread did not exit cleanly.")
-        if sentry_thread.is_alive():
+        if monitoring_thread.is_alive():
             logging.warning(f"{logging_header} {self.MONITOR_THREAD_NAME} thread did not exit cleanly.")
         # check if all js threads have exited
         for i, job_starter in enumerate(job_starters):
