@@ -27,6 +27,8 @@ from mozilla_bitbar_devicepool.util import misc
 # TODO: longer term, networked locking for control of job starting for a single pool
 #  - high availability
 #  - for development, take over starting jobs for a particlar project
+# TODO: incorporate a call to https://api-hyperexecute.lambdatest.com/sentinel/v1.0/concurrency/<OrgID>
+#  to get the current and allowed number of concurrent jobs for the org (org id is 1611945).
 
 
 class TestRunManagerLT(object):
