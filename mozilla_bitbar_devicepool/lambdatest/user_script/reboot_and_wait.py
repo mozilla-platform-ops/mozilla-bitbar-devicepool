@@ -5,6 +5,7 @@ import time
 
 # TODO: pull most of this code out into a library/class
 # TODO: consider using mozdevice pip for many of these functions
+# TODO: rename this to just post_script.py or something?
 
 
 MAX_WAIT_TIME = 120
@@ -40,8 +41,25 @@ def run_silent(command):
     return result.stdout
 
 
-# flush userPorts
+# debugging: display pwd and ls output
+print("Current working directory:", os.getcwd())
+print("Contents of current directory:")
+print("\n".join(os.listdir(".")))
 
+
+# if the tc metadata file exists, then display its contents
+metadata_path = "./generic-worker-metadata.json"
+metadata_filename = os.path.basename(metadata_path)
+if os.path.exists(metadata_path):
+    with open(metadata_path, "r") as f:
+        metadata = f.read()
+    print(f"{metadata_filename} contents:")
+    print(metadata)
+else:
+    print(f"{metadata_filename} does not exist")
+
+
+# flush userPorts
 ports = [p.split("/")[-1] for p in os.environ.get("UserPorts", "").split(",")]
 ports.extend(["2828", "8888", "8854", "4443", "4444"])
 for port in ports:

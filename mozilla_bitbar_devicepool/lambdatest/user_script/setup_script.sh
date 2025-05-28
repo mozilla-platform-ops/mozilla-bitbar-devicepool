@@ -8,7 +8,7 @@ set -x
 usbreset_log_file=/tmp/usbreset.log
 usbreset_log_file2=/tmp/usbreset-pass2.log
 POWER_METER_DEVICE_ID="0483:fffe"
-TC_VERSION=83.5.6
+TC_VERSION=84.0.2
 POWER_METER_FAST_FAIL=0
 
 
