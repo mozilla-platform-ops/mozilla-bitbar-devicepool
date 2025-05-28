@@ -57,3 +57,13 @@ class JobCleaner:
             dir_path (str): The path of the directory to remove.
         """
         shutil.rmtree(dir_path)
+
+
+# main
+if __name__ == "__main__":
+    cleaner = JobCleaner()
+    print(
+        f"Starting cleanup of old LambdaTest job directories in {cleaner.cleaning_path}/{cleaner.cleaning_pattern}..."
+    )
+    cleaner.clean_up()
+    print("Cleanup completed.")
