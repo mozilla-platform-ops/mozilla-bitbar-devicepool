@@ -41,12 +41,6 @@ def run_silent(command):
     return result.stdout
 
 
-# debugging: display pwd and ls output
-print("Current working directory:", os.getcwd())
-print("Contents of current directory:")
-print("\n".join(os.listdir(".")))
-
-
 # if the tc metadata file exists, then display its contents
 metadata_path = "./generic-worker-metadata.json"
 metadata_filename = os.path.basename(metadata_path)
@@ -58,23 +52,19 @@ if os.path.exists(metadata_path):
 else:
     print(f"{metadata_filename} does not exist")
 
+print("")
 
 # flush userPorts
+print("Flushing userPorts...")
 ports = [p.split("/")[-1] for p in os.environ.get("UserPorts", "").split(",")]
 ports.extend(["2828", "8888", "8854", "4443", "4444"])
 for port in ports:
     command = ["sudo", "ss", "--kill", "state", "listening", "src", f":{port}"]
     run(command)
 
+print("")
 
-# + /usr/bin/adb devices -l
-# List of devices attached
-# R5CY128X71B            device usb:1-6.1 product:a55xnsxx model:SM_A556E device:a55x transport_id:1
-# 10.146.5.140:5555      device product:a55xnsxx model:SM_A556E device:a55x transport_id:2
-
-
-# cmd = "adb devices -l | grep -v 'List of devices attached' | sed '/^[[:space:]]*$/d' | cut -f 1 -d ' '"
-
+print("Listing connected devices:")
 # TODO: could be a mozdevice.get_connected_devices() call
 cmd = ["/usr/bin/adb", "devices", "-l"]
 #
@@ -94,10 +84,14 @@ if not device_name:
     sys.exit(1)
 print(f"device_name: {device_name}")
 
+print("")
+
 # adb reboot
 print("Sending reboot command...")
 command = ["/usr/bin/adb", "-s", device_name, "reboot"]
 run(command)
+
+print("")
 
 # restart adb server
 print("restarting adb server...")
@@ -108,6 +102,7 @@ command = ["/usr/bin/adb", "start-server"]
 run(command)
 
 # wait up to 2 minutes for device to show up in `adb devices`
+print("Waiting for device to reconnect...")
 elapsed = 0
 wait_time = 10
 while elapsed < MAX_WAIT_TIME:
@@ -122,4 +117,5 @@ if elapsed >= MAX_WAIT_TIME:
     print("TEST-UNEXPECTED-FAIL | lambda | device failed to reconnect after reboot")
     sys.exit(1)
 
+print("Device reconnected successfully.")
 sys.exit(0)
