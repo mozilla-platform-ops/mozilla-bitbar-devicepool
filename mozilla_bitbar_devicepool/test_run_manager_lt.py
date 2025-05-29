@@ -347,15 +347,6 @@ class TestRunManagerLT(object):
 
             formatted_active_device_count = str(active_device_count_by_project_dict).strip("{}").replace("'", "")
             per_queue_string = f"Active device counts: {formatted_active_device_count}"
-            # TODO: move this to sentry/monitoring thread (can include if build is 'good')
-            # logging.info(
-            #     f"{logging_header} "
-            #     f"Session started jobs: {self.shared_data[self.SHARED_SESSION_STARTED_JOBS]}, "
-            #     "Global device utilization: Total/Active/Busy/Cleanup/BusyPercentage: "
-            #     f"{global_total_device_count}/{self.shared_data[self.SHARED_LT_G_ACTIVE_DEVICES]}/"
-            #     f"{local_device_stats['busy_devices']}/{self.shared_data[self.SHARED_LT_G_CLEANUP_DEVICES]}/"
-            #     f"{util_percent:.1f}%"
-            # )
             logging.info(f"{logging_header} {per_queue_string}")
 
             # normal thread sleep
@@ -873,8 +864,6 @@ def main():
     else:
         # Sentry DSN is not set, disable Sentry
         logging.warning("SENTRY_DSN is not set. Sentry SDK will not be initialized.")
-
-    # TODO: log in sentry when a particular git sha (version?) has run X jobs.
 
     # Parse command line arguments
     available_actions = ["start-test-run-manager"]
