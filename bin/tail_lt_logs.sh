@@ -31,9 +31,9 @@ journalctl -u lambdatest -f -n "${LINES_TO_SHOW}" | \
         if (line ~ /WARNING/) {
             print red line reset
         } else if (line ~ /Main/) {
-            print yellow line reset
+            print hiyellow line reset
         } else if (line ~ /Cleaner/) {
-            print hipurple line reset
+            print hiblue line reset
         } else if (line ~ /Monitor/) {
             print cyan line reset
         } else if (line ~ /Launched/) {
