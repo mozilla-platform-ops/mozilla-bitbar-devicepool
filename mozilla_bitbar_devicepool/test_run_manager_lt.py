@@ -598,7 +598,7 @@ class TestRunManagerLT(object):
         """Runs the Monitoring thread for monitoring and reporting."""
         logging_header = self.format_logging_header(self.MONITOR_THREAD_NAME)
 
-        logging.info(f"{logging_header} Thread startiing...")
+        logging.info(f"{logging_header} Thread starting...")
         build_good_notification_sent = False
 
         # wait for lt monitor thread to do initial population of data
