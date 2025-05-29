@@ -27,14 +27,27 @@ class JobCleaner:
         Perform the cleanup operation for the specified job.
         This method should contain the logic to clean up the job resources.
         """
+        result_stats = {
+            "removed": 0,  # directories removed
+            "matched": 0,  # matched the cleaning pattern, but not old enough to remove
+            "not_matched": 0,  # did not match the cleaning pattern
+            "total_inspected": 0,  # total directories inspected
+        }
 
         # remove directories older than 1 day that match the cleaning pattern
         for dirpath, dirnames, filenames in os.walk(self.cleaning_path):
             for dirname in dirnames:
+                result_stats["total_inspected"] += 1
                 if dirname.startswith(self.cleaning_pattern):
                     dir_to_check = os.path.join(dirpath, dirname)
                     if self.is_old_directory(dir_to_check):
                         self.remove_directory(dir_to_check)
+                        result_stats["removed"] += 1
+                    result_stats["matched"] += 1
+                else:
+                    result_stats["not_matched"] += 1
+
+        return result_stats
 
     def is_old_directory(self, dir_path):
         """
@@ -65,5 +78,7 @@ if __name__ == "__main__":
     print(
         f"Starting cleanup of old LambdaTest job directories in {cleaner.cleaning_path}/{cleaner.cleaning_pattern}..."
     )
-    cleaner.clean_up()
-    print("Cleanup completed.")
+    result_statistics = cleaner.clean_up()
+    print("Cleanup completed. Results: ")
+    for key, value in result_statistics.items():
+        print(f"  {key}: {value}")
