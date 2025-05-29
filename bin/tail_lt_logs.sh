@@ -19,6 +19,16 @@ GREP_COLOR_CYAN='1;36'
 GREP_COLOR_BLACK='1;30'
 GREP_COLOR_WHITE='1;37'
 
+# high intensity colors
+GREP_COLOR_HI_RED='0;91'
+GREP_COLOR_HI_GREEN='0;92'
+GREP_COLOR_HI_YELLOW='0;93'
+GREP_COLOR_HI_BLUE='0;94'
+GREP_COLOR_HI_PURPLE='0;95'
+GREP_COLOR_HI_CYAN='0;96'
+GREP_COLOR_HI_BLACK='0;90'
+GREP_COLOR_HI_WHITE='0;97'
+
 # even wider
 LINES_TO_SHOW=2000
 GREP_OPTIONS='--line-buffered'
@@ -31,6 +41,7 @@ journalctl -u lambdatest -f -n "${LINES_TO_SHOW}" | \
         grep --line-buffered -v DEBUG | \
         GREP_COLOR=$GREP_COLOR_RED grep ${GREP_OPTIONS} --color=always -E '.*WARNING.*|^' | \
         GREP_COLOR=$GREP_COLOR_YELLOW grep ${GREP_OPTIONS} --color=always -E '.*Main.*|^' | \
+        GREP_COLOR=$GREP_COLOR_HI_CYAN grep ${GREP_OPTIONS} --color=always -E '.*Cleaner.*|^' | \
         GREP_COLOR=$GREP_COLOR_CYAN grep ${GREP_OPTIONS} --color=always -E '.*Monitor.*|^' | \
         GREP_COLOR=$GREP_COLOR_GREEN grep ${GREP_OPTIONS} --color=always -E '.*Launched.*|^' | \
         GREP_COLOR=$GREP_COLOR_BLUE grep ${GREP_OPTIONS} --color=always -E '.*LT API.*|^' | \
