@@ -52,14 +52,14 @@ class TestRunManagerLT(object):
     LT_THREAD_NAME = "LT API"
     JOB_STARTER_THREAD_NAME = "JS"
     MONITOR_THREAD_NAME = "Monitor"
-    CLEANUP_THREAD_NAME = "Cleanup"
+    CLEANER_THREAD_NAME = "Cleaner"
 
     # Threading constants
     TC_MONITOR_INTERVAL = 30  # seconds
     LT_MONITOR_INTERVAL = 30  # seconds
     JOB_STARTER_INTERVAL = 10  # seconds
     SENTRY_INTERVAL = 30  # seconds
-    CLEANUP_INTERVAL = 10 * 60  # seconds
+    CLEANER_INTERVAL = 10 * 60  # seconds
     # Debug constants - set higher log levels for specific areas
     DEBUG_JOB_STARTER = True  # Enable detailed debugging for job starter
     DEBUG_DEVICE_SELECTION = True  # Enable detailed debugging for device selection
@@ -654,7 +654,7 @@ class TestRunManagerLT(object):
     # cleanup thread
     def _cleanup_thread(self):
         # cleans up old hyperexecute directories
-        logging_header = self.format_logging_header(self.CLEANUP_THREAD_NAME)
+        logging_header = self.format_logging_header(self.CLEANER_THREAD_NAME)
         logging.info(f"{logging_header} Thread starting...")
 
         # wait for things to settle a bit before starting
@@ -669,7 +669,7 @@ class TestRunManagerLT(object):
         while not self.shutdown_event.is_set():
             result_statistics = job_cleaner.clean_up()
             logging.info(f"{logging_header} Removed {result_statistics['removed']} old job dirs.")
-            self.shutdown_event.wait(self.CLEANUP_INTERVAL)
+            self.shutdown_event.wait(self.CLEANER_INTERVAL)
         logging.info(f"{logging_header} Thread stopped.")
 
     # main thread
@@ -696,10 +696,10 @@ class TestRunManagerLT(object):
         thread_started_count += 1
         logging.info(f"{logging_header} Started {self.MONITOR_THREAD_NAME} thread.")
         # start cleanup thread
-        cleanup_thread = threading.Thread(target=self._cleanup_thread, name=self.CLEANUP_THREAD_NAME)
+        cleanup_thread = threading.Thread(target=self._cleanup_thread, name=self.CLEANER_THREAD_NAME)
         cleanup_thread.start()
         thread_started_count += 1
-        logging.info(f"{logging_header} Started {self.CLEANUP_THREAD_NAME} thread.")
+        logging.info(f"{logging_header} Started {self.CLEANER_THREAD_NAME} thread.")
 
         # Give monitors/utility threads a moment to potentially fetch initial data
         time.sleep(2)
