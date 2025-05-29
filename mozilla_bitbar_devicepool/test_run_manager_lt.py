@@ -52,12 +52,14 @@ class TestRunManagerLT(object):
     LT_THREAD_NAME = "LT API"
     JOB_STARTER_THREAD_NAME = "JS"
     MONITOR_THREAD_NAME = "Monitor"
+    CLEANUP_THREAD_NAME = "Cleanup"
 
     # Threading constants
     TC_MONITOR_INTERVAL = 30  # seconds
     LT_MONITOR_INTERVAL = 30  # seconds
     JOB_STARTER_INTERVAL = 10  # seconds
     SENTRY_INTERVAL = 30  # seconds
+    CLEANUP_INTERVAL = 10 * 60  # seconds
     # Debug constants - set higher log levels for specific areas
     DEBUG_JOB_STARTER = True  # Enable detailed debugging for job starter
     DEBUG_DEVICE_SELECTION = True  # Enable detailed debugging for device selection
@@ -649,6 +651,27 @@ class TestRunManagerLT(object):
             self.shutdown_event.wait(self.SENTRY_INTERVAL)
         logging.info(f"{logging_header} Thread stopped.")
 
+    # cleanup thread
+    def _cleanup_thread(self):
+        # cleans up old hyperexecute directories
+        logging_header = self.format_logging_header(self.CLEANUP_THREAD_NAME)
+        logging.info(f"{logging_header} Thread starting...")
+
+        # wait for things to settle a bit before starting
+        self.shutdown_event.wait(30)
+
+        # setup a job cleaner instance
+        from mozilla_bitbar_devicepool.lambdatest.job_cleaner import JobCleaner
+
+        job_cleaner = JobCleaner()
+
+        # main loop
+        while not self.shutdown_event.is_set():
+            result_statistics = job_cleaner.clean_up()
+            logging.info(f"{logging_header} Removed {result_statistics['removed']} old job dirs.")
+            self.shutdown_event.wait(self.CLEANUP_INTERVAL)
+        logging.info(f"{logging_header} Thread stopped.")
+
     # main thread
     def run_multithreaded(self):
         """Runs the manager with separate threads for monitoring and job starting for each project."""
@@ -657,14 +680,13 @@ class TestRunManagerLT(object):
 
         thread_started_count = 0
 
-        # Create monitor threads
+        # start TC API thread
         tc_monitor = threading.Thread(target=self._taskcluster_monitor_thread, name=self.TC_THREAD_NAME)
-        lt_monitor = threading.Thread(target=self._lambdatest_monitor_thread, name=self.LT_THREAD_NAME)
-
-        # Start monitor threads
         tc_monitor.start()
         thread_started_count += 1
         logging.info(f"{logging_header} Started {self.TC_THREAD_NAME} thread.")
+        # start LT API thread
+        lt_monitor = threading.Thread(target=self._lambdatest_monitor_thread, name=self.LT_THREAD_NAME)
         lt_monitor.start()
         thread_started_count += 1
         logging.info(f"{logging_header} Started {self.LT_THREAD_NAME} thread.")
@@ -673,6 +695,11 @@ class TestRunManagerLT(object):
         monitoring_thread.start()
         thread_started_count += 1
         logging.info(f"{logging_header} Started {self.MONITOR_THREAD_NAME} thread.")
+        # start cleanup thread
+        cleanup_thread = threading.Thread(target=self._cleanup_thread, name=self.CLEANUP_THREAD_NAME)
+        cleanup_thread.start()
+        thread_started_count += 1
+        logging.info(f"{logging_header} Started {self.CLEANUP_THREAD_NAME} thread.")
 
         # Give monitors/utility threads a moment to potentially fetch initial data
         time.sleep(2)
