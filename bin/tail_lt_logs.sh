@@ -1,48 +1,49 @@
 #!/usr/bin/env bash
 
 set -e
-set -x
+# set -x
 
-# more restricted
-#journalctl -u lambdatest -f -n 20000 | grep -E 'Launched|TC Jobs' | grep 'a55-perf' | GREP_COLOR='1;32' grep --color=always -E '.*Launched.*|^'
-
-# wider, more color
-#journalctl -u lambdatest -f -n 20000 | grep 'a55-perf' | GREP_COLOR='1;32' grep --color=always -E '.*Launched.*|^' | GREP_COLOR='1;33' grep --color=always -E '.*Monitor.*|^'
-
-GREP_COLOR_RED='1;31'
-GREP_COLOR_GREEN='1;32'
-GREP_COLOR_YELLOW='1;33'
-GREP_COLOR_BLUE='1;34'
-GREP_COLOR_PURPLE='1;35'
-GREP_COLOR_CYAN='1;36'
-# not the most usable...
-GREP_COLOR_BLACK='1;30'
-GREP_COLOR_WHITE='1;37'
-
-# high intensity colors
-GREP_COLOR_HI_RED='0;91'
-GREP_COLOR_HI_GREEN='0;92'
-GREP_COLOR_HI_YELLOW='0;93'
-GREP_COLOR_HI_BLUE='0;94'
-GREP_COLOR_HI_PURPLE='0;95'
-GREP_COLOR_HI_CYAN='0;96'
-GREP_COLOR_HI_BLACK='0;90'
-GREP_COLOR_HI_WHITE='0;97'
-
-# even wider
 LINES_TO_SHOW=2000
-GREP_OPTIONS='--line-buffered'
-#journalctl -u lambdatest -f -n "${LINES_TO_SHOW}" | grep 'a55-perf' | \
-#journalctl -u lambdatest -f -n "${LINES_TO_SHOW}" | grep -E 'Monitor|a55-perf' | \
-#journalctl -u lambdatest -f -n "${LINES_TO_SHOW}" | \
-        #GREP_COLOR='1;36' grep --color=always -E '.* TC Jobs.*|^' | \
-        #grep --line-buffered -E 'Monitor|a55-perf' | \
+
+# ANSI color codes
+RED='\033[1;31m'
+YELLOW='\033[1;33m'
+CYAN='\033[1;36m'
+GREEN='\033[1;32m'
+BLUE='\033[1;34m'
+PURPLE='\033[1;35m'
+RESET='\033[0m'
+
+# hi vis color codes
+HI_RED='\033[0;91m'
+HI_YELLOW='\033[0;93m'
+HI_CYAN='\033[0;96m'
+HI_GREEN='\033[0;92m'
+HI_BLUE='\033[0;94m'
+HI_PURPLE='\033[0;95m'
+
 journalctl -u lambdatest -f -n "${LINES_TO_SHOW}" | \
-        grep --line-buffered -v DEBUG | \
-        GREP_COLOR=$GREP_COLOR_RED grep ${GREP_OPTIONS} --color=always -E '.*WARNING.*|^' | \
-        GREP_COLOR=$GREP_COLOR_YELLOW grep ${GREP_OPTIONS} --color=always -E '.*Main.*|^' | \
-        GREP_COLOR=$GREP_COLOR_HI_PURPLE grep ${GREP_OPTIONS} --color=always -E '.*Cleaner.*|^' | \
-        GREP_COLOR=$GREP_COLOR_CYAN grep ${GREP_OPTIONS} --color=always -E '.*Monitor.*|^' | \
-        GREP_COLOR=$GREP_COLOR_GREEN grep ${GREP_OPTIONS} --color=always -E '.*Launched.*|^' | \
-        GREP_COLOR=$GREP_COLOR_BLUE grep ${GREP_OPTIONS} --color=always -E '.*LT API.*|^' | \
-        GREP_COLOR=$GREP_COLOR_PURPLE grep ${GREP_OPTIONS} --color=always -E '.*TC API.*|^'
+    grep --line-buffered -v DEBUG | \
+    awk -v red="$RED" -v yellow="$YELLOW" -v cyan="$CYAN" -v green="$GREEN" -v blue="$BLUE" -v purple="$PURPLE" -v reset="$RESET" \
+        -v hired="$HI_RED" -v hiyellow="$HI_YELLOW" -v hicyan="$HI_CYAN" -v higreen="$HI_GREEN" -v hiblue="$HI_BLUE" -v hipurple="$HI_PURPLE" '
+    {
+        line = $0
+        if (line ~ /WARNING/) {
+            print red line reset
+        } else if (line ~ /Main/) {
+            print yellow line reset
+        } else if (line ~ /Cleaner/) {
+            print hipurple line reset
+        } else if (line ~ /Monitor/) {
+            print cyan line reset
+        } else if (line ~ /Launched/) {
+            print green line reset
+        } else if (line ~ /LT API/) {
+            print blue line reset
+        } else if (line ~ /TC API/) {
+            print purple line reset
+        } else {
+            print line
+        }
+    }
+'
