@@ -39,11 +39,11 @@ class JobCleaner:
             for dirname in dirnames:
                 result_stats["total_inspected"] += 1
                 if dirname.startswith(self.cleaning_pattern):
+                    result_stats["matched"] += 1
                     dir_to_check = os.path.join(dirpath, dirname)
                     if self.is_old_directory(dir_to_check):
                         self.remove_directory(dir_to_check)
                         result_stats["removed"] += 1
-                    result_stats["matched"] += 1
                 else:
                     result_stats["not_matched"] += 1
 
