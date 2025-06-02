@@ -23,7 +23,6 @@ HI_BLUE='\033[0;94m'
 HI_PURPLE='\033[0;95m'
 
 # heredoc with test input, store in variable, preserve newlines
-# HEREDOC_INPUT=$(cat << EOM
 read -r -d '' HEREDOC_INPUT <<EOF || true
 INFO: Main process started \n
 WARNING: Potential issue detected \n
@@ -40,12 +39,8 @@ EOF
 command_to_run="journalctl -u lambdatest -f -n ${LINES_TO_SHOW}"
 if [[ "$1" == "--test" ]]; then
     command_to_run="echo -e ${HEREDOC_INPUT}"
-    # command_to_run="printf '%s\n' '${HEREDOC_INPUT}'"
     echo "Running in test mode. Using heredoc input."
 fi
-
-# echo $HEREDOC_INPUT
-# exit
 
 $command_to_run | \
     grep --line-buffered -v DEBUG | \
