@@ -1,0 +1,25 @@
+[Unit]
+Description=Lambdatest Testrun manager service
+
+[Service]
+Type=simple
+ExecStart=/bin/bash /home/bitbar/mozilla-bitbar-devicepool/bin/start_ltdp.sh
+# disable execstop, let systemd track the pid and manage shutdown
+#ExecStop=/bin/bash /home/bitbar/mozilla-bitbar-devicepool/bin/stop_ltdp.sh
+Restart=always
+# restart process 24 hours to avoid any funk building up
+#  - disabled to find long-term bugs
+#RuntimeMaxSec=24h
+WorkingDirectory=/home/bitbar/mozilla-bitbar-devicepool
+User=bitbar
+# send USR2 to politely exit
+KillSignal=SIGUSR2
+# send SIGKILL after 30s
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target
+
+# install with:
+#   $ cp service/lambdatest.service /etc/systemd/system/lambdatest.service
+#   $ sudo systemctl daemon-reload

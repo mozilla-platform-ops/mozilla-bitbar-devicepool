@@ -8,13 +8,11 @@ license = "MPL-2.0"
 readme = "README.md"
 repository = "https://github.com/mozilla-platform-ops/mozilla-bitbar-devicepool"
 packages = [{include = "mozilla_bitbar_devicepool"}]
-classifiers = [
-        "Operating System :: OS Independent",
-]
+classifiers = ["Operating System :: OS Independent"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-pyyaml = "^6.0"
+pyyaml = "^6.0.2"
 requests = "^2.28.2"
 # use an unreleased version on master, v2.100.0+
 #   - includes https://github.com/bitbar/testdroid-api-client-python/issues/141
@@ -23,21 +21,45 @@ sentry-sdk = "^1.15.0"
 pytest = "^7.2.1"
 termplotlib = "^0.3.9"
 gitpython = "^3.1.42"
+humanhash3 = "^0.0.6"
+requests-cache = "^1.2.1"
+urllib3 = "^2.3.0"
 
 [tool.poetry.group.dev.dependencies]
-pre-commit = "^3.1.0"
+pre-commit = "^4.1.0"
 pylint = "^2.16.2"
 pytest = "^7.2.1"
 pytest-watch = "^4.2.0"
 pytest-cov = "^4.0.0"
-deptry = "^0.11.0"
+deptry = "^0.23.0"
+mozdevice = "^4.2.0"
+pytest-mock = "^3.14.0"
 
 [tool.poetry.scripts]
+# TODO: rework all of these (tcdp-lt, tcdp-bb?)
+# TODO: use consistent way of differentiating lt vs bb bins
 mbd = 'mozilla_bitbar_devicepool.main:main'
+mld = 'mozilla_bitbar_devicepool.test_run_manager_lt:main'
+dgr = 'mozilla_bitbar_devicepool.device_group_report:main'
+dgrlt = 'mozilla_bitbar_devicepool.device_group_report_lt:main'
+lt_status = 'mozilla_bitbar_devicepool.lambdatest.status:lt_status_main'
+lt_compare_to_api = 'mozilla_bitbar_devicepool.compare_to_api_lt:main'
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.ruff]
+# Allow lines to be as long as 120.
+line-length = 120
+
 [tool.deptry]
-ignore = ["DEP001", "DEP002"]
+#ignore = ["DEP001", "DEP002"]
+
+[tool.deptry.per_rule_ignores]
+DEP001 = ["google", "mozdevice", "script"]
+DEP003 = ["google", "mozdevice"]
+DEP004 = ["mozdevice"]
+
+[tool.pytest.ini_options]
+norecursedirs = "mozilla_bitbar_devicepool/lambdatest/user_script"

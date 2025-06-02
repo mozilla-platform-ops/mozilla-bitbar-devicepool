@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import os
-import sys
 
 import yaml
 
@@ -22,8 +21,9 @@ class DeviceGroupReport:
         self.test_result_dict = {}
         self.device_dict = {}  # device types to count
         if not config_path:
-            pathname = os.path.dirname(sys.argv[0])
-            root_dir = os.path.abspath(os.path.join(pathname, ".."))
+            # get the path of this file
+            filename_path = os.path.abspath(__file__)
+            root_dir = os.path.abspath(os.path.join(filename_path, "..", ".."))
             self.config_path = os.path.join(root_dir, "config", "config.yml")
             if not quiet:
                 print("INFO: Using config file at '%s'." % self.config_path)
@@ -131,9 +131,7 @@ class DeviceGroupReport:
                         self.device_dict["g5"] = self.device_dict.get("g5", 0) + 1
 
     def main(self):
-        self.get_report_dict()
-
-        banner = """
+        banner = r"""
    __   _ __  __                 __
   / /  (_) /_/ /  ___ _____  ___/ /__ _____
  / _ \/ / __/ _ \/ _ `/ __/ / _  / _ `/ __/
@@ -144,9 +142,10 @@ class DeviceGroupReport:
         print(f"  generated on {misc.get_utc_date_string()} ({misc.get_git_info()})")
         print()
 
+        self.get_report_dict()
+
         v1_enabled = False
         if v1_enabled:
-
             print("/// tc-w  workers ///")
             for key in sorted(self.tcw_result_dict.keys()):
                 print("%s: %s" % (key, self.tcw_result_dict[key]))
@@ -181,3 +180,8 @@ class DeviceGroupReport:
         print()
 
         print("total devices: %s" % result["total_devices"])
+
+
+def main():  # pragma: no cover
+    device_group_report = DeviceGroupReport()
+    device_group_report.main()

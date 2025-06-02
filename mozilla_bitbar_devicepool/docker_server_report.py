@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-import sys
 import pprint
+import sys
 
 import termplotlib as tpl
 
@@ -22,9 +22,7 @@ class DockerServerReport:
 
         device_to_docker_host_dict = {}
         for result_device in results:
-            device_to_docker_host_dict[result_device["deviceName"]] = result_device[
-                "clusterName"
-            ]
+            device_to_docker_host_dict[result_device["deviceName"]] = result_device["clusterName"]
         if self.verbose:
             pprint.pprint(device_to_docker_host_dict)
             print("")

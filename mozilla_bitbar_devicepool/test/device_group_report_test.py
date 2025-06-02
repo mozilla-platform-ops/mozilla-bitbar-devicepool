@@ -4,7 +4,6 @@
 
 from mozilla_bitbar_devicepool import device_group_report
 
-
 data = """
 device_groups:
   motog4-docker-builder-2:

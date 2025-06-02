@@ -1,4 +1,9 @@
+import uuid as uuidlib
 from datetime import datetime, timezone
+
+import git
+import humanhash
+import sentry_sdk
 
 
 # Get the current date in UTC in an ISO formatted string
@@ -6,10 +11,6 @@ def get_utc_date_string():
     utc_now = datetime.now(timezone.utc)
     utc_date_iso = utc_now.isoformat(timespec="seconds")
     return utc_date_iso
-
-
-# pip install GitPython
-import git
 
 
 def get_git_info():
@@ -26,3 +27,53 @@ def get_git_info():
 
 
 # print(get_git_info())
+
+
+def humanhash_from_string(value, **params):
+    """
+    Generate a UUID with a human-readable representation from an input string.
+    Returns `human_repr`.  Accepts the same keyword arguments as :meth:`humanize`
+    """
+
+    digest = str(uuidlib.uuid5(uuidlib.NAMESPACE_DNS, value)).replace("-", "")
+    return humanhash.humanize(digest, **params)
+
+
+# main
+if __name__ == "__main__":  # pragma: no cover
+    print(get_utc_date_string())
+    print(get_git_info())
+    print(humanhash_from_string("hello world"))
+    #
+    print(humanhash_from_string("hello world", words=1))
+    print(humanhash_from_string("hello world", words=2))
+    print(humanhash_from_string("hello world", words=2))
+    #
+    print(humanhash_from_string("hello world", words=3))
+    print(humanhash_from_string("hello world", words=3))
+    #
+    print(humanhash_from_string("hello world", words=4))
+    print(humanhash_from_string("hello world", words=5))
+    print(humanhash_from_string("hello world", words=6))
+    print(humanhash_from_string("hello world", words=7))
+    print(humanhash_from_string("hello world", words=8))
+
+
+# TODO: is this still needed?
+#   - this is really controlled by sentry detecting the logging level
+#     we use in the exception handler.
+def report_handled_exception_to_sentry(exc, level="warning"):
+    with sentry_sdk.push_scope() as scope:
+        scope.set_level(level)
+        scope.set_tag("handled", True)  # optional: for filtering in Sentry UI
+        sentry_sdk.capture_exception(exc)
+
+
+def pluralize(word, count):
+    """
+    Returns the pluralized form of a word based on the count.
+    """
+    if count == 1:
+        return word
+    else:
+        return f"{word}s"

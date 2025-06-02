@@ -29,7 +29,5 @@ def get_device_statuses(**kwargs):
 
     # GET
     filter = get_filter(fields, **kwargs)
-    response = TESTDROID.get(
-        "api/v2/admin/device/statuses", payload={"limit": 0, "filter": filter}
-    )
+    response = TESTDROID.get("api/v2/admin/device/statuses", payload={"limit": 0, "filter": filter})
     return response["data"]

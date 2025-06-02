@@ -5,3 +5,7 @@ venv
 .idea
 .vscode
 .coverage
+bitbar_env*
+lt_env*
+hyperexecute*
+.coverage*

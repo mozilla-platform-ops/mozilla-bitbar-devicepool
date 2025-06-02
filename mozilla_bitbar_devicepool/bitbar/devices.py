@@ -3,6 +3,8 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 
+from testdroid import Testdroid
+
 from mozilla_bitbar_devicepool import TESTDROID
 from mozilla_bitbar_devicepool.util.template import get_filter
 
@@ -49,9 +51,7 @@ def get_device(id):
     Examples:
        get_device(1) # Return device with id 1
     """
-    response = TESTDROID.get(
-        "api/v2/devices/{}".format(id), payload={"limit": 0, "filter": filter}
-    )
+    response = TESTDROID.get("api/v2/devices/{}".format(id), payload={"limit": 0, "filter": filter})
     return response
 
 
@@ -80,3 +80,26 @@ def get_offline_devices(device_model=None):
             if problem["type"] == "OFFLINE":
                 offline_devices.append(device_problem["deviceModelName"])
     return offline_devices
+
+
+# main
+if __name__ == "__main__":
+    import os
+    import pprint
+
+    # from mozilla_bitbar_devicepool.bitbar.devices import get_device
+
+    TESTDROID_URL = os.environ.get("TESTDROID_URL")
+    TESTDROID_APIKEY = os.environ.get("TESTDROID_APIKEY")
+    if TESTDROID_URL and TESTDROID_APIKEY:
+        TESTDROID = Testdroid(apikey=TESTDROID_APIKEY, url=TESTDROID_URL)
+    else:
+        TESTDROID = None
+
+    print(TESTDROID)
+    response = TESTDROID.get("/api/v2/device-groups", payload={"limit": 0, "filter": filter})
+    pprint.pprint(response)
+
+    print("*********")
+
+    pprint.pprint(get_device(17))

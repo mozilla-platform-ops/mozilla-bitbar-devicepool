@@ -33,19 +33,17 @@ def get_filter(fields, **kwargs):
         fieldtype = type(fieldvalue)
         if fieldtype != fields[fieldname]:
             raise ValueError(
-                "filter field name {} type {} does not match {}".format(
-                    fieldname, fieldtype, fields[fieldname]
-                )
+                "filter field name {} type {} does not match {}".format(fieldname, fieldtype, fields[fieldname])
             )
         fieldflag = ""
-        if fieldtype == int:
+        if fieldtype is int:
             if "time" in fieldname:
                 fieldflag = "d"
             else:
                 fieldflag = "n"
-        elif fieldtype == str:
+        elif fieldtype is str:
             fieldflag = "s"
-        elif fieldtype == bool:
+        elif fieldtype is bool:
             fieldflag = "b"
         else:
             raise ValueError("Unknown filter field type %s" % fieldtype)
@@ -67,9 +65,7 @@ def apply_dict_defaults(input_dict, defaults_dict):
         attribute = input_dict[attribute_name]
         if isinstance(attribute, dict):
             # Recursively do nested dicts.
-            new_dict[attribute_name] = apply_dict_defaults(
-                attribute, defaults_dict[attribute_name]
-            )
+            new_dict[attribute_name] = apply_dict_defaults(attribute, defaults_dict[attribute_name])
         else:
             new_dict[attribute_name] = attribute
 
