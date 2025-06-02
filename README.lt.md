@@ -1,5 +1,27 @@
 # LT Notes
 
+## Tracing
+
+### LT->TC
+
+Go to the 'Post Steps' tab of the selected job in the LambdaTest Hyperexecute UI (https://hyperexecute.lambdatest.com/hyperexecute/jobs). Reveal the 'Post' step's output. You should see text similar to:
+
+```
+generic-worker-metadata.json contents:
+{
+  "lastTaskUrl": "https://firefox-ci-tc.services.mozilla.com/tasks/Ym_uHmb0TmC_f45Wv8uw3w/runs/0"
+}
+```
+
+### TC->LT
+
+Search for `lambdatest` in the job's log. You should find content similar to:
+
+```
+[task 2025-06-02T22:27:14.576Z] LambdaTest Job Number: 21724
+[task 2025-06-02T22:27:14.576Z] LambdaTest Job URL: https://hyperexecute.lambdatest.com/hyperexecute/task?jobId=0e05dbf5-7cec-44a2-a63c-1d8c01525009&link=&logType=&order=&scenario_search_text=&taskId=HYPL-1611945-1748903159145866048AYB&taskStatus=
+```
+
 ## TODO
 
 - user_script/setup_script.sh
