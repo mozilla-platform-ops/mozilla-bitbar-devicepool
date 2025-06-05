@@ -51,7 +51,7 @@ class TestRunManagerLT(object):
     TC_THREAD_NAME = "TC API"
     LT_THREAD_NAME = "LT API"
     JOB_STARTER_THREAD_NAME = "JS"
-    MONITOR_THREAD_NAME = "Monitor"
+    REPORTER_THREAD_NAME = "Reporter"
     CLEANER_THREAD_NAME = "Cleaner"
 
     # Threading constants
@@ -593,10 +593,9 @@ class TestRunManagerLT(object):
 
         logging.info(f"{logging_header} Thread stopped.")
 
-    # TODO: rename to reporting thread
-    def _monitor_thread(self):
-        """Runs the Monitoring thread for monitoring and reporting."""
-        logging_header = self.format_logging_header(self.MONITOR_THREAD_NAME)
+    def _reporter_thread(self):
+        """Runs the Reporter thread for (monitoring and) reporting."""
+        logging_header = self.format_logging_header(self.REPORTER_THREAD_NAME)
 
         logging.info(f"{logging_header} Thread starting...")
         build_good_notification_sent = False
@@ -691,10 +690,10 @@ class TestRunManagerLT(object):
         thread_started_count += 1
         logging.info(f"{logging_header} Started {self.LT_THREAD_NAME} thread.")
         # start monitoring thread
-        monitoring_thread = threading.Thread(target=self._monitor_thread, name=self.MONITOR_THREAD_NAME)
+        monitoring_thread = threading.Thread(target=self._reporter_thread, name=self.REPORTER_THREAD_NAME)
         monitoring_thread.start()
         thread_started_count += 1
-        logging.info(f"{logging_header} Started {self.MONITOR_THREAD_NAME} thread.")
+        logging.info(f"{logging_header} Started {self.REPORTER_THREAD_NAME} thread.")
         # start cleanup thread
         cleanup_thread = threading.Thread(target=self._cleanup_thread, name=self.CLEANER_THREAD_NAME)
         cleanup_thread.start()
@@ -759,7 +758,7 @@ class TestRunManagerLT(object):
         if lt_monitor.is_alive():
             logging.warning(f"{logging_header} {self.LT_THREAD_NAME} thread did not exit cleanly.")
         if monitoring_thread.is_alive():
-            logging.warning(f"{logging_header} {self.MONITOR_THREAD_NAME} thread did not exit cleanly.")
+            logging.warning(f"{logging_header} {self.REPORTER_THREAD_NAME} thread did not exit cleanly.")
         # check if all js threads have exited
         for i, job_starter in enumerate(job_starters):
             if job_starter.is_alive():
