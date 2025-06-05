@@ -27,7 +27,7 @@ read -r -d '' HEREDOC_INPUT <<EOF || true
 INFO: Main process started \n
 WARNING: Potential issue detected \n
 INFO: Cleaner process started \n
-INFO: Monitor process started \n
+INFO: Reporter process started \n
 INFO: Launched new instance \n
 INFO: LT API request made \n
 INFO: TC API request made \n
@@ -54,7 +54,7 @@ $command_to_run | \
             print hiyellow line reset
         } else if (line ~ /Cleaner/) {
             print hiblue line reset
-        } else if (line ~ /Monitor/) {
+        } else if (line ~ /Reporter/) {
             print cyan line reset
         } else if (line ~ /Launched/) {
             print green line reset
