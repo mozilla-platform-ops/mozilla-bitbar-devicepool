@@ -42,6 +42,7 @@ def dump_scriptvars():
         "TC_WORKER_TYPE",
         "USER",
         "UserPorts",
+        "PowerMeterSerial",
     )
     variables = dict((k, get_envvar(k)) for k in names)
 
