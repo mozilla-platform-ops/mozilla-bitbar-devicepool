@@ -625,6 +625,8 @@ class TestRunManagerLT(object):
             )
 
             # show good build notification
+            # TODO: ideally this would be done once (but it will happen on each run of the binary (if it's working))
+            #   - this also seems like limited value at some point in code maturity (or should be set much higher?)
             if build_good_notification_sent is False:
                 if self.shared_data[self.SHARED_SESSION_STARTED_JOBS] >= self.GOOD_BUILD_JOB_STARTED_THRESHOLD:
                     git_info = misc.get_git_info()
