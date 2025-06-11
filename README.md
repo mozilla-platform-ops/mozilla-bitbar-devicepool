@@ -53,7 +53,7 @@ pre-commit install  # install the pre-commit hook
 # make a PR
 ```
 
-# Testing (Unit Tests)
+## Testing (Unit Tests)
 
 You must install the development requirements first.  See the "Development" section above.
 
@@ -64,7 +64,7 @@ pytest-watch  # monitors files for changes and reruns
 ```
 
 
-## Further Documentation
+## Running and More Documentation
 
 For Bitbar, see `README.bb.md`.
 
