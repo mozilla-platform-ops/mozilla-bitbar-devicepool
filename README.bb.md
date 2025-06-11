@@ -11,7 +11,7 @@ Bitbar Frameworks must be managed via the Testdroid user interface.
 ## Configuration
 
 Configuring mozilla-bitbar-devicepool requires creating environment
-variables and a yaml configuration file for Bitbar.
+variables and a yaml configuration file for Bitbar. See `config/config.yml`.
 
 ### Environment Variables
 

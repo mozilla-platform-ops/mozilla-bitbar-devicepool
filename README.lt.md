@@ -2,7 +2,13 @@
 
 Detects pending Taskcluster jobs and starts tasks at Lambdatest to handle them.
 
-### Usage
+Lambdatest job launching is done via their Hyperexecute CLI tool (that handles the API requests).
+
+## Configuration
+
+Configuring `mld` requires creating environment variables and a yaml configuration file for Bitbar. See `config/lambdatest.yml`.
+
+## Usage
 
 ```bash
 mld --help
