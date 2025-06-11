@@ -28,7 +28,7 @@ poetry install --with=dev
 
 ## Updates
 
-```
+```bash
 # Update the repository
 cd mozilla-bitbar-devicepool
 git pull --rebase
@@ -44,7 +44,7 @@ poetry install
 
 ## Development
 
-```
+```bash
 pip install -r requirements-dev.txt  # install deps
 pre-commit install  # install the pre-commit hook
 # make changes
@@ -57,12 +57,17 @@ pre-commit install  # install the pre-commit hook
 
 You must install the development requirements first.  See the "Development" section above.
 
-```
+```bash
+# activate venv
+. ./.venv/bin/activate
+
 pytest  # runs once
 # or
 pytest-watch  # monitors files for changes and reruns
-```
 
+# pytest-watch with coverage and double verbose
+pytest-watch -- -vv --cov
+```
 
 ## Running and More Documentation
 

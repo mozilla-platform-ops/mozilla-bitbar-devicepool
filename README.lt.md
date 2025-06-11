@@ -2,7 +2,32 @@
 
 Detects pending Taskcluster jobs and starts tasks at Lambdatest to handle them.
 
+### Usage
+
+```bash
+mld --help
+
+# run locally in debug mode (no LT API jobs started)
+mld --debug
+```
+
+## Deployment
+
+### getting the hyperexecute binary
+
+See https://www.lambdatest.com/support/docs/hyperexecute-cli-run-tests-on-hyperexecute-grid/.
+
+
+### Systemd Unit Installation
+
+```
+sudo cp service/lambdatest.service /etc/systemd/system/lambdatest.service
+sudo systemctl daemon-reload
+```
+
 ## Job Tracing
+
+Linking Taskcluster jobs to Lambdatest jobs bidrectionally.
 
 ### LT->TC
 
@@ -17,35 +42,18 @@ generic-worker-metadata.json contents:
 
 ### TC->LT
 
-Search for `lambdatest` in the job's log. You should find content similar to:
+Search for `lambdatest` in the Taskcluster job's log. You should find content similar to:
 
 ```
 [task 2025-06-02T22:27:14.576Z] LambdaTest Job Number: 21724
 [task 2025-06-02T22:27:14.576Z] LambdaTest Job URL: https://hyperexecute.lambdatest.com/hyperexecute/task?jobId=0e05dbf5-7cec-44a2-a63c-1d8c01525009&link=&logType=&order=&scenario_search_text=&taskId=HYPL-1611945-1748903159145866048AYB&taskStatus=
 ```
 
-## getting the hyperexecute binary
+## Development Notes
 
-See https://www.lambdatest.com/support/docs/hyperexecute-cli-run-tests-on-hyperexecute-grid/.
+TODO: Needs updating.
 
-## testing
-
-```bash
-# activate venv
-. ./.venv/bin/activate
-
-# pytest-watch with coverage and double verbose
-pytest-watch -- -vv --cov
-```
-
-## installation / deployment
-
-```
-sudo cp service/lambdatest.service /etc/systemd/system/lambdatest.service
-sudo systemctl daemon-reload
-```
-
-## execution loop overview
+### execution loop overview
 
 ```bash
 # overview:
@@ -58,7 +66,7 @@ sudo systemctl daemon-reload
 #     e. start jobs for the appropriate tc queue with selected devices
 ```
 
-## execution loop modes
+### execution loop modes
 
 1. starts a single job, foreground, targets device_type-os_version
   - replica of jmaher's PoC
@@ -69,7 +77,7 @@ sudo systemctl daemon-reload
 3. starts a single job with hyperexecute yaml concurrency, --no-track, foreground, targets device_type-os_version
   - didn't work (theoretically should, check with LT about my understanding of field), needs more investigation.
 
-### proposed modes
+#### proposed modes
 
 1. starts multiple jobs, --no-track, background, targets device_type-os_version
   - improve slow start problem
