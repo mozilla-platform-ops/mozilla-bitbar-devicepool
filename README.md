@@ -54,7 +54,7 @@ poetry install
 ## Development
 
 ```bash
-poetry install ---all-groups  # install deps
+poetry install --all-groups  # install deps
 poetry shell  # activate venv
 pre-commit install  # install the pre-commit hook
 # make changes
