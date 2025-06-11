@@ -1,6 +1,8 @@
-# LT Notes
+# mld: mozilla-lambdatest-devicepool
 
-## Tracing
+Detects pending Taskcluster jobs and starts tasks at Lambdatest to handle them.
+
+## Job Tracing
 
 ### LT->TC
 
@@ -21,13 +23,6 @@ Search for `lambdatest` in the job's log. You should find content similar to:
 [task 2025-06-02T22:27:14.576Z] LambdaTest Job Number: 21724
 [task 2025-06-02T22:27:14.576Z] LambdaTest Job URL: https://hyperexecute.lambdatest.com/hyperexecute/task?jobId=0e05dbf5-7cec-44a2-a63c-1d8c01525009&link=&logType=&order=&scenario_search_text=&taskId=HYPL-1611945-1748903159145866048AYB&taskStatus=
 ```
-
-## TODO
-
-- user_script/setup_script.sh
-  - don't hack up scripts, grab them from a repo
-- rename to mozilla-tc-devicepool or
-            mozilla-taskcluster-devicepool
 
 ## getting the hyperexecute binary
 
