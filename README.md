@@ -9,7 +9,7 @@ Currently supported vendors are [Bitbar](https://bitbar.com/) and [Lamdatest](ht
 
 ## Installation
 
-```
+```bash
 # Clone the repository
 git clone https://github.com/bclary/mozilla-bitbar-devicepool.git
 cd mozilla-bitbar-devicepool
@@ -17,6 +17,12 @@ cd mozilla-bitbar-devicepool
 # if needed, install poetry
 #   - see https://python-poetry.org/docs/ for more options and info
 curl -sSL https://install.python-poetry.org | python3 -
+
+# install poetry shell plugin
+poetry self add poetry-plugin-shell
+
+# ensure poetry and plugins are up to date
+poetry self update
 
 # activate the virtual environment
 poetry shell
@@ -33,6 +39,9 @@ poetry install --with=dev
 cd mozilla-bitbar-devicepool
 git pull --rebase
 
+# ensure poetry and plugins are up to date
+poetry self update
+
 # activate the virtual environment
 poetry shell
 
@@ -45,7 +54,8 @@ poetry install
 ## Development
 
 ```bash
-pip install -r requirements-dev.txt  # install deps
+poetry install ---all-groups  # install deps
+poetry shell  # activate venv
 pre-commit install  # install the pre-commit hook
 # make changes
 # commit
@@ -59,7 +69,7 @@ You must install the development requirements first.  See the "Development" sect
 
 ```bash
 # activate venv
-. ./.venv/bin/activate
+poetry shell
 
 pytest  # runs once
 # or
