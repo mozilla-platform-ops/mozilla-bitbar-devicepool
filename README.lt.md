@@ -1,34 +1,65 @@
-# LT Notes
+# mld: mozilla-lambdatest-devicepool
 
-## TODO
+Detects pending Taskcluster jobs and starts tasks at Lambdatest to handle them.
 
-- user_script/setup_script.sh
-  - don't hack up scripts, grab them from a repo
-- rename to mozilla-tc-devicepool or
-            mozilla-taskcluster-devicepool
+Lambdatest job launching is done via their Hyperexecute CLI tool (that handles the API requests).
 
-## getting the hyperexecute binary
+## Configuration
+
+Configuring `mld` requires creating environment variables and a yaml configuration file for Bitbar. See `config/lambdatest.yml`.
+
+## Usage
+
+```bash
+mld --help
+
+# run locally in debug mode (no LT API jobs started)
+mld --debug
+```
+
+## Deployment
+
+### getting the hyperexecute binary
 
 See https://www.lambdatest.com/support/docs/hyperexecute-cli-run-tests-on-hyperexecute-grid/.
 
-## testing
 
-```bash
-# activate venv
-. ./.venv/bin/activate
-
-# pytest-watch with coverage and double verbose
-pytest-watch -- -vv --cov
-```
-
-## installation / deployment
+### Systemd Unit Installation
 
 ```
 sudo cp service/lambdatest.service /etc/systemd/system/lambdatest.service
 sudo systemctl daemon-reload
 ```
 
-## execution loop overview
+## Job Tracing
+
+Linking Taskcluster jobs to Lambdatest jobs bidrectionally.
+
+### LT->TC
+
+Go to the 'Post Steps' tab of the selected job in the LambdaTest Hyperexecute UI (https://hyperexecute.lambdatest.com/hyperexecute/jobs). Reveal the 'Post' step's output. You should see text similar to:
+
+```
+generic-worker-metadata.json contents:
+{
+  "lastTaskUrl": "https://firefox-ci-tc.services.mozilla.com/tasks/Ym_uHmb0TmC_f45Wv8uw3w/runs/0"
+}
+```
+
+### TC->LT
+
+Search for `lambdatest` in the Taskcluster job's log. You should find content similar to:
+
+```
+[task 2025-06-02T22:27:14.576Z] LambdaTest Job Number: 21724
+[task 2025-06-02T22:27:14.576Z] LambdaTest Job URL: https://hyperexecute.lambdatest.com/hyperexecute/task?jobId=0e05dbf5-7cec-44a2-a63c-1d8c01525009&link=&logType=&order=&scenario_search_text=&taskId=HYPL-1611945-1748903159145866048AYB&taskStatus=
+```
+
+## Development Notes
+
+TODO: Needs updating.
+
+### execution loop overview
 
 ```bash
 # overview:
@@ -41,7 +72,7 @@ sudo systemctl daemon-reload
 #     e. start jobs for the appropriate tc queue with selected devices
 ```
 
-## execution loop modes
+### execution loop modes
 
 1. starts a single job, foreground, targets device_type-os_version
   - replica of jmaher's PoC
@@ -52,7 +83,7 @@ sudo systemctl daemon-reload
 3. starts a single job with hyperexecute yaml concurrency, --no-track, foreground, targets device_type-os_version
   - didn't work (theoretically should, check with LT about my understanding of field), needs more investigation.
 
-### proposed modes
+#### proposed modes
 
 1. starts multiple jobs, --no-track, background, targets device_type-os_version
   - improve slow start problem

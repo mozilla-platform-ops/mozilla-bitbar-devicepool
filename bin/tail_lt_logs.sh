@@ -22,7 +22,27 @@ HI_GREEN='\033[0;92m'
 HI_BLUE='\033[0;94m'
 HI_PURPLE='\033[0;95m'
 
-journalctl -u lambdatest -f -n "${LINES_TO_SHOW}" | \
+# heredoc with test input, store in variable, preserve newlines
+read -r -d '' HEREDOC_INPUT <<EOF || true
+INFO: Main process started \n
+WARNING: Potential issue detected \n
+INFO: Cleaner process started \n
+INFO: Reporter process started \n
+INFO: Launched new instance \n
+INFO: LT API request made \n
+INFO: TC API request made \n
+DEBUG: Not shown! \n
+INFO: Normal text is like this. \n
+EOF
+
+# if --test is passed in, use a heredoc as input and colorize it
+command_to_run="journalctl -u lambdatest -f -n ${LINES_TO_SHOW}"
+if [[ "$1" == "--test" ]]; then
+    command_to_run="echo -e ${HEREDOC_INPUT}"
+    echo "Running in test mode. Using heredoc input."
+fi
+
+$command_to_run | \
     grep --line-buffered -v DEBUG | \
     awk -v red="$RED" -v yellow="$YELLOW" -v cyan="$CYAN" -v green="$GREEN" -v blue="$BLUE" -v purple="$PURPLE" -v reset="$RESET" \
         -v hired="$HI_RED" -v hiyellow="$HI_YELLOW" -v hicyan="$HI_CYAN" -v higreen="$HI_GREEN" -v hiblue="$HI_BLUE" -v hipurple="$HI_PURPLE" '
@@ -34,7 +54,7 @@ journalctl -u lambdatest -f -n "${LINES_TO_SHOW}" | \
             print hiyellow line reset
         } else if (line ~ /Cleaner/) {
             print hiblue line reset
-        } else if (line ~ /Monitor/) {
+        } else if (line ~ /Reporter/) {
             print cyan line reset
         } else if (line ~ /Launched/) {
             print green line reset

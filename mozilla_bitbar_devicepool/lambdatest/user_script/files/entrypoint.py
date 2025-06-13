@@ -42,8 +42,14 @@ def dump_scriptvars():
         "TC_WORKER_TYPE",
         "USER",
         "UserPorts",
+        "PowerMeterSerial",
     )
     variables = dict((k, get_envvar(k)) for k in names)
+
+    # set USB_POWER_METER_SERIAL_NUMBER to contain the same value as PowerMeterSerial
+    #   - requested by jmaher (our code already looks for this perhaps)
+    if "PowerMeterSerial" in variables and variables["PowerMeterSerial"]:
+        variables["USB_POWER_METER_SERIAL_NUMBER"] = variables["PowerMeterSerial"]
 
     with open("/home/ltuser/taskcluster/scriptvars.env", "w") as scriptvarsb:
         for item in variables:
