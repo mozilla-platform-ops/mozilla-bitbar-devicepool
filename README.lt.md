@@ -80,6 +80,8 @@ In MLD, no such ability to group devices exists. Only MLD knows about these grou
 
 ### Execution Loop Implementation Details
 
+Ordered by complexity and date implemented.
+
 1. starts a single job, foreground, targets device_type-os_version
   - replica of jmaher's PoC
 2. starts multiple jobs, --no-track, foreground, targets device_type-os_version
