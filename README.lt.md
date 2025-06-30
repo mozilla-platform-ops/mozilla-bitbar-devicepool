@@ -61,9 +61,9 @@ Search for `lambdatest` in the Taskcluster job's log. You should find content si
 
 #### Device Pools: Server-side vs Client-side
 
-MBD submits Bitbar tasks to several projects. The projects represent our Taskcluster worker pools.
+MBD submits Bitbar tasks to several Bitbar projects. The projects map to our Taskcluster worker pools.
 
-In MLD, no such ability to group devices exists. Only MLD knows about these groups, not LT.
+At Lambdatest, we can't easily create arbitary groups of devices so MLD must manage them.
 
 ### Execution Loop Overview
 
