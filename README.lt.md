@@ -48,10 +48,16 @@ See https://www.lambdatest.com/support/docs/hyperexecute-cli-run-tests-on-hypere
 
 ### Systemd Unit Installation
 
-```
+```bash
 sudo cp service/lambdatest.service /etc/systemd/system/lambdatest.service
 sudo systemctl daemon-reload
 ```
+
+### Service Logs
+
+To follow the log output of the lambdatest service, run:
+
+`sudo journalctl _SYSTEMD_UNIT=lambdatest.service --follow`
 
 ## Job Tracing
 
