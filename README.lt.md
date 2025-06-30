@@ -87,7 +87,7 @@ Ordered by complexity and date implemented.
 2. starts multiple jobs, --no-track, foreground, targets device_type-os_version
   - works, current default
   - known issues
-    - slwo start problem: if 60 jobs come in, will take awhile to have 100% utilization (takes awhile to start jobs)
+    - slow start problem: if 60 jobs come in, will take awhile to have 100% utilization (takes awhile to start jobs)
 3. starts a single job with hyperexecute yaml concurrency, --no-track, foreground, targets device_type-os_version
   - didn't work (theoretically should, check with LT about my understanding of field), needs more investigation.
 4. (CURRENTLY IMPLEMENTED) starts multiple jobs, --no-track, background, targets single device (device_type-os_version and udid)
