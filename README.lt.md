@@ -14,10 +14,32 @@ Configuring `mld` requires creating environment variables and a yaml configurati
 mld --help
 
 # run locally in debug mode (no LT API jobs started)
+. ./lt_env.sh
 mld --debug
 ```
 
 ## Deployment
+
+### Environment Variables
+
+We need to set the following variables. For the Mozilla deployment, this env var file is stored in 1Password.
+
+```
+# to be able to find the hyperexecute bin in `.`
+export PATH=".:$PATH"
+
+# do not use your email, use the short username
+#   - known LT issue
+export LT_USERNAME=
+export LT_ACCESS_KEY=
+
+# taskcluster client credentials
+export gecko_t_lambda_alpha_a55=
+export gecko_t_lambda_perf_a55=
+
+# sentry creds
+export SENTRY_DSN=
+```
 
 ### getting the hyperexecute binary
 
