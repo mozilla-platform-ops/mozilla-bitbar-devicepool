@@ -57,9 +57,15 @@ Search for `lambdatest` in the Taskcluster job's log. You should find content si
 
 ## Development Notes
 
-TODO: Needs updating.
+### Differences between MBD and MLD
 
-### execution loop overview
+#### Device Pools: Server-side vs Client-side
+
+MBD submits Bitbar tasks to several projects. The projects represent our Taskcluster worker pools.
+
+In MLD, no such ability to group devices exists. Only MLD knows about these groups, not LT.
+
+### Execution Loop Overview
 
 ```bash
 # overview:
@@ -72,7 +78,7 @@ TODO: Needs updating.
 #     e. start jobs for the appropriate tc queue with selected devices
 ```
 
-### execution loop modes
+### Execution Loop Implementation Details
 
 1. starts a single job, foreground, targets device_type-os_version
   - replica of jmaher's PoC
@@ -82,13 +88,7 @@ TODO: Needs updating.
     - slwo start problem: if 60 jobs come in, will take awhile to have 100% utilization (takes awhile to start jobs)
 3. starts a single job with hyperexecute yaml concurrency, --no-track, foreground, targets device_type-os_version
   - didn't work (theoretically should, check with LT about my understanding of field), needs more investigation.
-
-#### proposed modes
-
-1. starts multiple jobs, --no-track, background, targets device_type-os_version
-  - improve slow start problem
-  - decision: implement
-2. starts multiple jobs, --no-track, background, targets single device (device_type-os_version and udid)
+4. (CURRENTLY IMPLEMENTED) starts multiple jobs, --no-track, background, targets single device (device_type-os_version and udid)
   - need to track specific free devices in app
   - enables creation of multiple device pools per device type
   - discussed with jmaher... wait on this
