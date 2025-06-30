@@ -24,7 +24,7 @@ mld --debug
 
 We need to set the following variables. For the Mozilla deployment, this env var file is stored in 1Password.
 
-```
+```bash
 # to be able to find the hyperexecute bin in `.`
 export PATH=".:$PATH"
 
@@ -61,8 +61,9 @@ Linking Taskcluster jobs to Lambdatest jobs bidrectionally.
 
 Go to the 'Post Steps' tab of the selected job in the LambdaTest Hyperexecute UI (https://hyperexecute.lambdatest.com/hyperexecute/jobs). Reveal the 'Post' step's output. You should see text similar to:
 
-```
 generic-worker-metadata.json contents:
+
+```json
 {
   "lastTaskUrl": "https://firefox-ci-tc.services.mozilla.com/tasks/Ym_uHmb0TmC_f45Wv8uw3w/runs/0"
 }
