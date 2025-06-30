@@ -93,5 +93,3 @@ Ordered by complexity and date implemented.
 4. (CURRENTLY IMPLEMENTED) starts multiple jobs, --no-track, background, targets single device (device_type-os_version and udid)
   - need to track specific free devices in app
   - enables creation of multiple device pools per device type
-  - discussed with jmaher... wait on this
-    - don't expect need for device_type partitions at LT yet
