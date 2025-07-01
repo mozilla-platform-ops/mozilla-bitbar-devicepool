@@ -48,7 +48,6 @@ def write_config(
         tc_access_token,
         tc_worker_type,
         lt_app_url,
-        device_type_and_os,
         udid,
         concurrency,
     )
@@ -67,7 +66,6 @@ def return_config(
     tc_access_token,
     tc_worker_type,
     lt_app_url,
-    device_type_and_os,
     udid=None,
     concurrency=1,
 ):
@@ -78,7 +76,6 @@ def return_config(
         tc_client_id (str): Taskcluster client ID for authentication.
         tc_access_token (str): Taskcluster access token for authentication.
         lt_app_url (str): URL to the application under test on LambdaTest.
-        device_type_and_os (str): Device and OS combination (e.g., "Galaxy A55 5G-14", "Pixel 9-15").
         udid (str, optional): The unique device identifier if targeting a specific device. Defaults to None.
         concurrency (int, optional): Number of parallel test executions. Defaults to 1.
 
@@ -174,8 +171,9 @@ framework:
   # Name of the test framework (raw in this case)
   name: raw
   args:
-    # List of devices to run tests on (two Pixel 5 devices in this case)
-    devices: ["{device_type_and_os}"]
+    # used to restrict device model and os version
+    # - we don't use it currently (see fixedIP), so use wildcard
+    devices: ".*-.*"
     framework:
     # fixedIP: can take the UDID a specific devices to run on
     {fixed_ip_line}

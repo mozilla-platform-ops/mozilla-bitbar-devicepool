@@ -259,11 +259,6 @@ class ConfigurationLt(object):
                 and len(device_groups[project_name]) > 0
             )
 
-            # Check if the project has lt_device_selector configured
-            has_device_selector = (
-                "lt_device_selector" in project_config and project_config["lt_device_selector"] is not None
-            )
-
             # Check if the project has TC_WORKER_TYPE configured
             has_worker_type = "TC_WORKER_TYPE" in project_config and project_config["TC_WORKER_TYPE"] is not None
 
@@ -282,7 +277,7 @@ class ConfigurationLt(object):
             # )
 
             # A project is fully configured if it has both devices assigned and a device selector
-            if has_devices and has_device_selector and has_worker_type and has_client_id:
+            if has_devices and has_worker_type and has_client_id:
                 self.fully_configured_projects.append(project_name)
 
         sorted(self.fully_configured_projects)
