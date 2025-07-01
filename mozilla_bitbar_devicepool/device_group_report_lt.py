@@ -50,11 +50,10 @@ class DeviceGroupReportLt:
         """Extract project names and their device selectors from config"""
         return_dict = {}
 
-        for project_name, project_config in self.config_object.config.get("projects", {}).items():
+        for project_name, _project_config in self.config_object.config.get("projects", {}).items():
             if project_name != "defaults":
-                device_selector = project_config.get("lt_device_selector")
-                if device_selector:
-                    return_dict[project_name] = device_selector
+                # TODO: elimiate this if we don't need to do anything now
+                pass
 
         return return_dict
 

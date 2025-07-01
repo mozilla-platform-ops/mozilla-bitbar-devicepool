@@ -79,7 +79,6 @@ class TestRunManagerLT(object):
     SHARED_LT_G_BUSY_DEVICES = "lt_g_busy_devices"
     # Shared data keys for project-specific data
     SHARED_PROJECTS = "projects"
-    PROJECT_LT_DEVICE_SELECTOR = "lt_device_selector"
     PROJECT_TC_JOB_COUNT = "tc_job_count"
     PROJECT_LT_ACTIVE_DEVICE_COUNT = "lt_active_device_count"
     PROJECT_LT_BUSY_DEVICE_COUNT = "lt_busy_device_count"
@@ -368,7 +367,6 @@ class TestRunManagerLT(object):
         tc_worker_type = current_project["TC_WORKER_TYPE"]
         tc_client_id = current_project["TASKCLUSTER_CLIENT_ID"]
         tc_client_key = current_project["TASKCLUSTER_ACCESS_TOKEN"]
-        lt_device_selector = current_project["lt_device_selector"]
 
         while not self.shutdown_event.is_set():
             tc_job_count = 0
@@ -501,7 +499,6 @@ class TestRunManagerLT(object):
                             tc_client_key,
                             tc_worker_type,
                             lt_app_url,
-                            lt_device_selector,
                             udid=device_udid,
                             concurrency=1,
                             path=test_run_file,

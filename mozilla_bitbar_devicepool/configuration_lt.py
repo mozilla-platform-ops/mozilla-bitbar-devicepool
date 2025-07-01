@@ -20,7 +20,7 @@ class ConfigurationLt(object):
         self.config = {}
         self.ci_mode = ci_mode
         self.quiet = quiet
-        # for tracking if lt_device_selector is set and devices are configured
+        # see _set_fully_configured_projects() for details
         self.fully_configured_projects = {}
 
         self.global_contract_device_count = -1
@@ -237,9 +237,8 @@ class ConfigurationLt(object):
         A project is considered fully configured when:
         1. It exists in the projects configuration (not 'defaults')
         2. It has at least one device assigned in device_groups
-        3. It has a lt_device_selector configured in the project configuration
-        4. It has a TC_WORKER_TYPE set in the project configuration
-        5. It has a TASKCLUSTER_CLIENT_ID set in the project configuration
+        3. It has a TC_WORKER_TYPE set in the project configuration
+        4. It has a TASKCLUSTER_CLIENT_ID set in the project configuration
 
         Sets self.fully_configured_projects to a list of project names that are fully configured.
         """
