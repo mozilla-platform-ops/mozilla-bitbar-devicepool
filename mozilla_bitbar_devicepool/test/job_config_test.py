@@ -51,7 +51,7 @@ def test_write_config(tmp_path):
     concurrency = 918
     # test with all parameters
     _blah = job_config.write_config(
-        tc_client_id, tc_access_token, tc_worker_type, lt_app_url, device_type_and_os, udid, concurrency, path=p
+        tc_client_id, tc_access_token, tc_worker_type, lt_app_url, udid, concurrency, path=p
     )
     # open the file and check contents
     with open(p, "r") as f:

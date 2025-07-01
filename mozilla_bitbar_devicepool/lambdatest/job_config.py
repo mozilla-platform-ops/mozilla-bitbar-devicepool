@@ -11,7 +11,6 @@ def write_config(
     tc_access_token,
     tc_worker_type,
     lt_app_url,
-    device_type_and_os,
     udid=None,
     concurrency=1,
     path="/tmp/mozilla-lt-devicepool-job-dir/hyperexecute.yaml",
@@ -23,7 +22,6 @@ def write_config(
         tc_client_id (str): Taskcluster client ID for authentication.
         tc_access_token (str): Taskcluster access token for authentication.
         lt_app_url (str): URL to the application under test on LambdaTest.
-        device_type_and_os (str): Device and OS combination (e.g., "Galaxy A55 5G-14", "Pixel 9-15").
         udid (str, optional): The unique device identifier if targeting a specific device. Defaults to None.
         path (str, optional): Destination path for the config file.
                               Defaults to "/tmp/mozilla-lt-devicepool-job-dir/hyperexecute.yaml".
@@ -38,7 +36,6 @@ def write_config(
     logging.debug(f"write_config: tc_access_token: {tc_access_token}")
     logging.debug(f"write_config: tc_worker_type: {tc_worker_type}")
     logging.debug(f"write_config: lt_app_url: {lt_app_url}")
-    logging.debug(f"write_config: device_type_and_os: {device_type_and_os}")
     logging.debug(f"write_config: udid: {udid}")
     logging.debug(f"write_config: path: {path}")
     logging.debug(f"write_config: concurrency: {concurrency}")
