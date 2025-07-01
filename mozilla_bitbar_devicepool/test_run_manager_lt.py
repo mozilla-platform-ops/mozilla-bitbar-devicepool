@@ -515,6 +515,9 @@ class TestRunManagerLT(object):
 
                             while retry_count < max_retry:
                                 if os.path.exists(hyperexecute_path) and os.access(hyperexecute_path, os.X_OK):
+                                    # TODO: ensure children process exit 0, with --background it should be pretty quick... need to test.
+                                    #   - hyperexecute yaml errors can be hidden...
+
                                     # Start process in background
                                     _process = subprocess.Popen(
                                         base_command_string,
