@@ -170,7 +170,8 @@ framework:
   args:
     # used to restrict device model and os version
     # - we don't use it currently (see fixedIP), so use wildcard
-    devices: ".*-.*"
+    devices:
+        - ".*-.*"
     framework:
     # fixedIP: can take the UDID a specific devices to run on
     {fixed_ip_line}
