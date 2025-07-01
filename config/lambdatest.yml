@@ -1,5 +1,5 @@
 global:
-  contract_device_count: 30
+  contract_device_count: 60
 projects:
   defaults:
     SCRIPT_REPO_COMMIT: master
