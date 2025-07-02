@@ -51,7 +51,7 @@ class TestRunManagerLT(object):
     TC_THREAD_NAME = "TC API"
     LT_THREAD_NAME = "LT API"
     JOB_STARTER_THREAD_NAME = "JS"
-    MONITOR_THREAD_NAME = "Monitor"
+    REPORTER_THREAD_NAME = "Reporter"
     CLEANER_THREAD_NAME = "Cleaner"
 
     # Threading constants
@@ -79,7 +79,6 @@ class TestRunManagerLT(object):
     SHARED_LT_G_BUSY_DEVICES = "lt_g_busy_devices"
     # Shared data keys for project-specific data
     SHARED_PROJECTS = "projects"
-    PROJECT_LT_DEVICE_SELECTOR = "lt_device_selector"
     PROJECT_TC_JOB_COUNT = "tc_job_count"
     PROJECT_LT_ACTIVE_DEVICE_COUNT = "lt_active_device_count"
     PROJECT_LT_BUSY_DEVICE_COUNT = "lt_busy_device_count"
@@ -368,7 +367,6 @@ class TestRunManagerLT(object):
         tc_worker_type = current_project["TC_WORKER_TYPE"]
         tc_client_id = current_project["TASKCLUSTER_CLIENT_ID"]
         tc_client_key = current_project["TASKCLUSTER_ACCESS_TOKEN"]
-        lt_device_selector = current_project["lt_device_selector"]
 
         while not self.shutdown_event.is_set():
             tc_job_count = 0
@@ -501,7 +499,6 @@ class TestRunManagerLT(object):
                             tc_client_key,
                             tc_worker_type,
                             lt_app_url,
-                            lt_device_selector,
                             udid=device_udid,
                             concurrency=1,
                             path=test_run_file,
@@ -518,6 +515,9 @@ class TestRunManagerLT(object):
 
                             while retry_count < max_retry:
                                 if os.path.exists(hyperexecute_path) and os.access(hyperexecute_path, os.X_OK):
+                                    # TODO: ensure children process exit 0, with --background it should be pretty quick... need to test.
+                                    #   - hyperexecute yaml errors can be hidden...
+
                                     # Start process in background
                                     _process = subprocess.Popen(
                                         base_command_string,
@@ -593,10 +593,9 @@ class TestRunManagerLT(object):
 
         logging.info(f"{logging_header} Thread stopped.")
 
-    # TODO: rename to reporting thread
-    def _monitor_thread(self):
-        """Runs the Monitoring thread for monitoring and reporting."""
-        logging_header = self.format_logging_header(self.MONITOR_THREAD_NAME)
+    def _reporter_thread(self):
+        """Runs the Reporter thread for (monitoring and) reporting."""
+        logging_header = self.format_logging_header(self.REPORTER_THREAD_NAME)
 
         logging.info(f"{logging_header} Thread starting...")
         build_good_notification_sent = False
@@ -626,6 +625,8 @@ class TestRunManagerLT(object):
             )
 
             # show good build notification
+            # TODO: ideally this would be done once (but it will happen on each run of the binary (if it's working))
+            #   - this also seems like limited value at some point in code maturity (or should be set much higher?)
             if build_good_notification_sent is False:
                 if self.shared_data[self.SHARED_SESSION_STARTED_JOBS] >= self.GOOD_BUILD_JOB_STARTED_THRESHOLD:
                     git_info = misc.get_git_info()
@@ -691,10 +692,10 @@ class TestRunManagerLT(object):
         thread_started_count += 1
         logging.info(f"{logging_header} Started {self.LT_THREAD_NAME} thread.")
         # start monitoring thread
-        monitoring_thread = threading.Thread(target=self._monitor_thread, name=self.MONITOR_THREAD_NAME)
+        monitoring_thread = threading.Thread(target=self._reporter_thread, name=self.REPORTER_THREAD_NAME)
         monitoring_thread.start()
         thread_started_count += 1
-        logging.info(f"{logging_header} Started {self.MONITOR_THREAD_NAME} thread.")
+        logging.info(f"{logging_header} Started {self.REPORTER_THREAD_NAME} thread.")
         # start cleanup thread
         cleanup_thread = threading.Thread(target=self._cleanup_thread, name=self.CLEANER_THREAD_NAME)
         cleanup_thread.start()
@@ -759,7 +760,7 @@ class TestRunManagerLT(object):
         if lt_monitor.is_alive():
             logging.warning(f"{logging_header} {self.LT_THREAD_NAME} thread did not exit cleanly.")
         if monitoring_thread.is_alive():
-            logging.warning(f"{logging_header} {self.MONITOR_THREAD_NAME} thread did not exit cleanly.")
+            logging.warning(f"{logging_header} {self.REPORTER_THREAD_NAME} thread did not exit cleanly.")
         # check if all js threads have exited
         for i, job_starter in enumerate(job_starters):
             if job_starter.is_alive():

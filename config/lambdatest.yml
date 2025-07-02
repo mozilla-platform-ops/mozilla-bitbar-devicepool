@@ -1,33 +1,27 @@
-# TODO: stop using lt_device_selector. is it needed if udid is specified? need to test.
-#   - extra messy for testing pools...
 global:
-  contract_device_count: 30
+  contract_device_count: 60
 projects:
   defaults:
     SCRIPT_REPO_COMMIT: master
     # fake values. inheriting projects below should set reasonable values.
-    lt_device_selector: "Samsung GZ4200-90"
     TASKCLUSTER_CLIENT_ID: tc-client-id-set-me
     # env var with key is looked for at this with underscores: `tc_worker_type_set_me`
     TC_WORKER_TYPE: tc-worker-type-set-me
   a55-alpha:
-    lt_device_selector: "Galaxy A55 5G-14"
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-alpha-a55
     TC_WORKER_TYPE: gecko-t-lambda-alpha-a55
   a55-perf:
-    lt_device_selector: "Galaxy A55 5G-14"
-    # swapped for testing
-    # lt_device_selector: "Galaxy A51-11"
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-a55
     TC_WORKER_TYPE: gecko-t-lambda-perf-a55
+  # pixel9-perf:
+  #   TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-pixel9
+  #   TC_WORKER_TYPE: gecko-t-lambda-perf-pixel9
   # test-1:
   #     SCRIPT_REPO_COMMIT: future_commit
-  #     lt_device_selector: "Galaxy A51-11"
   #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1
   #     TC_WORKER_TYPE: gecko-t-lambda-gw-test-1
   #     # override SCRIPT_REPO_COMMIT with a test commit
 device_groups:
-  # this block is not used yet (not possible with LT API), future goal. see lt_device_selector in projects.
   a55-perf:
     R5CX4089QNL
     R5CXC1AHV4M
@@ -57,20 +51,43 @@ device_groups:
     RZCY10Y4TBY
     RZCY10Y4TJX
     RZCY10Y548K
-    RZCY2011M7N
     RZCY203N75Z
     RZCY204AAZD
-    # these were removed from the pool (were extras, over contract)
-    # RZCXA0H3T9P
-    # R5CY128X71B
+    # second batch of devices for second part of contract
+    # R5CXC1AHWWZ
+    # R5CXC1AHXYD
+    # R5CXC1AHZBW
+    # R5CXC1AJ02Z
+    # R5CXC1AJ07K
+    # R5CXC1ARZDN
+    # R5CXC1ASH4E
+    # R5CXC1ASHNJ
+    # R5CXC1HZ43J
+    # R5CXC1HZ4KD
+    # R5CXC1HZ5PZ
+    # R5CXC1HZ62Y
+    # R5CXC1HZ85W
+    # R5CXC1HZA6V
+    # R5CXC1PW7CR
+    # R5CXC1PW94F
+    # R5CXC1SXMVR
+    # RZCXC15YZVZ
+    # RZCXC16W6KT
+    # RZCXC16WHTA
+    # RZCXC187YCR
+    # RZCXC189JSJ
+    # RZCXC19G1CT
+    # RZCXC19G1DM
+    # RZCXC19G2SH
+    # RZCXC1BK67D
+    # RZCY107MCLV
   a55-alpha:
-    # currently has power meter devices in it
+    # devices with power meters
     R5CXC1HZKLR
-    # these devices are all attached to the same power meter
-    # working on fixing that.
-    # RZCY203N75Z also has a power meter
-    # R5CXC1ARM0A also has a power meter
-    # R5CXC1HZK0W also has a power meter
-    # R5CXC1AP2KT also has a power meter
+    RZCY2011M7N
+  pixel9-perf:
+    47160DLAQ003UB
+    47241FDAQ0016Y
+    47241FDAQ002C0
   test-1:
     # no devices yet

@@ -9,7 +9,7 @@ def test_return_config():
     tc_access_token = "test_access_token"
     tc_worker_type = "test_worker_type"
     lt_app_url = "https://example.com"
-    device_type_and_os = "Galaxy A55 5G-14"
+    device_type_and_os = ".*-.*"
     udid = "test_udid"
     concurrency = 1
     # test with all parameters
@@ -18,7 +18,6 @@ def test_return_config():
         tc_access_token,
         tc_worker_type,
         lt_app_url,
-        device_type_and_os,
         udid,
         concurrency,
     )
@@ -47,12 +46,12 @@ def test_write_config(tmp_path):
     tc_access_token = "test_access_token"
     tc_worker_type = "test_worker_type"
     lt_app_url = "https://example.com"
-    device_type_and_os = "Galaxy A55 5G-14"
+    device_type_and_os = ".*-.*"
     udid = "test_udid"
     concurrency = 918
     # test with all parameters
     _blah = job_config.write_config(
-        tc_client_id, tc_access_token, tc_worker_type, lt_app_url, device_type_and_os, udid, concurrency, path=p
+        tc_client_id, tc_access_token, tc_worker_type, lt_app_url, udid, concurrency, path=p
     )
     # open the file and check contents
     with open(p, "r") as f:

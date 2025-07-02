@@ -330,26 +330,26 @@ device_groups:
     a55-45:
     a55-46:
     a55-47:
-    a55-48:
+    # a55-48:  # 6/13/25: removed, contract downsizing
     a55-49:
     a55-50:
-    a55-51:
-    a55-52:
-    a55-53:
-    a55-54:
-    a55-55:
-    a55-56:
-    a55-57:
+    # a55-51:  # 6/13/25: removed, contract downsizing
+    # a55-52:  # 6/13/25: removed, contract downsizing
+    # a55-53:  # 6/13/25: removed, contract downsizing
+    # a55-54:  # 6/13/25: removed, contract downsizing
+    # a55-55:  # 6/13/25: removed, contract downsizing
+    # a55-56:  # 6/13/25: removed, contract downsizing
+    # a55-57:  # 6/13/25: removed, contract downsizing
     # a55-58:  # 5/9/25: removed, contract downsizing
     # a55-59:  # 5/9/25: removed, contract downsizing
     # a55-60:  # 5/9/25: removed, contract downsizing
     # a55-61:  # 5/9/25: removed, contract downsizing
     # a55-62:  # 5/9/25: removed, contract downsizing
-    a55-63:
-    a55-64:
-    a55-65:
-    a55-66:
-    a55-67:
+    # a55-63:  # 6/13/25: removed, contract downsizing
+    # a55-64:  # 6/13/25: removed, contract downsizing
+    # a55-65:  # 6/13/25: removed, contract downsizing
+    # a55-66:  # 6/13/25: removed, contract downsizing
+    # a55-67:  # 6/13/25: removed, contract downsizing
     # a55-68:  # 5/21/25: removed, contract downsizing
     # a55-69:  # 5/9/25: removed, contract downsizing
     # a55-70:  # 5/21/25: removed, contract downsizing
@@ -377,15 +377,15 @@ device_groups:
     pixel5-09:
     pixel5-10:
     pixel5-11:
-    pixel5-12:
-    pixel5-13:
-    pixel5-14:
-    pixel5-15:
-    pixel5-16:
-    pixel5-17:
+    # pixel5-12:  # 6/13/25: removed, contract downsizing
+    # pixel5-13:  # 6/13/25: removed, contract downsizing
+    # pixel5-14:  # 6/13/25: removed, contract downsizing
+    # pixel5-15:  # 6/13/25: removed, contract downsizing
+    # pixel5-16:  # 6/13/25: removed, contract downsizing
+    # pixel5-17:  # 6/13/25: removed, contract downsizing
   pixel5-perf:
-    pixel5-18:
-    pixel5-19:
+    # pixel5-18:  # 6/13/25: removed, contract downsizing
+    # pixel5-19:  # 6/13/25: removed, contract downsizing
   pixel6-unit:
   pixel6-perf:
     pixel6-01:

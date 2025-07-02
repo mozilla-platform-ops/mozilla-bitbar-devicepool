@@ -20,7 +20,7 @@ class ConfigurationLt(object):
         self.config = {}
         self.ci_mode = ci_mode
         self.quiet = quiet
-        # for tracking if lt_device_selector is set and devices are configured
+        # see _set_fully_configured_projects() for details
         self.fully_configured_projects = {}
 
         self.global_contract_device_count = -1
@@ -237,9 +237,8 @@ class ConfigurationLt(object):
         A project is considered fully configured when:
         1. It exists in the projects configuration (not 'defaults')
         2. It has at least one device assigned in device_groups
-        3. It has a lt_device_selector configured in the project configuration
-        4. It has a TC_WORKER_TYPE set in the project configuration
-        5. It has a TASKCLUSTER_CLIENT_ID set in the project configuration
+        3. It has a TC_WORKER_TYPE set in the project configuration
+        4. It has a TASKCLUSTER_CLIENT_ID set in the project configuration
 
         Sets self.fully_configured_projects to a list of project names that are fully configured.
         """
@@ -257,11 +256,6 @@ class ConfigurationLt(object):
                 project_name in device_groups
                 and device_groups[project_name] is not None
                 and len(device_groups[project_name]) > 0
-            )
-
-            # Check if the project has lt_device_selector configured
-            has_device_selector = (
-                "lt_device_selector" in project_config and project_config["lt_device_selector"] is not None
             )
 
             # Check if the project has TC_WORKER_TYPE configured
@@ -282,7 +276,7 @@ class ConfigurationLt(object):
             # )
 
             # A project is fully configured if it has both devices assigned and a device selector
-            if has_devices and has_device_selector and has_worker_type and has_client_id:
+            if has_devices and has_worker_type and has_client_id:
                 self.fully_configured_projects.append(project_name)
 
         sorted(self.fully_configured_projects)
