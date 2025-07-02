@@ -85,7 +85,7 @@ device_groups:
     # devices with power meters
     R5CXC1HZKLR
     RZCY2011M7N
-  pixel9-perf:
+  p9-perf:
     47160DLAQ003UB
     47241FDAQ0016Y
     47241FDAQ002C0
