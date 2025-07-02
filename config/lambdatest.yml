@@ -13,7 +13,7 @@ projects:
   a55-perf:
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-a55
     TC_WORKER_TYPE: gecko-t-lambda-perf-a55
-  pixel9-perf:
+  p9-perf:
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-p9
     TC_WORKER_TYPE: gecko-t-lambda-perf-p9
   # test-1:
