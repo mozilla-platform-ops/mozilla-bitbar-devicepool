@@ -22,6 +22,7 @@ getCurrentWindow() {
 starting_dir=$(pwd)
 echo "starting_dir: $starting_dir"
 
+### show debugging information
 
 # show information about the user scripts
 THIS_SCRIPT_DIR=$(dirname "$0")
@@ -32,6 +33,17 @@ else
     echo "user_scripts version file not found."
 fi
 
+# show uname
+echo "uname -a:"
+uname -a
+
+# show lsb-release
+if [ -f /etc/lsb-release ]; then
+    echo "lsb-release:"
+    cat /etc/lsb-release
+else
+    echo "lsb-release file not found."
+fi
 
 ### general dependencies
 
