@@ -365,3 +365,6 @@ def test_config_file_format(request, fixture_name):
         except yaml.YAMLError as e:
             pytest.fail(f"Config file {config_file} is not valid YAML: {e}")
     assert "defaults" in y["projects"], "Config file does not contain 'defaults' in 'projects'."
+    assert "projects" in y, "Config file does not contain 'projects'."
+    assert "device_groups" in y, "Config file does not contain 'device_groups'."
+    # assert "global" in y, "Config file does not contain 'global'."
