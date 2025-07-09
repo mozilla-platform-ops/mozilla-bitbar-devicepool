@@ -15,10 +15,10 @@ from mozilla_bitbar_devicepool.util.template import apply_dict_defaults
 class ConfigurationLt(object):
     def __init__(self, ci_mode=False, quiet=False):
         # TODO?: mash all values into 'config'?
-        self.disabled = False
+        self.config = {}
+        #
         self.lt_access_key = None
         self.lt_username = None
-        self.config = {}
         self.ci_mode = ci_mode
         self.quiet = quiet
         # see _set_fully_configured_projects() for details
@@ -138,6 +138,24 @@ class ConfigurationLt(object):
             if udid in udid_list:
                 return project_name
         return None
+
+    def get_project_user_dir_version(self, project_name):
+        """
+        Returns the user directory version for a given project.
+
+        Args:
+            project_name (str): The name of the project to look up.
+
+        Returns:
+            str: The user directory version associated with the project.
+        """
+        version = None
+        projects_config = self.config.get("projects", {})
+        if project_name in projects_config:
+            version = projects_config[project_name].get("USER_SCRIPTS_VERSION", None)
+        if not version:
+            raise ValueError(f"USER_SCRIPTS_VERSION not found for project {project_name}")
+        return version
 
     def get_device_count_for_project(self, project_name):
         """

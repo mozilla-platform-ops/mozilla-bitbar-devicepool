@@ -62,4 +62,4 @@ DEP003 = ["google", "mozdevice"]
 DEP004 = ["mozdevice"]
 
 [tool.pytest.ini_options]
-norecursedirs = "mozilla_bitbar_devicepool/lambdatest/user_script"
+norecursedirs = "mozilla_bitbar_devicepool/lambdatest/user_scripts"

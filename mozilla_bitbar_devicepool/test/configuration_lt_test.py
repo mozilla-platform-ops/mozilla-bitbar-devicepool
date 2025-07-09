@@ -17,6 +17,7 @@ projects:
   defaults:
     # not used yet
     # SCRIPT_REPO_COMMIT: master
+    USER_SCRIPTS_VERSION: v9
     TEST_1: blah
     disabled: false
   a55-alpha:
@@ -32,6 +33,7 @@ projects:
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-a55_yy
     TC_WORKER_TYPE: gecko-t-lambda-perf-a55_y
   test-1:
+    USER_SCRIPTS_VERSION: v11
     lt_device_selector: "Galaxy A51-11"
     # TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1_t
     TC_WORKER_TYPE: gecko-t-lambda-gw-test-1_tt
@@ -280,6 +282,21 @@ def test_get_project_for_udid(configured_lt_instance):
     # Test with a device that does not exist
     assert configured_lt_instance.get_project_for_udid("non_existent_device") is None
     # TODO: have option that makes it raise on invalid device name
+
+
+def test_get_project_user_scripts_version(configured_lt_instance):
+    """
+    Tests that get_project_user_scripts_version correctly retrieves the user scripts version for a given project.
+    """
+    # Test with a project that has a user scripts version
+    assert configured_lt_instance.get_project_user_dir_version("a55-alpha") == "v9"
+    assert configured_lt_instance.get_project_user_dir_version("a55-perf") == "v9"
+    assert configured_lt_instance.get_project_user_dir_version("test-1") == "v11"
+
+    # Test with a project that does not have a user scripts version
+    # check that it raises an exception
+    with pytest.raises(ValueError):
+        configured_lt_instance.get_project_user_dir_version("non_existent_project")
 
 
 def test_get_fully_configured_projects(configured_lt_instance):
