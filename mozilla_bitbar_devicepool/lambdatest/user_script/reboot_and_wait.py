@@ -30,6 +30,7 @@ def get_connected_devices():
         return []
 
 
+# TODO: if we get non-zero exit code, then retry a few times?
 def run(command):
     result = subprocess.run(command, capture_output=True, text=True, check=True)
     print(result.stderr)
