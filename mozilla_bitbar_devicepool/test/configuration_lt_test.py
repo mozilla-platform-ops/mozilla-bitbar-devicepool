@@ -101,6 +101,7 @@ projects:
     # lt_device_selector: "Galaxy A51-11"
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-a55
     TC_WORKER_TYPE: gecko-t-lambda-perf-a55
+    disabled: true
   test-1:
   #     SCRIPT_REPO_COMMIT: future_commit
     lt_device_selector: "Galaxy A51-11"
@@ -312,7 +313,21 @@ def test_is_project_fully_configured(configured_lt_instance):
     assert configured_lt_instance.is_project_fully_configured("non_existent_project") is False
 
 
-def test_get_total_device_count(configured_lt_instance, configured_lt_instance2):
+def test_is_project_disabled(configured_lt_instance2):
+    """
+    Tests that the is_project_disabled method correctly identifies if a specific project is disabled.
+    """
+    # Test with a disabled project
+    assert configured_lt_instance2.is_project_disabled("a55-perf") is True
+
+    # Test with an enabled project
+    assert configured_lt_instance2.is_project_disabled("a55-alpha") is False
+
+    # Test with a non-existent project
+    assert configured_lt_instance2.is_project_disabled("non_existent_project") is False
+
+
+def test_get_total_device_count(configured_lt_instance):
     """
     Tests that the get_total_device_count method correctly counts the total number of devices across all projects.
     """
@@ -376,3 +391,5 @@ def test_instance_format(request, fixture_name):
     instance = request.getfixturevalue(fixture_name)
     print(type(instance))
     assert isinstance(instance, ConfigurationLt)
+    # assert the disabled attribute is a boolean (and present)
+    assert isinstance(instance.disabled, bool), "Instance 'disabled' attribute is not a boolean."

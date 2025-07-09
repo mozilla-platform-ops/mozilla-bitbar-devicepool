@@ -15,6 +15,7 @@ from mozilla_bitbar_devicepool.util.template import apply_dict_defaults
 class ConfigurationLt(object):
     def __init__(self, ci_mode=False, quiet=False):
         # TODO?: mash all values into 'config'?
+        self.disabled = False
         self.lt_access_key = None
         self.lt_username = None
         self.config = {}
@@ -187,9 +188,24 @@ class ConfigurationLt(object):
         self._set_lt_api_key()
         self._set_lt_username()
         self._set_global_contract_device_count()
+        self._set_disabled()
 
         # debug print
         # print(self.get_config())
+
+    def _set_disabled(self):
+        """
+        Sets the disabled flag based on the configuration.
+
+        The disabled flag is set to True if the "disabled" key is present
+        in the configuration and its value is True.
+        """
+        if "disabled" in self.config:
+            self.disabled = self.config["disabled"]
+        else:
+            self.disabled = False
+
+        # logging.info(f"ConfigurationLt: disabled set to {self.disabled}")
 
     def _set_global_contract_device_count(self):
         """
@@ -230,6 +246,20 @@ class ConfigurationLt(object):
             bool: True if the project is fully configured, False otherwise.
         """
         return project_name in self.fully_configured_projects
+
+    def is_project_disabled(self, project_name):
+        """
+        Checks if a project is disabled based on the configuration.
+
+        Args:
+            project_name (str): The name of the project to check.
+
+        Returns:
+            bool: True if the project is disabled, False otherwise.
+        """
+        if "projects" not in self.config or project_name not in self.config["projects"]:
+            return False
+        return self.config["projects"][project_name].get("disabled", False)
 
     def _set_fully_configured_projects(self):
         """
