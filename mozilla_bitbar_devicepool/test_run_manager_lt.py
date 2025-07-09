@@ -361,7 +361,7 @@ class TestRunManagerLT(object):
 
         project_source_dir = os.path.dirname(os.path.realpath(__file__))
         project_root_dir = os.path.abspath(os.path.join(project_source_dir, ".."))
-        user_script_golden_dir = os.path.join(project_source_dir, "lambdatest", "user_script")
+        user_script_golden_dir = self.config_object.get_path_to_user_script_directory(project_name)
 
         current_project = self.config_object.config["projects"][project_name]
         tc_worker_type = current_project["TC_WORKER_TYPE"]

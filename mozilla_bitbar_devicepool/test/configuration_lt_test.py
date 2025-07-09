@@ -410,3 +410,27 @@ def test_instance_format(request, fixture_name):
     assert isinstance(instance, ConfigurationLt)
     # assert the disabled attribute is a boolean (and present)
     assert isinstance(instance.disabled, bool), "Instance 'disabled' attribute is not a boolean."
+
+
+def test_get_path_to_user_script_directory(configured_lt_instance):
+    """
+    Tests that get_path_to_user_script_directory returns the correct path for user scripts.
+    """
+    # Test with a project that has a user scripts version
+    project_name = "a55-alpha"
+    expected_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "lambdatest", "user_scripts", "v9"))
+    assert configured_lt_instance.get_path_to_user_script_directory(project_name) == expected_path
+
+    # Test with a project that does not have a user scripts version
+    with pytest.raises(ValueError):
+        configured_lt_instance.get_path_to_user_script_directory("non_existent_project")
+
+
+def test_get_path_to_user_script_directory_2(configured_lt_instance):
+    """
+    Tests that get_path_to_user_script_directory returns the correct path for user scripts.
+    """
+    # Test with a project that has a user scripts version
+    project_name = "test-1"
+    expected_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "lambdatest", "user_scripts", "v11"))
+    assert configured_lt_instance.get_path_to_user_script_directory(project_name) == expected_path

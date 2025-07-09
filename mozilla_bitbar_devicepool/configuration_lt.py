@@ -139,7 +139,7 @@ class ConfigurationLt(object):
                 return project_name
         return None
 
-    def get_project_user_dir_version(self, project_name):
+    def get_project_user_dir_version(self, project_name, raise_on_error=True):
         """
         Returns the user directory version for a given project.
 
@@ -153,9 +153,24 @@ class ConfigurationLt(object):
         projects_config = self.config.get("projects", {})
         if project_name in projects_config:
             version = projects_config[project_name].get("USER_SCRIPTS_VERSION", None)
-        if not version:
+        if not version and raise_on_error:
             raise ValueError(f"USER_SCRIPTS_VERSION not found for project {project_name}")
         return version
+
+    def get_path_to_user_script_directory(self, project_name):
+        """
+        Returns the path to the user script directory for a given project.
+
+        Args:
+            project_name (str): The name of the project to look up.
+
+        Returns:
+            str: The path to the user script directory.
+        """
+        project_source_dir = os.path.dirname(os.path.realpath(__file__))
+        project_root_dir = os.path.abspath(os.path.join(project_source_dir, ".."))
+        project_user_script_version = self.get_project_user_dir_version(project_name)
+        return os.path.join(project_source_dir, "lambdatest", "user_scripts", project_user_script_version)
 
     def get_device_count_for_project(self, project_name):
         """
@@ -198,15 +213,16 @@ class ConfigurationLt(object):
         # expand the configuration (i.e. set defaults)
         self._expand_configuration()
 
+        # set project values/flags
         # set this flag so downstream jobs can short-circuit if a project isn't configured
         self._set_fully_configured_projects()
+        self._set_disabled()
 
-        #
+        # set config-wide values
         self._load_tc_env_vars()
         self._set_lt_api_key()
         self._set_lt_username()
         self._set_global_contract_device_count()
-        self._set_disabled()
 
         # debug print
         # print(self.get_config())
@@ -282,11 +298,6 @@ class ConfigurationLt(object):
     def _set_fully_configured_projects(self):
         """
         Identifies which projects are fully configured for LambdaTest execution.
-        A project is considered fully configured when:
-        1. It exists in the projects configuration (not 'defaults')
-        2. It has at least one device assigned in device_groups
-        3. It has a TC_WORKER_TYPE set in the project configuration
-        4. It has a TASKCLUSTER_CLIENT_ID set in the project configuration
 
         Sets self.fully_configured_projects to a list of project names that are fully configured.
         """
@@ -314,6 +325,23 @@ class ConfigurationLt(object):
                 "TASKCLUSTER_CLIENT_ID" in project_config and project_config["TASKCLUSTER_CLIENT_ID"] is not None
             )
 
+            # check for user scripts version
+            has_user_scripts_version = False
+            project_source_dir = os.path.dirname(os.path.realpath(__file__))
+            project_root_dir = os.path.abspath(os.path.join(project_source_dir, ".."))
+            project_user_script_version = self.get_project_user_dir_version(project_name, raise_on_error=False)
+            if project_user_script_version:
+                has_user_scripts_version = True
+                user_script_golden_dir = self.get_path_to_user_script_directory(project_name)
+                print(user_script_golden_dir)
+                # check if the user script golden directory exists
+                if not os.path.exists(user_script_golden_dir):
+                    print(
+                        f"Warning: User script directory {user_script_golden_dir} does not exist for project {project_name}."
+                    )
+            else:
+                has_user_scripts_version = False
+
             # show a summary of decisions on a single line
             # print(
             #     f"Project: {project_name}, "
@@ -323,11 +351,11 @@ class ConfigurationLt(object):
             #     f"Client ID: {has_client_id}"
             # )
 
-            # A project is fully configured if it has both devices assigned and a device selector
-            if has_devices and has_worker_type and has_client_id:
+            # add to the list of fully configured projects if all conditions are met
+            if has_devices and has_worker_type and has_client_id and has_user_scripts_version:
                 self.fully_configured_projects.append(project_name)
 
-        sorted(self.fully_configured_projects)
+        self.fully_configured_projects = sorted(self.fully_configured_projects)
 
         # if not self.quiet:
         #     configured_count = len(self.fully_configured_projects)
