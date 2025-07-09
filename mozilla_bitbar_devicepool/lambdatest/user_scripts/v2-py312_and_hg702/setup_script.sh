@@ -7,11 +7,7 @@ set -x
 
 ### variables
 
-usbreset_log_file=/tmp/usbreset.log
-usbreset_log_file2=/tmp/usbreset-pass2.log
-POWER_METER_DEVICE_ID="0483:fffe"
 TC_VERSION=84.0.2
-POWER_METER_FAST_FAIL=0
 LT_SETUP_MERCURIAL_VERSION="7.0.2"
 LT_SETUP_PYTHON_VERSION="3.12"
 
@@ -27,7 +23,7 @@ starting_dir=$(pwd)
 echo "starting_dir: $starting_dir"
 
 
-### show information about the user scripts
+# show information about the user scripts
 THIS_SCRIPT_DIR=$(dirname "$0")
 if [ -f $THIS_SCRIPT_DIR/version.txt ]; then
     echo "user_scripts version:"
