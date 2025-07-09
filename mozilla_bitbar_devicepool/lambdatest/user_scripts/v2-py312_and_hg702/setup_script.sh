@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -e
+# TODO: eventually disable -x
 set -x
 
 
@@ -24,6 +25,16 @@ getCurrentWindow() {
 
 starting_dir=$(pwd)
 echo "starting_dir: $starting_dir"
+
+
+### show information about the user scripts
+THIS_SCRIPT_DIR=$(dirname "$0")
+if [ -f $THIS_SCRIPT_DIR/version.txt ]; then
+    echo "user_scripts version:"
+    cat $THIS_SCRIPT_DIR/version.txt
+else
+    echo "user_scripts version file not found."
+fi
 
 
 ### general dependencies
