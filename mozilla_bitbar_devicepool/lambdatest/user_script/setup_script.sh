@@ -28,15 +28,17 @@ echo "starting_dir: $starting_dir"
 
 ### general dependencies
 
+# apt/debs
 sudo apt-get update -y
-sudo apt-get install gettext-base libgtk-3-0 mercurial usbutils -y
+sudo apt-get install gettext-base libgtk-3-0 usbutils -y
 
-# NOTE: pip is pip3 on the lt image
-# google-cloud-logging is for stackdriver
-pip install zstandard google-cloud-logging
-
+# python pips
+#   - NOTE: pip is pip3 on the lt image
 # upgrade mercurial
-pip install mercurial==$LT_SETUP_MERCURIAL_VERSION
+# google-cloud-logging is for stackdriver
+sudo pip install zstandard \
+                 google-cloud-logging \
+                 mercurial==$LT_SETUP_MERCURIAL_VERSION
 
 # show mercurial version
 hg --version
