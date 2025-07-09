@@ -37,6 +37,7 @@ sudo apt-get install gettext-base libgtk-3-0 usbutils -y
 # upgrade mercurial
 # google-cloud-logging is for stackdriver
 sudo pip install zstandard \
+                 mozdevice \
                  google-cloud-logging \
                  mercurial==$LT_SETUP_MERCURIAL_VERSION
 

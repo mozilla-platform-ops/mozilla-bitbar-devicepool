@@ -151,7 +151,6 @@ shell: bash
 #
 # Pre-install required dependencies using pip
 pre:
-  - pip3 install mozdevice
   - bash ./user_script/setup_script.sh
 
 # reboot and wait for device to come online
