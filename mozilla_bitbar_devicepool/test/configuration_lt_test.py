@@ -18,6 +18,7 @@ projects:
     # not used yet
     # SCRIPT_REPO_COMMIT: master
     TEST_1: blah
+    disabled: false
   a55-alpha:
     # lt_device_selector: "Galaxy A55 5G-14"
     # swapped for testing
@@ -31,11 +32,9 @@ projects:
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-a55_yy
     TC_WORKER_TYPE: gecko-t-lambda-perf-a55_y
   test-1:
-  #     SCRIPT_REPO_COMMIT: future_commit
     lt_device_selector: "Galaxy A51-11"
-  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1_t
-  #     TC_WORKER_TYPE: gecko-t-lambda-gw-test-1_tt
-  #     # override SCRIPT_REPO_COMMIT with a test commit
+    # TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1_t
+    TC_WORKER_TYPE: gecko-t-lambda-gw-test-1_tt
 device_groups:
   # this block is not used yet (not possible with LT API), future goal. see lt_device_selector in projects.
   a55-perf:
@@ -89,6 +88,7 @@ projects:
     # not used yet
     # SCRIPT_REPO_COMMIT: master
     TEST_1: blah
+    disabled: false
   a55-alpha:
     # lt_device_selector: "Galaxy A55 5G-14"
     # swapped for testing

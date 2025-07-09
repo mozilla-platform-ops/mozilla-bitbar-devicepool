@@ -2,14 +2,20 @@ global:
   contract_device_count: 60
 projects:
   defaults:
-    SCRIPT_REPO_COMMIT: master
+    # TODO: start using this? name repo `mozilla-lambdatest-files`?
+    SCRIPT_REPO_COMMIT: main
     # fake values. inheriting projects below should set reasonable values.
     TASKCLUSTER_CLIENT_ID: tc-client-id-set-me
     # env var with key is looked for at this with underscores: `tc_worker_type_set_me`
     TC_WORKER_TYPE: tc-worker-type-set-me
+    disabled: false
   a55-alpha:
+    # used for relops testing
+    # TODO: decomm this in favor of test-1, name is confusing given usage in cloud image context
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-alpha-a55
     TC_WORKER_TYPE: gecko-t-lambda-alpha-a55
+    disabled: true
+    # disabled is set to true in prod so we can run this queue locally when developing
   a55-perf:
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-a55
     TC_WORKER_TYPE: gecko-t-lambda-perf-a55
