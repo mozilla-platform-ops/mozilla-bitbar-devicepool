@@ -71,7 +71,7 @@ print("Listing connected devices:")
 cmd = ["/usr/bin/adb", "devices", "-l"]
 
 device_name = None
-retry_sleeps = [1, 2, 4]
+retry_sleeps = [1, 2, 5]
 for attempt, sleep_time in enumerate(retry_sleeps + [0]):  # final attempt, no sleep after
     output = run(cmd, show_output=True)
     for output_line in output.split("\n"):
