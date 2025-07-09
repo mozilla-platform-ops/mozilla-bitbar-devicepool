@@ -19,11 +19,11 @@ getCurrentWindow() {
     adb shell dumpsys window | grep mFocusedWindow
 }
 
-
-### main
-
 starting_dir=$(pwd)
 echo "starting_dir: $starting_dir"
+
+
+### general dependencies
 
 sudo apt-get update -y
 sudo apt-get install gettext-base libgtk-3-0 mercurial usbutils -y
@@ -32,10 +32,10 @@ sudo apt-get install gettext-base libgtk-3-0 mercurial usbutils -y
 # google-cloud-logging is for stackdriver
 pip install zstandard google-cloud-logging
 
-# install latest mercurial
+# upgrade mercurial
 pip install mercurial==7.0.2
 
-# TODO: upgrade python to 3.12
+# upgrade `python` and `python3` to our desired version
 LT_SETUP_PYTHON_VERSION="3.12"
 LT_SETUP_PYTHON_FULL_STRING="python$LT_SETUP_PYTHON_VERSION"
 sudo add-apt-repository ppa:deadsnakes/ppa
@@ -44,9 +44,9 @@ sudo apt-get install "$LT_SETUP_PYTHON_FULL_STRING" "$LT_SETUP_PYTHON_FULL_STRIN
 # update alternatives to use the new python version
 sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 100
 sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 10
-# python just mirrors python3
-# sudo update-alternatives --set python /usr/bin/python3
-# getting error: `update-alternatives: error: no alternatives for python`
+# python seems to be a symlink to python3, nothing required
+
+# show version
 python --version
 python3 --version
 
@@ -62,8 +62,10 @@ if ! python --version | grep -q "$LT_SETUP_PYTHON_VERSION"; then
     exit 1
 fi
 
-### for perftest jobs
-# AJE: mercurial installed above
+
+### perftest dependencies
+
+# mercurial is installed above
 
 echo "[extensions]" > ~/.hgrc
 echo "sparse =" >> ~/.hgrc
