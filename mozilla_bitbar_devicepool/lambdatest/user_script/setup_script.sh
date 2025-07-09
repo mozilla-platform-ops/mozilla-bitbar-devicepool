@@ -41,8 +41,8 @@ sudo add-apt-repository ppa:deadsnakes/ppa
 sudo apt-get update
 sudo apt-get install "python$LT_SETUP_PYTHON_VERSION" -y
 # update alternatives to use the new python version
-update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 100
-update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 10
+sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 100
+sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 10
 # python just mirrors python3
 sudo update-alternatives --set python /usr/bin/python3
 python --version
