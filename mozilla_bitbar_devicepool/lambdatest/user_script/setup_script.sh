@@ -37,14 +37,16 @@ pip install mercurial==7.0.2
 
 # TODO: upgrade python to 3.12
 LT_SETUP_PYTHON_VERSION="3.12"
+LT_SETUP_PYTHON_FULL_STRING="python$LT_SETUP_PYTHON_VERSION"
 sudo add-apt-repository ppa:deadsnakes/ppa
 sudo apt-get update
-sudo apt-get install "python$LT_SETUP_PYTHON_VERSION" -y
+sudo apt-get install "$LT_SETUP_PYTHON_FULL_STRING" "$LT_SETUP_PYTHON_FULL_STRING-venv" -y
 # update alternatives to use the new python version
 sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 100
 sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 10
 # python just mirrors python3
-sudo update-alternatives --set python /usr/bin/python3
+# sudo update-alternatives --set python /usr/bin/python3
+# getting error: `update-alternatives: error: no alternatives for python`
 python --version
 python3 --version
 
