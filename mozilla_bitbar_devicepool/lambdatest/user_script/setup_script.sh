@@ -25,11 +25,40 @@ getCurrentWindow() {
 starting_dir=$(pwd)
 echo "starting_dir: $starting_dir"
 
-sudo apt update -y
+sudo apt-get update -y
 sudo apt-get install gettext-base libgtk-3-0 mercurial usbutils -y
 
+# NOTE: pip is pip3 on these images
 # google-cloud-logging is for stackdriver
 pip install zstandard google-cloud-logging
+
+# install latest mercurial
+pip install mercurial==7.0.2
+
+# TODO: upgrade python to 3.12
+LT_SETUP_PYTHON_VERSION="3.12"
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt-get update
+sudo apt-get install "python$LT_SETUP_PYTHON_VERSION" -y
+# update alternatives to use the new python version
+update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 100
+update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 10
+# python just mirrors python3
+sudo update-alternatives --set python /usr/bin/python3
+python --version
+python3 --version
+
+# check that python3 is at the version we want
+if ! python3 --version | grep -q "$LT_SETUP_PYTHON_VERSION"; then
+    echo "Python 3 version is not $LT_SETUP_PYTHON_VERSION, exiting."
+    exit 1
+fi
+
+# check that python is at the version we want
+if ! python --version | grep -q "$LT_SETUP_PYTHON_VERSION"; then
+    echo "Python version is not $LT_SETUP_PYTHON_VERSION, exiting."
+    exit 1
+fi
 
 ### for perftest jobs
 # AJE: mercurial installed above
