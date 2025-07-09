@@ -124,8 +124,9 @@ wget -O start-worker https://github.com/taskcluster/taskcluster/releases/downloa
 #
 # TODO: eventually move these to their own repo like mozilla-bitbar-docker?
 
-ls -la
-find .
+# debugging
+# ls -la
+# find .
 
 script_dir=$(dirname $0)
 echo "script_dir: $script_dir"
