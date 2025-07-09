@@ -380,3 +380,4 @@ if __name__ == "__main__":  # pragma: no cover
     clt.configure()
     pprint.pprint(clt.get_config())
     pprint.pprint(clt.get_path_to_user_script_directory("a55-alpha"))
+    pprint.pprint(clt.get_path_to_user_script_directory("a55-perf"))
