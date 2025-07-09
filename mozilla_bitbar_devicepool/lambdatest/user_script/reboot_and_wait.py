@@ -64,16 +64,25 @@ for port in ports:
 
 print("")
 
+# TODO: could be mozdevice calls
+#   (see https://firefox-source-docs.mozilla.org/mozbase/mozdevice.html)
+
 print("Listing connected devices:")
-# TODO: could be a mozdevice.get_connected_devices() call
 cmd = ["/usr/bin/adb", "devices", "-l"]
-output = run(cmd, show_output=True)
-for output_line in output.split("\n"):
-    if "device usb" in output_line:
-        device_name = output_line.split()[0]
+
+device_name = None
+retry_sleeps = [1, 2, 4]
+for attempt, sleep_time in enumerate(retry_sleeps + [0]):  # final attempt, no sleep after
+    output = run(cmd, show_output=True)
+    for output_line in output.split("\n"):
+        if "device usb" in output_line:
+            device_name = output_line.split()[0]
+            break
+    if device_name:
         break
-    else:
-        device_name = None
+    if attempt < len(retry_sleeps):
+        print(f"device_name not found, retrying after {sleep_time}s...")
+        time.sleep(sleep_time)
 
 if not device_name:
     print("device_name is empty")
