@@ -3,16 +3,19 @@
 set -e
 set -x
 
-# variables
+
+### variables
 
 usbreset_log_file=/tmp/usbreset.log
 usbreset_log_file2=/tmp/usbreset-pass2.log
 POWER_METER_DEVICE_ID="0483:fffe"
 TC_VERSION=84.0.2
 POWER_METER_FAST_FAIL=0
+LT_SETUP_MERCURIAL_VERSION="7.0.2"
+LT_SETUP_PYTHON_VERSION="3.12"
 
 
-# functions
+### functions
 
 # Function to get the currently focused window
 getCurrentWindow() {
@@ -28,15 +31,23 @@ echo "starting_dir: $starting_dir"
 sudo apt-get update -y
 sudo apt-get install gettext-base libgtk-3-0 mercurial usbutils -y
 
-# NOTE: pip is pip3 on these images
+# NOTE: pip is pip3 on the lt image
 # google-cloud-logging is for stackdriver
 pip install zstandard google-cloud-logging
 
 # upgrade mercurial
-pip install mercurial==7.0.2
+pip install mercurial==$LT_SETUP_MERCURIAL_VERSION
+
+# show mercurial version
+hg --version
+
+# test mercurial version
+if ! hg --version | grep -q "$LT_SETUP_MERCURIAL_VERSION"; then
+    echo "Mercurial version is not $LT_SETUP_MERCURIAL_VERSION, exiting."
+    exit 1
+fi
 
 # upgrade `python` and `python3` to our desired version
-LT_SETUP_PYTHON_VERSION="3.12"
 LT_SETUP_PYTHON_FULL_STRING="python$LT_SETUP_PYTHON_VERSION"
 sudo add-apt-repository ppa:deadsnakes/ppa
 sudo apt-get update
