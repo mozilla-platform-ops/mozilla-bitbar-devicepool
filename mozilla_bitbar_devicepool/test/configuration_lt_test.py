@@ -5,6 +5,7 @@
 import os
 
 import pytest
+import yaml
 
 from mozilla_bitbar_devicepool.configuration_lt import ConfigurationLt
 
@@ -157,10 +158,8 @@ def sample_file_config_actual():
     """
     Fixture to create a configured instance of ConfigurationLt using the actual config file.
     """
-    config_lt = ConfigurationLt(ci_mode=True)
-    config_path = os.path.join(os.path.dirname(__file__), "..", "config", "lambdatest.yml")
-    config_lt.configure(config_path=str(config_path))
-    return config_lt
+    config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "config", "lambdatest.yml"))
+    return config_path
 
 
 # TODO: create a fixture for configured_lt_instance
@@ -213,6 +212,10 @@ def test_configure(configured_lt_instance):
     # check that the list contains a few of the expected devices
     assert "R5CX4089QNL" in configured_lt_instance.config["device_groups"]["a55-perf"]
     assert "R5CXC1AHV4M" in configured_lt_instance.config["device_groups"]["a55-perf"]
+
+    # check disabled projects
+    # assert configured_lt_instance.config["projects"]["a55-alpha"]["disabled"] is True
+    # assert configured_lt_instance.config["projects"]["a55-perf"]["disabled"] is False
 
 
 def test_load_file_config(sample_file_config):
@@ -329,3 +332,36 @@ def test_global_contract_device_count(configured_lt_instance2):
     Tests that the global.contract_device_count is correctly set in the configuration.
     """
     assert configured_lt_instance2.global_contract_device_count == 1319
+
+
+ALL_LT_INSTANCE_FIXTURES = [
+    "configured_lt_instance",
+    "configured_lt_instance2",
+    "configured_lt_instance_actual",
+]
+
+ALL_LT_CONFIG_FIXTURES = [
+    "sample_file_config",
+    "sample_file_config_2",
+    "sample_file_config_actual",
+]
+
+
+@pytest.mark.parametrize("fixture_name", ALL_LT_CONFIG_FIXTURES)
+def test_config_file_format(request, fixture_name):
+    """
+    Run test_configure against all instance fixtures.
+    """
+    config_file = request.getfixturevalue(fixture_name)
+    assert isinstance(config_file, str)
+    assert os.path.exists(config_file), f"Config file {config_file} does not exist."
+    # inspect the yaml content
+    with open(config_file, "r") as f:
+        content = f.read()
+        assert content.strip() != "", "Config file is empty."
+        y = None
+        try:
+            y = yaml.safe_load(content)
+        except yaml.YAMLError as e:
+            pytest.fail(f"Config file {config_file} is not valid YAML: {e}")
+    assert "defaults" in y["projects"], "Config file does not contain 'defaults' in 'projects'."
