@@ -151,6 +151,18 @@ def sample_file_config_2(tmp_path):
     return str(config_file)
 
 
+# a fixture that uses this repo's actual config file (config/lambdatest.yml)
+@pytest.fixture
+def sample_file_config_actual():
+    """
+    Fixture to create a configured instance of ConfigurationLt using the actual config file.
+    """
+    config_lt = ConfigurationLt(ci_mode=True)
+    config_path = os.path.join(os.path.dirname(__file__), "..", "config", "lambdatest.yml")
+    config_lt.configure(config_path=str(config_path))
+    return config_lt
+
+
 # TODO: create a fixture for configured_lt_instance
 @pytest.fixture
 def configured_lt_instance(sample_file_config):
@@ -173,19 +185,16 @@ def configured_lt_instance2(sample_file_config_2):
 
 
 # TODO: use this in tests
-# a fixture that uses this repo's actual config file (config/lambdatest.yml)
 @pytest.fixture
-def configured_lt_instance_actual(tmp_path):
+def configured_lt_instance_actual(sample_file_config_actual):
     """
     Fixture to create a configured instance of ConfigurationLt using the actual config file.
     """
-    config_lt = ConfigurationLt(ci_mode=True)
-    config_path = tmp_path / "config" / "lambdatest.yml"
-    config_lt.configure(config_path=str(config_path))
+    config_lt = sample_file_config_actual
     return config_lt
 
 
-# TODO: run all fixtures against all test cases
+# TODO: run all instance fixtures against all test cases
 
 
 def test_configure(configured_lt_instance):
