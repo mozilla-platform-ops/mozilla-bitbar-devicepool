@@ -30,15 +30,14 @@ def get_connected_devices():
         return []
 
 
-# TODO: if we get non-zero exit code, then retry a few times?
-def run(command):
+def run(command, show_output=True):
     result = subprocess.run(command, capture_output=True, text=True, check=True)
-    print(result.stderr)
-    print(result.stdout)
-
-
-def run_silent(command):
-    result = subprocess.run(command, capture_output=True, text=True, check=True)
+    if show_output:
+        if result.stdout:
+            print(result.stdout)
+        # TODO: should we show stderr? should stderr and stdout be merged?
+        if result.stderr:
+            print(result.stderr)
     return result.stdout
 
 
@@ -68,11 +67,7 @@ print("")
 print("Listing connected devices:")
 # TODO: could be a mozdevice.get_connected_devices() call
 cmd = ["/usr/bin/adb", "devices", "-l"]
-#
-run(cmd)
-#
-output = run_silent(cmd)
-#
+output = run(cmd, show_output=True)
 for output_line in output.split("\n"):
     if "device usb" in output_line:
         device_name = output_line.split()[0]
