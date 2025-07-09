@@ -189,7 +189,8 @@ def configured_lt_instance_actual(sample_file_config_actual):
     """
     Fixture to create a configured instance of ConfigurationLt using the actual config file.
     """
-    config_lt = sample_file_config_actual
+    config_lt = ConfigurationLt(ci_mode=True)
+    config_lt.configure(config_path=sample_file_config_actual)
     return config_lt
 
 
@@ -334,16 +335,16 @@ def test_global_contract_device_count(configured_lt_instance2):
     assert configured_lt_instance2.global_contract_device_count == 1319
 
 
-ALL_LT_INSTANCE_FIXTURES = [
-    "configured_lt_instance",
-    "configured_lt_instance2",
-    "configured_lt_instance_actual",
-]
-
 ALL_LT_CONFIG_FIXTURES = [
     "sample_file_config",
     "sample_file_config_2",
     "sample_file_config_actual",
+]
+
+ALL_LT_INSTANCE_FIXTURES = [
+    "configured_lt_instance",
+    "configured_lt_instance2",
+    "configured_lt_instance_actual",
 ]
 
 
@@ -368,3 +369,10 @@ def test_config_file_format(request, fixture_name):
     assert "projects" in y, "Config file does not contain 'projects'."
     assert "device_groups" in y, "Config file does not contain 'device_groups'."
     # assert "global" in y, "Config file does not contain 'global'."
+
+
+@pytest.mark.parametrize("fixture_name", ALL_LT_INSTANCE_FIXTURES)
+def test_instance_format(request, fixture_name):
+    instance = request.getfixturevalue(fixture_name)
+    print(type(instance))
+    assert isinstance(instance, ConfigurationLt)
