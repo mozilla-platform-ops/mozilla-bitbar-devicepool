@@ -189,6 +189,4 @@ ss -np
 
 cd taskcluster
 bash entrypoint.sh
-
-# TODO: now that test command is run_gw.py, we need to configure the worker to terminate after each task...
-#       this ensures that it won't hang around forever and we can ensure the phone and hyperexecute are running together
+# worker is configured to exit after one task.
