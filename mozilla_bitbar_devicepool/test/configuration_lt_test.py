@@ -171,7 +171,7 @@ def configured_lt_instance(sample_file_config):
     """
     Fixture to create a configured instance of ConfigurationLt.
     """
-    config_lt = ConfigurationLt(ci_mode=True)
+    config_lt = ConfigurationLt(ci_mode_envvars=True, ci_mode_fs=True)
     config_lt.configure(config_path=sample_file_config)
     return config_lt
 
@@ -181,7 +181,7 @@ def configured_lt_instance2(sample_file_config_2):
     """
     Fixture to create a configured instance of ConfigurationLt.
     """
-    config_lt = ConfigurationLt(ci_mode=True)
+    config_lt = ConfigurationLt(ci_mode_envvars=True, ci_mode_fs=True)
     config_lt.configure(config_path=sample_file_config_2)
     return config_lt
 
@@ -192,7 +192,7 @@ def configured_lt_instance_actual(sample_file_config_actual):
     """
     Fixture to create a configured instance of ConfigurationLt using the actual config file.
     """
-    config_lt = ConfigurationLt(ci_mode=True)
+    config_lt = ConfigurationLt(ci_mode_envvars=True)
     config_lt.configure(config_path=sample_file_config_actual)
     return config_lt
 
@@ -226,7 +226,7 @@ def test_load_file_config(sample_file_config):
     """
     Tests that _load_file_config correctly loads configuration from an actual file.
     """
-    config_lt = ConfigurationLt(ci_mode=True)
+    config_lt = ConfigurationLt(ci_mode_envvars=True)
 
     # if we want to do no ci_mode
     #

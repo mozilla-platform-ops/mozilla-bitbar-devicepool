@@ -101,7 +101,7 @@ class TestRunManagerLT(object):
         self.unit_testing_mode = unit_testing_mode
         self.logging_padding = 12  # Store the padding value as instance variable
         # Skip hyperexecute binary check in unit testing mode or when running tests
-        self.config_object = configuration_lt.ConfigurationLt(ci_mode=self.unit_testing_mode)
+        self.config_object = configuration_lt.ConfigurationLt(ci_mode_envvars=self.unit_testing_mode)
         self.config_object.configure()
         self.status_object = status.Status(self.config_object.lt_username, self.config_object.lt_access_key)
 

@@ -12,7 +12,9 @@ class DeviceGroupReportLt:
         self.verbose = verbose
         self.config_path = config_path
         # Using ConfigurationLt to handle config loading
-        self.config_object = ConfigurationLt(ci_mode=True, quiet=True)  # ci_mode=True to avoid credentials check
+        self.config_object = ConfigurationLt(
+            ci_mode_envvars=True, quiet=True
+        )  # ci_mode=True to avoid credentials check
         self.config_object.configure(config_path=self.config_path)
 
     def show_report(self, verbose=False):
