@@ -97,6 +97,12 @@ if ! hg --version | grep -q "$LT_SETUP_MERCURIAL_VERSION"; then
     exit 1
 fi
 
+# ensure mozdevice is installed
+if ! python3 -c "import mozdevice" &> /dev/null; then
+    echo "mozdevice is not installed, exiting."
+    exit 1
+fi
+
 
 ### perftest dependencies
 
