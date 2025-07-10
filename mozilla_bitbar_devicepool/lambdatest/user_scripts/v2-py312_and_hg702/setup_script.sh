@@ -51,14 +51,42 @@ fi
 sudo apt-get update -y
 sudo apt-get install gettext-base libgtk-3-0 usbutils -y
 
+# upgrade `python` and `python3` to our desired version
+#   NOTE: do this once we're done using apt, since this might fry it
+LT_SETUP_PYTHON_FULL_STRING="python$LT_SETUP_PYTHON_VERSION"
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt-get update
+sudo apt-get install "$LT_SETUP_PYTHON_FULL_STRING" \
+                     "$LT_SETUP_PYTHON_FULL_STRING-venv" \
+                     "$LT_SETUP_PYTHON_FULL_STRING-dev" \
+                     "$LT_SETUP_PYTHON_FULL_STRING-lib2to3" \
+                     -y
+# don't update default `python3`, since it breaks tons of stuff
+
+# show version
+python3.12 --version
+
+# # check that python3.12 is at the version we want
+if ! python3.12 --version | grep -q "$LT_SETUP_PYTHON_VERSION"; then
+    echo "Python 3 version is not $LT_SETUP_PYTHON_VERSION, exiting."
+    exit 1
+fi
+
 # python pips
 #   - NOTE: pip is pip3 on the lt image
-# upgrade mercurial
-# google-cloud-logging is for stackdriver
+
+# install pips in system python(3)
 sudo pip install zstandard \
-                 mozdevice \
-                 google-cloud-logging \
-                 mercurial==$LT_SETUP_MERCURIAL_VERSION
+                  mozdevice \
+                  google-cloud-logging
+
+# setup venv in /home/ltuser, activate, and install pips
+python3.12 -m venv /home/ltuser/venv
+source /home/ltuser/venv/bin/activate
+pip install zstandard \
+                  mozdevice \
+                  google-cloud-logging \
+                  mercurial==$LT_SETUP_MERCURIAL_VERSION
 
 # show mercurial version
 hg --version
@@ -66,32 +94,6 @@ hg --version
 # test mercurial version
 if ! hg --version | grep -q "$LT_SETUP_MERCURIAL_VERSION"; then
     echo "Mercurial version is not $LT_SETUP_MERCURIAL_VERSION, exiting."
-    exit 1
-fi
-
-# upgrade `python` and `python3` to our desired version
-LT_SETUP_PYTHON_FULL_STRING="python$LT_SETUP_PYTHON_VERSION"
-sudo add-apt-repository ppa:deadsnakes/ppa
-sudo apt-get update
-sudo apt-get install "$LT_SETUP_PYTHON_FULL_STRING" "$LT_SETUP_PYTHON_FULL_STRING-venv" -y
-# update alternatives to use the new python version
-sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 100
-sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 10
-# python seems to be a symlink to python3, nothing required
-
-# show version
-python --version
-python3 --version
-
-# check that python3 is at the version we want
-if ! python3 --version | grep -q "$LT_SETUP_PYTHON_VERSION"; then
-    echo "Python 3 version is not $LT_SETUP_PYTHON_VERSION, exiting."
-    exit 1
-fi
-
-# check that python is at the version we want
-if ! python --version | grep -q "$LT_SETUP_PYTHON_VERSION"; then
-    echo "Python version is not $LT_SETUP_PYTHON_VERSION, exiting."
     exit 1
 fi
 

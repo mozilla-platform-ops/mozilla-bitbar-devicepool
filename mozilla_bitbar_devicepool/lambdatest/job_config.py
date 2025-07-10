@@ -137,7 +137,8 @@ env:
 # testRunnerCommand: ls -la
 # testRunnerCommand: cat /home/ltuser/taskcluster/worker-runner-config.yml
 # testRunnerCommand: start-worker /home/ltuser/taskcluster/worker-runner-config.yml
-testRunnerCommand: python3 /home/ltuser/taskcluster/run_gw.py
+# testRunnerCommand: python3 /home/ltuser/taskcluster/run_gw.py
+testRunnerCommand: bash -c 'source /home/ltuser/venv/bin/activate; python3 /home/ltuser/taskcluster/run_gw.py'
 
 # Only report the status of the test framework
 frameworkStatusOnly: true
