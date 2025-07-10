@@ -69,13 +69,10 @@ class DeviceGroupReportLt:
         # Create a ConfigurationLt instance to access the config
         config_object = self.config_object
 
-        # pprint.pprint(config_object.config)
-
         device_types = {}
 
         # iterate through the 'projects' in the config
         for project_name, project_config in config_object.config.get("projects", {}).items():
-            # print(project_name)
             devices_for_project = config_object.config.get("device_groups", {})[project_name]
             if devices_for_project:
                 # no need to worry about the 'defaults' project, already handled in configure()
