@@ -151,7 +151,9 @@ shell: bash
 # aje: moved all to test command as something we're doing in pre is disconnecting the device per LT
 #
 # Pre-install required dependencies using pip
+# TODO: remove the pip3 install mozdevice once everything is off v1 of user scripts
 pre:
+  - pip3 install mozdevice
   - bash ./user_script/setup_script.sh
 
 # reboot and wait for device to come online
