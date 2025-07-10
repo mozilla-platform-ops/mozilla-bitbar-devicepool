@@ -2,8 +2,8 @@ global:
   contract_device_count: 60
 projects:
   defaults:
-    # TODO: start using this? name repo `mozilla-lambdatest-files`?
-    # for now this points to a directory name, later, make it a git hash/branch
+    # TODO: start using USER_SCRIPTS_VERSION for git version? name repo `mozilla-lambdatest-files`?
+    # for now this points to a directory name in `mozilla_bitbar_devicepool/lambdatest/user_scripts`
     USER_SCRIPTS_VERSION: v1
     # fake values. inheriting projects below should set reasonable values.
     TASKCLUSTER_CLIENT_ID: tc-client-id-set-me
