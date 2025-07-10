@@ -1,3 +1,6 @@
+# TODO: move these to the common util module (mozilla_bitbar_devicepool/util)
+
+
 def shorten_worker_type(worker_type):
     """Shorten the worker type for display."""
     worker_type_short = worker_type.replace("gecko-t-lambda-", "")
