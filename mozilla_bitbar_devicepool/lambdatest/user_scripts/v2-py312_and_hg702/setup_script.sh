@@ -178,7 +178,11 @@ chmod +x script.py
 cd /home/ltuser
 
 # robust checkout plugin: update sha1 to latest when building a new image
-wget https://hg.mozilla.org/mozilla-central/raw-file/260e22f03e984e0ced16b6c5ff63201cdef0a1f6/testing/mozharness/external_tools/robustcheckout.py
+#  - https://raw.githubusercontent.com/mozilla-firefox/firefox/refs/heads/main/testing/mozharness/external_tools/robustcheckout.py
+#  - example permaurl (with git sha1):
+#    - https://raw.githubusercontent.com/mozilla-firefox/firefox/COMMIT_SHA1/testing/mozharness/external_tools/robustcheckout.py
+wget https://raw.githubusercontent.com/mozilla-firefox/firefox/15d9e775817fa39fa4f5c08946fa154182b91d05/testing/mozharness/external_tools/robustcheckout.py
+# TODO: get a better canonical location for tooltool.py
 wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/refs/heads/master/scripts/tooltool.py
 chmod +x robustcheckout.py
 chmod +x tooltool.py
