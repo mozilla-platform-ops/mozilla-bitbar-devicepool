@@ -43,7 +43,10 @@ def main():
     )
     parser.add_argument("--change", action="store_true", help="Update the version in the setup script.")
     parser.add_argument(
-        "-v", "--version", default="latest", help="Version of the setup script to check (default: v2-py312_and_hg702)."
+        "-v",
+        "--version",
+        default="latest",
+        help="Version of the setup script to check (default: `latest`, resolves to latest version dir).",
     )
     args = parser.parse_args()
 
