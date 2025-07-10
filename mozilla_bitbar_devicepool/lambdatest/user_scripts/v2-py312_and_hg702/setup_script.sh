@@ -112,8 +112,8 @@ echo "[extensions]" > ~/.hgrc
 echo "sparse =" >> ~/.hgrc
 
 # profgen
-wget -O cmdlinetools.zip --no-check-certificate "https://android-packages.s3.us-west-2.amazonaws.com/commandlinetools-linux-13114758_latest.zip"
-unzip cmdlinetools.zip
+wget -q -O cmdlinetools.zip --no-check-certificate "https://android-packages.s3.us-west-2.amazonaws.com/commandlinetools-linux-13114758_latest.zip"
+unzip -q cmdlinetools.zip
 
 # this is in PATH, lets use it:
 mkdir -p /home/ltuser/taskcluster/android-sdk-linux
