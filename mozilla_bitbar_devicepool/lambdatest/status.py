@@ -396,10 +396,6 @@ if __name__ == "__main__":  # pragma: no cover
     import pprint
     import sys
 
-    lt_failed_job_report()
-
-    sys.exit(0)
-
     lt_username = os.environ["LT_USERNAME"]
     lt_api_key = os.environ["LT_ACCESS_KEY"]
 
@@ -417,36 +413,36 @@ if __name__ == "__main__":  # pragma: no cover
 
         if output_flag == True:
             # raw debug output
-            # pprint.pprint(job)
+            pprint.pprint(job)
 
             # inspect job_summary
-            test_failure_phase = "testing"
-            if "job_summary" in job:
-                # print("job summary:")
-                # pprint.pprint(job["job_summary"])
-                for phase, phase_details in job["job_summary"].items():
-                    print(f"  - {phase}: {phase_details}")
-                    # pprint.pprint(phase_details)
-                    if phase_details and "failed" in phase_details and int(phase_details["failed"]) > 0:
-                        # print(f"    - {phase_details['name']}: {phase_details['status']}")
-                        # print(f"{phase}: failed zazaaz")
-                        test_failure_phase = phase.split("_")[0]
-                print(f"test failure phase: {test_failure_phase}")
+            # test_failure_phase = "testing"
+            # if "job_summary" in job:
+            #     # print("job summary:")
+            #     # pprint.pprint(job["job_summary"])
+            #     for phase, phase_details in job["job_summary"].items():
+            #         print(f"  - {phase}: {phase_details}")
+            #         # pprint.pprint(phase_details)
+            #         if phase_details and "failed" in phase_details and int(phase_details["failed"]) > 0:
+            #             # print(f"    - {phase_details['name']}: {phase_details['status']}")
+            #             # print(f"{phase}: failed zazaaz")
+            #             test_failure_phase = phase.split("_")[0]
+            #     print(f"test failure phase: {test_failure_phase}")
 
             # more advanced debugging output
-            print(f"job number: {job['job_number']}")
-            print(f"status: {job['status']}")
-            print(f"job label: {job['job_label']}")
-            # print("device udid: %s" % job["device_udid"])
-            # print("device name: %s" % job["device_name"])
-            # print("device os: %s" % job["device_os"])
-            # print("device status: %s" % job["device_status"])
-            if job["status"] == "running":
-                # pprint.pprint(job)
-                # where number of currently running is for concurrent jobs
-                # TODO: incorporate into functions above
-                # print(job["job_summary"]["scenario_stage_summary"]["status_counts_excluding_retries"]["in_progress"])
-                print(job["Tasks"])
+            # print(f"job number: {job['job_number']}")
+            # print(f"status: {job['status']}")
+            # print(f"job label: {job['job_label']}")
+            # # print("device udid: %s" % job["device_udid"])
+            # # print("device name: %s" % job["device_name"])
+            # # print("device os: %s" % job["device_os"])
+            # # print("device status: %s" % job["device_status"])
+            # if job["status"] == "running":
+            #     # pprint.pprint(job)
+            #     # where number of currently running is for concurrent jobs
+            #     # TODO: incorporate into functions above
+            #     # print(job["job_summary"]["scenario_stage_summary"]["status_counts_excluding_retries"]["in_progress"])
+            #     print(job["Tasks"])
             print("")
     print("")
     sys.exit()
