@@ -46,6 +46,7 @@ def get_jobs(
     show_test_summary=False,
     timeout=(10, 30),
     status=None,
+    print_url=False,
 ):
     # check that jobs is greater than page_size
     if jobs < page_size:
@@ -80,7 +81,8 @@ def get_jobs(
             url += f"&cursor={next_cursor}"
 
         response = cached_session.get(url, headers=headers, timeout=timeout)
-        print(f"Fetching {url}...")
+        if print_url:
+            print(f"Fetching {url}...")
         if response.status_code != 200:
             print(f"Error: {response.status_code}")
             print(f"  while fetching {url}")

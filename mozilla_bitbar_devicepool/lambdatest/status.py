@@ -267,7 +267,7 @@ def lt_status_main():
             print(f"    - {udid}")
 
 
-def lt_failed_job_report(verbose=False):
+def lt_failed_job_report(verbose=True):
     lt_username = os.environ["LT_USERNAME"]
     lt_api_key = os.environ["LT_ACCESS_KEY"]
 
@@ -288,8 +288,9 @@ def lt_failed_job_report(verbose=False):
 
         device_id = util.get_device_from_job_labels(job_labels_list)
         if device_id:
-            if verbose:
-                print(f"device id: {device_id}")
+            # if verbose:
+            #     print(f"device id: {device_id}")
+            pass
 
         if job["status"] == "failed" and "tcdp" in job_labels_list:
             inspection_flag = True
@@ -320,24 +321,28 @@ def lt_failed_job_report(verbose=False):
                     device_failure_count[device_id] = 1
 
             if verbose:
+                print(
+                    f"job number: {job['job_number']}: device id: {device_id}: {job['status']}: test_failure_phase: {test_failure_phase}  "
+                )
+
                 # more advanced debugging output
-                print(f"job number: {job['job_number']}")
-                print(f"status: {job['status']}")
-                print(f"job label: {job['job_label']} type: {type(job['job_label'])}")
-                print(f"test failure phase: {test_failure_phase}")
+                # print(f"job number: {job['job_number']}")
+                # # print(f"status: {job['status']}")
+                # print(f"job label: {job['job_label']} type: {type(job['job_label'])}")
+                # print(f"test failure phase: {test_failure_phase}")
                 # print("device udid: %s" % job["device_udid"])
                 # print("device name: %s" % job["device_name"])
                 # print("device os: %s" % job["device_os"])
                 # print("device status: %s" % job["device_status"])
-                if job["status"] == "running":
-                    # pprint.pprint(job)
-                    # where number of currently running is for concurrent jobs
-                    # TODO: incorporate into functions above
-                    # print(job["job_summary"]["scenario_stage_summary"]["status_counts_excluding_retries"]["in_progress"])
-                    print(job["Tasks"])
-                print("")
-    print("")
+                # if job["status"] == "running":
+                #     # pprint.pprint(job)
+                #     # where number of currently running is for concurrent jobs
+                #     # TODO: incorporate into functions above
+                #     # print(job["job_summary"]["scenario_stage_summary"]["status_counts_excluding_retries"]["in_progress"])
+                #     print(job["Tasks"])
+                # print("")
 
+    print("")
     print("Device failure counts:")
     if not device_failure_count:
         print("  No failed jobs found.")
