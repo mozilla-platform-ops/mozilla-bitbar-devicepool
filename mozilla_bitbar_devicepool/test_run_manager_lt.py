@@ -708,7 +708,6 @@ class TestRunManagerLT(object):
         # Create and start a job starter thread for each project
         job_starters = []
         for project_name in self.config_object.get_fully_configured_projects():
-            # TODO: if project is disabled, skip it
             if self.config_object.is_project_disabled(project_name):
                 logging.info(f"{logging_header} Project '{project_name}' is disabled. Skipping Job Starter thread.")
                 continue
