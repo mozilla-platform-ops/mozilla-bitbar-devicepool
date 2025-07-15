@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import argparse
 import os
 import pprint
 
@@ -268,7 +269,32 @@ def lt_status_main():
             print(f"    - {udid}")
 
 
+# TODO: idea: find out if we need to randomly shuffle available devices
+def lt_distribution_report():
+    pass
+
+
+# TODO: idea: report that gets percentage of failing/total jobs
+
+
 def lt_failed_job_report(verbose=True):
+    DEFAULT_JOBS = 400
+
+    # use argparse to get the count of jobs to fetch
+    parser = argparse.ArgumentParser(description="Generate a report of failed jobs.")
+    parser.add_argument(
+        "--jobs",
+        type=int,
+        default=DEFAULT_JOBS,
+        help=f"Number of jobs to fetch (default: {DEFAULT_JOBS})",
+    )
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Enable verbose output",
+    )
+    args = parser.parse_args()
+
     lt_username = os.environ["LT_USERNAME"]
     lt_api_key = os.environ["LT_ACCESS_KEY"]
 
@@ -282,7 +308,7 @@ def lt_failed_job_report(verbose=True):
     failure_phase_count = {}
 
     # pprint.pprint(status.get_jobs())
-    for job in get_jobs(lt_username, lt_api_key, status="failed", jobs=300)["data"]:
+    for job in get_jobs(lt_username, lt_api_key, status="failed", jobs=args.jobs)["data"]:
         inspection_flag = False
 
         job_labels_list = util.string_list_to_list(job["job_label"])
