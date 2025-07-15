@@ -76,6 +76,7 @@ def get_jobs(
             url += f"&cursor={next_cursor}"
 
         response = cached_session.get(url, headers=headers, timeout=timeout)
+        print(f"Fetching {url}...")
         if response.status_code != 200:
             print(f"Error: {response.status_code}")
             print(f"  while fetching {url}")
@@ -95,12 +96,16 @@ def get_jobs(
                     filtered_jobs.append(job)
             jobs_data = filtered_jobs
 
+        # update next_cursor with the last job's job_number
+        if jobs_data:
+            next_cursor = jobs_data[-1]["job_number"]
+
         all_jobs.extend(jobs_data)
         fetched += len(jobs_data)
 
         # Check if we have enough jobs or no more pages
-        next_cursor = result.get("next_cursor")
-        if not next_cursor or fetched >= jobs:
+        # next_cursor = result.get("next_cursor") #job['job_number']
+        if fetched >= jobs:
             break
 
     # Trim to the requested number of jobs
