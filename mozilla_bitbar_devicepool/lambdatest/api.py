@@ -47,6 +47,10 @@ def get_jobs(
     timeout=(10, 30),
     status=None,
 ):
+    # check that jobs is greater than page_size
+    if jobs < page_size:
+        raise ValueError("jobs must be greater than or equal to page_size")
+
     url_base = (
         "https://api.hyperexecute.cloud/v1.0/jobs"
         f"?show_test_summary={show_test_summary}"
