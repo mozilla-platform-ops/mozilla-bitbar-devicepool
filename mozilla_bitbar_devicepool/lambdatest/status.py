@@ -4,6 +4,7 @@
 
 import pprint
 
+import mozilla_bitbar_devicepool.lambdatest.util as util
 from mozilla_bitbar_devicepool.lambdatest.api import get_devices, get_jobs
 
 # idea: uses api data to build a status/state
@@ -266,10 +267,104 @@ def lt_status_main():
             print(f"    - {udid}")
 
 
+def lt_failed_job_report():
+    lt_username = os.environ["LT_USERNAME"]
+    lt_api_key = os.environ["LT_ACCESS_KEY"]
+
+    status = Status(lt_username, lt_api_key)
+
+    # pprint.pprint(status.get_running_job_count())
+    # sys.exit()
+
+    # maintain a data structure tracking failure counts to devices
+    device_failure_count = {}
+    failure_phase_count = {}
+
+    # pprint.pprint(status.get_jobs())
+    for job in get_jobs(lt_username, lt_api_key, status="failed", jobs=500)["data"]:
+        output_flag = False
+
+        job_labels_list = util.string_list_to_list(job["job_label"])
+
+        device_id = util.get_device_from_job_labels(job_labels_list)
+        if device_id:
+            print(f"device id: {device_id}")
+
+        if job["status"] == "failed" and "tcdp" in job_labels_list:
+            output_flag = True
+
+        if output_flag == True:
+            # raw debug output
+            # pprint.pprint(job)
+
+            # inspect job_summary
+            test_failure_phase = "testing"
+            if "job_summary" in job:
+                # print("job summary:")
+                # pprint.pprint(job["job_summary"])
+                for phase, phase_details in job["job_summary"].items():
+                    # print(f"  - {phase}: {phase_details}")
+                    # pprint.pprint(phase_details)
+                    if phase_details and "failed" in phase_details and int(phase_details["failed"]) > 0:
+                        # print(f"    - {phase_details['name']}: {phase_details['status']}")
+                        # print(f"{phase}: failed zazaaz")
+                        test_failure_phase = phase.split("_")[0]
+                failure_phase_count[test_failure_phase] = failure_phase_count.get(test_failure_phase, 0) + 1
+
+            if device_id:
+                # increment the failure count for this device
+                if device_id in device_failure_count:
+                    device_failure_count[device_id] += 1
+                else:
+                    device_failure_count[device_id] = 1
+
+            # more advanced debugging output
+            print(f"job number: {job['job_number']}")
+            print(f"status: {job['status']}")
+            print(f"job label: {job['job_label']} type: {type(job['job_label'])}")
+            print(f"test failure phase: {test_failure_phase}")
+            # print("device udid: %s" % job["device_udid"])
+            # print("device name: %s" % job["device_name"])
+            # print("device os: %s" % job["device_os"])
+            # print("device status: %s" % job["device_status"])
+            if job["status"] == "running":
+                # pprint.pprint(job)
+                # where number of currently running is for concurrent jobs
+                # TODO: incorporate into functions above
+                # print(job["job_summary"]["scenario_stage_summary"]["status_counts_excluding_retries"]["in_progress"])
+                print(job["Tasks"])
+            print("")
+    print("")
+
+    print("Device failure counts:")
+    if not device_failure_count:
+        print("  No failed jobs found.")
+    else:
+        # sort by count descending
+        device_failure_count = dict(sorted(device_failure_count.items(), key=lambda item: item[1], reverse=True))
+        for device_id, count in device_failure_count.items():
+            print(f"  {device_id}: {count} failures")
+
+    print("")
+    # show failure_phase_count
+    print("Failure phase counts:")
+    if not failure_phase_count:
+        print("  No failed jobs found.")
+    else:
+        # sort by count descending
+        failure_phase_count = dict(sorted(failure_phase_count.items(), key=lambda item: item[1], reverse=True))
+        for phase, count in failure_phase_count.items():
+            print(f"  {phase}: {count} failures")
+
+
 if __name__ == "__main__":  # pragma: no cover
     import os
     import pprint
     import sys
+
+    lt_failed_job_report()
+
+    sys.exit(0)
 
     lt_username = os.environ["LT_USERNAME"]
     lt_api_key = os.environ["LT_ACCESS_KEY"]
@@ -281,20 +376,44 @@ if __name__ == "__main__":  # pragma: no cover
 
     # pprint.pprint(status.get_jobs())
     for job in status.get_jobs()["data"]:
-        print("job number: %s" % job["job_number"])
-        print("status: %s" % job["status"])
-        print("job label: %s" % job["job_label"])
-        # print("device udid: %s" % job["device_udid"])
-        # print("device name: %s" % job["device_name"])
-        # print("device os: %s" % job["device_os"])
-        # print("device status: %s" % job["device_status"])
-        if job["status"] == "running":
+        output_flag = False
+
+        if job["status"] == "failed":
+            output_flag = True
+
+        if output_flag == True:
+            # raw debug output
             # pprint.pprint(job)
-            # where number of currently running is for concurrent jobs
-            # TODO: incorporate into functions above
-            # print(job["job_summary"]["scenario_stage_summary"]["status_counts_excluding_retries"]["in_progress"])
-            print(job["Tasks"])
-        print("")
+
+            # inspect job_summary
+            test_failure_phase = "testing"
+            if "job_summary" in job:
+                # print("job summary:")
+                # pprint.pprint(job["job_summary"])
+                for phase, phase_details in job["job_summary"].items():
+                    print(f"  - {phase}: {phase_details}")
+                    # pprint.pprint(phase_details)
+                    if phase_details and "failed" in phase_details and int(phase_details["failed"]) > 0:
+                        # print(f"    - {phase_details['name']}: {phase_details['status']}")
+                        # print(f"{phase}: failed zazaaz")
+                        test_failure_phase = phase.split("_")[0]
+                print(f"test failure phase: {test_failure_phase}")
+
+            # more advanced debugging output
+            print(f"job number: {job['job_number']}")
+            print(f"status: {job['status']}")
+            print(f"job label: {job['job_label']}")
+            # print("device udid: %s" % job["device_udid"])
+            # print("device name: %s" % job["device_name"])
+            # print("device os: %s" % job["device_os"])
+            # print("device status: %s" % job["device_status"])
+            if job["status"] == "running":
+                # pprint.pprint(job)
+                # where number of currently running is for concurrent jobs
+                # TODO: incorporate into functions above
+                # print(job["job_summary"]["scenario_stage_summary"]["status_counts_excluding_retries"]["in_progress"])
+                print(job["Tasks"])
+            print("")
     print("")
     sys.exit()
 
