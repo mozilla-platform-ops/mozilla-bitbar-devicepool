@@ -10,17 +10,23 @@ projects:
     # env var with key is looked for at this with underscores: `tc_worker_type_set_me`
     TC_WORKER_TYPE: tc-worker-type-set-me
     disabled: false
+    priority_group: set-a-priority-group
+    priority: 1
   a55-alpha:
     # used for relops testing
     # TODO: decomm this in favor of test-1, name is confusing given usage in cloud image context
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-alpha-a55
     TC_WORKER_TYPE: gecko-t-lambda-alpha-a55
+    priority_group: a55
+    priority: 10
   a55-perf:
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-a55
     TC_WORKER_TYPE: gecko-t-lambda-perf-a55
+    priority_group: a55
   p9-perf:
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-p9
     TC_WORKER_TYPE: gecko-t-lambda-perf-p9
+    priority_group: p9
   # test-1:
   #     SCRIPT_REPO_COMMIT: future_commit
   #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1
