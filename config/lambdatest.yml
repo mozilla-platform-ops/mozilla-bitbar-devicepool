@@ -36,7 +36,6 @@ device_groups:
   a55-perf:
     # devices with power meters
     R5CX4089QNL
-    R5CXC1AHWWZ
     R5CXC1AHXYD
     R5CXC1AHZBW
     R5CXC1AJ02Z
@@ -50,12 +49,7 @@ device_groups:
     R5CXC1ASA3P
     R5CXC1ASH4E
     R5CXC1ASHNJ
-    R5CXC1HZ43J
-    R5CXC1HZ4KD
-    R5CXC1HZ5PZ
     R5CXC1HZ62Y
-    R5CXC1HZ85W
-    R5CXC1HZA6V
     R5CXC1HZK0W
     R5CXC1HZKLR
     R5CXC1PW7CR
@@ -73,8 +67,6 @@ device_groups:
     RZCXC189JSJ
     RZCXC19G1CT
     RZCXC19G1DM
-    RZCXC19G2SH
-    RZCXC1BK67D
     RZCY107MCLV
     RZCY2011M7N
     RZCY203N75Z
@@ -95,6 +87,16 @@ device_groups:
     R5CXC1ANGLT
     R5CXC1ARCER
     R5CXC1ARELR
+  jmaher-problem-devices:
+    # 7/25/25: devices joel has found issues with. lt investigating.
+    R5CXC1HZA6V
+    RZCXC1BK67D
+    R5CXC1HZ43J
+    R5CXC1HZ4KD
+    R5CXC1AHWWZ
+    R5CXC1HZ85W
+    R5CXC1HZ5PZ
+    RZCXC19G2SH
   p9-perf:
     # devices with power meters
     47160DLAQ003UB
