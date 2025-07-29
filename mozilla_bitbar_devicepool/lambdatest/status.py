@@ -369,7 +369,9 @@ def lt_success_rate_report():
     print(f"      Successful Jobs: {success_count}")
     print(f"      Failed Jobs: {failure_count}")
     print(f"        Failure Phase Counts: {failure_phase_dict}")
-    print(f"        Failure Phase Device Frequency: {failure_phase_device_list_summary}")
+    print(
+        f"        Failure Phase Device Frequency: {pprint.pformat(failure_phase_device_list_summary, sort_dicts=False)}"
+    )
     # TODO: show frequency of devices per failure phase
     if success_count == 0:
         print(f"  Success Rate (success_count / completed_count): 0%")

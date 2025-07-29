@@ -27,7 +27,7 @@ def get_device_from_job_labels(job_labels):
     for label in job_labels:
         if label == "tcdp":
             continue  # skip tcdp label
-        if "unit" in label or "perf" in label:
+        if "unit" in label or "perf" in label or "alpha" in label:
             continue
         else:
             return label
