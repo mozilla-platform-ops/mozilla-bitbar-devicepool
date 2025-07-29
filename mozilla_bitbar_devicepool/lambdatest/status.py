@@ -310,6 +310,7 @@ def lt_success_rate_report():
         job_labels_list = util.string_list_to_list(job["job_label"])
         # only inspect tcdp jobs
         if "tcdp" not in job_labels_list:
+            # print(job_labels_list)
             skipped_count += 1
             continue
 
@@ -317,7 +318,8 @@ def lt_success_rate_report():
         #     pprint.pprint(job)  # verbose output
 
         # pprint.pprint(job)  # verbose output
-        print(f"status: {job['status']}")
+        # print(f"status: {job['status']}")
+
         if job["status"] == "completed":
             success_count += 1
             completed_count += 1
@@ -336,6 +338,7 @@ def lt_success_rate_report():
 
     print(f"Job Success Report:")
     print(f"  Total Jobs: {total_count}")
+    print(f"    Skipped Jobs: {skipped_count}")
     print(f"    Running Jobs: {running_count}")
     print(f"    Completed Jobs: {completed_count}")
     print(f"      Successful Jobs: {success_count}")
