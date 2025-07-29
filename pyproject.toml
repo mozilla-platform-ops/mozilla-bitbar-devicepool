@@ -45,6 +45,7 @@ dgrlt = 'mozilla_bitbar_devicepool.device_group_report_lt:main'
 lt_status = 'mozilla_bitbar_devicepool.lambdatest.status:lt_status_main'
 lt_compare_to_api = 'mozilla_bitbar_devicepool.compare_to_api_lt:main'
 lt_failure_report = 'mozilla_bitbar_devicepool.lambdatest.status:lt_failed_job_report'
+lt_success_rate_report = 'mozilla_bitbar_devicepool.lambdatest.status:lt_success_rate_report'
 
 [build-system]
 requires = ["poetry-core"]

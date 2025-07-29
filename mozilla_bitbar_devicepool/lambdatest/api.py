@@ -50,7 +50,7 @@ def get_jobs(
 ):
     # check that jobs is greater than page_size
     if jobs < page_size:
-        raise ValueError("jobs must be greater than or equal to page_size")
+        page_size = jobs
 
     url_base = (
         "https://api.hyperexecute.cloud/v1.0/jobs"

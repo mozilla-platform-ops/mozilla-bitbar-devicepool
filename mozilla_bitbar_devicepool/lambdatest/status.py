@@ -275,6 +275,89 @@ def lt_distribution_report():
 
 
 # TODO: idea: report that gets percentage of failing/total jobs
+def lt_success_rate_report():
+    DEFAULT_JOBS = 100
+
+    # use argparse to get the count of jobs to fetch
+    parser = argparse.ArgumentParser(description="Generate a report on the success rate of jobs.")
+    parser.add_argument(
+        "--jobs",
+        type=int,
+        default=DEFAULT_JOBS,
+        help=f"Number of jobs to fetch (default: {DEFAULT_JOBS})",
+    )
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Enable verbose output",
+    )
+    args = parser.parse_args()
+
+    lt_username = os.environ["LT_USERNAME"]
+    lt_api_key = os.environ["LT_ACCESS_KEY"]
+
+    status = Status(lt_username, lt_api_key)
+
+    # count success and failure jobs
+    skipped_count = 0
+    success_count = 0
+    failure_count = 0
+    running_count = 0
+    completed_count = 0
+    total_count = 0
+    failure_phase_dict = {}
+    for job in get_jobs(lt_username, lt_api_key, jobs=args.jobs)["data"]:
+        job_labels_list = util.string_list_to_list(job["job_label"])
+        # only inspect tcdp jobs
+        if "tcdp" not in job_labels_list:
+            skipped_count += 1
+            continue
+
+        # pprint.pprint(job)  # verbose output
+        print(f"status: {job['status']}")
+        if job["status"] == "success":
+            success_count += 1
+            completed_count += 1
+        elif job["status"] == "failed":
+            failure_count += 1
+            completed_count += 1
+            # track failure phase
+            failure_phase = extract_failure_phase(job)
+            failure_phase_dict[failure_phase] = failure_phase_dict.get(failure_phase, 0) + 1
+        elif job["status"] == "running":
+            running_count += 1
+        else:
+            print(f"Unknown job status: {job['status']}")
+            continue
+    total_count = completed_count + running_count
+
+    print(f"Job Success Report:")
+    print(f"  Total Jobs: {total_count}")
+    print(f"    Running Jobs: {running_count}")
+    print(f"    Completed Jobs: {completed_count}")
+    print(f"      Successful Jobs: {success_count}")
+    print(f"      Failed Jobs: {failure_count}")
+    print(f"        Failure Phase Dict: {failure_phase_dict}")
+    if success_count == 0:
+        print(f"  Success Rate (success_count / completed_count): 0%")
+    else:
+        print(f"  Success Rate (success_count / completed_count): {success_count / completed_count * 100:.2f}%")
+
+
+def extract_failure_phase(job):
+    test_failure_phase = "testing"  # default phase
+    # TODO: should we not have a default? should we raise in some cases?
+    if "job_summary" in job:
+        # print("job summary:")
+        # pprint.pprint(job["job_summary"])
+        for phase, phase_details in job["job_summary"].items():
+            # print(f"  - {phase}: {phase_details}")
+            # pprint.pprint(phase_details)
+            if phase_details and "failed" in phase_details and int(phase_details["failed"]) > 0:
+                # print(f"    - {phase_details['name']}: {phase_details['status']}")
+                # print(f"{phase}: failed zazaaz")
+                test_failure_phase = phase.split("_")[0]
+    return test_failure_phase
 
 
 def lt_failed_job_report(verbose=True):
