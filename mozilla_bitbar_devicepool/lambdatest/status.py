@@ -282,12 +282,16 @@ def lt_success_rate_report():
     parser = argparse.ArgumentParser(description="Generate a report on the success rate of jobs.")
     parser.add_argument(
         "--jobs",
+        "-j",
         type=int,
         default=DEFAULT_JOBS,
         help=f"Number of jobs to fetch (default: {DEFAULT_JOBS})",
     )
     parser.add_argument(
         "--verbose",
+        "-v",
+        dest="verbose",
+        default=False,
         action="store_true",
         help="Enable verbose output",
     )
@@ -306,8 +310,12 @@ def lt_success_rate_report():
     completed_count = 0
     total_count = 0
     failure_phase_dict = {}
+    # dict of lists, {'pre': ['device1', 'device2'], 'post': ['device3']}
+    failure_phase_device_list_dict = {}
     for job in get_jobs(lt_username, lt_api_key, jobs=args.jobs)["data"]:
         job_labels_list = util.string_list_to_list(job["job_label"])
+        device_id = util.get_device_from_job_labels(job_labels_list)
+
         # only inspect tcdp jobs
         if "tcdp" not in job_labels_list:
             # print(job_labels_list)
@@ -329,12 +337,29 @@ def lt_success_rate_report():
             # track failure phase
             failure_phase = extract_failure_phase(job)
             failure_phase_dict[failure_phase] = failure_phase_dict.get(failure_phase, 0) + 1
+            failure_phase_device_list_dict.setdefault(failure_phase, []).append(device_id)
         elif job["status"] == "running":
             running_count += 1
         else:
             print(f"Unknown job status: {job['status']}")
             continue
     total_count = completed_count + running_count + skipped_count
+
+    # create a summary datastructure of failure_phase_device_list_dict with counts per device
+    failure_phase_device_list_summary = {}
+    for phase, device_list in failure_phase_device_list_dict.items():
+        device_count = {}
+        for device in device_list:
+            if device in device_count:
+                device_count[device] += 1
+            else:
+                device_count[device] = 1
+        failure_phase_device_list_summary[phase] = device_count
+    # order the summary by count descending
+    for phase in failure_phase_device_list_summary:
+        failure_phase_device_list_summary[phase] = dict(
+            sorted(failure_phase_device_list_summary[phase].items(), key=lambda item: item[1], reverse=True)
+        )
 
     print(f"Job Success Report:")
     print(f"  Total Jobs: {total_count}")
@@ -343,7 +368,9 @@ def lt_success_rate_report():
     print(f"    Completed Jobs: {completed_count}")
     print(f"      Successful Jobs: {success_count}")
     print(f"      Failed Jobs: {failure_count}")
-    print(f"        Failure Phase Dict: {failure_phase_dict}")
+    print(f"        Failure Phase Counts: {failure_phase_dict}")
+    print(f"        Failure Phase Device Frequency: {failure_phase_device_list_summary}")
+    # TODO: show frequency of devices per failure phase
     if success_count == 0:
         print(f"  Success Rate (success_count / completed_count): 0%")
     else:
