@@ -313,9 +313,12 @@ def lt_success_rate_report():
             skipped_count += 1
             continue
 
+        # if job["status"] == "completed":
+        #     pprint.pprint(job)  # verbose output
+
         # pprint.pprint(job)  # verbose output
         print(f"status: {job['status']}")
-        if job["status"] == "success":
+        if job["status"] == "completed":
             success_count += 1
             completed_count += 1
         elif job["status"] == "failed":
@@ -329,7 +332,7 @@ def lt_success_rate_report():
         else:
             print(f"Unknown job status: {job['status']}")
             continue
-    total_count = completed_count + running_count
+    total_count = completed_count + running_count + skipped_count
 
     print(f"Job Success Report:")
     print(f"  Total Jobs: {total_count}")
