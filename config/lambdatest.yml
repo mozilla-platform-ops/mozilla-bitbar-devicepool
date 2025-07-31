@@ -80,8 +80,6 @@ device_groups:
     RZCY10Y4TBY
     RZCY10Y4TJX
     RZCY10Y548K
-  a55-alpha:
-    # joel requested pool
     R5CXC1AHWWZ
     R5CXC1HZA6V
     R5CXC1HZ85W
@@ -92,21 +90,12 @@ device_groups:
     R5CXC1HZ43J
     R5CXC1AMMNK
     RZCXC16W6KT
-  no-power-meters:
+  a55-alpha:
+    # no power meters yet on these
     R5CXC1ALFED
     R5CXC1ANGLT
     R5CXC1ARCER
     R5CXC1ARELR
-  jmaher-problem-devices:
-    # 7/25/25: devices joel has found issues with. lt investigating.
-    R5CXC1HZA6V
-    RZCXC1BK67D
-    R5CXC1HZ43J
-    R5CXC1HZ4KD
-    R5CXC1AHWWZ
-    R5CXC1HZ85W
-    R5CXC1HZ5PZ
-    RZCXC19G2SH
   p9-perf:
     # devices with power meters
     47160DLAQ003UB
