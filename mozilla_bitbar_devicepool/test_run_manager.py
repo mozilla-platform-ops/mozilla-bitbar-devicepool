@@ -148,7 +148,7 @@ class TestRunManager(object):
                 # TODO: vary this based on how many devices out of total this queue has
                 #   - set a global limit and then give each queue a fraction of that
                 #
-                max_jobs_to_have_waiting = 5
+                max_jobs_to_have_waiting = 1
                 if stats["WAITING"] >= max_jobs_to_have_waiting or pending_tasks == 0:
                     jobs_to_start = 0
                 else:
