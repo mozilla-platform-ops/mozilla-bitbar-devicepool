@@ -3,6 +3,7 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import argparse
+import datetime
 import os
 import pprint
 
@@ -312,36 +313,49 @@ def lt_success_rate_report():
     failure_phase_dict = {}
     # dict of lists, {'pre': ['device1', 'device2'], 'post': ['device3']}
     failure_phase_device_list_dict = {}
+
+    start_times = []
+
     for job in get_jobs(lt_username, lt_api_key, jobs=args.jobs)["data"]:
+        # Collect start_time for date range
+        if "start_time" in job and job["start_time"]:
+            try:
+                # Try parsing as ISO 8601, fallback to int if needed
+                if isinstance(job["start_time"], str):
+                    start_times.append(datetime.datetime.fromisoformat(job["start_time"].replace("Z", "+00:00")))
+                else:
+                    # If it's a timestamp (int/float)
+                    start_times.append(datetime.datetime.fromtimestamp(job["start_time"]))
+            except Exception:
+                pass
+
         job_labels_list = util.string_list_to_list(job["job_label"])
         device_id = util.get_device_from_job_labels(job_labels_list)
 
         # only inspect tcdp jobs
         if "tcdp" not in job_labels_list:
-            # print(job_labels_list)
             skipped_count += 1
             continue
 
-        # if job["status"] == "completed":
-        #     pprint.pprint(job)  # verbose output
-
-        # pprint.pprint(job)  # verbose output
-        # print(f"status: {job['status']}")
+        if args.verbose:
+            pprint.pprint(job)  # verbose output
 
         if job["status"] == "completed":
             success_count += 1
             completed_count += 1
-        elif job["status"] == "failed":
+        elif job["status"] == "timeout" or job["status"] == "failed":
             failure_count += 1
             completed_count += 1
-            # track failure phase
             failure_phase = extract_failure_phase(job)
             failure_phase_dict[failure_phase] = failure_phase_dict.get(failure_phase, 0) + 1
             failure_phase_device_list_dict.setdefault(failure_phase, []).append(device_id)
-        elif job["status"] == "running":
+        elif job["status"] == "running" or job["status"] == "initiated":
+            # count initiated as running for now
             running_count += 1
         else:
             print(f"Unknown job status: {job['status']}")
+            if args.verbose:
+                pprint.pprint(job)
             continue
     total_count = completed_count + running_count + skipped_count
 
@@ -361,8 +375,17 @@ def lt_success_rate_report():
             sorted(failure_phase_device_list_summary[phase].items(), key=lambda item: item[1], reverse=True)
         )
 
+    # Compute date range string
+    if start_times:
+        min_time = min(start_times)
+        max_time = max(start_times)
+        date_range_string = f"{min_time.isoformat()} to {max_time.isoformat()}"
+    else:
+        date_range_string = "(no start_time data found)"
+
     print(f"Job Success Report:")
     print(f"  Total Jobs: {total_count}")
+    print(f"    Job Date Range: {date_range_string}")
     print(f"    Skipped Jobs: {skipped_count}")
     print(f"    Running Jobs: {running_count}")
     print(f"    Completed Jobs: {completed_count}")
@@ -372,7 +395,6 @@ def lt_success_rate_report():
     print(
         f"        Failure Phase Device Frequency: {pprint.pformat(failure_phase_device_list_summary, sort_dicts=False)}"
     )
-    # TODO: show frequency of devices per failure phase
     if success_count == 0:
         print(f"  Success Rate (success_count / completed_count): 0%")
     else:
