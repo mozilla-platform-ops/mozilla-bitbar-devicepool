@@ -111,7 +111,7 @@ print("")
 # wait up to 2 minutes for device to show up in `adb devices`
 print("Waiting for device to reconnect...")
 elapsed = 0
-wait_time = 10
+wait_time = 120
 while elapsed < MAX_WAIT_TIME:
     print(f"  sleeping {wait_time} seconds")
     time.sleep(wait_time)  # sleep X seconds
