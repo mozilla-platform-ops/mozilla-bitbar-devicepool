@@ -71,7 +71,7 @@ print("Listing connected devices:")
 cmd = ["/usr/bin/adb", "devices", "-l"]
 
 device_name = None
-retry_sleeps = [1, 2, 5]
+retry_sleeps = [1, 2, 5, 10, 20, 30, 60]
 for attempt, sleep_time in enumerate(retry_sleeps + [0]):  # final attempt, no sleep after
     output = run(cmd, show_output=True)
     for output_line in output.split("\n"):
@@ -108,10 +108,10 @@ print("")
 # command = ["/usr/bin/adb", "start-server"]
 # run(command)
 
-# wait up to 2 minutes for device to show up in `adb devices`
-print("Waiting for device to reconnect...")
+# wait for device to show up in `adb devices`
 elapsed = 0
-wait_time = 120
+wait_time = 10
+print(f"Waiting up to {MAX_WAIT_TIME} seconds for device to reconnect...")
 while elapsed < MAX_WAIT_TIME:
     print(f"  sleeping {wait_time} seconds")
     time.sleep(wait_time)  # sleep X seconds
