@@ -17,6 +17,7 @@ projects:
     # TODO: decomm this in favor of test-1, name is confusing given usage in cloud image context
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-alpha-a55
     TC_WORKER_TYPE: gecko-t-lambda-alpha-a55
+    USER_SCRIPTS_VERSION: v3-disable-adb-killserver
     priority_group: a55
     priority: 10
   a55-perf:
@@ -38,7 +39,6 @@ device_groups:
     R5CX4089QNL
     R5CXC1AHXYD
     R5CXC1AHZBW
-    R5CXC1AJ02Z
     R5CXC1AJ07K
     R5CXC1AMNFY
     R5CXC1AP2KT
@@ -80,7 +80,6 @@ device_groups:
     RZCY10Y4TBY
     RZCY10Y4TJX
     RZCY10Y548K
-    R5CXC1AHWWZ
     R5CXC1HZA6V
     R5CXC1HZ85W
     R5CXC1HZ4KD
@@ -91,6 +90,9 @@ device_groups:
     R5CXC1AMMNK
     RZCXC16W6KT
   a55-alpha:
+    R5CXC1AJ02Z
+    R5CXC1AHWWZ
+  was-a55-alpha-devices-without-power-meters:
     # no power meters yet on these
     R5CXC1ALFED
     R5CXC1ANGLT
