@@ -1,7 +1,11 @@
+import logging
 import os
 import subprocess
 import sys
 import time
+
+# Configure logging to include timestamps
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
 
 # TODO: pull most of this code out into a library/class
 # TODO: consider using mozdevice pip for many of these functions
@@ -17,7 +21,7 @@ def get_connected_devices():
         result = subprocess.run(["/usr/bin/adb", "devices"], capture_output=True, text=True, check=True)
         # result = subprocess.run([os.environ['ADB_BINARY_PATH'], 'devices'], capture_output=True, text=True, check=True)
 
-        print("got stdout from 'adb devices': %s" % result.stdout)
+        logging.info("got stdout from 'adb devices': %s", result.stdout)
 
         # Split the output into lines and extract device IDs
         output_lines = result.stdout.strip().split("\n")[1:]
@@ -26,7 +30,7 @@ def get_connected_devices():
         return devices
 
     except subprocess.CalledProcessError as e:
-        print(f"Error: {e}")
+        logging.error(f"Error: {e}")
         return []
 
 
@@ -34,10 +38,10 @@ def run(command, show_output=True):
     result = subprocess.run(command, capture_output=True, text=True, check=True)
     if show_output:
         if result.stdout:
-            print(result.stdout)
+            logging.info(result.stdout.strip())
         # TODO: should we show stderr? should stderr and stdout be merged?
         if result.stderr:
-            print(result.stderr)
+            logging.info(result.stderr.strip())
     return result.stdout
 
 
@@ -47,27 +51,29 @@ metadata_filename = os.path.basename(metadata_path)
 if os.path.exists(metadata_path):
     with open(metadata_path, "r") as f:
         metadata = f.read()
-    print(f"{metadata_filename} contents:")
-    print(metadata)
+    logging.info(f"{metadata_filename} contents:")
+    logging.info(metadata)
 else:
-    print(f"{metadata_filename} does not exist")
+    logging.info(f"{metadata_filename} does not exist")
 
-print("")
+logging.info("")
 
+# 8/19/25: disabled as we get a new container for each test run, not needed
+#
 # flush userPorts
-print("Flushing userPorts...")
-ports = [p.split("/")[-1] for p in os.environ.get("UserPorts", "").split(",")]
-ports.extend(["2828", "8888", "8854", "4443", "4444"])
-for port in ports:
-    command = ["sudo", "ss", "--kill", "state", "listening", "src", f":{port}"]
-    run(command)
+# logging.info("Flushing userPorts...")
+# ports = [p.split("/")[-1] for p in os.environ.get("UserPorts", "").split(",")]
+# ports.extend(["2828", "8888", "8854", "4443", "4444"])
+# for port in ports:
+#     command = ["sudo", "ss", "--kill", "state", "listening", "src", f":{port}"]
+#     run(command)
 
-print("")
+logging.info("")
 
 # TODO: could be mozdevice calls
 #   (see https://firefox-source-docs.mozilla.org/mozbase/mozdevice.html)
 
-print("Listing connected devices:")
+logging.info("Listing connected devices:")
 cmd = ["/usr/bin/adb", "devices", "-l"]
 
 device_name = None
@@ -81,27 +87,27 @@ for attempt, sleep_time in enumerate(retry_sleeps + [0]):  # final attempt, no s
     if device_name:
         break
     if attempt < len(retry_sleeps):
-        print(f"device_name not found, retrying after {sleep_time}s...")
+        logging.info(f"device_name not found, retrying after {sleep_time}s...")
         time.sleep(sleep_time)
 
 if not device_name:
-    print("device_name is empty")
+    logging.error("device_name is empty")
     sys.exit(1)
-print(f"device_name: {device_name}")
+logging.info(f"device_name: {device_name}")
 
-print("")
+logging.info("")
 
 # adb reboot
-print("Sending reboot command...")
+logging.info("Sending reboot command...")
 command = ["/usr/bin/adb", "-s", device_name, "reboot"]
 run(command)
 
-print("")
+logging.info("")
 
 # 8/18/25: disabled to see if needed
 #
 # restart adb server
-# print("restarting adb server...")
+# logging.info("restarting adb server...")
 # command = ["/usr/bin/adb", "kill-server"]
 # run(command)
 # time.sleep(3)
@@ -111,9 +117,9 @@ print("")
 # wait for device to show up in `adb devices`
 elapsed = 0
 wait_time = 10
-print(f"Waiting up to {MAX_WAIT_TIME} seconds for device to reconnect...")
+logging.info(f"Waiting up to {MAX_WAIT_TIME} seconds for device to reconnect...")
 while elapsed < MAX_WAIT_TIME:
-    print(f"  sleeping {wait_time} seconds")
+    logging.info(f"  sleeping {wait_time} seconds")
     time.sleep(wait_time)  # sleep X seconds
     elapsed += wait_time
     devices = get_connected_devices()
@@ -121,8 +127,8 @@ while elapsed < MAX_WAIT_TIME:
         break
 
 if elapsed >= MAX_WAIT_TIME:
-    print("TEST-UNEXPECTED-FAIL | lambda | device failed to reconnect after reboot")
+    logging.error("TEST-UNEXPECTED-FAIL | lambda | device failed to reconnect after reboot")
     sys.exit(1)
 
-print("Device reconnected successfully.")
+logging.info("Device reconnected successfully.")
 sys.exit(0)
