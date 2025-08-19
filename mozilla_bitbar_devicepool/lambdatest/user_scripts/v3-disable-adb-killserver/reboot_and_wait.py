@@ -56,7 +56,7 @@ if os.path.exists(metadata_path):
 else:
     logging.info(f"{metadata_filename} does not exist")
 
-logging.info("")
+# logging.info("")
 
 # 8/19/25: disabled as we get a new container for each test run, not needed
 #
@@ -68,7 +68,7 @@ logging.info("")
 #     command = ["sudo", "ss", "--kill", "state", "listening", "src", f":{port}"]
 #     run(command)
 
-logging.info("")
+# logging.info("")
 
 # TODO: could be mozdevice calls
 #   (see https://firefox-source-docs.mozilla.org/mozbase/mozdevice.html)
@@ -95,14 +95,14 @@ if not device_name:
     sys.exit(1)
 logging.info(f"device_name: {device_name}")
 
-logging.info("")
+# logging.info("")
 
 # adb reboot
 logging.info("Sending reboot command...")
 command = ["/usr/bin/adb", "-s", device_name, "reboot"]
 run(command)
 
-logging.info("")
+# logging.info("")
 
 # 8/18/25: disabled to see if needed
 #
