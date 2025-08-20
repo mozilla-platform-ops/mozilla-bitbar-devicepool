@@ -185,15 +185,15 @@ projects:
   #   additional_parameters:
   #     DOCKER_IMAGE_VERSION: 20240307T112108
   # used for testing new docker images
-  mozilla-gw-test-1:
-    device_group_name: test-1
-    framework_name: mozilla-usb
-    description: used for testing new images, devices, operating systems
-    additional_parameters:
-      TASKCLUSTER_CLIENT_ID: project/autophone/bitbar-x-test-1
-      TC_WORKER_TYPE: gecko-t-bitbar-gw-test-1
-      # replace with version to test
-      DOCKER_IMAGE_VERSION: 20250304T123621
+  # mozilla-gw-test-1:
+  #   device_group_name: test-1
+  #   framework_name: mozilla-usb
+  #   description: used for testing new images, devices, operating systems
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/bitbar-x-test-1
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-test-1
+  #     # replace with version to test
+  #     DOCKER_IMAGE_VERSION: 20250304T123621
   # mozilla-gw-test-2:
   #   device_group_name: test-2
   #   framework_name: mozilla-usb
