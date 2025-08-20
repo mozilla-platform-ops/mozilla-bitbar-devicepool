@@ -2,6 +2,7 @@
 
 # compares bitbar api devices to devices in our config
 
+import argparse
 import os
 import sys
 
@@ -42,31 +43,45 @@ def get_device_names():
     return devices
 
 
-try:
-    api_devices = get_device_names()
-except AttributeError as e:
-    print("Please ensure the bitbar env vars have been set!")
-    print("  - TESTDROID_URL and TESTDROID_APIKEY")
-    print("full exception follows")
+def main():
+    parser = argparse.ArgumentParser(description="Compare Bitbar API devices to config devices")
+    parser.add_argument(
+        "--config-file",
+        "-c",
+        dest="config_file",
+        default=None,
+        help="Path to device config file (default: use DeviceGroupReport default)",
+    )
+    args = parser.parse_args()
+
+    try:
+        api_devices = get_device_names()
+    except AttributeError as e:
+        print("Please ensure the bitbar env vars have been set!")
+        print("  - TESTDROID_URL and TESTDROID_APIKEY")
+        print("full exception follows")
+        print("")
+        raise e
+    api_devices_set = set(api_devices)
+    print("api devices: ")
+    print(f"  {api_devices}")
+    print(f"  count: {len(api_devices)}")
+
     print("")
-    raise e
-api_devices_set = set(api_devices)
-print("api devices: ")
-print(f"  {api_devices}")
-print(f"  count: {len(api_devices)}")
 
-print("")
+    dgri = DeviceGroupReport(quiet=True, config_path=args.config_file)
+    config_devices = dgri.get_config_devices()
+    config_devices_set = set(config_devices)
+    print(f"config ({dgri.config_path}) devices: ")
+    print(f"  {config_devices}")
+    print(f"  count: {len(config_devices)}")
 
-# config_path=args.config_file
-dgri = DeviceGroupReport(quiet=True)
-config_devices = dgri.get_config_devices()
-config_devices_set = set(config_devices)
-print(f"config ({dgri.config_path}) devices: ")
-print(f"  {config_devices}")
-print(f"  count: {len(config_devices)}")
+    print("")
+    print("api - config: ")
+    print(f"  {sorted(api_devices_set.difference(config_devices_set))}")
+    print("config - api: ")
+    print(f"  {sorted(config_devices_set.difference(api_devices_set))}")
 
-print("")
-print("api - config: ")
-print(f"  {sorted(api_devices_set.difference(config_devices_set))}")
-print("config - api: ")
-print(f"  {sorted(config_devices_set.difference(api_devices_set))}")
+
+if __name__ == "__main__":
+    main()
