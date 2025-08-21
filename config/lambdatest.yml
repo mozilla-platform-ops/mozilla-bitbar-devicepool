@@ -89,9 +89,18 @@ device_groups:
     R5CXC1HZ43J
     R5CXC1AMMNK
     RZCXC16W6KT
-  a55-alpha:
     R5CXC1AJ02Z
     R5CXC1AHWWZ
+  a55-alpha:
+    # devices on the docker host at 10.146.2.55
+    R5CXC1ARZDN
+    R5CXC1HZ43J
+    R5CXC1HZ85W
+    R5CXC1HZA6V
+    R5CXC1SXMVR
+    RZCXC19G1DM
+    RZCXC1BK67D
+    RZCY107MCLV
   was-a55-alpha-devices-without-power-meters:
     # no power meters yet on these
     R5CXC1ALFED
