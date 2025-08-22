@@ -29,6 +29,7 @@ class DeviceGroupReport:
                 print("INFO: Using config file at '%s'." % self.config_path)
         else:
             self.config_path = config_path
+        print("INFO: Using config file at '%s'." % self.config_path)
 
     def get_config_devices(self):
         # TODO: store this data in the instance and only read once

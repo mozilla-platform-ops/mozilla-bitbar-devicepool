@@ -62,6 +62,8 @@ def main():
         print("full exception follows")
         print("")
         raise e
+    dgri = DeviceGroupReport(quiet=True, config_path=args.config_file)
+
     api_devices_set = set(api_devices)
     print("api devices: ")
     print(f"  {api_devices}")
@@ -69,7 +71,6 @@ def main():
 
     print("")
 
-    dgri = DeviceGroupReport(quiet=True, config_path=args.config_file)
     config_devices = dgri.get_config_devices()
     config_devices_set = set(config_devices)
     print(f"config ({dgri.config_path}) devices: ")
