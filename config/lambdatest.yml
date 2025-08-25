@@ -4,7 +4,7 @@ projects:
   defaults:
     # TODO: start using USER_SCRIPTS_VERSION for git version? name repo `mozilla-lambdatest-files`?
     # for now this points to a directory name in `mozilla_bitbar_devicepool/lambdatest/user_scripts`
-    USER_SCRIPTS_VERSION: v2-py312_and_hg702
+    USER_SCRIPTS_VERSION: v3-disable-adb-killserver
     # fake values. inheriting projects below should set reasonable values.
     TASKCLUSTER_CLIENT_ID: tc-client-id-set-me
     # env var with key is looked for at this with underscores: `tc_worker_type_set_me`
@@ -17,7 +17,7 @@ projects:
     # TODO: decomm this in favor of test-1, name is confusing given usage in cloud image context
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-alpha-a55
     TC_WORKER_TYPE: gecko-t-lambda-alpha-a55
-    USER_SCRIPTS_VERSION: v3-disable-adb-killserver
+    # USER_SCRIPTS_VERSION: v3-disable-adb-killserver
     priority_group: a55
     priority: 10
   a55-perf:
@@ -58,7 +58,6 @@ device_groups:
     RZCX50TW03H
     RZCX71ZVF6J
     RZCX821GYPX
-    RZCXC15YZVZ
     RZCXC16WHTA
     RZCXC187YCR
     RZCXC189JSJ
@@ -83,8 +82,6 @@ device_groups:
     RZCXC16W6KT
     R5CXC1AJ02Z
     R5CXC1AHWWZ
-  a55-alpha:
-    # devices on the docker host at 10.146.2.55
     R5CXC1ARZDN
     R5CXC1HZ43J
     R5CXC1HZ85W
@@ -93,6 +90,9 @@ device_groups:
     RZCXC19G1DM
     RZCXC1BK67D
     RZCY107MCLV
+  a55-alpha:
+    # bad devices for jmaher to test. quarantined by sheriffs.
+    RZCXC15YZVZ
   was-a55-alpha-devices-without-power-meters:
     # no power meters yet on these
     R5CXC1ALFED
