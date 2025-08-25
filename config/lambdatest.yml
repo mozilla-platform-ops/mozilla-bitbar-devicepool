@@ -47,8 +47,6 @@ device_groups:
     R5CXC1ASA2E
     R5CXC1ASA3P
     R5CXC1ASH4E
-    R5CXC1ASHNJ
-    R5CXC1HZ62Y
     R5CXC1HZK0W
     R5CXC1HZKLR
     R5CXC1PW7CR
@@ -75,7 +73,6 @@ device_groups:
     RZCY10Y4TBY
     RZCY10Y4TJX
     RZCY10Y548K
-    R5CXC1HZ4KD
     RZCXC19G2SH
     R5CXC1HZ5PZ
     R5CXC1AMMNK
@@ -93,6 +90,9 @@ device_groups:
   a55-alpha:
     # bad devices for jmaher to test. quarantined by sheriffs.
     RZCXC15YZVZ
+    R5CXC1HZ4KD
+    R5CXC1ASHNJ
+    R5CXC1HZ62Y
   was-a55-alpha-devices-without-power-meters:
     # no power meters yet on these
     R5CXC1ALFED
