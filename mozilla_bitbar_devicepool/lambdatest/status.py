@@ -404,9 +404,13 @@ def lt_success_rate_report():
 def extract_failure_phase(job):
     test_failure_phase = "testing"  # default phase
     # TODO: should we not have a default? should we raise in some cases?
-    if "job_summary" in job:
+    if "job_summary" in job and job["job_summary"] is not None:
         # print("job summary:")
         # pprint.pprint(job["job_summary"])
+        if len(job["job_summary"]) == 0:
+            print("job summary is empty")
+            pprint.pprint(job)
+            return test_failure_phase
         for phase, phase_details in job["job_summary"].items():
             # print(f"  - {phase}: {phase_details}")
             # pprint.pprint(phase_details)
@@ -414,6 +418,9 @@ def extract_failure_phase(job):
                 # print(f"    - {phase_details['name']}: {phase_details['status']}")
                 # print(f"{phase}: failed zazaaz")
                 test_failure_phase = phase.split("_")[0]
+    else:
+        print("job summary not in job or is None")
+        pprint.pprint(job)
     return test_failure_phase
 
 
