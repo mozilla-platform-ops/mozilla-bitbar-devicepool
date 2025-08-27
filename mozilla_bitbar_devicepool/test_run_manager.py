@@ -112,7 +112,7 @@ class TestRunManager(object):
                             device_group_name,
                             stats["DISABLED"],
                             stats["OFFLINE"],
-                            ", ".join(stats["OFFLINE_DEVICES"]),
+                            ", ".join(sorted(stats["OFFLINE_DEVICES"])),
                         )
                     )
 
