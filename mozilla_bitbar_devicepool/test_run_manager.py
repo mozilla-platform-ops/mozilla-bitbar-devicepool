@@ -166,7 +166,7 @@ class TestRunManager(object):
                     #   - no extra waiting jobs (hmm, has more than one (v2))...
                     #     - system should be able to handle it. represents a bug to squash.
                     tasks_that_need_handling = pending_tasks - stats["WAITING"]
-                    logger.info(f"jts calc: min({tasks_that_need_handling}, {stats['IDLE']} - {stats['WAITING']})")
+                    # logger.info(f"jts calc: min({tasks_that_need_handling}, {stats['IDLE']} - {stats['WAITING']})")
                     jobs_to_start = min(
                         tasks_that_need_handling,
                         stats["IDLE"] - stats["WAITING"],  # TODO: also subtract just started like in lt?
