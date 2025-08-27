@@ -5,7 +5,7 @@
 
 This project enables the execution of Mozilla's [Taskcluster](https://taskcluster.net/) tests on Android hardware devices via API integrations with various vendors.
 
-Currently supported vendors are [Bitbar](https://bitbar.com/) and [Lamdatest](https://www.lambdatest.com/).
+Currently supported vendors are [Bitbar](https://bitbar.com/) and [Lambdatest](https://www.lambdatest.com/).
 
 ## Installation
 
