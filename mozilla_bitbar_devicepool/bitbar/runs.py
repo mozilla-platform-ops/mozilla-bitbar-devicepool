@@ -91,3 +91,9 @@ def get_active_test_runs(**kwargs):
     """Gets active test runs."""
     response = TESTDROID.get("api/v2/admin/runs?filter=d_endTime_isnull&limit=0")
     return response["data"]
+
+
+if __name__ == "__main__":
+    import pprint
+
+    pprint.pprint(get_active_test_runs())
