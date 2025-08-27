@@ -129,6 +129,11 @@ def configure(bitbar_configpath, filespath=None, update_bitbar=False):
     configure_device_groups(update_bitbar=update_bitbar)
     configure_projects(update_bitbar=update_bitbar)
 
+    if not CONFIG.get("devicepool_config", {}).get("jobs_to_start_algorithm", None):
+        CONFIG["devicepool_config"]["jobs_to_start_algorithm"] = "v2"
+        logger.info("configure: 'jobs_to_start_algorithm' not set, defaulting to 'v2'")
+    logger.info(f"jobs_to_start_algorithm: {CONFIG['devicepool_config']['jobs_to_start_algorithm']}")
+
     end = time.time()
     diff = end - start
     logger.info("configure: configuration took {} seconds".format(diff))

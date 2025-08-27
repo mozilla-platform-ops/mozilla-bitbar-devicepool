@@ -1,3 +1,5 @@
+devicepool_config:
+  jobs_to_start_algorithm: v3
 projects:
   defaults:
     os_type: ANDROID
