@@ -9,6 +9,41 @@ from mozilla_bitbar_devicepool import TESTDROID
 from mozilla_bitbar_devicepool.util.template import get_filter
 
 
+# get_admin_devices() includes state, whereas get_devices() does not
+def get_admin_devices(**kwargs):
+    """Return list of matching Bitbar devices.
+
+    :param **kwargs: keyword arguments containing fieldnames and
+                     values with which to filter the devices to
+                     be returned. If a fieldname is missing, it is
+                     not used in the filter.
+                     {
+                       'displayname': str,
+                       'enabled': bool,
+                       'id': int,
+                       'locked': bool,
+                       'online': bool,
+                       'ostype': str,
+                     }
+
+    Examples:
+       get_devices() # Return all devices
+       get_devices(displayname='pixel2-25') # Return pixel2-25
+    """
+    fields = {
+        "displayname": str,
+        "enabled": bool,
+        "id": int,
+        "locked": bool,
+        "online": bool,
+        "ostype": str,
+    }
+
+    filter = get_filter(fields, **kwargs)
+    response = TESTDROID.get("api/v2/admin/devices", payload={"limit": 0, "filter": filter})
+    return response["data"]
+
+
 def get_devices(**kwargs):
     """Return list of matching Bitbar devices.
 
@@ -95,11 +130,15 @@ if __name__ == "__main__":
         TESTDROID = Testdroid(apikey=TESTDROID_APIKEY, url=TESTDROID_URL)
     else:
         TESTDROID = None
+        raise Exception("need to set TESTDROID_URL and TESTDROID_APIKEY")
 
-    print(TESTDROID)
-    response = TESTDROID.get("/api/v2/device-groups", payload={"limit": 0, "filter": filter})
-    pprint.pprint(response)
+    # print(TESTDROID)
 
-    print("*********")
+    pprint.pprint(get_admin_devices())
 
-    pprint.pprint(get_device(17))
+    # response = TESTDROID.get("/api/v2/device-groups", payload={"limit": 0, "filter": filter})
+    # pprint.pprint(response)
+
+    # print("*********")
+
+    # pprint.pprint(get_device(17))
