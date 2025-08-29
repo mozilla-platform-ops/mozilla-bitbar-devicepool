@@ -255,13 +255,12 @@ device_groups:
   test-2:
     pixel5-07:
     pixel5-10:
-    pixel5-11:
     pixel5-12:
     pixel5-16:
   test-3:
+    s24-05:
     # s21-01:
     # s24-01:
     # s24-02:
     # s24-03:
     # s24-04:
-    'samsung SM-S926U1':
