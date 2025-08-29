@@ -79,17 +79,17 @@ device_groups:
     RZCXC19G1DM
     RZCXC1BK67D
     RZCY107MCLV
-  a55-alpha:
     RZCX821GXDJ
     RZCY10LGB6W
     RZCY10Y4HWD
-    RZCY10Y4QVX
     RZCY10Y4TAV
     RZCY10Y4TBY
     RZCY10Y4TJX
     RZCY10Y548K
-  sheriff-quarantined-from-perf:
-    # bad devices for jmaher to test. quarantined by sheriffs.
+  a55-alpha:
+    # first dev is from second docker host (but wasn't working)
+    # second - end: sheriff quarantined bad devices
+    RZCY10Y4QVX
     RZCXC15YZVZ
     R5CXC1HZ4KD
     R5CXC1ASHNJ
