@@ -67,7 +67,6 @@ device_groups:
     R5CXC1AHV4M
     RZCXC19G2SH
     R5CXC1HZ5PZ
-    R5CXC1AMMNK
     RZCXC16W6KT
     R5CXC1AJ02Z
     R5CXC1AHWWZ
@@ -79,8 +78,6 @@ device_groups:
     RZCXC19G1DM
     RZCXC1BK67D
     RZCY107MCLV
-  a55-alpha:
-    # second docker host of devices that have been recabled
     RZCX821GXDJ
     RZCY10LGB6W
     RZCY10Y4HWD
@@ -89,7 +86,16 @@ device_groups:
     RZCY10Y4TBY
     RZCY10Y4TJX
     RZCY10Y548K
-  a55-alpha-old:
+  a55-alpha:
+    # recabled a55 devices with power meters on 10.146.2.46 and 10.146.2.56
+    R5CXC1AMMNK
+    R5CXC1ASLHH
+    R5CXC1AHV4M
+    R5CXC1ASA0L
+    R5CXC1AJ02Z
+    R5CXC1HZ62Y
+    RZCXC19G2SH
+  a55-sheriff-bad:
     # sheriff quarantined bad devices
     RZCXC15YZVZ
     R5CXC1HZ4KD
@@ -102,7 +108,7 @@ device_groups:
     R5CXC1ARCER
     R5CXC1ARELR
   p9-perf:
-    # devices with power meters
+    # devices with power meters, have been recabled
     47160DLAQ003UB
     47241FDAQ0016Y
     47241FDAQ002C0
