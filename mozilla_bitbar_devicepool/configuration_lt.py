@@ -97,7 +97,13 @@ class ConfigurationLt(object):
         # massage device_groups into a more usable format
         for item in project_device_groups:
             if project_device_groups[item] is not None:
-                project_device_groups[item] = project_device_groups[item].split(" ")
+                # handle `device:` format like bitbar (list of strings)
+                if type(project_device_groups[item]) is list:
+                    # already a list, do nothing
+                    pass
+                # handle `device` format (string)
+                elif type(project_device_groups[item]) is str:
+                    project_device_groups[item] = project_device_groups[item].split(" ")
             else:
                 # if we don't have a entry in projects, skip it
                 projects_config[item] = {}
