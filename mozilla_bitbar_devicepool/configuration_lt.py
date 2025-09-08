@@ -220,6 +220,9 @@ class ConfigurationLt(object):
         self._set_fully_configured_projects()
         self._set_disabled()
 
+        # validate the configuration
+        self._validate_device_groups()
+
         # set config-wide values
         self._load_tc_env_vars()
         self._set_lt_api_key()
@@ -364,6 +367,32 @@ class ConfigurationLt(object):
         #     configured_count = len(self.fully_configured_projects)
         #     total_count = len(projects_config) - 1  # Exclude defaults
         #     print(f"Fully configured projects: {configured_count}/{total_count}")
+
+    def _validate_device_groups(self):
+        """
+        Validates that there are no duplicate devices across device groups
+        of fully configured projects.
+
+        Raises:
+            ValueError: If a duplicate device is found in multiple device groups.
+        """
+        device_to_group_map = {}
+        device_groups = self.config.get("device_groups", {})
+        projects_to_check = self.get_fully_configured_projects()
+
+        for project_name in projects_to_check:
+            # a project name can be a device group name
+            if project_name in device_groups:
+                devices = device_groups[project_name]
+                if not devices:
+                    continue
+                for device_udid in devices:
+                    if device_udid in device_to_group_map:
+                        raise ValueError(
+                            f"Duplicate device found: UDID '{device_udid}' is in both "
+                            f"group '{device_to_group_map[device_udid]}' and group '{project_name}'."
+                        )
+                    device_to_group_map[device_udid] = project_name
 
     def get_fully_configured_projects(self):
         """

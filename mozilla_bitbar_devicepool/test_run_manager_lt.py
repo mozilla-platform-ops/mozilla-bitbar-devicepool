@@ -936,6 +936,16 @@ def main():
         # Start the main run loop using the multithreaded runner
         trmlt.run_multithreaded()
 
+    if args.action == "config-check":
+        # Config check action
+        try:
+            _ = TestRunManagerLT(unit_testing_mode=args.ci_mode, debug_mode=args.debug)
+            logging.info("Configuration check passed.")
+            sys.exit(0)
+        except ValueError as e:
+            logging.warning(f"Configuration check failed. {e}")
+            # misc.report_handled_exception_to_sentry(e)
+            sys.exit(1)
     elif args.action is None:
         # No action was provided
         # list the available actions
