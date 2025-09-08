@@ -7,6 +7,7 @@ import argparse
 import logging
 import multiprocessing  # Add import for multiprocessing.Manager
 import os
+import pprint
 import shutil
 import signal
 import subprocess
@@ -939,11 +940,17 @@ def main():
     if args.action == "config-check":
         # Config check action
         try:
-            _ = TestRunManagerLT(unit_testing_mode=args.ci_mode, debug_mode=args.debug)
+            trmlt = TestRunManagerLT(unit_testing_mode=args.ci_mode, debug_mode=args.debug)
+            # show the configuration
+            pprint.pprint(trmlt.config_object.config, sort_dicts=False)
             logging.info("Configuration check passed.")
             sys.exit(0)
         except ValueError as e:
             logging.warning(f"Configuration check failed. {e}")
+            # misc.report_handled_exception_to_sentry(e)
+            sys.exit(1)
+        except Exception as e:
+            logging.warning(f"Configuration check failed with unexpected error. {e}", exc_info=True)
             # misc.report_handled_exception_to_sentry(e)
             sys.exit(1)
     elif args.action is None:
