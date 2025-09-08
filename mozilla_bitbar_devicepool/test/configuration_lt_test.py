@@ -126,6 +126,51 @@ device_groups:
 """
 
 
+# device_groups use list of strings instead of (string) block
+SAMPLE_FILE_CONFIG_YAML_3 = """
+global:
+  contract_device_count: 1319
+projects:
+  defaults:
+    # not used yet
+    # SCRIPT_REPO_COMMIT: master
+    TEST_1: blah
+    disabled: false
+  a55-alpha:
+    # lt_device_selector: "Galaxy A55 5G-14"
+    # swapped for testing
+    lt_device_selector: "Galaxy A51-11"
+    TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-alpha-a55
+    TC_WORKER_TYPE: gecko-t-lambda-alpha-a55
+  a55-perf:
+    lt_device_selector: "Galaxy A55 5G-14"
+    # swapped for testing
+    # lt_device_selector: "Galaxy A51-11"
+    TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-a55
+    TC_WORKER_TYPE: gecko-t-lambda-perf-a55
+    disabled: true
+  test-1:
+  #     SCRIPT_REPO_COMMIT: future_commit
+    lt_device_selector: "Galaxy A51-11"
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1
+  #     TC_WORKER_TYPE: gecko-t-lambda-gw-test-1
+  #     # override SCRIPT_REPO_COMMIT with a test commit
+device_groups:
+  # this block is not used yet (not possible with LT API), future goal. see lt_device_selector in projects.
+  a55-perf:
+    R5CX4089QNL:
+    R5CXC1AHV4M:
+    R5CXC1ALFED:
+  a55-alpha:
+    # the only device with a power meter
+    R5CXC1HZKLR:
+  test-1:
+    # a51
+    RZ8NB0WJ47H:
+  test-2:
+"""
+
+
 # create a fixture using SAMPLE_FILE_CONFIG_YAML
 @pytest.fixture
 def sample_file_config(tmp_path):
@@ -151,6 +196,20 @@ def sample_file_config_2(tmp_path):
     config_dir.mkdir()
     config_file = config_dir / "config.yml"
     config_file.write_text(SAMPLE_FILE_CONFIG_YAML_2)
+
+    return str(config_file)
+
+
+@pytest.fixture
+def sample_file_config_3(tmp_path):
+    """
+    Fixture to create a temporary YAML file with sample configuration data.
+    """
+    # Create a temporary config file
+    config_dir = tmp_path / "config3"
+    config_dir.mkdir()
+    config_file = config_dir / "config.yml"
+    config_file.write_text(SAMPLE_FILE_CONFIG_YAML_3)
 
     return str(config_file)
 
@@ -370,6 +429,7 @@ def test_global_contract_device_count(configured_lt_instance2):
 ALL_LT_CONFIG_FIXTURES = [
     "sample_file_config",
     "sample_file_config_2",
+    "sample_file_config_3",
     "sample_file_config_actual",
 ]
 
