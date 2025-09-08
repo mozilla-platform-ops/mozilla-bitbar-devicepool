@@ -81,14 +81,14 @@ device_groups:
     RZCY10Y4TBY
     RZCY10Y4TJX
     RZCY10Y548K
+    R5CXC1AMMNK
+    R5CXC1HZ62Y
   a55-alpha:
     # recabled a55 devices with power meters on 10.146.2.46 and 10.146.2.56
-    R5CXC1AMMNK
     R5CXC1ASLHH
     R5CXC1AHV4M
     R5CXC1ASA0L
     R5CXC1AJ02Z
-    R5CXC1HZ62Y
     RZCXC19G2SH
   a55-sheriff-bad:
     # sheriff quarantined bad devices
