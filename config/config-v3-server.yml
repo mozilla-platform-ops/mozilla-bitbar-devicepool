@@ -252,13 +252,18 @@ device_groups:
     a55-76:
     a55-77:
     a55-78:
-  test-2:
+    a55-134:
+    a55-135:
+    a55-141:
+    a55-142:
     pixel5-07:
-    pixel5-10:
     pixel5-12:
-    pixel5-16:
-  test-3:
+    pixel6-137:
+    pixel6-138:
+    s24-06:
     s24-05:
+  test-2:
+  test-3:
     # s21-01:
     # s24-01:
     # s24-02:
