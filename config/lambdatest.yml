@@ -73,23 +73,24 @@ device_groups:
     RZCXC19G1DM:
     RZCXC1BK67D:
     RZCY107MCLV:
-    RZCX821GXDJ:
-    RZCY10LGB6W:
-    RZCY10Y4HWD:
-    RZCY10Y4QVX:
-    RZCY10Y4TAV:
-    RZCY10Y4TBY:
-    RZCY10Y4TJX:
-    RZCY10Y548K:
-    R5CXC1AMMNK:
-    R5CXC1HZ62Y:
-  a55-alpha:
+    RZCX821GXDJ:  # 9/10/25: previously recabled and verified by jmaher
+    RZCY10LGB6W:  # 9/10/25: previously recabled and verified by jmaher
+    RZCY10Y4HWD:  # 9/10/25: previously recabled and verified by jmaher
+    RZCY10Y4QVX:  # 9/10/25: previously recabled and verified by jmaher
+    RZCY10Y4TAV:  # 9/10/25: previously recabled and verified by jmaher
+    RZCY10Y4TBY:  # 9/10/25: previously recabled and verified by jmaher
+    RZCY10Y4TJX:  # 9/10/25: previously recabled and verified by jmaher
+    RZCY10Y548K:  # 9/10/25: previously recabled and verified by jmaher
+    R5CXC1AMMNK:  # 9/10/25: previously recabled and verified by jmaher
+    R5CXC1HZ62Y:  # 9/10/25: previously recabled and verified by jmaher
     # recabled a55 devices with power meters on 10.146.2.46 and 10.146.2.56
-    R5CXC1ASLHH:
-    R5CXC1AHV4M:
-    R5CXC1ASA0L:
-    R5CXC1AJ02Z:
-    RZCXC19G2SH:
+    R5CXC1ASLHH:  # 9/10/25: recabled and verified by jmaher
+    R5CXC1AHV4M:  # 9/10/25: recabled and verified by jmaher
+    R5CXC1ASA0L:  # 9/10/25: recabled and verified by jmaher
+    R5CXC1AJ02Z:  # 9/10/25: recabled and verified by jmaher
+    RZCXC19G2SH:  # 9/10/25: recabled and verified by jmaher
+  a55-alpha:
+
   a55-sheriff-bad:
     # sheriff quarantined bad devices
     RZCXC15YZVZ:
