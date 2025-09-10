@@ -90,6 +90,14 @@ device_groups:
     R5CXC1AJ02Z:  # 9/10/25: recabled and verified by jmaher
     RZCXC19G2SH:  # 9/10/25: recabled and verified by jmaher
   a55-alpha:
+    # devices on 10.146.2.45
+    R5CXC1ASA3P:
+    RZCY2011M7N:
+    RZCY203N75Z:
+    R5CXC1ARM0A:
+    R5CXC1ASA2E:
+    R5CXC1HZK0W:
+    R5CXC1AP2KT:
   a55-sheriff-bad:
     # sheriff quarantined bad devices
     RZCXC15YZVZ:
