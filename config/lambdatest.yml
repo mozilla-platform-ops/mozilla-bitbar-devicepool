@@ -36,25 +36,17 @@ projects:
 device_groups:
   a55-perf:
     # devices with power meters
-    R5CX4089QNL:
     R5CXC1AHXYD:
     R5CXC1AHZBW:
     R5CXC1AJ07K:
-    R5CXC1AMNFY:
     R5CXC1ASH4E:
     R5CXC1HZKLR:
     R5CXC1PW7CR:
     R5CXC1PW94F:
-    R5CY21T22NH:
-    RZCX31FDGJE:
-    RZCX50TW03H:
-    RZCX71ZVF6J:
-    RZCX821GYPX:
     RZCXC16WHTA:
     RZCXC187YCR:
     RZCXC189JSJ:
     RZCXC19G1CT:
-    RZCY204AAZD:
     R5CXC1HZ5PZ:
     RZCXC16W6KT:
     R5CXC1AHWWZ:
@@ -82,15 +74,25 @@ device_groups:
     R5CXC1ASA0L:  # 9/10/25: recabled and verified by jmaher
     R5CXC1AJ02Z:  # 9/10/25: recabled and verified by jmaher
     RZCXC19G2SH:  # 9/10/25: recabled and verified by jmaher
+    # devices on 10.146.2.45
+    R5CXC1ASA3P:  # 9/11/25: recabled and verified by jmaher
+    R5CXC1AP2KT:  # 9/11/25: recabled and verified by jmaher
+    R5CXC1HZK0W:  # 9/11/25: recabled and verified by jmaher
+    R5CXC1ASA2E:  # 9/11/25: recabled and verified by jmaher
+    R5CXC1ARM0A:  # 9/11/25: recabled and verified by jmaher
+    RZCY2011M7N:  # 9/11/25: recabled and verified by jmaher
   a55-alpha:
     # devices on 10.146.2.45
-    R5CXC1ASA3P:
-    RZCY2011M7N:
-    RZCY203N75Z:
-    R5CXC1ARM0A:
-    R5CXC1ASA2E:
-    R5CXC1HZK0W:
-    R5CXC1AP2KT:
+    RZCY203N75Z:  # 9/11/25: not doing work, shows busy
+    # devices on 10.146.2.48
+    R5CX4089QNL:
+    R5CXC1AMNFY:
+    R5CY21T22NH:
+    RZCX31FDGJE:
+    RZCX50TW03H:
+    RZCX71ZVF6J:
+    RZCY204AAZD:
+    RZCX821GYPX:
   a55-sheriff-bad:
     # sheriff quarantined bad devices
     RZCXC15YZVZ:
