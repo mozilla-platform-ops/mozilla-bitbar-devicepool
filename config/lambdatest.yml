@@ -37,19 +37,10 @@ device_groups:
   a55-perf:
     # devices with power meters
     R5CXC1AHXYD:
-    R5CXC1AHZBW:
     R5CXC1AJ07K:
-    R5CXC1ASH4E:
     R5CXC1HZKLR:
-    R5CXC1PW7CR:
-    R5CXC1PW94F:
-    RZCXC16WHTA:
-    RZCXC187YCR:
-    RZCXC189JSJ:
     RZCXC19G1CT:
     R5CXC1HZ5PZ:
-    RZCXC16W6KT:
-    R5CXC1AHWWZ:
     R5CXC1ARZDN:
     R5CXC1HZ43J:
     R5CXC1HZ85W:
@@ -93,6 +84,15 @@ device_groups:
   a55-alpha:
     # devices on 10.146.2.48
     RZCX50TW03H:
+    R5CXC1AHWWZ:  # testing, on 10.146.2.53 and 10.146.2.54
+    R5CXC1AHZBW:  # testing, on 10.146.2.53 and 10.146.2.54
+    R5CXC1ASH4E:  # testing, on 10.146.2.53 and 10.146.2.54
+    R5CXC1PW7CR:  # testing, on 10.146.2.53 and 10.146.2.54
+    RZCXC189JSJ:  # testing, on 10.146.2.53 and 10.146.2.54
+    R5CXC1PW94F:  # testing, on 10.146.2.53 and 10.146.2.54
+    RZCXC16W6KT:  # testing, on 10.146.2.53 and 10.146.2.54
+    RZCXC16WHTA:  # testing, on 10.146.2.53 and 10.146.2.54
+    RZCXC187YCR:  # testing, on 10.146.2.53 and 10.146.2.54
   a55-sheriff-bad:
     # sheriff quarantined bad devices
     RZCXC15YZVZ:
