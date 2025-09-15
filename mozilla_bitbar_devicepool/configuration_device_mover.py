@@ -171,8 +171,18 @@ class ConfigurationDeviceMover:
 
                     # Add comment if provided (using YAML's comment functionality)
                     if comment:
-                        # Set end-of-line comment for the device
-                        device_groups[target_group].yaml_add_eol_comment(comment, device_id)
+                        # Calculate the column position to ensure exactly 2 spaces after the value
+                        # Format: "device_id: value" or "device_id:" (if no value)
+                        if device_value is None:
+                            # No value, so format is "device_id:"
+                            base_length = len(device_id) + 1  # +2 for ": "
+                        else:
+                            # Has a value, so format is "device_id: value"
+                            value_str = str(device_value) if device_value != "" else ""
+                            base_length = len(device_id) + 2 + len(value_str)  # +2 for ": "
+
+                        comment_column = base_length + 3  # +3 for exactly 2 spaces (ruamel counts differently)
+                        device_groups[target_group].yaml_add_eol_comment(comment, device_id, column=comment_column)
 
                 results["moved"].append(device_id)
                 action = "Would move" if dry_run else "Moved"
@@ -248,8 +258,31 @@ class ConfigurationDeviceMover:
 
                     # Add comment if provided (using YAML's comment functionality)
                     if comment:
-                        # Set end-of-line comment for the device
-                        device_groups[target_group].yaml_add_eol_comment(comment, device_id)
+                        # # Calculate the column position to ensure exactly 2 spaces after the value
+                        # # Format: "device_id: value" or "device_id:" (if no value)
+                        # if device_value is None:
+                        #     # No value, so format is "device_id:"
+                        #     base_length = len(device_id) + 1  # +1 for the colon
+                        # else:
+                        #     raise Exception("why?")
+                        #     # # Has a value, so format is "device_id: value"
+                        #     # value_str = str(device_value) if device_value != '' else ''
+                        #     # base_length = len(device_id) + 2 + len(value_str)  # +2 for ": "
+
+                        # comment_column = base_length + 5  # +3 for exactly 2 spaces (ruamel counts differently)
+
+                        # Calculate the current line length for proper comment positioning
+                        line_content = f"{device_id}:"
+                        if device_value is not None and device_value != "":
+                            line_content += f" {device_value}"
+
+                        current_line_length = len(line_content)
+                        comment_column = current_line_length + 6  # Add 6 spaces before comment (indent + 2 spaces?)
+                        # NOTE: not sure how to calculate how much ruamel will indent the line...
+                        #   should be consistent for our config file format though
+
+                        print(comment_column)
+                        device_groups[target_group].yaml_add_eol_comment(comment, device_id, column=comment_column)
 
                 results["moved"].append(device_id)
                 action = "Would move" if dry_run else "Moved"
