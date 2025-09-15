@@ -1,0 +1,243 @@
+#!/usr/bin/env python3
+"""
+Device Group Management Tool
+
+A command-line tool for managing devices in configuration files.
+Usage: ./configuration_device_tool move <source_group> <target_group> <device1,device2,device3>
+"""
+
+import argparse
+import os
+import re
+import sys
+from pathlib import Path
+
+from mozilla_bitbar_devicepool.configuration_device_mover import ConfigurationDeviceMover
+
+
+def find_config_file(config_name: str = None) -> Path:
+    """Find a configuration file in the config directory."""
+    config_dir = Path("config")
+
+    if config_name:
+        # If specific config name provided
+        config_file = config_dir / config_name
+        if not config_file.suffix:
+            config_file = config_file.with_suffix(".yml")
+
+        if config_file.exists():
+            return config_file
+        else:
+            raise FileNotFoundError(f"Configuration file not found: {config_file}")
+
+    # Default search order
+    default_configs = ["lambdatest.yml", "config.yml"]
+
+    for config in default_configs:
+        config_file = config_dir / config
+        if config_file.exists():
+            return config_file
+
+    raise FileNotFoundError(f"No configuration files found in {config_dir}")
+
+
+def print_move_results(results: dict) -> None:
+    """Print the results of a move operation."""
+    if results["moved"]:
+        print(f"✅ Successfully moved {len(results['moved'])} devices:")
+        for device in results["moved"]:
+            print(f"   - {device}")
+
+    if results["already_in_target"]:
+        print(f"ℹ️  {len(results['already_in_target'])} devices already in target group:")
+        for device in results["already_in_target"]:
+            print(f"   - {device}")
+
+    if results["not_found"]:
+        print(f"❌ {len(results['not_found'])} devices not found in source group:")
+        for device in results["not_found"]:
+            print(f"   - {device}")
+
+    if results["errors"]:
+        print(f"🚨 {len(results['errors'])} errors occurred:")
+        for error in results["errors"]:
+            print(f"   - {error}")
+
+
+def cmd_move(args) -> None:
+    """Handle the move command."""
+    try:
+        # Parse device list (accepts comma, space, or newline separated)
+        device_list = [d.strip() for d in re.split(r"[,\s]+", args.devices) if d.strip()]
+
+        if not device_list:
+            print("❌ No devices specified")
+            sys.exit(1)
+
+        # Find config file
+        config_file = find_config_file(args.config)
+        print(f"📁 Using configuration file: {config_file}")
+
+        # Initialize device mover
+        mover = ConfigurationDeviceMover(str(config_file), backup=not args.no_backup)
+
+        # Load and validate
+        mover.load_config()
+
+        # Show current device locations if verbose
+        if args.verbose:
+            print(f"\n🔍 Validating device locations:")
+            validation = mover.validate_device_list(device_list)
+
+            for device, group in validation["found"].items():
+                print(f"   {device} -> currently in '{group}'")
+
+            for device in validation["not_found"]:
+                print(f"   {device} -> ⚠️  not found in any group")
+            print()
+
+        # Perform the move
+        print(f"🔄 Moving devices from '{args.source_group}' to '{args.target_group}'...")
+
+        if args.dry_run:
+            print("🧪 DRY RUN - No changes will be made")
+
+        results = mover.move_devices(args.source_group, args.target_group, device_list, dry_run=args.dry_run)
+
+        print()
+        print_move_results(results)
+
+        # Summary
+        total_requested = len(device_list)
+        total_moved = len(results["moved"])
+
+        if total_moved == total_requested and not results["errors"]:
+            print(f"\n✅ All {total_requested} devices processed successfully!")
+        elif total_moved > 0:
+            print(f"\n⚠️  Processed {total_moved}/{total_requested} devices successfully")
+        else:
+            print(f"\n❌ No devices were moved")
+            sys.exit(1)
+
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        sys.exit(1)
+
+
+def cmd_list(args) -> None:
+    """Handle the list command."""
+    try:
+        config_file = find_config_file(args.config)
+        print(f"📁 Using configuration file: {config_file}")
+
+        mover = ConfigurationDeviceMover(str(config_file))
+        mover.load_config()
+
+        if args.group:
+            # List devices in specific group
+            try:
+                devices = mover.list_devices_in_group(args.group)
+                print(f"\n📱 Devices in group '{args.group}' ({len(devices)}):")
+                if devices:
+                    for device in sorted(devices):
+                        print(f"   - {device}")
+                else:
+                    print("   (no devices)")
+            except ValueError as e:
+                print(f"❌ {e}")
+                sys.exit(1)
+        else:
+            # List all groups
+            groups = mover.list_device_groups()
+            print(f"\n📂 Available device groups ({len(groups)}):")
+
+            for group in sorted(groups):
+                device_count = len(mover.list_devices_in_group(group))
+                print(f"   - {group} ({device_count} devices)")
+
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        sys.exit(1)
+
+
+def cmd_find(args) -> None:
+    """Handle the find command."""
+    try:
+        config_file = find_config_file(args.config)
+        print(f"📁 Using configuration file: {config_file}")
+
+        mover = ConfigurationDeviceMover(str(config_file))
+        mover.load_config()
+
+        device_list = [d.strip() for d in args.devices.split(",") if d.strip()]
+        validation = mover.validate_device_list(device_list)
+
+        print(f"\n🔍 Device location results:")
+
+        for device, group in validation["found"].items():
+            print(f"   ✅ {device} -> '{group}'")
+
+        for device in validation["not_found"]:
+            print(f"   ❌ {device} -> not found")
+
+        if validation["not_found"]:
+            sys.exit(1)
+
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        sys.exit(1)
+
+
+def main():
+    """Main entry point."""
+    parser = argparse.ArgumentParser(
+        description="Device Group Management Tool",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  configuration_device_tool move a55-alpha a55-perf dev1,dev2,dev3
+  configuration_device_tool list
+  configuration_device_tool list --group a55-perf
+  configuration_device_tool find dev1,dev2,dev3
+  configuration_device_tool move --config lambdatest.yml --dry-run a55-alpha a55-perf dev1,dev2
+        """,
+    )
+
+    parser.add_argument("--config", "-c", help="Configuration file name (searches in config/ directory)")
+
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+
+    # Move command
+    move_parser = subparsers.add_parser("move", help="Move devices between groups")
+    move_parser.add_argument("source_group", help="Source device group name")
+    move_parser.add_argument("target_group", help="Target device group name")
+    move_parser.add_argument("devices", help="Comma-separated list of device IDs")
+    move_parser.add_argument("--dry-run", action="store_true", help="Show what would be moved without making changes")
+    move_parser.add_argument("--no-backup", action="store_true", help="Skip creating backup file")
+    move_parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
+
+    # List command
+    list_parser = subparsers.add_parser("list", help="List device groups or devices")
+    list_parser.add_argument("--group", "-g", help="List devices in specific group")
+
+    # Find command
+    find_parser = subparsers.add_parser("find", help="Find which group devices belong to")
+    find_parser.add_argument("devices", help="Comma-separated list of device IDs to find")
+
+    args = parser.parse_args()
+
+    if not args.command:
+        parser.print_help()
+        sys.exit(1)
+
+    # Execute the appropriate command
+    if args.command == "move":
+        cmd_move(args)
+    elif args.command == "list":
+        cmd_list(args)
+    elif args.command == "find":
+        cmd_find(args)
+
+
+if __name__ == "__main__":
+    main()
