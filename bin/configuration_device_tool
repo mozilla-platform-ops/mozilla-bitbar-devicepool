@@ -3,7 +3,9 @@
 Device Group Management Tool
 
 A command-line tool for managing devices in configuration files.
-Usage: ./configuration_device_tool move <source_group> <target_group> <device1,device2,device3>
+Usage:
+  ./configuration_device_tool move <target_group> <device1,device2,device3>
+  ./configuration_device_tool move --source-group <source_group> <target_group> <device1,device2,device3>
 """
 
 import argparse
@@ -97,12 +99,26 @@ def cmd_move(args) -> None:
             print()
 
         # Perform the move
-        print(f"🔄 Moving devices from '{args.source_group}' to '{args.target_group}'...")
+        if args.source_group:
+            # Original behavior: move from specific source group to target group
+            print(f"🔄 Moving devices from '{args.source_group}' to '{args.target_group}'...")
 
-        if args.dry_run:
-            print("🧪 DRY RUN - No changes will be made")
+            if args.dry_run:
+                print("🧪 DRY RUN - No changes will be made")
 
-        results = mover.move_devices(args.source_group, args.target_group, device_list, dry_run=args.dry_run)
+            results = mover.move_devices(
+                args.source_group, args.target_group, device_list, dry_run=args.dry_run, comment=args.comment
+            )
+        else:
+            # New behavior: move from any pool to target group
+            print(f"🔄 Moving devices from any pool to '{args.target_group}'...")
+
+            if args.dry_run:
+                print("🧪 DRY RUN - No changes will be made")
+
+            results = mover.move_devices_from_any_pool(
+                args.target_group, device_list, dry_run=args.dry_run, comment=args.comment
+            )
 
         print()
         print_move_results(results)
@@ -195,11 +211,17 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  configuration_device_tool move a55-alpha a55-perf dev1,dev2,dev3
+  # Move devices from any pool to target group (recommended)
+  configuration_device_tool move a55-perf dev1,dev2,dev3
+
+  # Move devices from specific source group to target group
+  configuration_device_tool move --source-group a55-alpha a55-perf dev1,dev2,dev3
+
+  # Other commands
   configuration_device_tool list
   configuration_device_tool list --group a55-perf
   configuration_device_tool find dev1,dev2,dev3
-  configuration_device_tool move --config lambdatest.yml --dry-run a55-alpha a55-perf dev1,dev2
+  configuration_device_tool move --config lambdatest.yml --dry-run a55-perf dev1,dev2
         """,
     )
 
@@ -209,12 +231,15 @@ Examples:
 
     # Move command
     move_parser = subparsers.add_parser("move", help="Move devices between groups")
-    move_parser.add_argument("source_group", help="Source device group name")
     move_parser.add_argument("target_group", help="Target device group name")
     move_parser.add_argument("devices", help="Comma-separated list of device IDs")
+    move_parser.add_argument(
+        "--source-group", "-s", help="Source device group name (if not specified, devices will be moved from any group)"
+    )
     move_parser.add_argument("--dry-run", action="store_true", help="Show what would be moved without making changes")
     move_parser.add_argument("--no-backup", action="store_true", help="Skip creating backup file")
     move_parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
+    move_parser.add_argument("--comment", "-C", help="Inline comment to append to each moved device line")
 
     # List command
     list_parser = subparsers.add_parser("list", help="List device groups or devices")

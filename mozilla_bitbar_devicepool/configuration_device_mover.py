@@ -100,7 +100,12 @@ class ConfigurationDeviceMover:
         return None
 
     def move_devices(
-        self, source_group: str, target_group: str, device_ids: List[str], dry_run: bool = False
+        self,
+        source_group: str,
+        target_group: str,
+        device_ids: List[str],
+        dry_run: bool = False,
+        comment: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Move devices from source group to target group.
@@ -110,6 +115,7 @@ class ConfigurationDeviceMover:
             target_group: Name of the target device group
             device_ids: List of device IDs to move
             dry_run: If True, show what would be moved without making changes
+            comment: Optional comment to append to each moved device
 
         Returns:
             Dictionary with move results and statistics
@@ -163,9 +169,91 @@ class ConfigurationDeviceMover:
                     # Add to target group (preserving any value/comment)
                     device_groups[target_group][device_id] = device_value
 
+                    # Add comment if provided (using YAML's comment functionality)
+                    if comment:
+                        # Set end-of-line comment for the device
+                        device_groups[target_group].yaml_add_eol_comment(comment, device_id)
+
                 results["moved"].append(device_id)
                 action = "Would move" if dry_run else "Moved"
                 self.logger.info(f"{action} device {device_id} from '{source_group}' to '{target_group}'")
+
+            except Exception as e:
+                error_msg = f"Error moving device {device_id}: {e}"
+                results["errors"].append(error_msg)
+                self.logger.error(error_msg)
+
+        # Save changes if not dry run and there were successful moves
+        if not dry_run and results["moved"]:
+            self.save_config()
+
+        return results
+
+    def move_devices_from_any_pool(
+        self, target_group: str, device_ids: List[str], dry_run: bool = False, comment: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Move devices from any group to target group.
+
+        Args:
+            target_group: Name of the target device group
+            device_ids: List of device IDs to move
+            dry_run: If True, show what would be moved without making changes
+            comment: Optional comment to append to each moved device
+
+        Returns:
+            Dictionary with move results and statistics
+        """
+        if not self.config_data:
+            self.load_config()
+
+        device_groups = self.config_data["device_groups"]
+
+        # Validate target group exists
+        if target_group not in device_groups:
+            raise ValueError(f"Target group '{target_group}' not found")
+
+        # Initialize target group if it's None/empty
+        if device_groups[target_group] is None:
+            device_groups[target_group] = {}
+
+        # Track results
+        results = {"moved": [], "not_found": [], "already_in_target": [], "errors": []}
+
+        for device_id in device_ids:
+            try:
+                # Find which group the device is currently in
+                current_group = self.find_device_group(device_id)
+
+                if not current_group:
+                    results["not_found"].append(device_id)
+                    self.logger.error(f"Device {device_id} not found in any group")
+                    continue
+
+                # Check if device is already in target group
+                if current_group == target_group:
+                    results["already_in_target"].append(device_id)
+                    self.logger.warning(f"Device {device_id} already in target group '{target_group}'")
+                    continue
+
+                if not dry_run:
+                    # Get any existing value/comment for the device
+                    device_value = device_groups[current_group][device_id]
+
+                    # Remove from current group
+                    del device_groups[current_group][device_id]
+
+                    # Add to target group (preserving any value/comment)
+                    device_groups[target_group][device_id] = device_value
+
+                    # Add comment if provided (using YAML's comment functionality)
+                    if comment:
+                        # Set end-of-line comment for the device
+                        device_groups[target_group].yaml_add_eol_comment(comment, device_id)
+
+                results["moved"].append(device_id)
+                action = "Would move" if dry_run else "Moved"
+                self.logger.info(f"{action} device {device_id} from '{current_group}' to '{target_group}'")
 
             except Exception as e:
                 error_msg = f"Error moving device {device_id}: {e}"
