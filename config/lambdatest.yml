@@ -81,18 +81,18 @@ device_groups:
     R5CXC1ASA2E:  # 9/11/25: recabled and verified by jmaher
     R5CXC1ARM0A:  # 9/11/25: recabled and verified by jmaher
     RZCY2011M7N:  # 9/11/25: recabled and verified by jmaher
-  a55-alpha:
-    # devices on 10.146.2.45
-    RZCY203N75Z:  # 9/11/25: not doing work, shows busy
+    RZCY203N75Z:  # 9/15/25: recabled and verified by jmaher
     # devices on 10.146.2.48
-    R5CX4089QNL:
-    R5CXC1AMNFY:
-    R5CY21T22NH:
-    RZCX31FDGJE:
+    R5CXC1AMNFY:  # 9/15/25: recabled and verified by jmaher
+    R5CX4089QNL:  # 9/15/25: recabled and verified by jmaher
+    RZCX31FDGJE:  # 9/15/25: recabled and verified by jmaher
+    R5CY21T22NH:  # 9/15/25: recabled and verified by jmaher
+    RZCX71ZVF6J:  # 9/15/25: recabled and verified by jmaher
+    RZCX821GYPX:  # 9/15/25: recabled and verified by jmaher
+    RZCY204AAZD:  # 9/15/25: recabled and verified by jmaher
+  a55-alpha:
+    # devices on 10.146.2.48
     RZCX50TW03H:
-    RZCX71ZVF6J:
-    RZCY204AAZD:
-    RZCX821GYPX:
   a55-sheriff-bad:
     # sheriff quarantined bad devices
     RZCXC15YZVZ:
