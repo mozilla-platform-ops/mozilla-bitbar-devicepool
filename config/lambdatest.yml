@@ -73,6 +73,7 @@ device_groups:
     RZCX71ZVF6J:  # 9/15/25: recabled and verified by jmaher
     RZCX821GYPX:  # 9/15/25: recabled and verified by jmaher
     RZCY204AAZD:  # 9/15/25: recabled and verified by jmaher
+    # devices on 10.146.2.54 and 10.146.2.53
     R5CXC1ASH4E:  # 9/16/25: recabled and verified by jmaher
     RZCXC16WHTA:  # 9/16/25: recabled and verified by jmaher
     R5CXC1AHWWZ:  # 9/16/25: recabled and verified by jmaher
