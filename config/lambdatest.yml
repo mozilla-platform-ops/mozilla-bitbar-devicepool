@@ -41,14 +41,6 @@ device_groups:
     R5CXC1HZKLR:
     RZCXC19G1CT:
     R5CXC1HZ5PZ:
-    R5CXC1ARZDN:
-    R5CXC1HZ43J:
-    R5CXC1HZ85W:
-    R5CXC1HZA6V:
-    R5CXC1SXMVR:
-    RZCXC19G1DM:
-    RZCXC1BK67D:
-    RZCY107MCLV:
     RZCX821GXDJ:  # 9/10/25: previously recabled and verified by jmaher
     RZCY10LGB6W:  # 9/10/25: previously recabled and verified by jmaher
     RZCY10Y4HWD:  # 9/10/25: previously recabled and verified by jmaher
@@ -93,6 +85,14 @@ device_groups:
   a55-alpha:
     # devices on 10.146.2.48
     RZCX50TW03H:
+    R5CXC1ARZDN:  # devices on 10.146.2.55
+    R5CXC1HZ43J:  # devices on 10.146.2.55
+    R5CXC1HZ85W:  # devices on 10.146.2.55
+    R5CXC1HZA6V:  # devices on 10.146.2.55
+    R5CXC1SXMVR:  # devices on 10.146.2.55
+    RZCXC19G1DM:  # devices on 10.146.2.55
+    RZCXC1BK67D:  # devices on 10.146.2.55
+    RZCY107MCLV:  # devices on 10.146.2.55
   a55-sheriff-bad:
     # sheriff quarantined bad devices
     RZCXC15YZVZ:
