@@ -23,12 +23,22 @@ GREP_COLOR_WHITE='1;37'
 LINES_TO_SHOW=20000
 LINES_TO_SHOW=2000
 GREP_OPTIONS='--line-buffered'
+
+# Check if local log file exists, use it instead of journalctl
+if [ -f "local_bitbar_devicepool.log" ]; then
+    echo "Using local log file: local_bitbar_devicepool.log"
+    LOG_SOURCE="tail -f -n ${LINES_TO_SHOW} local_bitbar_devicepool.log"
+else
+    echo "Using journalctl for bitbar service logs"
+    LOG_SOURCE="journalctl -u bitbar -f -n ${LINES_TO_SHOW}"
+fi
+
 #journalctl -u lambdatest -f -n "${LINES_TO_SHOW}" | grep 'a55-perf' | \
 #journalctl -u lambdatest -f -n "${LINES_TO_SHOW}" | grep -E 'Monitor|a55-perf' | \
 #journalctl -u lambdatest -f -n "${LINES_TO_SHOW}" | \
         #GREP_COLOR='1;36' grep --color=always -E '.* TC Jobs.*|^' | \
         #grep --line-buffered -E 'Monitor|a55-perf' | \
-journalctl -u bitbar -f -n "${LINES_TO_SHOW}" | \
+${LOG_SOURCE} | \
         grep --line-buffered -v DEBUG | \
         GREP_COLOR=$GREP_COLOR_RED grep ${GREP_OPTIONS} --color=always -E '.*WARNING.*|^' | \
         GREP_COLOR=$GREP_COLOR_YELLOW grep ${GREP_OPTIONS} --color=always -E '.*Main.*|^' | \
