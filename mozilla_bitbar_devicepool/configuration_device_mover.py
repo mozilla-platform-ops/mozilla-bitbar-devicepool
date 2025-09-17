@@ -125,6 +125,9 @@ class ConfigurationDeviceMover:
 
         device_groups = self.config_data["device_groups"]
 
+        # Sanitize device_ids by stripping colons
+        device_ids = [device_id.replace(":", "") for device_id in device_ids]
+
         # Validate groups exist
         if source_group not in device_groups:
             raise ValueError(f"Source group '{source_group}' not found")
@@ -219,6 +222,9 @@ class ConfigurationDeviceMover:
 
         device_groups = self.config_data["device_groups"]
 
+        # Sanitize device_ids by stripping colons
+        device_ids = [device_id.replace(":", "") for device_id in device_ids]
+
         # Validate target group exists
         if target_group not in device_groups:
             raise ValueError(f"Target group '{target_group}' not found")
@@ -308,6 +314,9 @@ class ConfigurationDeviceMover:
         """
         if not self.config_data:
             self.load_config()
+
+        # Sanitize device_ids by stripping colons
+        device_ids = [device_id.replace(":", "") for device_id in device_ids]
 
         validation = {
             "found": {},  # device_id: group_name
