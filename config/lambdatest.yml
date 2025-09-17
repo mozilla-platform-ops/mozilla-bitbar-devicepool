@@ -36,11 +36,6 @@ projects:
 device_groups:
   a55-perf:
     # devices with power meters
-    R5CXC1AHXYD:
-    R5CXC1AJ07K:
-    R5CXC1HZKLR:
-    RZCXC19G1CT:
-    R5CXC1HZ5PZ:
     RZCX821GXDJ:  # 9/10/25: previously recabled and verified by jmaher
     RZCY10LGB6W:  # 9/10/25: previously recabled and verified by jmaher
     RZCY10Y4HWD:  # 9/10/25: previously recabled and verified by jmaher
@@ -95,6 +90,15 @@ device_groups:
   a55-alpha:
     # devices on 10.146.2.48
     RZCX50TW03H:
+    R5CXC1ALFED:  # devices on 10.146.2.55? qualify
+    R5CXC1ANGLT:  # devices on 10.146.2.55? qualify
+    R5CXC1ARCER:  # devices on 10.146.2.55? qualify
+    R5CXC1ARELR:  # devices on 10.146.2.55? qualify
+    R5CXC1AHXYD:  # devices on 10.146.2.55? qualify
+    R5CXC1AJ07K:  # devices on 10.146.2.55? qualify
+    R5CXC1HZKLR:  # devices on 10.146.2.55? qualify
+    RZCXC19G1CT:  # devices on 10.146.2.55? qualify
+    R5CXC1HZ5PZ:  # devices on 10.146.2.55? qualify
   a55-sheriff-bad:
     # sheriff quarantined bad devices
     RZCXC15YZVZ:
@@ -104,10 +108,6 @@ device_groups:
   was-a55-alpha-devices-without-power-meters:
     # no power meters yet on these
     # 9/17/25: have power meters, slowly qual and add back in.
-    R5CXC1ALFED:
-    R5CXC1ANGLT:
-    R5CXC1ARCER:
-    R5CXC1ARELR:
   p9-perf:
     # devices with power meters, have been recabled
     47160DLAQ003UB:
