@@ -90,24 +90,21 @@ device_groups:
   a55-alpha:
     # devices on 10.146.2.48
     RZCX50TW03H:
-    R5CXC1ALFED:  # devices on 10.146.2.55? qualify
-    R5CXC1ANGLT:  # devices on 10.146.2.55? qualify
-    R5CXC1ARCER:  # devices on 10.146.2.55? qualify
-    R5CXC1ARELR:  # devices on 10.146.2.55? qualify
-    R5CXC1AHXYD:  # devices on 10.146.2.55? qualify
-    R5CXC1AJ07K:  # devices on 10.146.2.55? qualify
-    R5CXC1HZKLR:  # devices on 10.146.2.55? qualify
-    RZCXC19G1CT:  # devices on 10.146.2.55? qualify
-    R5CXC1HZ5PZ:  # devices on 10.146.2.55? qualify
+    R5CXC1ALFED:  # devices on 10.146.2.55? qualify, no power meter previously
+    R5CXC1ANGLT:  # devices on 10.146.2.55? qualify, no power meter previously
+    R5CXC1ARCER:  # devices on 10.146.2.55? qualify, no power meter previously
+    R5CXC1ARELR:  # devices on 10.146.2.55? qualify, no power meter previously
+    R5CXC1AHXYD:  # devices on 10.146.2.55? qualify, from perf
+    R5CXC1AJ07K:  # devices on 10.146.2.55? qualify, from perf
+    R5CXC1HZKLR:  # devices on 10.146.2.55? qualify, from perf
+    RZCXC19G1CT:  # devices on 10.146.2.55? qualify, from perf
+    R5CXC1HZ5PZ:  # devices on 10.146.2.55? qualify, from perf
   a55-sheriff-bad:
     # sheriff quarantined bad devices
     RZCXC15YZVZ:
     R5CXC1HZ4KD:
     R5CXC1ASHNJ:
     R5CXC1HZ62Y:
-  was-a55-alpha-devices-without-power-meters:
-    # no power meters yet on these
-    # 9/17/25: have power meters, slowly qual and add back in.
   p9-perf:
     # devices with power meters, have been recabled
     47160DLAQ003UB:
