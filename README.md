@@ -70,12 +70,18 @@ You must install the development requirements first.  See the "Development" sect
 # activate venv
 poetry shell
 
-pytest  # runs once
-# or
-pytest-watch  # monitors files for changes and reruns
+# run once
+pytest
+#
+# pytest with coverage (html and terminal)
+pytest --cov --cov-report=html --cov-report=term
+
+ # monitors files for changes and reruns
+pytest-watch
 
 # pytest-watch with coverage and double verbose
-pytest-watch -- -vv --cov
+pytest-watch -- -v --cov --cov-report=html --cov-report=term
+
 ```
 
 ## Running and More Documentation
