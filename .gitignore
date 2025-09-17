@@ -9,3 +9,5 @@ bitbar_env*
 lt_env*
 hyperexecute*
 .coverage*
+
+*.log
