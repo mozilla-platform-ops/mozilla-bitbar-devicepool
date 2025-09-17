@@ -83,17 +83,18 @@ device_groups:
     R5CXC1PW94F:  # 9/16/25: recabled and verified by jmaher
     RZCXC187YCR:  # 9/16/25: recabled and verified by jmaher
     RZCXC16W6KT:  # 9/16/25: recabled and verified by jmaher
+    # devices on 10.146.2.55
+    R5CXC1ARZDN:  # 9/17/25: recabled and verified by jmaher
+    R5CXC1HZ43J:  # 9/17/25: recabled and verified by jmaher
+    R5CXC1HZ85W:  # 9/17/25: recabled and verified by jmaher
+    R5CXC1HZA6V:  # 9/17/25: recabled and verified by jmaher
+    R5CXC1SXMVR:  # 9/17/25: recabled and verified by jmaher
+    RZCXC19G1DM:  # 9/17/25: recabled and verified by jmaher
+    RZCXC1BK67D:  # 9/17/25: recabled and verified by jmaher
+    RZCY107MCLV:  # 9/17/25: recabled and verified by jmaher
   a55-alpha:
     # devices on 10.146.2.48
     RZCX50TW03H:
-    R5CXC1ARZDN:  # devices on 10.146.2.55
-    R5CXC1HZ43J:  # devices on 10.146.2.55
-    R5CXC1HZ85W:  # devices on 10.146.2.55
-    R5CXC1HZA6V:  # devices on 10.146.2.55
-    R5CXC1SXMVR:  # devices on 10.146.2.55
-    RZCXC19G1DM:  # devices on 10.146.2.55
-    RZCXC1BK67D:  # devices on 10.146.2.55
-    RZCY107MCLV:  # devices on 10.146.2.55
   a55-sheriff-bad:
     # sheriff quarantined bad devices
     RZCXC15YZVZ:
@@ -102,6 +103,7 @@ device_groups:
     R5CXC1HZ62Y:
   was-a55-alpha-devices-without-power-meters:
     # no power meters yet on these
+    # 9/17/25: have power meters, slowly qual and add back in.
     R5CXC1ALFED:
     R5CXC1ANGLT:
     R5CXC1ARCER:
