@@ -53,12 +53,19 @@ class ConfigurationDeviceMover:
             raise ValueError(f"Error parsing YAML file {self.config_file}: {e}")
 
     def save_config(self) -> None:
-        """Save the configuration file with optional backup."""
+        """Save the configuration file with optional backup, omitting empty device groups."""
         if self.backup:
             backup_file = f"{self.config_file}.bak"
             self.logger.info(f"Creating backup: {backup_file}")
             with open(self.config_file, "r") as src, open(backup_file, "w") as dst:
                 dst.write(src.read())
+
+        # Remove empty device groups before saving
+        if self.config_data and "device_groups" in self.config_data:
+            device_groups = self.config_data["device_groups"]
+            # Build a new dict omitting empty groups
+            filtered_groups = {k: v for k, v in device_groups.items() if v and len(v) > 0}
+            self.config_data["device_groups"] = filtered_groups
 
         try:
             with open(self.config_file, "w") as f:
