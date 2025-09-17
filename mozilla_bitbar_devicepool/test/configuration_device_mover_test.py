@@ -5,8 +5,8 @@ import pytest
 
 from mozilla_bitbar_devicepool.configuration_device_mover import ConfigurationDeviceMover
 
-TEST_CONFIG_PATH = os.path.join(os.path.dirname(__file__), "../files/test_config.yml")
-TEST_CONFIG_COPY = os.path.join(os.path.dirname(__file__), "../files/test_config_copy.yml")
+TEST_CONFIG_PATH = os.path.join(os.path.dirname(__file__), "./test_data/configs/test_config.yml")
+TEST_CONFIG_COPY = os.path.join(os.path.dirname(__file__), "./test_data/configs/test_config_copy.yml")
 
 
 @pytest.fixture(autouse=True)
