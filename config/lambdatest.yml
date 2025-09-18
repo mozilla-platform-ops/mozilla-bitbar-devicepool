@@ -45,7 +45,6 @@ device_groups:
     RZCY10Y4TJX:  # 9/10/25: previously recabled and verified by jmaher
     RZCY10Y548K:  # 9/10/25: previously recabled and verified by jmaher
     R5CXC1AMMNK:  # 9/10/25: previously recabled and verified by jmaher
-    R5CXC1HZ62Y:  # 9/10/25: previously recabled and verified by jmaher
     # recabled a55 devices with power meters on 10.146.2.46 and 10.146.2.56
     R5CXC1ASLHH:  # 9/10/25: recabled and verified by jmaher
     R5CXC1AHV4M:  # 9/10/25: recabled and verified by jmaher
@@ -99,11 +98,12 @@ device_groups:
     RZCX50TW03H:
     R5CXC1ANGLT:  # devices on 10.146.2.55? qualify, no power meter previously
     R5CXC1AHXYD:  # devices on 10.146.2.55? qualify, from perf
+    RZCXC15YZVZ:  # devices that did not have power meters, qualify
+    R5CXC1HZ4KD:  # devices that did not have power meters, qualify
+    R5CXC1ASHNJ:  # devices that did not have power meters, qualify
+    R5CXC1HZ62Y:  # devices that did not have power meters, qualify
   a55-sheriff-bad:
     # sheriff quarantined bad devices
-    RZCXC15YZVZ:
-    R5CXC1HZ4KD:
-    R5CXC1ASHNJ:
     R5CXC1HZ62Y:
   p9-perf:
     # devices with power meters, have been recabled
