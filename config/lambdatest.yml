@@ -87,18 +87,18 @@ device_groups:
     RZCXC19G1DM:  # 9/17/25: recabled and verified by jmaher
     RZCXC1BK67D:  # 9/17/25: recabled and verified by jmaher
     RZCY107MCLV:  # 9/17/25: recabled and verified by jmaher
+    R5CXC1HZ5PZ:  # 9/18/25: recabled and verified by jmaher
+    R5CXC1HZKLR:  # 9/18/25: recabled and verified by jmaher
+    R5CXC1AJ07K:  # 9/18/25: recabled and verified by jmaher
+    R5CXC1ALFED:  # 9/18/25: recabled and verified by jmaher
+    RZCXC19G1CT:  # 9/18/25: recabled and verified by jmaher
+    R5CXC1ARCER:  # 9/18/25: recabled and verified by jmaher
+    R5CXC1ARELR:  # 9/18/25: recabled and verified by jmaher
   a55-alpha:
     # devices on 10.146.2.48
     RZCX50TW03H:
-    R5CXC1ALFED:  # devices on 10.146.2.55? qualify, no power meter previously
     R5CXC1ANGLT:  # devices on 10.146.2.55? qualify, no power meter previously
-    R5CXC1ARCER:  # devices on 10.146.2.55? qualify, no power meter previously
-    R5CXC1ARELR:  # devices on 10.146.2.55? qualify, no power meter previously
     R5CXC1AHXYD:  # devices on 10.146.2.55? qualify, from perf
-    R5CXC1AJ07K:  # devices on 10.146.2.55? qualify, from perf
-    R5CXC1HZKLR:  # devices on 10.146.2.55? qualify, from perf
-    RZCXC19G1CT:  # devices on 10.146.2.55? qualify, from perf
-    R5CXC1HZ5PZ:  # devices on 10.146.2.55? qualify, from perf
   a55-sheriff-bad:
     # sheriff quarantined bad devices
     RZCXC15YZVZ:
