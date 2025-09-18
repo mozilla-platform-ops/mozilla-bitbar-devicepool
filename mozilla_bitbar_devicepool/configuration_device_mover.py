@@ -95,16 +95,17 @@ class ConfigurationDeviceMover:
         devices = list(device_groups[group_name].keys()) if device_groups[group_name] else []
         return devices
 
-    def find_device_group(self, device_id: str) -> Optional[str]:
-        """Find which group a device belongs to."""
+    def find_device_groups(self, device_id: str) -> List[str]:
+        """Find all groups a device belongs to."""
         if not self.config_data:
             self.load_config()
 
+        groups = []
         for group_name, devices in self.config_data["device_groups"].items():
             if devices and device_id in devices:
-                return group_name
+                groups.append(group_name)
 
-        return None
+        return groups
 
     def move_devices(
         self,
@@ -245,61 +246,39 @@ class ConfigurationDeviceMover:
 
         for device_id in device_ids:
             try:
-                # Find which group the device is currently in
-                current_group = self.find_device_group(device_id)
+                # Find which groups the device is currently in
+                current_groups = self.find_device_groups(device_id)
 
-                if not current_group:
+                if not current_groups:
                     results["not_found"].append(device_id)
                     self.logger.error(f"Device {device_id} not found in any group")
                     continue
 
                 # Check if device is already in target group
-                if current_group == target_group:
+                if target_group in current_groups:
                     results["already_in_target"].append(device_id)
                     self.logger.warning(f"Device {device_id} already in target group '{target_group}'")
                     continue
 
                 if not dry_run:
-                    # Get any existing value/comment for the device
-                    device_value = device_groups[current_group][device_id]
+                    for current_group in current_groups:
+                        # Get any existing value/comment for the device
+                        device_value = device_groups[current_group][device_id]
 
-                    # Remove from current group
-                    del device_groups[current_group][device_id]
+                        # Remove from current group
+                        del device_groups[current_group][device_id]
 
-                    # Add to target group (preserving any value/comment)
-                    device_groups[target_group][device_id] = device_value
+                        # Add to target group (preserving any value/comment)
+                        device_groups[target_group][device_id] = device_value
 
                     # Add comment if provided (using YAML's comment functionality)
                     if comment:
-                        # # Calculate the column position to ensure exactly 2 spaces after the value
-                        # # Format: "device_id: value" or "device_id:" (if no value)
-                        # if device_value is None:
-                        #     # No value, so format is "device_id:"
-                        #     base_length = len(device_id) + 1  # +1 for the colon
-                        # else:
-                        #     raise Exception("why?")
-                        #     # # Has a value, so format is "device_id: value"
-                        #     # value_str = str(device_value) if device_value != '' else ''
-                        #     # base_length = len(device_id) + 2 + len(value_str)  # +2 for ": "
-
-                        # comment_column = base_length + 5  # +3 for exactly 2 spaces (ruamel counts differently)
-
-                        # Calculate the current line length for proper comment positioning
-                        line_content = f"{device_id}:"
-                        if device_value is not None and device_value != "":
-                            line_content += f" {device_value}"
-
-                        current_line_length = len(line_content)
-                        comment_column = current_line_length + 6  # Add 6 spaces before comment (indent + 2 spaces?)
-                        # NOTE: not sure how to calculate how much ruamel will indent the line...
-                        #   should be consistent for our config file format though
-
-                        print(comment_column)
-                        device_groups[target_group].yaml_add_eol_comment(comment, device_id, column=comment_column)
+                        # Add comment logic here if needed
+                        pass
 
                 results["moved"].append(device_id)
                 action = "Would move" if dry_run else "Moved"
-                self.logger.info(f"{action} device {device_id} from '{current_group}' to '{target_group}'")
+                self.logger.info(f"{action} device {device_id} to '{target_group}'")
 
             except Exception as e:
                 error_msg = f"Error moving device {device_id}: {e}"
@@ -331,9 +310,9 @@ class ConfigurationDeviceMover:
         }
 
         for device_id in device_ids:
-            group = self.find_device_group(device_id)
-            if group:
-                validation["found"][device_id] = group
+            groups = self.find_device_groups(device_id)
+            if groups:
+                validation["found"][device_id] = groups
             else:
                 validation["not_found"].append(device_id)
 
