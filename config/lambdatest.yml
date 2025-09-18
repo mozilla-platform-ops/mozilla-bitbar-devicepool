@@ -104,7 +104,6 @@ device_groups:
     R5CXC1HZ62Y:  # devices that did not have power meters, qualify
   a55-sheriff-bad:
     # sheriff quarantined bad devices
-    R5CXC1HZ62Y:
   p9-perf:
     # devices with power meters, have been recabled
     47160DLAQ003UB:
