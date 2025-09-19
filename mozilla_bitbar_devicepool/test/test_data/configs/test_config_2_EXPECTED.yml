@@ -8,7 +8,8 @@ device_groups:
     device4:
     device5:
     # test 4
-    device6:  # test123
+    device6:  # gorilla
   groupC:
+    # test123
   groupD:
     device1:  # duplicate device in another group

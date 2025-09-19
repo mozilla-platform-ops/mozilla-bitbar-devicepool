@@ -1,3 +1,4 @@
+import difflib
 import os
 import shutil
 
@@ -18,24 +19,24 @@ TEST_CONFIG_COPY_2 = os.path.join(os.path.dirname(__file__), "./test_data/config
 def compare_files(file1, file2, verbose=False):
     # load both files
     with open(file1, "r") as f1, open(file2, "r") as f2:
-        content1 = f1.read()
-        content2 = f2.read()
+        content1 = f1.readlines()
+        content2 = f2.readlines()
 
     if verbose:
         # show both files
-        print(f"File 1 ({file1}):\n{content1}\n")
-        print(f"File 2 ({file2}):\n{content2}\n")
+        print(f"File 1 ({file1}):\n{''.join(content1)}\n")
+        print(f"File 2 ({file2}):\n{''.join(content2)}\n")
 
     # if they are the same, return True
     # show output if they differ
     if content1 != content2:
-        print(f"Files {file1} and {file2} differ")
-        return False
+        diff = "".join(difflib.unified_diff(content1, content2, fromfile=file1, tofile=file2))
+        raise AssertionError(f"Files {file1} and {file2} differ:\n{diff}")
     return True
 
 
 @pytest.fixture(autouse=True)
-def setup_and_teardown(debugging=False):
+def setup_and_teardown(debugging=True):
     # clean up any existing test copies (do this now vs after yield so we can debug issues)
     if debugging:
         try:
@@ -137,6 +138,14 @@ def test_save_config_retains_empty_groups():
     assert mover.config_data["device_groups"]["groupC"] == {}
 
 
+def test_cmopare_files_works():
+    # identical files
+    assert compare_files(TEST_CONFIG_PATH, TEST_CONFIG_PATH)
+    # different files
+    with pytest.raises(AssertionError):
+        compare_files(TEST_CONFIG_PATH, TEST_CONFIG_PATH_2, verbose=True)
+
+
 # move device6 to groupB
 #   - ensure groupC still exists with its comment
 #   - ensure groupC is not defined as `{}`
@@ -144,6 +153,6 @@ def test_exact_file_after_move():
     mover = ConfigurationDeviceMover(TEST_CONFIG_COPY_2, backup=False)
     mover.load_config()
     # move device6 to groupB
-    mover.move_devices_from_any_pool("groupB", ["device6"], comment="test123")
+    mover.move_devices_from_any_pool("groupB", ["device6"], comment="gorilla")
     # compare the modified config file to the expected file
     assert compare_files(TEST_CONFIG_COPY_2, TEST_CONFIG_PATH_2_EXPECTED)
