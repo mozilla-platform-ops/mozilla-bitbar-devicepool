@@ -93,17 +93,16 @@ device_groups:
     RZCXC19G1CT:  # 9/18/25: recabled and verified by jmaher
     R5CXC1ARCER:  # 9/18/25: recabled and verified by jmaher
     R5CXC1ARELR:  # 9/18/25: recabled and verified by jmaher
+    R5CXC1ANGLT:  # 9/19/25: recabled and verified by jmaher
+    RZCXC15YZVZ:  # 9/19/25: recabled and verified by jmaher
+    R5CXC1HZ4KD:  # 9/19/25: recabled and verified by jmaher
+    R5CXC1ASHNJ:  # 9/19/25: recabled and verified by jmaher
   a55-alpha:
     # devices on 10.146.2.48
     RZCX50TW03H:
-    R5CXC1ANGLT:  # devices on 10.146.2.55? qualify, no power meter previously
     R5CXC1AHXYD:  # devices on 10.146.2.55? qualify, from perf
-    RZCXC15YZVZ:  # devices that did not have power meters, qualify
-    R5CXC1HZ4KD:  # devices that did not have power meters, qualify
-    R5CXC1ASHNJ:  # devices that did not have power meters, qualify
     R5CXC1HZ62Y:  # devices that did not have power meters, qualify
   a55-sheriff-bad:
-    # sheriff quarantined bad devices
   p9-perf:
     # devices with power meters, have been recabled
     47160DLAQ003UB:
