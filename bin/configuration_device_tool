@@ -98,27 +98,18 @@ def cmd_move(args) -> None:
                 print(f"   {device} -> ⚠️  not found in any group")
             print()
 
-        # Perform the move
+        # Always use move_devices_from_any_pool
         if args.source_group:
-            # Original behavior: move from specific source group to target group
             print(f"🔄 Moving devices from '{args.source_group}' to '{args.target_group}'...")
-
-            if args.dry_run:
-                print("🧪 DRY RUN - No changes will be made")
-
-            results = mover.move_devices(
-                args.source_group, args.target_group, device_list, dry_run=args.dry_run, comment=args.comment
-            )
         else:
-            # New behavior: move from any pool to target group
             print(f"🔄 Moving devices from any pool to '{args.target_group}'...")
 
-            if args.dry_run:
-                print("🧪 DRY RUN - No changes will be made")
+        if args.dry_run:
+            print("🧪 DRY RUN - No changes will be made")
 
-            results = mover.move_devices_from_any_pool(
-                args.target_group, device_list, dry_run=args.dry_run, comment=args.comment
-            )
+        results = mover.move_devices_from_any_pool(
+            args.target_group, device_list, source_group=args.source_group, dry_run=args.dry_run, comment=args.comment
+        )
 
         print()
         print_move_results(results)
