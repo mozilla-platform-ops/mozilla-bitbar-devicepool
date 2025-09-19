@@ -135,12 +135,12 @@ class ConfigurationDeviceMover:
         comment: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
-        Move devices from any group (or a specific source group) to target group.
+        Move devices from any group to target group.
 
         Args:
             target_group: Name of the target device group
             device_ids: List of device IDs to move
-            source_group: If provided, only remove devices from this group; otherwise, remove from all groups
+            source_group: Name of the source device group (optional)
             dry_run: If True, show what would be moved without making changes
             comment: Optional comment to append to each moved device
 
@@ -150,80 +150,68 @@ class ConfigurationDeviceMover:
         if not self.config_data:
             self.load_config()
 
-        # Initialize result structure
-        result = {"moved": [], "already_in_target": [], "not_found": [], "errors": []}
+        device_groups = self.config_data["device_groups"]
 
         # Sanitize device_ids by stripping colons
         device_ids = [device_id.replace(":", "") for device_id in device_ids]
 
-        # Check if target group exists
-        if target_group not in self.config_data["device_groups"]:
-            result["errors"].append(f"Target group '{target_group}' does not exist")
-            return result
+        # Validate target group exists
+        if target_group not in device_groups:
+            raise ValueError(f"Target group '{target_group}' not found")
 
-        # Ensure target group has a dictionary structure
-        if self.config_data["device_groups"][target_group] is None:
-            self.config_data["device_groups"][target_group] = CommentedMap()
+        # Initialize target group if it's None/empty
+        if device_groups[target_group] is None:
+            device_groups[target_group] = {}
+
+        # Track results
+        results = {"moved": [], "not_found": [], "already_in_target": [], "errors": []}
 
         for device_id in device_ids:
             try:
-                # Find all groups where this device exists
+                # Find all groups the device is currently in
                 current_groups = self.find_device_groups(device_id)
 
                 if not current_groups:
-                    result["not_found"].append(device_id)
+                    results["not_found"].append(device_id)
+                    self.logger.error(f"Device {device_id} not found in any group")
                     continue
-
-                # If source_group is specified, only consider devices in that group
-                if source_group:
-                    if source_group not in current_groups:
-                        result["not_found"].append(device_id)
-                        continue
-                    # Only remove from the specified source group
-                    groups_to_remove_from = [source_group]
-                else:
-                    # Remove from all groups
-                    groups_to_remove_from = current_groups
 
                 # Check if device is already in target group
                 if target_group in current_groups:
-                    # If we're removing from all groups, or specifically from the target group,
-                    # we still need to process to ensure it's only in the target group
-                    if source_group and source_group == target_group:
-                        result["already_in_target"].append(device_id)
-                        continue
-                    elif not source_group and len(current_groups) == 1:
-                        # Already only in target group
-                        result["already_in_target"].append(device_id)
-                        continue
+                    results["already_in_target"].append(device_id)
+                    self.logger.warning(f"Device {device_id} already in target group '{target_group}'")
+                    continue
 
                 if not dry_run:
-                    # Remove device from source groups
-                    for group_name in groups_to_remove_from:
-                        if (
-                            group_name in self.config_data["device_groups"]
-                            and self.config_data["device_groups"][group_name]
-                            and device_id in self.config_data["device_groups"][group_name]
-                        ):
-                            del self.config_data["device_groups"][group_name][device_id]
+                    # Remove from all current groups
+                    for current_group in current_groups:
+                        if device_id in device_groups[current_group]:
+                            del device_groups[current_group][device_id]
 
-                    # Add device to target group with comment
-                    device_comment = comment if comment else None
-                    self.config_data["device_groups"][target_group][device_id] = device_comment
+                    # Add to target group
+                    device_groups[target_group][device_id] = None
 
-                result["moved"].append(device_id)
+                    # Add comment if provided
+                    if comment:
+                        line_content = f"{device_id}:"
+                        current_line_length = len(line_content)
+                        comment_column = current_line_length + 6
+                        device_groups[target_group].yaml_add_eol_comment(comment, device_id, column=comment_column)
+
+                results["moved"].append(device_id)
+                action = "Would move" if dry_run else "Moved"
+                self.logger.info(f"{action} device {device_id} to '{target_group}'")
 
             except Exception as e:
-                result["errors"].append(f"Error processing device {device_id}: {str(e)}")
+                error_msg = f"Error moving device {device_id}: {e}"
+                results["errors"].append(error_msg)
+                self.logger.error(error_msg)
 
-        # Save configuration if not a dry run
-        if not dry_run and (result["moved"] or any(result.values())):
-            try:
-                self.save_config()
-            except Exception as e:
-                result["errors"].append(f"Error saving configuration: {str(e)}")
+        # Save changes if not dry run and there were successful moves
+        if not dry_run and results["moved"]:
+            self.save_config()
 
-        return result
+        return results
 
     def validate_device_list(self, device_ids: List[str]) -> Dict[str, List[str]]:
         """
