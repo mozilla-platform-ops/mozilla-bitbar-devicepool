@@ -79,6 +79,21 @@ class ConfigurationDeviceMover:
         except Exception as e:
             raise RuntimeError(f"Error saving configuration file: {e}")
 
+        # reopen and remove any `{}` (the exact string) entries left behind by ruamel.yaml
+        new_content = ""
+        with open(self.config_file, "r") as f:
+            content = f.read()
+        # for each line
+        for line in content.splitlines():
+            if line.strip() == "{}":
+                # skip the entire line
+                pass
+            else:
+                new_content += line + "\n"
+
+        with open(self.config_file, "w") as f:
+            f.write(new_content)
+
     def list_device_groups(self) -> List[str]:
         """List all available device groups."""
         if not self.config_data:
