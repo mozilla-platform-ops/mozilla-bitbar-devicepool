@@ -106,6 +106,7 @@ class ConfigurationDeviceMover:
 
         return groups
 
+    # TODO: remove this by adding optional source arg to move_devices_from_any_pool
     def move_devices(
         self,
         source_group: str,
@@ -214,7 +215,12 @@ class ConfigurationDeviceMover:
         return results
 
     def move_devices_from_any_pool(
-        self, target_group: str, device_ids: List[str], dry_run: bool = False, comment: Optional[str] = None
+        self,
+        target_group: str,
+        device_ids: List[str],
+        source_group: str = None,
+        dry_run: bool = False,
+        comment: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Move devices from any group to target group.
@@ -276,8 +282,18 @@ class ConfigurationDeviceMover:
 
                     # Add comment if provided (using YAML's comment functionality)
                     if comment:
-                        # Add comment logic here if needed
-                        pass
+                        # Calculate the column position to ensure exactly 2 spaces after the value
+                        # Format: "device_id: value" or "device_id:" (if no value)
+                        if device_value is None:
+                            # No value, so format is "device_id:"
+                            base_length = len(device_id) + 1  # +2 for ": "
+                        else:
+                            # Has a value, so format is "device_id: value"
+                            value_str = str(device_value) if device_value != "" else ""
+                            base_length = len(device_id) + 2 + len(value_str)  # +2 for ": "
+
+                        comment_column = base_length + 6  # I have no idea why this is 6 instead of 3 like above
+                        device_groups[target_group].yaml_add_eol_comment(comment, device_id, column=comment_column)
 
                 results["moved"].append(device_id)
                 action = "Would move" if dry_run else "Moved"
