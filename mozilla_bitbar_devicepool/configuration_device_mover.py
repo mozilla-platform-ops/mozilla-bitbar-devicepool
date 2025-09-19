@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from ruamel.yaml import YAML
+from ruamel.yaml.comments import CommentedMap
 
 
 class ConfigurationDeviceMover:
@@ -45,6 +46,10 @@ class ConfigurationDeviceMover:
 
             if "device_groups" not in self.config_data:
                 raise ValueError(f"No 'device_groups' section found in {self.config_file}")
+
+            # Ensure device_groups is a CommentedMap for YAML comment handling
+            if "device_groups" in self.config_data:
+                self.config_data["device_groups"] = CommentedMap(self.config_data["device_groups"])
 
             self.logger.info(f"Loaded configuration from {self.config_file}")
             return self.config_data
@@ -130,85 +135,80 @@ class ConfigurationDeviceMover:
         if not self.config_data:
             self.load_config()
 
-        device_groups = self.config_data["device_groups"]
+        # Initialize result structure
+        result = {"moved": [], "already_in_target": [], "not_found": [], "errors": []}
 
         # Sanitize device_ids by stripping colons
         device_ids = [device_id.replace(":", "") for device_id in device_ids]
 
-        # Validate target group exists
-        if target_group not in device_groups:
-            raise ValueError(f"Target group '{target_group}' not found")
+        # Check if target group exists
+        if target_group not in self.config_data["device_groups"]:
+            result["errors"].append(f"Target group '{target_group}' does not exist")
+            return result
 
-        # Initialize target group if it's None/empty
-        if device_groups[target_group] is None:
-            device_groups[target_group] = {}
-
-        # Track results
-        results = {"moved": [], "not_found": [], "already_in_target": [], "errors": []}
+        # Ensure target group has a dictionary structure
+        if self.config_data["device_groups"][target_group] is None:
+            self.config_data["device_groups"][target_group] = CommentedMap()
 
         for device_id in device_ids:
             try:
-                # Find which groups the device is currently in
+                # Find all groups where this device exists
                 current_groups = self.find_device_groups(device_id)
 
                 if not current_groups:
-                    results["not_found"].append(device_id)
-                    self.logger.error(f"Device {device_id} not found in any group")
+                    result["not_found"].append(device_id)
                     continue
+
+                # If source_group is specified, only consider devices in that group
+                if source_group:
+                    if source_group not in current_groups:
+                        result["not_found"].append(device_id)
+                        continue
+                    # Only remove from the specified source group
+                    groups_to_remove_from = [source_group]
+                else:
+                    # Remove from all groups
+                    groups_to_remove_from = current_groups
 
                 # Check if device is already in target group
                 if target_group in current_groups:
-                    results["already_in_target"].append(device_id)
-                    self.logger.warning(f"Device {device_id} already in target group '{target_group}'")
-                    continue
-
-                # Determine which groups to remove from
-                if source_group:
-                    if source_group not in current_groups:
-                        results["errors"].append(f"Device {device_id} not in source group '{source_group}'")
-                        self.logger.error(f"Device {device_id} not in source group '{source_group}'")
+                    # If we're removing from all groups, or specifically from the target group,
+                    # we still need to process to ensure it's only in the target group
+                    if source_group and source_group == target_group:
+                        result["already_in_target"].append(device_id)
                         continue
-                    groups_to_remove = [source_group]
-                else:
-                    groups_to_remove = current_groups
+                    elif not source_group and len(current_groups) == 1:
+                        # Already only in target group
+                        result["already_in_target"].append(device_id)
+                        continue
 
-                device_value = None
                 if not dry_run:
-                    for group in groups_to_remove:
-                        # Get any existing value/comment for the device
-                        device_value = device_groups[group][device_id]
-                        # Remove from group
-                        del device_groups[group][device_id]
-                        # Ensure the group remains even if empty
-                        if not device_groups[group]:
-                            device_groups[group] = {}
-                    # Add to target group (preserving any value/comment)
-                    device_groups[target_group][device_id] = device_value
+                    # Remove device from source groups
+                    for group_name in groups_to_remove_from:
+                        if (
+                            group_name in self.config_data["device_groups"]
+                            and self.config_data["device_groups"][group_name]
+                            and device_id in self.config_data["device_groups"][group_name]
+                        ):
+                            del self.config_data["device_groups"][group_name][device_id]
 
-                    # Add comment if provided (using YAML's comment functionality)
-                    if comment:
-                        if device_value is None:
-                            base_length = len(device_id) + 1
-                        else:
-                            value_str = str(device_value) if device_value != "" else ""
-                            base_length = len(device_id) + 2 + len(value_str)
-                        comment_column = base_length + 6  # Keep as before
-                        device_groups[target_group].yaml_add_eol_comment(comment, device_id, column=comment_column)
+                    # Add device to target group with comment
+                    device_comment = comment if comment else None
+                    self.config_data["device_groups"][target_group][device_id] = device_comment
 
-                results["moved"].append(device_id)
-                action = "Would move" if dry_run else "Moved"
-                self.logger.info(f"{action} device {device_id} to '{target_group}'")
+                result["moved"].append(device_id)
 
             except Exception as e:
-                error_msg = f"Error moving device {device_id}: {e}"
-                results["errors"].append(error_msg)
-                self.logger.error(error_msg)
+                result["errors"].append(f"Error processing device {device_id}: {str(e)}")
 
-        # Save changes if not dry run and there were successful moves
-        if not dry_run and results["moved"]:
-            self.save_config()
+        # Save configuration if not a dry run
+        if not dry_run and (result["moved"] or any(result.values())):
+            try:
+                self.save_config()
+            except Exception as e:
+                result["errors"].append(f"Error saving configuration: {str(e)}")
 
-        return results
+        return result
 
     def validate_device_list(self, device_ids: List[str]) -> Dict[str, List[str]]:
         """
