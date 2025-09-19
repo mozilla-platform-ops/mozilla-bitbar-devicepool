@@ -60,12 +60,11 @@ class ConfigurationDeviceMover:
             with open(self.config_file, "r") as src, open(backup_file, "w") as dst:
                 dst.write(src.read())
 
-        # Remove empty device groups before saving
+        # Retain empty device groups before saving
         if self.config_data and "device_groups" in self.config_data:
             device_groups = self.config_data["device_groups"]
-            # Build a new dict omitting empty groups
-            filtered_groups = {k: v for k, v in device_groups.items() if v and len(v) > 0}
-            self.config_data["device_groups"] = filtered_groups
+            # Ensure all groups, including empty ones, are retained
+            self.config_data["device_groups"] = {k: v if v else {} for k, v in device_groups.items()}
 
         try:
             with open(self.config_file, "w") as f:
@@ -176,6 +175,10 @@ class ConfigurationDeviceMover:
 
                     # Remove from source group
                     del device_groups[source_group][device_id]
+
+                    # Ensure the source group remains even if empty
+                    if not device_groups[source_group]:
+                        device_groups[source_group] = {}
 
                     # Add to target group (preserving any value/comment)
                     device_groups[target_group][device_id] = device_value

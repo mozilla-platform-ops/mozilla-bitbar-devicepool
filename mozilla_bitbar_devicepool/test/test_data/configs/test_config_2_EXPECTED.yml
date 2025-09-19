@@ -1,0 +1,14 @@
+device_groups:
+  groupA:
+    device1:
+    device2:
+    device3:
+  groupB:
+    # test 2
+    device4:
+    device5:
+    # test 4
+    device6:  # test123
+  groupC:
+  groupD:
+    device1:  # duplicate device in another group

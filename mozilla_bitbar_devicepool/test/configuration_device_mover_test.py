@@ -8,18 +8,48 @@ from mozilla_bitbar_devicepool.configuration_device_mover import ConfigurationDe
 TEST_CONFIG_PATH = os.path.join(os.path.dirname(__file__), "./test_data/configs/test_config.yml")
 TEST_CONFIG_PATH_2 = os.path.join(os.path.dirname(__file__), "./test_data/configs/test_config_2.yml")
 
+TEST_CONFIG_PATH_2_EXPECTED = os.path.join(os.path.dirname(__file__), "./test_data/configs/test_config_2_EXPECTED.yml")
+
 TEST_CONFIG_COPY = os.path.join(os.path.dirname(__file__), "./test_data/configs/test_config_copy.yml")
 TEST_CONFIG_COPY_2 = os.path.join(os.path.dirname(__file__), "./test_data/configs/test_config_2_copy.yml")
 
 
+# function that compares two files and checks that they are identical
+def compare_files(file1, file2, verbose=False):
+    # load both files
+    with open(file1, "r") as f1, open(file2, "r") as f2:
+        content1 = f1.read()
+        content2 = f2.read()
+
+    if verbose:
+        # show both files
+        print(f"File 1 ({file1}):\n{content1}\n")
+        print(f"File 2 ({file2}):\n{content2}\n")
+
+    # if they are the same, return True
+    # show output if they differ
+    if content1 != content2:
+        print(f"Files {file1} and {file2} differ")
+        return False
+    return True
+
+
 @pytest.fixture(autouse=True)
-def setup_and_teardown():
+def setup_and_teardown(debugging=False):
+    # clean up any existing test copies (do this now vs after yield so we can debug issues)
+    if debugging:
+        try:
+            os.remove(TEST_CONFIG_COPY)
+            os.remove(TEST_CONFIG_COPY_2)
+        except FileNotFoundError:
+            pass
     # Copy the config file for each test to avoid modifying the original
     shutil.copyfile(TEST_CONFIG_PATH, TEST_CONFIG_COPY)
     shutil.copyfile(TEST_CONFIG_PATH_2, TEST_CONFIG_COPY_2)
     yield
-    os.remove(TEST_CONFIG_COPY)
-    os.remove(TEST_CONFIG_COPY_2)
+    if not debugging:
+        os.remove(TEST_CONFIG_COPY)
+        os.remove(TEST_CONFIG_COPY_2)
 
 
 def test_load_config():
@@ -95,11 +125,25 @@ def test_validate_device_list():
     assert "unknown" in validation["not_found"]
 
 
-def test_save_config_removes_empty_groups():
+def test_save_config_retains_empty_groups():
     mover = ConfigurationDeviceMover(TEST_CONFIG_COPY, backup=False)
     mover.load_config()
     # Remove all devices from groupC
     mover.config_data["device_groups"]["groupC"] = {}
     mover.save_config()
     mover.load_config()
-    assert "groupC" not in mover.config_data["device_groups"]
+    # Assert that groupC still exists but is empty
+    assert "groupC" in mover.config_data["device_groups"]
+    assert mover.config_data["device_groups"]["groupC"] == {}
+
+
+# move device6 to groupB
+#   - ensure groupC still exists with its comment
+#   - ensure groupC is not defined as `{}`
+def test_exact_file_after_move():
+    mover = ConfigurationDeviceMover(TEST_CONFIG_COPY_2, backup=False)
+    mover.load_config()
+    # move device6 to groupB
+    mover.move_devices_from_any_pool("groupB", ["device6"], comment="test123")
+    # compare the modified config file to the expected file
+    assert compare_files(TEST_CONFIG_COPY_2, TEST_CONFIG_PATH_2_EXPECTED)
