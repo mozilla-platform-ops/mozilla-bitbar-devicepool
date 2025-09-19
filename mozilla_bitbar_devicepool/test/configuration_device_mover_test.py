@@ -87,10 +87,12 @@ def test_find_device_group():
 def test_move_devices():
     mover = ConfigurationDeviceMover(TEST_CONFIG_COPY, backup=False)
     mover.load_config()
-    result = mover.move_devices("groupA", "groupB", ["device1"], dry_run=True)
+    result = mover.move_devices_from_any_pool(
+        source_group="groupA", target_group="groupB", device_ids=["device1"], dry_run=True
+    )
     assert "device1" in result["moved"]
     # Actually move
-    result = mover.move_devices("groupA", "groupB", ["device1"])
+    result = mover.move_devices_from_any_pool(source_group="groupA", target_group="groupB", device_ids=["device1"])
     assert "device1" in result["moved"]
     assert "groupB" in mover.find_device_groups("device1")
 
