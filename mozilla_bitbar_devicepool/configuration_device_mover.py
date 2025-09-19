@@ -65,19 +65,35 @@ class ConfigurationDeviceMover:
             with open(self.config_file, "r") as src, open(backup_file, "w") as dst:
                 dst.write(src.read())
 
-        # Retain empty device groups before saving
+        # Ensure all groups, including empty ones, retain their CommentedMap structure
         if self.config_data and "device_groups" in self.config_data:
             device_groups = self.config_data["device_groups"]
-            # Ensure all groups, including empty ones, are retained
-            self.config_data["device_groups"] = {k: v if v else {} for k, v in device_groups.items()}
+            # Retain CommentedMap structure for empty groups
+            for group_name, devices in device_groups.items():
+                if devices is None or not devices:
+                    device_groups[group_name] = CommentedMap()
 
+        # Save the updated configuration
         try:
             with open(self.config_file, "w") as f:
                 self.yaml.dump(self.config_data, f)
             self.logger.info(f"Saved configuration to {self.config_file}")
-
         except Exception as e:
             raise RuntimeError(f"Error saving configuration file: {e}")
+
+        # reopen the file and remove ' {}' strings in the device groups
+        try:
+            with open(self.config_file, "r") as f:
+                lines = f.readlines()
+
+            with open(self.config_file, "w") as f:
+                for line in lines:
+                    # Remove ' {}' at the end of device group lines
+                    if line.strip().endswith(" {}"):
+                        line = line.replace(" {}", "")
+                    f.write(line)
+        except Exception as e:
+            raise RuntimeError(f"Error cleaning up configuration file: {e}")
 
     def list_device_groups(self) -> List[str]:
         """List all available device groups."""
@@ -175,6 +191,9 @@ class ConfigurationDeviceMover:
 
                     # Add to target group
                     device_groups[target_group][device_id] = None
+
+                    # Debugging: Log comment addition
+                    self.logger.debug(f"Adding comment '{comment}' to device '{device_id}' in group '{target_group}'")
 
                     # Add comment if provided
                     if comment:
