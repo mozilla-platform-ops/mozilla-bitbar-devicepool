@@ -98,8 +98,7 @@ device_groups:
     R5CXC1HZ4KD:  # 9/19/25: recabled and verified by jmaher
     R5CXC1ASHNJ:  # 9/19/25: recabled and verified by jmaher
   a55-alpha:
-    # devices on 10.146.2.48
-    RZCX50TW03H:
+    RZCX50TW03H:  # on 10.146.2.48
     R5CXC1AHXYD:  # devices on 10.146.2.55? qualify, from perf
     R5CXC1HZ62Y:  # devices that did not have power meters, qualify
   a55-sheriff-bad:
