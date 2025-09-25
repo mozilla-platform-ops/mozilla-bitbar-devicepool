@@ -2,9 +2,63 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import json
+import os
+import pprint
+
 import requests
+import taskcluster
+from natsort import natsorted
 from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
+
+ROOT_URL = "https://firefox-ci-tc.services.mozilla.com"
+
+
+class TaskclusterClient:
+    def __init__(self, verbose=False):
+        self.verbose = verbose
+        # self.queue = taskcluster.Queue()
+        cfg = {"rootUrl": ROOT_URL}
+
+        with open(os.path.expanduser("~/.tc_token")) as json_file:
+            data = json.load(json_file)
+        creds = {"clientId": data["clientId"], "accessToken": data["accessToken"]}
+
+        self.tc_wm = taskcluster.WorkerManager({"rootUrl": ROOT_URL, "credentials": creds})
+
+    def get_quarantined_worker_names(self, provisioner, worker_type):
+        results = self.get_quarantined_workers(provisioner, worker_type)
+        return_arr = []
+        for result in results:
+            return_arr.append(result["workerId"])
+        # pprint.pprint(natsorted(return_arr))
+        return natsorted(return_arr)
+
+    def get_quarantined_workers(self, provisioner, worker_type):
+        results = self.tc_wm.listWorkers(provisioner, worker_type)
+        # do filtering
+        quarantined_workers = []
+        for item in results["workers"]:
+            if self.verbose:
+                pprint.pprint(item)
+            # check if quarantineUntil is set and in the future
+            if "quarantineUntil" in item:
+                if item["quarantineUntil"] is None:
+                    # if self.verbose:
+                    #     print("Not quarantined: %s" % item["workerId"])
+                    item["quarantined"] = False
+                else:
+                    # if self.verbose:
+                    #     print("Quarantined: %s" % item["workerId"])
+                    item["quarantined"] = True
+                    quarantined_workers.append(item)
+            else:
+                # if self.verbose:
+                #     print("Not quarantined: %s" % item["workerId"])
+                item["quarantined"] = False
+
+        return quarantined_workers
 
 
 def get_taskcluster_pending_tasks(provisioner_id, worker_type, verbose=False):
@@ -47,9 +101,15 @@ def get_taskcluster_pending_tasks(provisioner_id, worker_type, verbose=False):
 
 # main
 if __name__ == "__main__":  # pragma: no cover
-    # Example usage
+    tci = TaskclusterClient(verbose=True)
     provisioner_id = "proj-autophone"
-    worker_type = "t-lambda-alpha-a55"
-    worker_type = "gecko-t-lambda-alpha-a55"
+    # worker_type = "t-lambda-a55-perf"
+    worker_type = "gecko-t-lambda-perf-a55"
+
+    # pending tasks
     pending_tasks = get_taskcluster_pending_tasks(provisioner_id, worker_type, verbose=True)
     print("Pending tasks: %s" % pending_tasks)
+
+    # quarantined workers
+    quarantined_workers = tci.get_quarantined_worker_names(provisioner_id, worker_type)
+    print("Quarantined workers: %s" % quarantined_workers)
