@@ -24,11 +24,23 @@ class TaskclusterClient:
         # self.queue = taskcluster.Queue()
         cfg = {"rootUrl": ROOT_URL}
 
-        with open(os.path.expanduser("~/.tc_token")) as json_file:
-            data = json.load(json_file)
+        # load credentials
+        if "TC_CLIENT_ID" in os.environ and "TC_ACCESS_TOKEN" in os.environ:
+            if verbose:
+                print("Using Taskcluster credentials from environment variables")
+            # Load credentials from environment variables
+            data = {"clientId": os.environ["TC_CLIENT_ID"], "accessToken": os.environ["TC_ACCESS_TOKEN"]}
+        else:
+            if verbose:
+                print("Using Taskcluster credentials from ~/.tc_token")
+            # Load credentials from file
+            with open(os.path.expanduser("~/.tc_token")) as json_file:
+                data = json.load(json_file)
+
         creds = {"clientId": data["clientId"], "accessToken": data["accessToken"]}
 
         self.tc_wm = taskcluster.WorkerManager({"rootUrl": ROOT_URL, "credentials": creds})
+        self.tc_queue = taskcluster.Queue(cfg, creds)
 
     def get_quarantined_worker_names(self, provisioner, worker_type, results=None):
         if results is None:
@@ -38,6 +50,9 @@ class TaskclusterClient:
             return_arr.append(result["workerId"])
         # pprint.pprint(natsorted(return_arr))
         return natsorted(return_arr)
+
+    def get_pending_tasks(self, provisioner_id, worker_type):
+        return self.tc_queue.taskQueueCounts(f"{provisioner_id}/{worker_type}")
 
     def get_quarantined_workers(self, provisioner, worker_type, results=None):
         if results is None:
@@ -123,10 +138,15 @@ if __name__ == "__main__":  # pragma: no cover
     worker_type = "gecko-t-lambda-perf-a55"
 
     # pending tasks
+    #
+    # old
     pending_tasks = get_taskcluster_pending_tasks(provisioner_id, worker_type, verbose=True)
     print("Pending tasks: %s" % pending_tasks)
+    # new
+    pending_tasks = tci.get_pending_tasks(provisioner_id, worker_type)
+    print("Pending tasks (new): %s" % pending_tasks)
 
     # quarantined workers
-    quarantined_workers = tci.get_quarantined_worker_names(provisioner_id, worker_type)
-    print("Quarantined workers: %s" % quarantined_workers)
-    print("Number of quarantined workers: %s" % len(quarantined_workers))
+    # quarantined_workers = tci.get_quarantined_worker_names(provisioner_id, worker_type)
+    # print("Quarantined workers: %s" % quarantined_workers)
+    # print("Number of quarantined workers: %s" % len(quarantined_workers))
