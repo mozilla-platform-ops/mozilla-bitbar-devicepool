@@ -20,7 +20,7 @@ import sentry_sdk
 from mozilla_bitbar_devicepool import configuration_lt, logging_setup
 from mozilla_bitbar_devicepool.lambdatest import job_config, status
 from mozilla_bitbar_devicepool.lambdatest.job_tracker import JobTracker
-from mozilla_bitbar_devicepool.taskcluster import get_taskcluster_pending_tasks
+from mozilla_bitbar_devicepool.taskcluster_client import get_taskcluster_pending_tasks
 from mozilla_bitbar_devicepool.util import misc
 
 # TODO: add a semaphore file that makes that turns on --debug mode

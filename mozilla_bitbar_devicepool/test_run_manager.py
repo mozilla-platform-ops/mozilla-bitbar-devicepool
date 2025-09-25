@@ -20,7 +20,7 @@ from mozilla_bitbar_devicepool.bitbar.runs import (
     get_active_test_runs,
     run_test_for_project,
 )
-from mozilla_bitbar_devicepool.taskcluster import get_taskcluster_pending_tasks
+from mozilla_bitbar_devicepool.taskcluster_client import get_taskcluster_pending_tasks
 
 #
 # WARNING: not used everywhere yet!!!
