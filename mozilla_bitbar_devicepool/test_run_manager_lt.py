@@ -431,9 +431,10 @@ class TestRunManagerLT(object):
             job_tracker_active_udids = job_tracker.get_active_udids()  # UDIDs tracked by job tracker
 
             # Calculate devices truly available for starting jobs: API Active minus JobTracker Active
-            available_devices_for_job_start = [
-                udid for udid in project_active_devices_api_list if udid not in job_tracker_active_udids
-            ]
+            available_devices_for_job_start = []
+            for udid in project_active_devices_api_list:
+                if udid not in job_tracker_active_udids:
+                    available_devices_for_job_start.append(udid)
             available_devices_for_job_start_count = len(available_devices_for_job_start)
 
             # Debug logging for job tracker and available devices calculation
