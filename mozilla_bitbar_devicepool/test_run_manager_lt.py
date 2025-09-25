@@ -83,6 +83,8 @@ class TestRunManagerLT(object):
     # Shared data keys for project-specific data
     SHARED_PROJECTS = "projects"
     PROJECT_TC_JOB_COUNT = "tc_job_count"
+    PROJECT_TC_QUARANTINED_WORKERS = "tc_quarantined_workers"
+    PROJECT_TC_QUARANTINED_WORKER_COUNT = "tc_quarantined_worker_count"
     PROJECT_LT_ACTIVE_DEVICE_COUNT = "lt_active_device_count"
     PROJECT_LT_BUSY_DEVICE_COUNT = "lt_busy_device_count"
     PROJECT_LT_CLEANUP_DEVICE_COUNT = "lt_cleanup_device_count"
@@ -222,9 +224,11 @@ class TestRunManagerLT(object):
                 # fetch the quarantined workers and update the shared data structure
                 try:
                     quarantined_workers = tcci.get_quarantined_worker_names("proj-autophone", tc_worker_type)
-                    self.shared_data[self.SHARED_PROJECTS][project_name]["quarantined_workers"] = quarantined_workers
-                    self.shared_data[self.SHARED_PROJECTS][project_name]["quarantined_worker_count"] = len(
+                    self.shared_data[self.SHARED_PROJECTS][project_name][self.PROJECT_TC_QUARANTINED_WORKERS] = (
                         quarantined_workers
+                    )
+                    self.shared_data[self.SHARED_PROJECTS][project_name][self.PROJECT_TC_QUARANTINED_WORKER_COUNT] = (
+                        len(quarantined_workers)
                     )
                     # logging.debug(pprint.pformat(quarantined_workers))
                 except Exception as e:
@@ -245,7 +249,7 @@ class TestRunManagerLT(object):
                 if not self.config_object.is_project_fully_configured(project_name):
                     continue
                 quarantined_count = self.shared_data[self.SHARED_PROJECTS][project_name].get(
-                    "quarantined_worker_count", 0
+                    self.PROJECT_TC_QUARANTINED_WORKER_COUNT, 0
                 )
                 if quarantine_string:
                     quarantine_string += ", "
