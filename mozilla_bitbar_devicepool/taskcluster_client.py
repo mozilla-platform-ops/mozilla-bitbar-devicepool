@@ -140,7 +140,7 @@ def get_taskcluster_pending_tasks(provisioner_id, worker_type, verbose=False):
 
 # main
 if __name__ == "__main__":  # pragma: no cover
-    tci = TaskclusterClient(verbose=True)
+    tci = TaskclusterClient(verbose=False)
     provisioner_id = "proj-autophone"
     # worker_type = "t-lambda-a55-perf"
     worker_type = "gecko-t-lambda-perf-a55"
@@ -154,7 +154,9 @@ if __name__ == "__main__":  # pragma: no cover
     pending_tasks = tci.get_pending_tasks(provisioner_id, worker_type)
     print("Pending tasks (new): %s" % pending_tasks)
 
+    print("")
+
     # quarantined workers
-    # quarantined_workers = tci.get_quarantined_worker_names(provisioner_id, worker_type)
-    # print("Quarantined workers: %s" % quarantined_workers)
-    # print("Number of quarantined workers: %s" % len(quarantined_workers))
+    quarantined_workers = tci.get_quarantined_worker_names(provisioner_id, worker_type)
+    print("Quarantined workers: %s" % quarantined_workers)
+    print("Number of quarantined workers: %s" % len(quarantined_workers))
