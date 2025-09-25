@@ -224,7 +224,7 @@ class TestRunManagerLT(object):
                     self.shared_data[self.SHARED_PROJECTS][project_name]["quarantined_worker_count"] = len(
                         quarantined_workers
                     )
-                    logging.debug(pprint.pformat(quarantined_workers))
+                    # logging.debug(pprint.pformat(quarantined_workers))
                 except Exception as e:
                     logging.warning(
                         f"{logging_header} Error fetching quarantined workers for {project_name}: {e}", exc_info=True
