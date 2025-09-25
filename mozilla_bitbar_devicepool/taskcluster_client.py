@@ -6,6 +6,9 @@ import json
 import os
 import pprint
 
+# import datetime
+from datetime import datetime
+
 import requests
 import taskcluster
 from natsort import natsorted
@@ -27,7 +30,7 @@ class TaskclusterClient:
 
         self.tc_wm = taskcluster.WorkerManager({"rootUrl": ROOT_URL, "credentials": creds})
 
-    def get_quarantined_worker_names(self, provisioner, worker_type):
+    def get_quarantined_worker_names(self, provisioner, worker_type, results=None):
         results = self.get_quarantined_workers(provisioner, worker_type)
         return_arr = []
         for result in results:
@@ -35,7 +38,7 @@ class TaskclusterClient:
         # pprint.pprint(natsorted(return_arr))
         return natsorted(return_arr)
 
-    def get_quarantined_workers(self, provisioner, worker_type):
+    def get_quarantined_workers(self, provisioner, worker_type, results=None):
         results = self.tc_wm.listWorkers(provisioner, worker_type)
         # do filtering
         quarantined_workers = []
@@ -51,8 +54,19 @@ class TaskclusterClient:
                 else:
                     # if self.verbose:
                     #     print("Quarantined: %s" % item["workerId"])
-                    item["quarantined"] = True
-                    quarantined_workers.append(item)
+
+                    # cast date string to datetime object
+                    # item["quarantineUntil"] = taskcluster.utils.fromNow(item["quarantineUntil"])
+                    dt = datetime.fromisoformat(item["quarantineUntil"].replace("Z", "+00:00"))
+
+                    # check if date is in the future
+                    if dt > taskcluster.utils.fromNow("0 hour"):
+                        # print("Quarantined (date in future): %s" % item["workerId"])
+                        item["quarantined"] = True
+                        quarantined_workers.append(item)
+                    else:
+                        # print("Not quarantined (date in past): %s" % item["workerId"])
+                        pass
             else:
                 # if self.verbose:
                 #     print("Not quarantined: %s" % item["workerId"])
@@ -113,3 +127,4 @@ if __name__ == "__main__":  # pragma: no cover
     # quarantined workers
     quarantined_workers = tci.get_quarantined_worker_names(provisioner_id, worker_type)
     print("Quarantined workers: %s" % quarantined_workers)
+    print("Number of quarantined workers: %s" % len(quarantined_workers))
