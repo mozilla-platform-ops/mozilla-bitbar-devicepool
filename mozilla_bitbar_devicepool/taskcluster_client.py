@@ -56,10 +56,10 @@ class TaskclusterClient:
 
     def get_pending_tasks(self, provisioner_id, worker_type):
         # TODO: use this when https://github.com/taskcluster/taskcluster/issues/7980 is fixed
-        # return self.tc_queue.pendingTasks(f"{provisioner_id}/{worker_type}")
+        # return self.tc_queue.taskQueueCounts(f"{provisioner_id}/{worker_type}")
 
         # deprecated call that doesn't have scope issues
-        return self.tc_queue.taskQueueCounts(f"{provisioner_id}/{worker_type}")
+        return self.tc_queue.pendingTasks(f"{provisioner_id}/{worker_type}")
 
     def get_quarantined_workers(self, provisioner, worker_type, results=None):
         if results is None:
