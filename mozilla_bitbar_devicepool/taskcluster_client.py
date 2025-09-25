@@ -31,7 +31,8 @@ class TaskclusterClient:
         self.tc_wm = taskcluster.WorkerManager({"rootUrl": ROOT_URL, "credentials": creds})
 
     def get_quarantined_worker_names(self, provisioner, worker_type, results=None):
-        results = self.get_quarantined_workers(provisioner, worker_type)
+        if results is None:
+            results = self.get_quarantined_workers(provisioner, worker_type)
         return_arr = []
         for result in results:
             return_arr.append(result["workerId"])
@@ -39,7 +40,8 @@ class TaskclusterClient:
         return natsorted(return_arr)
 
     def get_quarantined_workers(self, provisioner, worker_type, results=None):
-        results = self.tc_wm.listWorkers(provisioner, worker_type)
+        if results is None:
+            results = self.tc_wm.listWorkers(provisioner, worker_type)
         # do filtering
         quarantined_workers = []
         for item in results["workers"]:
