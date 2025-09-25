@@ -11,13 +11,10 @@ def setup_logging(level=logging.INFO, disable_timestamps=False):
     # for requests, it gets too chatty
     # TODO: make -vv show these or something
     #
-    # Get the logger for 'requests' (and others) and set their levels
-    logging.getLogger("requests").setLevel(logging.WARNING)
+    # Get the logger for 'requests' (and others) and set its level to INFO
+    logging.getLogger("requests").setLevel(logging.INFO)
     logging.getLogger("requests_cache").setLevel(logging.INFO)
-    logging.getLogger("urllib3").setLevel(logging.WARNING)
-
-    # Optionally suppress taskcluster logging if it's verbose
-    logging.getLogger("taskcluster").setLevel(logging.WARNING)
+    logging.getLogger("urllib3").setLevel(logging.INFO)
 
     if disable_timestamps:
         # Disable timestamps in the log messages
