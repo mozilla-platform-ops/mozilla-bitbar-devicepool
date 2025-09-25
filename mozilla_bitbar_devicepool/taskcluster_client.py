@@ -54,6 +54,7 @@ class TaskclusterClient:
         # pprint.pprint(natsorted(return_arr))
         return natsorted(return_arr)
 
+    # TODO: implement retries like in outer function
     def get_pending_tasks(self, provisioner_id, worker_type):
         # TODO: use this when https://github.com/taskcluster/taskcluster/issues/7980 is fixed
         # return self.tc_queue.taskQueueCounts(f"{provisioner_id}/{worker_type}")
@@ -80,7 +81,6 @@ class TaskclusterClient:
                     #     print("Quarantined: %s" % item["workerId"])
 
                     # cast date string to datetime object
-                    # item["quarantineUntil"] = taskcluster.utils.fromNow(item["quarantineUntil"])
                     dt = datetime.fromisoformat(item["quarantineUntil"].replace("Z", "+00:00"))
 
                     # check if date is in the future
