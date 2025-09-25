@@ -32,6 +32,7 @@ from mozilla_bitbar_devicepool.util import misc
 #  - for development, take over starting jobs for a particlar project
 # TODO: incorporate a call to https://api-hyperexecute.lambdatest.com/sentinel/v1.0/concurrency/<OrgID>
 #  to get the current and allowed number of concurrent jobs for the org (org id is 1611945).
+# TODO: start using `logger = logging.getLogger(__name__)` or set a name for the logger (vs root logger)
 
 
 class TestRunManagerLT(object):
