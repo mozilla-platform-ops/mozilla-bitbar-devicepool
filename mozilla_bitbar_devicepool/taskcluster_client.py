@@ -36,6 +36,9 @@ class TaskclusterClient:
             # Load credentials from file
             with open(os.path.expanduser("~/.tc_token")) as json_file:
                 data = json.load(json_file)
+        if verbose:
+            # mention the clientid but not the access token
+            print("Using Taskcluster clientId: %s" % data["clientId"])
 
         creds = {"clientId": data["clientId"], "accessToken": data["accessToken"]}
 
@@ -52,6 +55,10 @@ class TaskclusterClient:
         return natsorted(return_arr)
 
     def get_pending_tasks(self, provisioner_id, worker_type):
+        # TODO: use this when https://github.com/taskcluster/taskcluster/issues/7980 is fixed
+        # return self.tc_queue.pendingTasks(f"{provisioner_id}/{worker_type}")
+
+        # deprecated call that doesn't have scope issues
         return self.tc_queue.taskQueueCounts(f"{provisioner_id}/{worker_type}")
 
     def get_quarantined_workers(self, provisioner, worker_type, results=None):
@@ -92,6 +99,7 @@ class TaskclusterClient:
         return quarantined_workers
 
 
+# TODO: move to call in TaskclusterClient class
 def get_taskcluster_pending_tasks(provisioner_id, worker_type, verbose=False):
     # define the retry strategy
     retry_strategy = Retry(
