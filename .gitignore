@@ -7,6 +7,7 @@ venv
 .coverage
 bitbar_env*
 lt_env*
+*env.sh
 hyperexecute*
 .coverage*
 
