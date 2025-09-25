@@ -16,6 +16,9 @@ def setup_logging(level=logging.INFO, disable_timestamps=False):
     logging.getLogger("requests_cache").setLevel(logging.INFO)
     logging.getLogger("urllib3").setLevel(logging.INFO)
 
+    # Optionally suppress taskcluster logging if it's verbose
+    logging.getLogger("taskcluster").setLevel(logging.WARNING)
+
     if disable_timestamps:
         # Disable timestamps in the log messages
         logging.basicConfig(
