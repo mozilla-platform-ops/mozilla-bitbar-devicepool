@@ -9,7 +9,7 @@ def client():
 
 
 def test_get_quarantined_worker_names(client):
-    # Injecting results directly
+    # Injecting results directly to avoid api call mocking
     results = [
         {"workerId": "worker-2"},
         {"workerId": "worker-1"},
@@ -20,7 +20,7 @@ def test_get_quarantined_worker_names(client):
 
 
 def test_get_quarantined_workers(client):
-    # Injecting results directly
+    # Injecting results directly to avoid api call mocking
     results = {
         "workers": [
             {"workerId": "worker-1", "quarantineUntil": None},
