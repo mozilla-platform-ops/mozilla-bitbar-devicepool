@@ -13,7 +13,7 @@ def setup_logging(level=logging.INFO, disable_timestamps=False):
     #
     # Get the logger for 'requests' (and others) and set its level to INFO
     # logging.getLogger("requests").setLevel(logging.INFO)
-    logging.getLogger("requests_cache").setLevel(logging.INFO)
+    logging.getLogger("requests_cache").setLevel(logging.WARNING)
     # logging.getLogger("urllib3").setLevel(logging.INFO)
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     logging.getLogger("requests").setLevel(logging.WARNING)
