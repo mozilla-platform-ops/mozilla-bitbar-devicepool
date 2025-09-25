@@ -3,7 +3,6 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import json
-import logging
 import os
 import pprint
 
@@ -24,14 +23,6 @@ class TaskclusterClient:
         self.verbose = verbose
         # self.queue = taskcluster.Queue()
         cfg = {"rootUrl": ROOT_URL}
-
-        # setup logging
-        #
-        # Suppress logging from 'urllib3' and 'requests'
-        logging.getLogger("urllib3").setLevel(logging.WARNING)
-        logging.getLogger("requests").setLevel(logging.WARNING)
-        # Optionally suppress taskcluster logging if it's verbose
-        logging.getLogger("taskcluster").setLevel(logging.WARNING)
 
         # load credentials
         if "TC_CLIENT_ID" in os.environ and "TC_ACCESS_TOKEN" in os.environ:

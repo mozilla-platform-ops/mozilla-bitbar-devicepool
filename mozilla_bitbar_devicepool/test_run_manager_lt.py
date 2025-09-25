@@ -17,6 +17,8 @@ import time
 
 import sentry_sdk
 
+# run fist to set logging on everything
+# rest
 from mozilla_bitbar_devicepool import configuration_lt, logging_setup, taskcluster_client
 from mozilla_bitbar_devicepool.lambdatest import job_config, status
 from mozilla_bitbar_devicepool.lambdatest.job_tracker import JobTracker

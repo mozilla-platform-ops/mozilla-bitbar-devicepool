@@ -12,9 +12,12 @@ def setup_logging(level=logging.INFO, disable_timestamps=False):
     # TODO: make -vv show these or something
     #
     # Get the logger for 'requests' (and others) and set its level to INFO
-    logging.getLogger("requests").setLevel(logging.INFO)
+    # logging.getLogger("requests").setLevel(logging.INFO)
     logging.getLogger("requests_cache").setLevel(logging.INFO)
-    logging.getLogger("urllib3").setLevel(logging.INFO)
+    # logging.getLogger("urllib3").setLevel(logging.INFO)
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+    logging.getLogger("requests").setLevel(logging.WARNING)
+    logging.getLogger("taskcluster").setLevel(logging.WARNING)
 
     if disable_timestamps:
         # Disable timestamps in the log messages
