@@ -198,6 +198,7 @@ class TestRunManagerLT(object):
             worker_type_to_count_dict = {}
             # For each project, get taskcluster job count
             for project_name, project_config in self.config_object.config["projects"].items():
+                start_time = time.time()
                 if not self.config_object.is_project_fully_configured(project_name):
                     # logging.warning(f"{logging_header} Project '{project_name}' is not fully configured. Skipping.")
                     continue
@@ -212,9 +213,11 @@ class TestRunManagerLT(object):
                         self.shared_data[self.SHARED_PROJECTS][project_name][self.PROJECT_TC_JOB_COUNT] = tc_job_count
                 except Exception as e:
                     logging.warning(f"{logging_header} Error fetching TC tasks for {project_name}: {e}", exc_info=True)
-
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+            elapsed_time_str = f"{elapsed_time:.1f}s"
             formatted_wttcd = str(worker_type_to_count_dict).strip("{}").replace("'", "")
-            logging.info(f"{logging_header} Queue counts: {formatted_wttcd}")
+            logging.info(f"{logging_header} Queue counts ({elapsed_time_str}): {formatted_wttcd}")
 
             # normal thread sleep
             self.shutdown_event.wait(self.TC_MONITOR_INTERVAL)
