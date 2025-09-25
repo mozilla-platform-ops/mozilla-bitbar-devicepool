@@ -17,7 +17,7 @@ import time
 
 import sentry_sdk
 
-from mozilla_bitbar_devicepool import configuration_lt, logging_setup
+from mozilla_bitbar_devicepool import configuration_lt, logging_setup, taskcluster_client
 from mozilla_bitbar_devicepool.lambdatest import job_config, status
 from mozilla_bitbar_devicepool.lambdatest.job_tracker import JobTracker
 from mozilla_bitbar_devicepool.taskcluster_client import get_taskcluster_pending_tasks
@@ -193,15 +193,18 @@ class TestRunManagerLT(object):
     def _taskcluster_monitor_thread(self):
         logging_header = self.format_logging_header(self.TC_THREAD_NAME)
 
+        tcci = taskcluster_client.TaskclusterClient(verbose=False)
+
         while not self.shutdown_event.is_set():
             count_of_fetched_projects = 0
             worker_type_to_count_dict = {}
-            # For each project, get taskcluster job count
+            # do TC things for each project
             for project_name, project_config in self.config_object.config["projects"].items():
                 start_time = time.time()
                 if not self.config_object.is_project_fully_configured(project_name):
                     # logging.warning(f"{logging_header} Project '{project_name}' is not fully configured. Skipping.")
                     continue
+                # update the pending job count for the project
                 try:
                     tc_worker_type = project_config.get("TC_WORKER_TYPE")
                     tc_job_count = get_taskcluster_pending_tasks("proj-autophone", tc_worker_type, verbose=False)
@@ -213,11 +216,39 @@ class TestRunManagerLT(object):
                         self.shared_data[self.SHARED_PROJECTS][project_name][self.PROJECT_TC_JOB_COUNT] = tc_job_count
                 except Exception as e:
                     logging.warning(f"{logging_header} Error fetching TC tasks for {project_name}: {e}", exc_info=True)
+
+                # fetch the quarantined workers and update the shared data structure
+                try:
+                    quarantined_workers = tcci.get_quarantined_worker_names("proj-autophone", tc_worker_type)
+                    self.shared_data[self.SHARED_PROJECTS][project_name]["quarantined_workers"] = quarantined_workers
+                    self.shared_data[self.SHARED_PROJECTS][project_name]["quarantined_worker_count"] = len(
+                        quarantined_workers
+                    )
+                    logging.debug(pprint.pformat(quarantined_workers))
+                except Exception as e:
+                    logging.warning(
+                        f"{logging_header} Error fetching quarantined workers for {project_name}: {e}", exc_info=True
+                    )
             end_time = time.time()
             elapsed_time = end_time - start_time
+
+            # format queue count message
             elapsed_time_str = f"{elapsed_time:.1f}s"
             formatted_wttcd = str(worker_type_to_count_dict).strip("{}").replace("'", "")
             logging.info(f"{logging_header} Queue counts ({elapsed_time_str}): {formatted_wttcd}")
+
+            # format quarantine message
+            quarantine_string = ""
+            for project_name, project_config in self.config_object.config["projects"].items():
+                if not self.config_object.is_project_fully_configured(project_name):
+                    continue
+                quarantined_count = self.shared_data[self.SHARED_PROJECTS][project_name].get(
+                    "quarantined_worker_count", 0
+                )
+                if quarantine_string:
+                    quarantine_string += ", "
+                quarantine_string += f"{project_name}: {quarantined_count}"
+            logging.info(f"{logging_header} Quarantine counts: {quarantine_string}")
 
             # normal thread sleep
             self.shutdown_event.wait(self.TC_MONITOR_INTERVAL)
