@@ -451,7 +451,7 @@ class TestRunManagerLT(object):
                     devices_removed_for_quarantine.append(udid)
             available_devices_for_job_start_count = len(available_devices_for_job_start)
             if devices_removed_for_quarantine_count > 0:
-                logging.info(
+                logging.debug(
                     f"{logging_header} Removed {devices_removed_for_quarantine_count} quarantined devices from available list ({', '.join(devices_removed_for_quarantine)})"
                 )
 
