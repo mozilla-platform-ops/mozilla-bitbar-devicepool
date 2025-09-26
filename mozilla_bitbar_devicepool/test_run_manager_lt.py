@@ -438,8 +438,8 @@ class TestRunManagerLT(object):
                 if udid not in job_tracker_active_udids:
                     available_devices_for_job_start.append(udid)
             # subtract quarantined devices
-            logging.info(f"{logging_header} avail devices to start: {available_devices_for_job_start}")
-            logging.info(f"{logging_header} quarantined devs: {project_quarantined_workers}")
+            # logging.debug(f"{logging_header} avail devices to start: {available_devices_for_job_start}")
+            # logging.debug(f"{logging_header} quarantined devs: {project_quarantined_workers}")
             devices_removed_for_quarantine_count = 0
             devices_removed_for_quarantine = []
             for udid in project_quarantined_workers:
@@ -451,7 +451,7 @@ class TestRunManagerLT(object):
                     devices_removed_for_quarantine.append(udid)
             available_devices_for_job_start_count = len(available_devices_for_job_start)
             if devices_removed_for_quarantine_count > 0:
-                logging.info(
+                logging.debug(
                     f"{logging_header} Removed {devices_removed_for_quarantine_count} quarantined devices from available list ({', '.join(devices_removed_for_quarantine)})"
                 )
 
