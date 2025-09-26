@@ -422,6 +422,8 @@ class TestRunManagerLT(object):
             project_active_device_count_api = project_data.get(self.PROJECT_LT_ACTIVE_DEVICE_COUNT, 0)
             project_busy_devices_api = project_data.get(self.PROJECT_LT_BUSY_DEVICE_COUNT, 0)
             project_cleanup_devices_api = project_data.get(self.PROJECT_LT_CLEANUP_DEVICE_COUNT, 0)
+            # project_quarantined_worker_count = project_data.get(self.PROJECT_TC_QUARANTINED_WORKER_COUNT, 0)
+            project_quarantined_workers = project_data.get(self.PROJECT_TC_QUARANTINED_WORKERS, [])
             # Make a copy of the list from shared data
             project_active_devices_api_list = list(project_data.get(self.PROJECT_LT_ACTIVE_DEVICES, []))
 
@@ -435,7 +437,23 @@ class TestRunManagerLT(object):
             for udid in project_active_devices_api_list:
                 if udid not in job_tracker_active_udids:
                     available_devices_for_job_start.append(udid)
+            # subtract quarantined devices
+            logging.info(f"{logging_header} avail devices to start: {available_devices_for_job_start}")
+            logging.info(f"{logging_header} quarantined devs: {project_quarantined_workers}")
+            devices_removed_for_quarantine_count = 0
+            devices_removed_for_quarantine = []
+            for udid in project_quarantined_workers:
+                # logging.info(f"{logging_header} pqw udid: {udid}")
+                if udid in available_devices_for_job_start:
+                    logging.info(f"{logging_header} Removing quarantined device {udid} from available devices list")
+                    available_devices_for_job_start.remove(udid)
+                    devices_removed_for_quarantine_count += 1
+                    devices_removed_for_quarantine.append(udid)
             available_devices_for_job_start_count = len(available_devices_for_job_start)
+            if devices_removed_for_quarantine_count > 0:
+                logging.info(
+                    f"{logging_header} Removed {devices_removed_for_quarantine_count} quarantined devices from available list ({', '.join(devices_removed_for_quarantine)})"
+                )
 
             # Debug logging for job tracker and available devices calculation
             if self.DEBUG_JOB_STARTER or self.DEBUG_DEVICE_SELECTION:
@@ -477,8 +495,10 @@ class TestRunManagerLT(object):
             # Add global initiated jobs count to the log for better visibility
             logging.info(
                 f"{logging_header} TC Jobs: {tc_job_count:>4}, {lt_blob:>41}, "
-                f"RStarted/NeedH/Avail/ToStart: {recently_started_jobs_count}/{tc_jobs_not_handled}/{available_devices_for_job_start_count}/{jobs_to_start}, "  # Added Avail count
-                f"GInit/GInitMax {self.shared_data[self.SHARED_LT_G_INITIATED_JOBS]}/{self.GLOBAL_MAX_INITITATED_JOBS}"
+                # TODO: split this up differently, show active near available and jobs to start
+                f"RStarted/NeedH/TcQW/AvailW/ToStart: {recently_started_jobs_count}/{tc_jobs_not_handled}/{len(project_quarantined_workers)}/{available_devices_for_job_start_count}/{jobs_to_start}"
+                # TODO: show GInit elsewhere?
+                # f"GInit/GInitMax {self.shared_data[self.SHARED_LT_G_INITIATED_JOBS]}/{self.GLOBAL_MAX_INITITATED_JOBS}"
             )
 
             if jobs_to_start > 0:
