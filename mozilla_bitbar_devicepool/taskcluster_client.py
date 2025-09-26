@@ -182,5 +182,5 @@ if __name__ == "__main__":  # pragma: no cover
 
     # quarantined workers
     quarantined_workers = tci.get_quarantined_worker_names(provisioner_id, worker_type)
-    print("Quarantined workers: %s" % quarantined_workers)
     print("Number of quarantined workers: %s" % len(quarantined_workers))
+    print(f"Quarantined workers: {pprint.pformat(quarantined_workers)}")
