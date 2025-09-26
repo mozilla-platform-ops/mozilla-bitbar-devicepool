@@ -445,7 +445,7 @@ class TestRunManagerLT(object):
             for udid in project_quarantined_workers:
                 # logging.info(f"{logging_header} pqw udid: {udid}")
                 if udid in available_devices_for_job_start:
-                    logging.info(f"{logging_header} Removing quarantined device {udid} from available devices list")
+                    # logging.info(f"{logging_header} Removing quarantined device {udid} from available devices list")
                     available_devices_for_job_start.remove(udid)
                     devices_removed_for_quarantine_count += 1
                     devices_removed_for_quarantine.append(udid)
