@@ -25,25 +25,32 @@ class TaskclusterClient:
         cfg = {"rootUrl": ROOT_URL}
 
         # load credentials
+        data = {}
         if "TC_CLIENT_ID" in os.environ and "TC_ACCESS_TOKEN" in os.environ:
             if verbose:
                 print("Using Taskcluster credentials from environment variables")
             # Load credentials from environment variables
             data = {"clientId": os.environ["TC_CLIENT_ID"], "accessToken": os.environ["TC_ACCESS_TOKEN"]}
-            self.tc_client_id = os.environ["TC_CLIENT_ID"]
         elif os.path.exists(os.path.expanduser("~/.tc_token")):
             if verbose:
                 print("Using Taskcluster credentials from ~/.tc_token")
             # Load credentials from file
             with open(os.path.expanduser("~/.tc_token")) as json_file:
                 data = json.load(json_file)
-            self.tc_client_id = data["clientId"]
         else:
-            # TODO: allow anonymous at this point?
-            raise Exception("No Taskcluster credentials found in environment variables or ~/.tc_token")
+            # raise Exception("No Taskcluster credentials found in environment variables or ~/.tc_token")
+            # allow anonymous access
+            if verbose:
+                print(
+                    "No Taskcluster credentials found in environment variables or ~/.tc_token, using anonymous access."
+                )
+            data["clientId"] = "anonymous"
+            data["accessToken"] = ""
         if verbose:
             # mention the clientid but not the access token
             print("Using Taskcluster clientId: %s" % data["clientId"])
+        # set for later use
+        self.tc_client_id = data["clientId"]
 
         creds = {"clientId": data["clientId"], "accessToken": data["accessToken"]}
 
