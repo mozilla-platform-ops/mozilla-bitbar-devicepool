@@ -44,6 +44,7 @@ class TaskclusterClient:
 
         self.tc_wm = taskcluster.WorkerManager({"rootUrl": ROOT_URL, "credentials": creds})
         self.tc_queue = taskcluster.Queue(cfg, creds)
+        self.tc_ai = taskcluster.Auth(cfg, creds)
 
     def get_quarantined_worker_names(self, provisioner, worker_type, results=None):
         if results is None:
@@ -56,6 +57,9 @@ class TaskclusterClient:
 
     # TODO: implement retries like in outer function
     def get_pending_tasks(self, provisioner_id, worker_type):
+        # results = self.tc_ai.currentScopes()
+        # pprint.pprint(results)
+
         # TODO: use this when https://github.com/taskcluster/taskcluster/issues/7980 is fixed
         # return self.tc_queue.taskQueueCounts(f"{provisioner_id}/{worker_type}")
 
