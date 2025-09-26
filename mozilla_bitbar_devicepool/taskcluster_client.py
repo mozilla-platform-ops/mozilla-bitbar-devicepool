@@ -3,6 +3,7 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import json
+import logging
 import os
 import pprint
 
@@ -55,8 +56,8 @@ class TaskclusterClient:
         creds = {"clientId": data["clientId"], "accessToken": data["accessToken"]}
 
         self.tc_wm = taskcluster.WorkerManager({"rootUrl": ROOT_URL, "credentials": creds})
-        self.tc_queue = taskcluster.Queue(cfg, creds)
-        self.tc_ai = taskcluster.Auth(cfg, creds)
+        self.tc_queue = taskcluster.Queue({"rootUrl": ROOT_URL, "credentials": creds})
+        self.tc_ai = taskcluster.Auth({"rootUrl": ROOT_URL, "credentials": creds})
 
     def get_quarantined_worker_names(self, provisioner, worker_type, results=None):
         if results is None:
@@ -160,12 +161,19 @@ def get_taskcluster_pending_tasks(provisioner_id, worker_type, verbose=False):
 
 # main
 if __name__ == "__main__":  # pragma: no cover
+    # setup logging
+    logging.basicConfig(level=logging.INFO)
+    # enable verbose logs if having issues
+    # logging.basicConfig(level=logging.DEBUG)
+    # logging.getLogger("taskcluster").setLevel(logging.DEBUG)
+
     tci = TaskclusterClient(verbose=False)
     provisioner_id = "proj-autophone"
     # worker_type = "t-lambda-a55-perf"
     worker_type = "gecko-t-lambda-perf-a55"
 
     print("TC Client id is: %s" % tci.tc_client_id)
+    print(f"Current scopes: {pprint.pformat(tci.tc_ai.currentScopes())}")
 
     # pending tasks
     #
