@@ -30,12 +30,17 @@ class TaskclusterClient:
                 print("Using Taskcluster credentials from environment variables")
             # Load credentials from environment variables
             data = {"clientId": os.environ["TC_CLIENT_ID"], "accessToken": os.environ["TC_ACCESS_TOKEN"]}
-        else:
+            self.tc_client_id = os.environ["TC_CLIENT_ID"]
+        elif os.path.exists(os.path.expanduser("~/.tc_token")):
             if verbose:
                 print("Using Taskcluster credentials from ~/.tc_token")
             # Load credentials from file
             with open(os.path.expanduser("~/.tc_token")) as json_file:
                 data = json.load(json_file)
+            self.tc_client_id = data["clientId"]
+        else:
+            # TODO: allow anonymous at this point?
+            raise Exception("No Taskcluster credentials found in environment variables or ~/.tc_token")
         if verbose:
             # mention the clientid but not the access token
             print("Using Taskcluster clientId: %s" % data["clientId"])
@@ -59,12 +64,16 @@ class TaskclusterClient:
     def get_pending_tasks(self, provisioner_id, worker_type):
         # results = self.tc_ai.currentScopes()
         # pprint.pprint(results)
+        results = self.tc_queue.taskQueueCounts(f"{provisioner_id}/{worker_type}")
+        return results.get("pendingTasks", 0)
 
-        # TODO: use this when https://github.com/taskcluster/taskcluster/issues/7980 is fixed
-        # return self.tc_queue.taskQueueCounts(f"{provisioner_id}/{worker_type}")
-
-        # deprecated call that doesn't have scope issues
-        return self.tc_queue.pendingTasks(f"{provisioner_id}/{worker_type}")
+    # TODO: implement retries like in outer function
+    # uses a deprecated call
+    def get_pending_tasks_old(self, provisioner_id, worker_type):
+        # results = self.tc_ai.currentScopes()
+        # pprint.pprint(results)
+        results = self.tc_queue.pendingTasks(f"{provisioner_id}/{worker_type}")
+        return results.get("pendingTasks", 0)
 
     def get_quarantined_workers(self, provisioner, worker_type, results=None):
         if results is None:
@@ -149,6 +158,8 @@ if __name__ == "__main__":  # pragma: no cover
     # worker_type = "t-lambda-a55-perf"
     worker_type = "gecko-t-lambda-perf-a55"
 
+    print("TC Client id is: %s" % tci.tc_client_id)
+
     # pending tasks
     #
     # old
@@ -157,6 +168,8 @@ if __name__ == "__main__":  # pragma: no cover
     # new
     pending_tasks = tci.get_pending_tasks(provisioner_id, worker_type)
     print("Pending tasks (new): %s" % pending_tasks)
+    pending_tasks = tci.get_pending_tasks_old(provisioner_id, worker_type)
+    print("Pending tasks (old): %s" % pending_tasks)
 
     print("")
 
