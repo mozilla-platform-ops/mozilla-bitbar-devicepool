@@ -41,17 +41,10 @@ device_groups:
     RZCY10Y4HWD:  # 9/10/25: previously recabled and verified by jmaher
     RZCY10Y4QVX:  # 9/10/25: previously recabled and verified by jmaher
     RZCY10Y4TAV:  # 9/10/25: previously recabled and verified by jmaher
-    RZCY10Y4TBY:  # 9/10/25: previously recabled and verified by jmaher
     RZCY10Y4TJX:  # 9/10/25: previously recabled and verified by jmaher
-    RZCY10Y548K:  # 9/10/25: previously recabled and verified by jmaher
-    R5CXC1AMMNK:  # 9/10/25: previously recabled and verified by jmaher
-    # recabled a55 devices with power meters on 10.146.2.46 and 10.146.2.56
     R5CXC1ASLHH:  # 9/10/25: recabled and verified by jmaher
     R5CXC1AHV4M:  # 9/10/25: recabled and verified by jmaher
     R5CXC1ASA0L:  # 9/10/25: recabled and verified by jmaher
-    R5CXC1AJ02Z:  # 9/10/25: recabled and verified by jmaher
-    RZCXC19G2SH:  # 9/10/25: recabled and verified by jmaher
-    # devices on 10.146.2.45
     R5CXC1ASA3P:  # 9/11/25: recabled and verified by jmaher
     R5CXC1AP2KT:  # 9/11/25: recabled and verified by jmaher
     R5CXC1HZK0W:  # 9/11/25: recabled and verified by jmaher
@@ -61,7 +54,6 @@ device_groups:
     RZCY203N75Z:  # 9/15/25: recabled and verified by jmaher
     # devices on 10.146.2.48
     R5CXC1AMNFY:  # 9/15/25: recabled and verified by jmaher
-    R5CX4089QNL:  # 9/15/25: recabled and verified by jmaher
     RZCX31FDGJE:  # 9/15/25: recabled and verified by jmaher
     R5CY21T22NH:  # 9/15/25: recabled and verified by jmaher
     RZCX71ZVF6J:  # 9/15/25: recabled and verified by jmaher
@@ -70,7 +62,6 @@ device_groups:
     # devices on 10.146.2.54 and 10.146.2.53
     R5CXC1ASH4E:  # 9/16/25: recabled and verified by jmaher
     RZCXC16WHTA:  # 9/16/25: recabled and verified by jmaher
-    R5CXC1AHWWZ:  # 9/16/25: recabled and verified by jmaher
     R5CXC1AHZBW:  # 9/16/25: recabled and verified by jmaher
     RZCXC189JSJ:  # 9/16/25: recabled and verified by jmaher
     R5CXC1PW7CR:  # 9/16/25: recabled and verified by jmaher
@@ -86,21 +77,28 @@ device_groups:
     RZCXC19G1DM:  # 9/17/25: recabled and verified by jmaher
     RZCXC1BK67D:  # 9/17/25: recabled and verified by jmaher
     RZCY107MCLV:  # 9/17/25: recabled and verified by jmaher
-    R5CXC1HZ5PZ:  # 9/18/25: recabled and verified by jmaher
     R5CXC1HZKLR:  # 9/18/25: recabled and verified by jmaher
-    R5CXC1AJ07K:  # 9/18/25: recabled and verified by jmaher
     R5CXC1ALFED:  # 9/18/25: recabled and verified by jmaher
-    RZCXC19G1CT:  # 9/18/25: recabled and verified by jmaher
     R5CXC1ARCER:  # 9/18/25: recabled and verified by jmaher
-    R5CXC1ARELR:  # 9/18/25: recabled and verified by jmaher
     R5CXC1ANGLT:  # 9/19/25: recabled and verified by jmaher
-    RZCXC15YZVZ:  # 9/19/25: recabled and verified by jmaher
-    R5CXC1HZ4KD:  # 9/19/25: recabled and verified by jmaher
-    R5CXC1ASHNJ:  # 9/19/25: recabled and verified by jmaher
   a55-alpha:
     RZCX50TW03H:  # on 10.146.2.48
-    R5CXC1AHXYD:  # devices on 10.146.2.55? qualify, from perf
     R5CXC1HZ62Y:  # devices that did not have power meters, qualify
+    R5CXC1AHXYD:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
+    R5CX4089QNL:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
+    R5CXC1AHWWZ:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
+    R5CXC1AJ02Z:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
+    R5CXC1AJ07K:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
+    R5CXC1AMMNK:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
+    R5CXC1ARELR:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
+    R5CXC1ASHNJ:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
+    R5CXC1HZ4KD:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
+    R5CXC1HZ5PZ:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
+    RZCXC15YZVZ:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
+    RZCXC19G1CT:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
+    RZCXC19G2SH:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
+    RZCY10Y4TBY:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
+    RZCY10Y548K:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
   a55-sheriff-bad:
   p9-perf:
     # devices with power meters, have been recabled
