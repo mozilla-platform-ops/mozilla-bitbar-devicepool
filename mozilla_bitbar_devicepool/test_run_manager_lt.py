@@ -389,7 +389,8 @@ class TestRunManagerLT(object):
                 util_percent = (local_device_stats["busy_devices"] / global_total_device_count) * 100
 
             formatted_active_device_count = str(active_device_count_by_project_dict).strip("{}").replace("'", "")
-            per_queue_string = f"Active device counts: {formatted_active_device_count}"
+            total_active_count = sum(active_device_count_by_project_dict.values())
+            per_queue_string = f"Active device counts ({total_active_count}): {formatted_active_device_count}"
             logging.info(f"{logging_header} {per_queue_string}")
 
             # normal thread sleep
