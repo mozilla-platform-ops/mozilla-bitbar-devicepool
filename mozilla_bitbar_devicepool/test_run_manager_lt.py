@@ -199,6 +199,8 @@ class TestRunManagerLT(object):
         logging_header = self.format_logging_header(self.TC_THREAD_NAME)
 
         tcci = taskcluster_client.TaskclusterClient(verbose=False)
+        # define at this level, but updated inside loop below
+        total_quarantined_devices = 0
 
         while not self.shutdown_event.is_set():
             worker_type_to_count_dict = {}
