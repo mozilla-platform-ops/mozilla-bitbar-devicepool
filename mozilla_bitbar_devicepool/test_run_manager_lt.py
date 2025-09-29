@@ -204,10 +204,10 @@ class TestRunManagerLT(object):
 
         while not self.shutdown_event.is_set():
             worker_type_to_count_dict = {}
+            total_quarantined_devices = 0
             # do TC things for each project
             for project_name, project_config in self.config_object.config["projects"].items():
                 start_time = time.time()
-                total_quarantined_devices = 0
                 if not self.config_object.is_project_fully_configured(project_name):
                     # logging.warning(f"{logging_header} Project '{project_name}' is not fully configured. Skipping.")
                     continue
