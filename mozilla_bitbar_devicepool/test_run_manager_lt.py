@@ -201,11 +201,11 @@ class TestRunManagerLT(object):
         tcci = taskcluster_client.TaskclusterClient(verbose=False)
 
         while not self.shutdown_event.is_set():
-            count_of_fetched_projects = 0
             worker_type_to_count_dict = {}
             # do TC things for each project
             for project_name, project_config in self.config_object.config["projects"].items():
                 start_time = time.time()
+                total_quarantined_devices = 0
                 if not self.config_object.is_project_fully_configured(project_name):
                     # logging.warning(f"{logging_header} Project '{project_name}' is not fully configured. Skipping.")
                     continue
@@ -213,7 +213,6 @@ class TestRunManagerLT(object):
                 try:
                     tc_worker_type = project_config.get("TC_WORKER_TYPE")
                     tc_job_count = get_taskcluster_pending_tasks("proj-autophone", tc_worker_type, verbose=False)
-                    count_of_fetched_projects += 1
                     worker_type_to_count_dict[tc_worker_type] = tc_job_count
 
                     # Update shared data without lock
@@ -231,6 +230,7 @@ class TestRunManagerLT(object):
                     self.shared_data[self.SHARED_PROJECTS][project_name][self.PROJECT_TC_QUARANTINED_WORKER_COUNT] = (
                         len(quarantined_workers)
                     )
+                    total_quarantined_devices += len(quarantined_workers)
                     # logging.debug(pprint.pformat(quarantined_workers))
                 except Exception as e:
                     logging.warning(
@@ -255,7 +255,7 @@ class TestRunManagerLT(object):
                 if quarantine_string:
                     quarantine_string += ", "
                 quarantine_string += f"{project_name}: {quarantined_count}"
-            logging.info(f"{logging_header} Quarantine counts: {quarantine_string}")
+            logging.info(f"{logging_header} Quarantine counts ({total_quarantined_devices}): {quarantine_string}")
 
             # normal thread sleep
             self.shutdown_event.wait(self.TC_MONITOR_INTERVAL)
