@@ -307,32 +307,32 @@ device_groups:
     a55-22:
     # a55-23:  # 5/9/25: removed, contract downsizing
     a55-24:
-    a55-25:
-    a55-26:
-    a55-27:
-    a55-28:
-    a55-29:
-    a55-30:
-    a55-31:
-    a55-32:
-    a55-33:
-    a55-34:
-    a55-35:
-    a55-36:
-    a55-37:
-    a55-38:
-    a55-39:
-    a55-40:
-    a55-41:
-    a55-42:
-    a55-43:
-    a55-44:
-    a55-45:
-    a55-46:
-    a55-47:
+    # a55-25:  # 9/29/25: removed, secondary contract not renewed
+    # a55-26:  # 9/29/25: removed, secondary contract not renewed
+    # a55-27:  # 9/29/25: removed, secondary contract not renewed
+    # a55-28:  # 9/29/25: removed, secondary contract not renewed
+    # a55-29:  # 9/29/25: removed, secondary contract not renewed
+    # a55-30:  # 9/29/25: removed, secondary contract not renewed
+    # a55-31:  # 9/29/25: removed, secondary contract not renewed
+    # a55-32:  # 9/29/25: removed, secondary contract not renewed
+    # a55-33:  # 9/29/25: removed, secondary contract not renewed
+    # a55-34:  # 9/29/25: removed, secondary contract not renewed
+    # a55-35:  # 9/29/25: removed, secondary contract not renewed
+    # a55-36:  # 9/29/25: removed, secondary contract not renewed
+    # a55-37:  # 9/29/25: removed, secondary contract not renewed
+    # a55-38:  # 9/29/25: removed, secondary contract not renewed
+    # a55-39:  # 9/29/25: removed, secondary contract not renewed
+    # a55-40:  # 9/29/25: removed, secondary contract not renewed
+    # a55-41:  # 9/29/25: removed, secondary contract not renewed
+    # a55-42:  # 9/29/25: removed, secondary contract not renewed
+    # a55-43:  # 9/29/25: removed, secondary contract not renewed
+    # a55-44:  # 9/29/25: removed, secondary contract not renewed
+    # a55-45:  # 9/29/25: removed, secondary contract not renewed
+    # a55-46:  # 9/29/25: removed, secondary contract not renewed
+    # a55-47:  # 9/29/25: removed, secondary contract not renewed
     # a55-48:  # 6/13/25: removed, contract downsizing
-    a55-49:
-    a55-50:
+    # a55-49:  # 9/29/25: removed, secondary contract not renewed
+    # a55-50:  # 9/29/25: removed, secondary contract not renewed
     # a55-51:  # 6/13/25: removed, contract downsizing
     # a55-52:  # 6/13/25: removed, contract downsizing
     # a55-53:  # 6/13/25: removed, contract downsizing
@@ -372,11 +372,11 @@ device_groups:
     pixel5-04:
     pixel5-05:
     # pixel5-06:  # 5/9/25: removed, contract downsizing
-    pixel5-07:
+    # pixel5-07:  # 9/29/25: removed, secondary contract not renewed
     # pixel5-08:  # 5/9/25: removed, contract downsizing
     pixel5-09:
-    pixel5-10:
-    pixel5-11:
+    # pixel5-10:  # 9/29/25: removed, secondary contract not renewed
+    # pixel5-11:  # 9/29/25: removed, secondary contract not renewed
     # pixel5-12:  # 6/13/25: removed, contract downsizing
     # pixel5-13:  # 6/13/25: removed, contract downsizing
     # pixel5-14:  # 6/13/25: removed, contract downsizing
