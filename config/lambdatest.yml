@@ -81,21 +81,21 @@ device_groups:
     R5CXC1ALFED:  # 9/18/25: recabled and verified by jmaher
     R5CXC1ARCER:  # 9/18/25: recabled and verified by jmaher
     R5CXC1ANGLT:  # 9/19/25: recabled and verified by jmaher
+    R5CXC1ASHNJ:  # 9/30/25: was quarantined, but reseated and power cycled and tested by jmaher as good
+    R5CXC1HZ4KD:  # 9/30/25: was quarantined, but reseated and power cycled and tested by jmaher as good
+    RZCXC15YZVZ:  # 9/30/25: was quarantined, but reseated and power cycled and tested by jmaher as good
+    R5CXC1HZ5PZ:  # 9/30/25: was quarantined, but reseated and power cycled and tested by jmaher as good
+    R5CXC1AHXYD:  # 9/30/25: was quarantined, but reseated and power cycled and tested by jmaher as good
+    RZCXC19G1CT:  # 9/30/25: was quarantined, but reseated and power cycled and tested by jmaher as good
   a55-alpha:
     RZCX50TW03H:  # on 10.146.2.48
     R5CXC1HZ62Y:  # devices that did not have power meters, qualify
-    R5CXC1AHXYD:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
     R5CX4089QNL:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
     R5CXC1AHWWZ:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
     R5CXC1AJ02Z:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
     R5CXC1AJ07K:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
     R5CXC1AMMNK:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
     R5CXC1ARELR:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
-    R5CXC1ASHNJ:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
-    R5CXC1HZ4KD:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
-    R5CXC1HZ5PZ:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
-    RZCXC15YZVZ:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
-    RZCXC19G1CT:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
     RZCXC19G2SH:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
     RZCY10Y4TBY:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
     RZCY10Y548K:  # 9/29/25: quarantined device batch 1, has been reseated and powered off/on. now test
