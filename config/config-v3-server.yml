@@ -178,8 +178,8 @@ projects:
   #     TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-s24
   # used for building new docker images
   # mozilla-docker-build:
-  #   device_group_name: motog4-docker-builder-2
-  #   device_model: motog4
+  #   device_group_name: docker-builder
+  #   device_model: motog4  # need to change?
   #   framework_name: Docker image build
   #   description: Mozilla Docker image build
   #   test_file: mozilla-docker-20240307T112108.zip
@@ -224,9 +224,23 @@ projects:
   #     # replace with version to test
   #     DOCKER_IMAGE_VERSION: 20200326T142021
 device_groups:
-  motog4-docker-builder-2:
-    Docker Builder:
+  docker-builder:
+    Linux 777:  # Docker Builder
+  # motog4-docker-builder-2:
+  #   Docker Builder:
   test-1:
+    a55-25:
+    a55-26:
+    a55-27:
+    a55-28:
+    a55-29:
+    a55-30:
+    a55-31:
+    a55-43:
+    a55-44:
+    a55-45:
+    a55-46:
+    a55-47:
     a55-51:
     a55-52:
     a55-56:
@@ -234,7 +248,7 @@ device_groups:
     a55-58:
     a55-59:
     a55-60:
-    a55-61:
+    # a55-61:
     a55-62:
     a55-63:
     a55-64:
@@ -252,14 +266,21 @@ device_groups:
     a55-76:
     a55-77:
     a55-78:
+    a55-131:
     a55-134:
     a55-135:
     a55-141:
     a55-142:
-    pixel5-07:
+    a55-143:
+    # pixel5-07:
     pixel5-12:
     pixel6-137:
     pixel6-138:
+    pixel5-144:
+    pixel6-146:
+    pixel6-147:
+    # s24-03:
+    # s24-04:
     s24-06:
     s24-05:
   test-2:
