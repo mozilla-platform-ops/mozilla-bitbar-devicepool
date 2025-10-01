@@ -224,8 +224,8 @@ projects:
   #     # replace with version to test
   #     DOCKER_IMAGE_VERSION: 20200326T142021
 device_groups:
-  docker-builder:
-    Linux 777:  # Docker Builder
+  # docker-builder:
+  #   Linux 777:  # Docker Builder
   # motog4-docker-builder-2:
   #   Docker Builder:
   test-1:
