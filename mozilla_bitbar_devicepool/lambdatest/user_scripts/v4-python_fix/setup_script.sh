@@ -74,6 +74,7 @@ wget https://android-packages.s3.us-west-2.amazonaws.com/python3.12_for_20.04/py
 wget https://android-packages.s3.us-west-2.amazonaws.com/python3.12_for_20.04/python3.12-venv_3.12.11-16-gade85bc5f4-1%2Bfocal1_amd64.deb
 wget https://android-packages.s3.us-west-2.amazonaws.com/python3.12_for_20.04/libpython3.12_3.12.11-16-gade85bc5f4-1%2Bfocal1_amd64.deb
 wget https://android-packages.s3.us-west-2.amazonaws.com/python3.12_for_20.04/libpython3.12-stdlib_3.12.11-16-gade85bc5f4-1%2Bfocal1_amd64.deb
+wget https://android-packages.s3.us-west-2.amazonaws.com/python3.12_for_20.04/libpython3.12-dev_3.12.11-16-gade85bc5f4-1%2Bfocal1_amd64.deb
 # now install
 sudo apt-get install -y ./*.deb
 cd -
