@@ -75,7 +75,7 @@ wget https://android-packages.s3.us-west-2.amazonaws.com/python3.12_for_20.04/py
 wget https://android-packages.s3.us-west-2.amazonaws.com/python3.12_for_20.04/libpython3.12_3.12.11-16-gade85bc5f4-1%2Bfocal1_amd64.deb
 wget https://android-packages.s3.us-west-2.amazonaws.com/python3.12_for_20.04/libpython3.12-stdlib_3.12.11-16-gade85bc5f4-1%2Bfocal1_amd64.deb
 # now install
-sudo dpkg -i ./*.deb
+sudo apt-get install -y ./*.deb
 cd -
 
 # don't update default `python3`, since it breaks tons of stuff
