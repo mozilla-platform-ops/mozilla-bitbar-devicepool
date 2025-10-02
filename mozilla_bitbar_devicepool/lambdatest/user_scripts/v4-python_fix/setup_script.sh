@@ -9,8 +9,7 @@ set -x
 
 TC_VERSION=87.0.0
 LT_SETUP_MERCURIAL_VERSION="7.0.2"
-LT_SETUP_PYTHON_VERSION="3.13"
-
+LT_SETUP_PYTHON_VERSION="3.12"
 
 ### functions
 
@@ -51,16 +50,31 @@ fi
 sudo apt-get update -y
 sudo apt-get install gettext-base libgtk-3-0 usbutils -y
 
+# fetch python3 from deadsnakes ppa
+#   - NOTE: BROKEN on 20.04 as of 10/1/2025
+#
 # upgrade `python` and `python3` to our desired version
 #   NOTE: do this once we're done using apt, since this might fry it
-LT_SETUP_PYTHON_FULL_STRING="python$LT_SETUP_PYTHON_VERSION"
-sudo add-apt-repository ppa:deadsnakes/ppa
-sudo apt-get update
-sudo apt-get install "$LT_SETUP_PYTHON_FULL_STRING" \
-                     "$LT_SETUP_PYTHON_FULL_STRING-venv" \
-                     "$LT_SETUP_PYTHON_FULL_STRING-dev" \
-                     "$LT_SETUP_PYTHON_FULL_STRING-lib2to3" \
-                     -y
+# LT_SETUP_PYTHON_FULL_STRING="python$LT_SETUP_PYTHON_VERSION"
+# sudo add-apt-repository ppa:deadsnakes/ppa
+# sudo apt-get update
+# sudo apt-get install "$LT_SETUP_PYTHON_FULL_STRING" \
+#                      "$LT_SETUP_PYTHON_FULL_STRING-venv" \
+#                      "$LT_SETUP_PYTHON_FULL_STRING-dev" \
+#                      "$LT_SETUP_PYTHON_FULL_STRING-lib2to3" \
+#                      -y
+
+# fetch python3 from aws bucket and then install it
+#
+mkdir /tmp/python312
+cd /tmp/python312
+wget https://android-packages.s3.us-west-2.amazonaws.com/python3.12_for_20.04/python3.12_3.12.11-16-gade85bc5f4-1%2Bfocal1_amd64.deb
+wget https://android-packages.s3.us-west-2.amazonaws.com/python3.12_for_20.04/python3.12-dev_3.12.11-16-gade85bc5f4-1%2Bfocal1_amd64.deb
+wget https://android-packages.s3.us-west-2.amazonaws.com/python3.12_for_20.04/python3.12-lib2to3_3.12.11-16-gade85bc5f4-1%2Bfocal1_all.deb
+wget https://android-packages.s3.us-west-2.amazonaws.com/python3.12_for_20.04/python3.12-venv_3.12.11-16-gade85bc5f4-1%2Bfocal1_amd64.deb
+dpkg -i ./*.deb
+cd -
+
 # don't update default `python3`, since it breaks tons of stuff
 
 # show version
