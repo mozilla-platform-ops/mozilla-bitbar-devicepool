@@ -28,6 +28,9 @@ projects:
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-p9
     TC_WORKER_TYPE: gecko-t-lambda-perf-p9
     priority_group: p9
+  stab:
+    TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-stab
+    TC_WORKER_TYPE: gecko-t-lambda-stab
   # test-1:
   #     SCRIPT_REPO_COMMIT: future_commit
   #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1
@@ -78,7 +81,6 @@ device_groups:
     RZCXC1BK67D:  # 9/17/25: recabled and verified by jmaher
     RZCY107MCLV:  # 9/17/25: recabled and verified by jmaher
     R5CXC1HZKLR:  # 9/18/25: recabled and verified by jmaher
-    R5CXC1ALFED:  # 9/18/25: recabled and verified by jmaher
     R5CXC1ARCER:  # 9/18/25: recabled and verified by jmaher
     R5CXC1ANGLT:  # 9/19/25: recabled and verified by jmaher
     R5CXC1ASHNJ:  # 9/30/25: was quarantined, but reseated and power cycled and tested by jmaher as good
@@ -88,8 +90,6 @@ device_groups:
     R5CXC1AHXYD:  # 9/30/25: was quarantined, but reseated and power cycled and tested by jmaher as good
     RZCXC19G1CT:  # 9/30/25: was quarantined, but reseated and power cycled and tested by jmaher as good
     R5CXC1AMMNK:  # 10/1/25: was reseated, power cycled, and verified by jmaher
-    R5CXC1ARELR:  # 10/1/25: was reseated, power cycled, and verified by jmaher
-    RZCY10Y548K:  # 10/1/25: was reseated, power cycled, and verified by jmaher
     R5CX4089QNL:  # 10/1/25: was reseated, power cycled, and verified by jmaher
     R5CXC1AJ07K:  # 10/2/25: reseated, power cycled, and verified by jmaher
     R5CXC1AHWWZ:  # 10/2/25: reseated, power cycled, and verified by jmaher
@@ -107,3 +107,7 @@ device_groups:
     47241FDAQ002C0:
   test-1:
     # no devices yet
+  stab:
+    R5CXC1ARELR:  # 10/1/25: was reseated, power cycled, and verified by jmaher
+    RZCY10Y548K:  # 10/1/25: was reseated, power cycled, and verified by jmaher
+    R5CXC1ALFED:  # 9/18/25: recabled and verified by jmaher
