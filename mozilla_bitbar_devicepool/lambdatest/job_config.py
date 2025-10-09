@@ -126,6 +126,8 @@ runtime:
     version: "17"
   - language: node
     version: '20'
+  - language: python
+    version: '3.12'
 
 env:
     # inject our own secrets

@@ -17,7 +17,7 @@ projects:
     # TODO: decomm this in favor of test-1, name is confusing given usage in cloud image context
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-alpha-a55
     TC_WORKER_TYPE: gecko-t-lambda-alpha-a55
-    # USER_SCRIPTS_VERSION: v4-python_fix
+    USER_SCRIPTS_VERSION: v5-python_runtime
     priority_group: a55
     priority: 10
   a55-perf:
