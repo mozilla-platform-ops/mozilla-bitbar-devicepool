@@ -97,8 +97,9 @@ device_groups:
     RZCXC19G2SH:  # 10/2/25: reseated, power cycled, and verified by jmaher
     RZCX50TW03H:  # 10/2/25: reseated, power cycled, and verified by jmaher
     RZCY10Y4TBY:  # 10/2/25: reseated, power cycled, and verified by jmaher
-    R5CXC1AJ02Z:  # 10/2/25: reseated, power cycled, and verified by jmaher
   a55-alpha:
+    # grabbed for testing, 02Z is fine.
+    R5CXC1AJ02Z:  # 10/2/25: reseated, power cycled, and verified by jmaher
   a55-sheriff-bad:
   p9-perf:
     # devices with power meters, have been recabled

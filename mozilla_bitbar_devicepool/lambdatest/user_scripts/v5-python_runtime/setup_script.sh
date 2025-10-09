@@ -83,6 +83,10 @@ sudo apt-get install gettext-base libgtk-3-0 usbutils -y
 
 # don't update default `python3`, since it breaks tons of stuff
 
+# show which python we're using
+which python3
+which python3.12
+
 # show version
 python3.12 --version
 
