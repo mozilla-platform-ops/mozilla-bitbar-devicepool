@@ -47,15 +47,12 @@ device_groups:
     RZCY10Y4TJX:  # 9/10/25: previously recabled and verified by jmaher
     R5CXC1ASLHH:  # 9/10/25: recabled and verified by jmaher
     R5CXC1AHV4M:  # 9/10/25: recabled and verified by jmaher
-    R5CXC1ASA0L:  # 9/10/25: recabled and verified by jmaher
     R5CXC1ASA3P:  # 9/11/25: recabled and verified by jmaher
     R5CXC1AP2KT:  # 9/11/25: recabled and verified by jmaher
     R5CXC1HZK0W:  # 9/11/25: recabled and verified by jmaher
     R5CXC1ASA2E:  # 9/11/25: recabled and verified by jmaher
     R5CXC1ARM0A:  # 9/11/25: recabled and verified by jmaher
     RZCY2011M7N:  # 9/11/25: recabled and verified by jmaher
-    RZCY203N75Z:  # 9/15/25: recabled and verified by jmaher
-    # devices on 10.146.2.48
     R5CXC1AMNFY:  # 9/15/25: recabled and verified by jmaher
     RZCX31FDGJE:  # 9/15/25: recabled and verified by jmaher
     R5CY21T22NH:  # 9/15/25: recabled and verified by jmaher
@@ -72,11 +69,8 @@ device_groups:
     RZCXC187YCR:  # 9/16/25: recabled and verified by jmaher
     RZCXC16W6KT:  # 9/16/25: recabled and verified by jmaher
     # devices on 10.146.2.55
-    R5CXC1ARZDN:  # 9/17/25: recabled and verified by jmaher
     R5CXC1HZ43J:  # 9/17/25: recabled and verified by jmaher
     R5CXC1HZ85W:  # 9/17/25: recabled and verified by jmaher
-    R5CXC1HZA6V:  # 9/17/25: recabled and verified by jmaher
-    R5CXC1SXMVR:  # 9/17/25: recabled and verified by jmaher
     RZCXC19G1DM:  # 9/17/25: recabled and verified by jmaher
     RZCXC1BK67D:  # 9/17/25: recabled and verified by jmaher
     RZCY107MCLV:  # 9/17/25: recabled and verified by jmaher
@@ -87,7 +81,6 @@ device_groups:
     R5CXC1HZ4KD:  # 9/30/25: was quarantined, but reseated and power cycled and tested by jmaher as good
     RZCXC15YZVZ:  # 9/30/25: was quarantined, but reseated and power cycled and tested by jmaher as good
     R5CXC1HZ5PZ:  # 9/30/25: was quarantined, but reseated and power cycled and tested by jmaher as good
-    R5CXC1AHXYD:  # 9/30/25: was quarantined, but reseated and power cycled and tested by jmaher as good
     RZCXC19G1CT:  # 9/30/25: was quarantined, but reseated and power cycled and tested by jmaher as good
     R5CXC1AMMNK:  # 10/1/25: was reseated, power cycled, and verified by jmaher
     R5CX4089QNL:  # 10/1/25: was reseated, power cycled, and verified by jmaher
@@ -97,9 +90,14 @@ device_groups:
     RZCXC19G2SH:  # 10/2/25: reseated, power cycled, and verified by jmaher
     RZCX50TW03H:  # 10/2/25: reseated, power cycled, and verified by jmaher
     RZCY10Y4TBY:  # 10/2/25: reseated, power cycled, and verified by jmaher
-  a55-alpha:
-    # grabbed for testing, 02Z is fine.
     R5CXC1AJ02Z:  # 10/2/25: reseated, power cycled, and verified by jmaher
+  a55-alpha:
+    R5CXC1AHXYD:  # 10/16/25: bad power meter again
+    R5CXC1ARZDN:  # 10/16/25: bad power meter again
+    R5CXC1ASA0L:  # 10/16/25: bad power meter again
+    R5CXC1HZA6V:  # 10/16/25: bad power meter again
+    R5CXC1SXMVR:  # 10/16/25: bad power meter again
+    RZCY203N75Z:  # 10/16/25: bad power meter again
   a55-sheriff-bad:
   p9-perf:
     # devices with power meters, have been recabled
@@ -107,7 +105,6 @@ device_groups:
     47241FDAQ0016Y:
     47241FDAQ002C0:
   test-1:
-    # no devices yet
   stab:
     R5CXC1ARELR:  # 10/1/25: was reseated, power cycled, and verified by jmaher
     RZCY10Y548K:  # 10/1/25: was reseated, power cycled, and verified by jmaher
