@@ -91,12 +91,12 @@ device_groups:
     RZCX50TW03H:  # 10/2/25: reseated, power cycled, and verified by jmaher
     RZCY10Y4TBY:  # 10/2/25: reseated, power cycled, and verified by jmaher
     R5CXC1AJ02Z:  # 10/2/25: reseated, power cycled, and verified by jmaher
+    R5CXC1SXMVR:  # 10/20/25: tested by joel, power meter good
+    R5CXC1AHXYD:  # 10/20/25: tested by joel, power meter good
+    R5CXC1ARZDN:  # 10/20/25: tested by joel, power meter good
+    R5CXC1HZA6V:  # 10/20/25: tested by joel, power meter good
   a55-alpha:
-    R5CXC1AHXYD:  # 10/16/25: bad power meter again
-    R5CXC1ARZDN:  # 10/16/25: bad power meter again
     R5CXC1ASA0L:  # 10/16/25: bad power meter again
-    R5CXC1HZA6V:  # 10/16/25: bad power meter again
-    R5CXC1SXMVR:  # 10/16/25: bad power meter again
     RZCY203N75Z:  # 10/16/25: bad power meter again
   a55-sheriff-bad:
   p9-perf:
