@@ -8,7 +8,7 @@ import os
 import pprint
 import sys
 
-import mozilla_bitbar_devicepool.lambdatest.status as Status
+import mozilla_bitbar_devicepool.lambdatest.status as status
 import mozilla_bitbar_devicepool.lambdatest.util as util
 from mozilla_bitbar_devicepool.lambdatest.api import get_devices, get_jobs
 from mozilla_bitbar_devicepool.taskcluster_client import TaskclusterClient
@@ -16,6 +16,7 @@ from mozilla_bitbar_devicepool.taskcluster_client import TaskclusterClient
 
 # inspects x jobs, and presents a report of job distribution across devices
 def job_distribution_report(verbose=True):
+    start_time = datetime.datetime.now()
     DEFAULT_JOBS = 400
 
     # use argparse to get the count of jobs to fetch
@@ -37,11 +38,27 @@ def job_distribution_report(verbose=True):
     lt_username = os.environ["LT_USERNAME"]
     lt_api_key = os.environ["LT_ACCESS_KEY"]
 
-    status = Status(lt_username, lt_api_key)
-    tc_client = TaskclusterClient()
+    #
+    si = status.Status(lt_username, lt_api_key)
+    lt_device_list = si.get_device_list()
+    udid_to_state = {}
+    for device_type in lt_device_list:
+        # print(device_type)
+        for device in lt_device_list[device_type]:
+            # print(device)
+            # print(lt_device_list[device_type][device])
+            # print(device["udid"], device["status"])
+            udid_to_state[device] = lt_device_list[device_type][device]
+    # print(udid_to_state)
+    # sys.exit(0)
+    #
+    tci = TaskclusterClient(verbose=False)
+    provisioner_id = "proj-autophone"
+    worker_type = "gecko-t-lambda-perf-a55"
+    quarantined_workers = tci.get_quarantined_worker_names(provisioner_id, worker_type)
 
     # get a list of all available devices from the API, used later
-    all_devices = status.get_device_list()
+    all_devices = si.get_device_list()
     import pprint
 
     # pprint.pprint(all_devices)
@@ -59,6 +76,8 @@ def job_distribution_report(verbose=True):
     # store failures also
     device_failure_count = {}
     jobs_inspected = 0
+
+    # TODO: separate calculation and display logic
 
     for job in get_jobs(lt_username, lt_api_key, jobs=args.jobs)["data"]:
         job_labels_list = util.string_list_to_list(job["job_label"])
@@ -93,14 +112,31 @@ def job_distribution_report(verbose=True):
         # show a total count of seen devices
     print("")
 
-    # TODO: show devices not working (from config or via available devices? use avaiable devices for now)
     unseen_devices = set(api_udid_list) - set(device_job_count.keys())
-    print(f"Devices with no jobs run ({len(unseen_devices)}):")
-    if not unseen_devices:
-        print("  All devices have jobs run on them.")
+    if args.verbose:
+        # TODO: show devices not working (from config or via available devices? use avaiable devices for now)
+        print(f"Devices with no jobs run ({len(unseen_devices)} devices):")
+        if not unseen_devices:
+            print("  All devices have jobs run on them.")
+        else:
+            for device_id in sorted(unseen_devices):
+                print(f"  {device_id}")
+        print("")
+
+    # TODO: for these devices show their lt_api status
+    not_seen_non_quarantined_devices = unseen_devices - set(quarantined_workers)
+    print(f"Devices not seen that aren't quarantined ({len(not_seen_non_quarantined_devices)} devices):")
+    if not not_seen_non_quarantined_devices:
+        print("  All unseen devices are quarantined.")
     else:
-        for device_id in sorted(unseen_devices):
-            print(f"  {device_id}")
+        for device_id in sorted(not_seen_non_quarantined_devices):
+            print(f"  {device_id} (lt api: {udid_to_state.get(device_id, 'unknown')})")
+
+    print("")
 
     print("Jobs inspected: ", jobs_inspected)
-    print(f"Total devices seen: {len(device_job_count)}")
+    # TODO: show how many devices found via api
+    print(f"Total devices available (from LT devices): {len(udid_to_state)}")
+    print(f"Total devices seen (from LT jobs): {len(device_job_count)}")
+    end_time = datetime.datetime.now()
+    print("Report generation time: ", end_time - start_time)
