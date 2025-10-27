@@ -4,7 +4,7 @@ projects:
   defaults:
     # TODO: start using USER_SCRIPTS_VERSION for git version? name repo `mozilla-lambdatest-files`?
     # for now this points to a directory name in `mozilla_bitbar_devicepool/lambdatest/user_scripts`
-    USER_SCRIPTS_VERSION: v4-python_fix
+    USER_SCRIPTS_VERSION: v5-python_runtime
     # fake values. inheriting projects below should set reasonable values.
     TASKCLUSTER_CLIENT_ID: tc-client-id-set-me
     # env var with key is looked for at this with underscores: `tc_worker_type_set_me`
@@ -17,7 +17,7 @@ projects:
     # TODO: decomm this in favor of test-1, name is confusing given usage in cloud image context
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-alpha-a55
     TC_WORKER_TYPE: gecko-t-lambda-alpha-a55
-    USER_SCRIPTS_VERSION: v5-python_runtime
+    # USER_SCRIPTS_VERSION: v5-python_runtime
     priority_group: a55
     priority: 10
   a55-perf:
