@@ -57,7 +57,6 @@ device_groups:
     RZCX31FDGJE:  # 9/15/25: recabled and verified by jmaher
     R5CY21T22NH:  # 9/15/25: recabled and verified by jmaher
     RZCX71ZVF6J:  # 9/15/25: recabled and verified by jmaher
-    RZCX821GYPX:  # 9/15/25: recabled and verified by jmaher
     RZCY204AAZD:  # 9/15/25: recabled and verified by jmaher
     # devices on 10.146.2.54 and 10.146.2.53
     R5CXC1ASH4E:  # 9/16/25: recabled and verified by jmaher
@@ -98,6 +97,7 @@ device_groups:
   a55-alpha:
     R5CXC1ASA0L:  # 10/16/25: bad power meter again
     RZCY203N75Z:  # 10/16/25: bad power meter again
+    RZCX821GYPX:  # 11/3/25: aerickson: bad power meter
   a55-sheriff-bad:
   p9-perf:
     # devices with power meters, have been recabled
