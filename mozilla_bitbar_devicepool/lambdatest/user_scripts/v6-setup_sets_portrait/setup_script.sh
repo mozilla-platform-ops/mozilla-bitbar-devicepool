@@ -275,9 +275,6 @@ adb shell wm size
 # Show the current screen density
 adb shell wm density
 
-# Dump window manager internal info (may help debug rotation issues)
-adb shell dumpsys wmi
-
 
 ### other debugging information
 
