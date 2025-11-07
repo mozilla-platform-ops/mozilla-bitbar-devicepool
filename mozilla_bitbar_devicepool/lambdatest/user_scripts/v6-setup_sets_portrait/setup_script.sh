@@ -267,7 +267,7 @@ adb shell wm user-rotation lock 0 || true
 ### debugging of device rotation state
 
 # Show display info related to rotation capability
-adb shell dumpsys display | grep -i rotable
+adb shell dumpsys display
 
 # Force the device window manager to set rotation to 0 (portrait)
 adb shell wm rotation 0
