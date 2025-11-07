@@ -257,7 +257,11 @@ adb shell content insert --uri content://settings/system \
 
 # LT provided command #2
 # Disable automatic screen rotation (lock to current orientation)
-adb shell settings put system accelerometer_rotation 0
+adb shell settings put system accelerometer_rotation 0 || true
+
+# Lock the device's rotation to portrait mode (0 degrees)
+#   from perf team/mstange
+adb shell wm user-rotation lock 0
 
 
 ### debugging of device rotation state
