@@ -269,9 +269,6 @@ adb shell wm user-rotation lock 0 || true
 # Show display info related to rotation capability
 adb shell dumpsys display
 
-# Force the device window manager to set rotation to 0 (portrait)
-adb shell wm rotation 0
-
 # Show the current screen size
 adb shell wm size
 
