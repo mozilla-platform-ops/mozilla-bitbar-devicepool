@@ -11,6 +11,7 @@ TC_VERSION=87.0.0
 LT_SETUP_MERCURIAL_VERSION="7.0.2"
 LT_SETUP_PYTHON_VERSION="3.12"
 
+
 ### functions
 
 # Function to get the currently focused window
@@ -20,6 +21,7 @@ getCurrentWindow() {
 
 starting_dir=$(pwd)
 echo "starting_dir: $starting_dir"
+
 
 ### show debugging information
 
@@ -43,6 +45,7 @@ if [ -f /etc/lsb-release ]; then
 else
     echo "lsb-release file not found."
 fi
+
 
 ### general dependencies
 
@@ -275,7 +278,13 @@ adb shell wm density
 adb shell dumpsys wmi
 
 
+### other debugging information
+
+# show current network connections
 ss -np
+
+
+### start generic worker
 
 cd taskcluster
 bash entrypoint.sh
