@@ -261,7 +261,7 @@ adb shell settings put system accelerometer_rotation 0 || true
 
 # Lock the device's rotation to portrait mode (0 degrees)
 #   from perf team/mstange
-adb shell wm user-rotation lock 0
+adb shell wm user-rotation lock 0 || true
 
 
 ### debugging of device rotation state
