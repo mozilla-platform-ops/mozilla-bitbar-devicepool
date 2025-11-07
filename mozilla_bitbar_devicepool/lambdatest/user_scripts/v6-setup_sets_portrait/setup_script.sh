@@ -241,12 +241,23 @@ else
     echo "Screen is awake."
 fi
 
-# TODO: set portrait rotation mode
-# Set the device's user_rotation setting to 0 (portrait mode)
-adb shell settings put system user_rotation 0
 
+### device rotation mode setting
+
+# Set the device's user_rotation setting to 0 (portrait mode)
+adb shell settings put system user_rotation 0 || true
+
+# LT provided command #1
+# Set the device's accelerometer_rotation setting to 0 (disable auto-rotate)
+adb shell content insert --uri content://settings/system \
+    --bind name:s:accelerometer_rotation --bind value:i:0 || true
+
+# LT provided command #2
 # Disable automatic screen rotation (lock to current orientation)
 adb shell settings put system accelerometer_rotation 0
+
+
+### debugging of device rotation state
 
 # Show display info related to rotation capability
 adb shell dumpsys display | grep -i rotable
