@@ -1,0 +1,17 @@
+# ruamel has issues with block comments that aren't inside data structures
+# so it's not possible to get this output exactly as desired
+device_groups:
+  groupA:
+    device1:
+    device2:
+    device3:
+  groupB:
+    # test 2
+    device4:
+    device5:
+    # test 4
+    device6:  # gorilla
+  groupC:
+    # test123
+  groupD:
+    device1:  # duplicate device in another group

@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import logging
 import os
 import pprint
 import subprocess
@@ -13,19 +14,21 @@ from mozilla_bitbar_devicepool.util.template import apply_dict_defaults
 
 
 class ConfigurationLt(object):
-    def __init__(self, ci_mode=False, quiet=False):
+    def __init__(self, ci_mode_envvars=False, ci_mode_fs=False, quiet=False):
         # TODO?: mash all values into 'config'?
+        self.config = {}
+        #
         self.lt_access_key = None
         self.lt_username = None
-        self.config = {}
-        self.ci_mode = ci_mode
+        self.ci_mode_envvars = ci_mode_envvars
+        self.ci_mode_fs = ci_mode_fs
         self.quiet = quiet
         # see _set_fully_configured_projects() for details
         self.fully_configured_projects = {}
 
         self.global_contract_device_count = -1
 
-        if self.ci_mode and not self.quiet:
+        if self.ci_mode_envvars and not self.quiet:
             print("ConfigurationLt: Running in CI mode. Using fake credentials.")
 
     def _load_file_config(self, config_path="config/lambdatest.yml"):
@@ -43,7 +46,7 @@ class ConfigurationLt(object):
 
     def _set_lt_api_key(self):
         # load from os environment
-        if self.ci_mode:
+        if self.ci_mode_envvars:
             self.lt_api_key = "fake123"
             return
         if "LT_ACCESS_KEY" not in os.environ:
@@ -53,7 +56,7 @@ class ConfigurationLt(object):
 
     def _set_lt_username(self):
         # load from os environment
-        if self.ci_mode:
+        if self.ci_mode_envvars:
             self.lt_username = "fake123"
             return
         if "LT_USERNAME" not in os.environ:
@@ -70,7 +73,7 @@ class ConfigurationLt(object):
             data = self.config["projects"][project_name]
             taskcluster_access_token_name = data["TC_WORKER_TYPE"].replace("-", "_")
             # ensure the environment variable is set
-            if self.ci_mode:
+            if self.ci_mode_envvars:
                 data["TASKCLUSTER_ACCESS_TOKEN"] = "fake123"
                 continue
             if taskcluster_access_token_name not in os.environ:
@@ -94,7 +97,13 @@ class ConfigurationLt(object):
         # massage device_groups into a more usable format
         for item in project_device_groups:
             if project_device_groups[item] is not None:
-                project_device_groups[item] = project_device_groups[item].split(" ")
+                # handle `device:` format like bitbar (list of strings)
+                if type(project_device_groups[item]) is list:
+                    # already a list, do nothing
+                    pass
+                # handle `device` format (string)
+                elif type(project_device_groups[item]) is str:
+                    project_device_groups[item] = project_device_groups[item].split(" ")
             else:
                 # if we don't have a entry in projects, skip it
                 projects_config[item] = {}
@@ -138,6 +147,39 @@ class ConfigurationLt(object):
                 return project_name
         return None
 
+    def get_project_user_dir_version(self, project_name, raise_on_error=True):
+        """
+        Returns the user directory version for a given project.
+
+        Args:
+            project_name (str): The name of the project to look up.
+
+        Returns:
+            str: The user directory version associated with the project.
+        """
+        version = None
+        projects_config = self.config.get("projects", {})
+        if project_name in projects_config:
+            version = projects_config[project_name].get("USER_SCRIPTS_VERSION", None)
+        if not version and raise_on_error:
+            raise ValueError(f"USER_SCRIPTS_VERSION not found for project {project_name}")
+        return version
+
+    def get_path_to_user_script_directory(self, project_name):
+        """
+        Returns the path to the user script directory for a given project.
+
+        Args:
+            project_name (str): The name of the project to look up.
+
+        Returns:
+            str: The path to the user script directory.
+        """
+        project_source_dir = os.path.dirname(os.path.realpath(__file__))
+        project_root_dir = os.path.abspath(os.path.join(project_source_dir, ".."))
+        project_user_script_version = self.get_project_user_dir_version(project_name)
+        return os.path.join(project_source_dir, "lambdatest", "user_scripts", project_user_script_version)
+
     def get_device_count_for_project(self, project_name):
         """
         Returns the number of devices associated with a given project.
@@ -151,14 +193,14 @@ class ConfigurationLt(object):
         device_groups = self.config.get("device_groups", {})
         import pprint
 
-        pprint.pprint(device_groups)
+        # pprint.pprint(device_groups)
         if project_name in device_groups:
             return len(device_groups[project_name])
         return 0
 
     def configure(self, config_blob=None, config_path=None):
         # Check for hyperexecute binary on path using a shell command
-        if not self.ci_mode:
+        if not self.ci_mode_envvars:
             cmd = "where" if sys.platform == "win32" else "which"
             try:
                 subprocess.check_call([cmd, "hyperexecute"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -179,10 +221,15 @@ class ConfigurationLt(object):
         # expand the configuration (i.e. set defaults)
         self._expand_configuration()
 
+        # set project values/flags
         # set this flag so downstream jobs can short-circuit if a project isn't configured
         self._set_fully_configured_projects()
+        self._set_disabled()
 
-        #
+        # validate the configuration
+        self._validate_device_groups()
+
+        # set config-wide values
         self._load_tc_env_vars()
         self._set_lt_api_key()
         self._set_lt_username()
@@ -190,6 +237,20 @@ class ConfigurationLt(object):
 
         # debug print
         # print(self.get_config())
+
+    def _set_disabled(self):
+        """
+        Sets the disabled flag based on the configuration.
+
+        The disabled flag is set to True if the "disabled" key is present
+        in the configuration and its value is True.
+        """
+        if "disabled" in self.config:
+            self.disabled = self.config["disabled"]
+        else:
+            self.disabled = False
+
+        # logging.info(f"ConfigurationLt: disabled set to {self.disabled}")
 
     def _set_global_contract_device_count(self):
         """
@@ -231,14 +292,23 @@ class ConfigurationLt(object):
         """
         return project_name in self.fully_configured_projects
 
+    def is_project_disabled(self, project_name):
+        """
+        Checks if a project is disabled based on the configuration.
+
+        Args:
+            project_name (str): The name of the project to check.
+
+        Returns:
+            bool: True if the project is disabled, False otherwise.
+        """
+        if "projects" not in self.config or project_name not in self.config["projects"]:
+            return False
+        return self.config["projects"][project_name].get("disabled", False)
+
     def _set_fully_configured_projects(self):
         """
         Identifies which projects are fully configured for LambdaTest execution.
-        A project is considered fully configured when:
-        1. It exists in the projects configuration (not 'defaults')
-        2. It has at least one device assigned in device_groups
-        3. It has a TC_WORKER_TYPE set in the project configuration
-        4. It has a TASKCLUSTER_CLIENT_ID set in the project configuration
 
         Sets self.fully_configured_projects to a list of project names that are fully configured.
         """
@@ -266,6 +336,24 @@ class ConfigurationLt(object):
                 "TASKCLUSTER_CLIENT_ID" in project_config and project_config["TASKCLUSTER_CLIENT_ID"] is not None
             )
 
+            # check for user scripts version
+            has_user_scripts_dir = False
+            project_source_dir = os.path.dirname(os.path.realpath(__file__))
+            project_root_dir = os.path.abspath(os.path.join(project_source_dir, ".."))
+            project_user_script_version = self.get_project_user_dir_version(project_name, raise_on_error=False)
+            if project_user_script_version:
+                has_user_scripts_dir = True
+                user_script_golden_dir = self.get_path_to_user_script_directory(project_name)
+                # print(user_script_golden_dir)
+                # check if the user script golden directory exists
+                if not os.path.exists(user_script_golden_dir) and not self.ci_mode_fs:
+                    logging.info(
+                        f"User script directory {user_script_golden_dir} does not exist for project {project_name}."
+                    )
+                    has_user_scripts_dir = False
+            else:
+                has_user_scripts_dir = False
+
             # show a summary of decisions on a single line
             # print(
             #     f"Project: {project_name}, "
@@ -275,16 +363,42 @@ class ConfigurationLt(object):
             #     f"Client ID: {has_client_id}"
             # )
 
-            # A project is fully configured if it has both devices assigned and a device selector
-            if has_devices and has_worker_type and has_client_id:
+            # add to the list of fully configured projects if all conditions are met
+            if has_devices and has_worker_type and has_client_id and has_user_scripts_dir:
                 self.fully_configured_projects.append(project_name)
 
-        sorted(self.fully_configured_projects)
+        self.fully_configured_projects = sorted(self.fully_configured_projects)
 
         # if not self.quiet:
         #     configured_count = len(self.fully_configured_projects)
         #     total_count = len(projects_config) - 1  # Exclude defaults
         #     print(f"Fully configured projects: {configured_count}/{total_count}")
+
+    def _validate_device_groups(self):
+        """
+        Validates that there are no duplicate devices across device groups
+        of fully configured projects.
+
+        Raises:
+            ValueError: If a duplicate device is found in multiple device groups.
+        """
+        device_to_group_map = {}
+        device_groups = self.config.get("device_groups", {})
+        projects_to_check = self.get_fully_configured_projects()
+
+        for project_name in projects_to_check:
+            # a project name can be a device group name
+            if project_name in device_groups:
+                devices = device_groups[project_name]
+                if not devices:
+                    continue
+                for device_udid in devices:
+                    if device_udid in device_to_group_map:
+                        raise ValueError(
+                            f"Duplicate device found: UDID '{device_udid}' is in both "
+                            f"group '{device_to_group_map[device_udid]}' and group '{project_name}'."
+                        )
+                    device_to_group_map[device_udid] = project_name
 
     def get_fully_configured_projects(self):
         """
@@ -300,3 +414,5 @@ if __name__ == "__main__":  # pragma: no cover
     clt = ConfigurationLt()
     clt.configure()
     pprint.pprint(clt.get_config())
+    pprint.pprint(clt.get_path_to_user_script_directory("a55-alpha"))
+    pprint.pprint(clt.get_path_to_user_script_directory("a55-perf"))

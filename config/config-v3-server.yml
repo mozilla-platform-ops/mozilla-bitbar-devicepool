@@ -1,0 +1,292 @@
+devicepool_config:
+  jobs_to_start_algorithm: v3
+projects:
+  defaults:
+    os_type: ANDROID
+    project_type: APPIUM_ANDROID_SERVER_SIDE
+    application_file: relops-testdroid-sample-app.apk
+    test_file: relops-empty-test.zip
+    timeout: 0
+    scheduler: SINGLE
+    archivingStrategy: DAYS
+    archivingItemCount: 7
+    taskcluster_provisioner_id: proj-autophone
+    additional_parameters:
+      bitbar_cloud_url: https://mozilla-v3.bitbar.com
+      DOCKER_IMAGE_VERSION: 20250304T123621
+      TC_WORKER_CONF: gecko-t-ap
+  # generic-worker
+  # mozilla-gw-unittest-p2:
+  #   device_group_name: pixel2-unit-2
+  #   device_model: pixel2
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Unit tests for Pixel2 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-p2
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-p2
+  # mozilla-gw-perftest-p2:
+  #   device_group_name: pixel2-perf-2
+  #   device_model: pixel2
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Performance tests for Pixel2 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-p2
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-p2
+  # mozilla-gw-unittest-p5:
+  #   device_group_name: pixel5-unit
+  #   device_model: pixel5
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Unit tests for Pixel5 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-p5
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-p5
+  # mozilla-gw-perftest-p5:
+  #   device_group_name: pixel5-perf
+  #   device_model: pixel5
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Performance tests for Pixel5 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-p5
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-p5
+  # mozilla-gw-unittest-p6:
+  #   device_group_name: pixel6-unit
+  #   device_model: pixel6
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Unit tests for Pixel6 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-p6
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-p6
+  # mozilla-gw-perftest-p6:
+  #   device_group_name: pixel6-perf
+  #   device_model: pixel6
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Performance tests for Pixel6 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-p6
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-p6
+  # mozilla-gw-unittest-s21:
+  #   device_group_name: s21-unit
+  #   device_model: s21
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Unit tests for Samsung Galaxy S21 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-s21
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-s21
+  # mozilla-gw-perftest-s21:
+  #   device_group_name: s21-perf
+  #   device_model: s21
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Performance tests for Samsung Galaxy S21 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-s21
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-s21
+  # mozilla-gw-perftest-g5:
+  #   device_group_name: motog5-perf-2
+  #   device_model: motog5
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Performance tests for MotoG5 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-g5
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-g5
+  # mozilla-gw-batttest-p2:
+  #   device_group_name: pixel2-batt-2
+  #   device_model: pixel2
+  #   framework_name: mozilla-tcp
+  #   description: Mozilla Battery tests for Pixel2 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-batt-p2
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-batt-p2
+  # mozilla-gw-batttest-g5:
+  #   device_group_name: motog5-batt-2
+  #   device_model: motog5
+  #   framework_name: mozilla-tcp
+  #   description: Mozilla Battery tests for MotoG5 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-batt-g5
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-batt-g5
+  # mozilla-gw-unittest-g5:
+  #   device_group_name: motog5-unit-2
+  #   device_model: motog5
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Unit tests for MotoG5 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-g5
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-g5
+  # mozilla-gw-unittest-s7:
+  #   device_group_name: s7-unit
+  #   device_model: s7
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Unit tests for S7Galaxy (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-s7
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-s7
+  # mozilla-gw-perftest-s7:
+  #   device_group_name: s7-perf
+  #   device_model: s7
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Performance tests for S7Galaxy (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-s7
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-s7
+  # mozilla-gw-unittest-a51:
+  #   device_group_name: a51-unit
+  #   device_model: a51
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Unit tests for A51 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-a51
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-a51
+  # mozilla-gw-perftest-a51:
+  #   device_group_name: a51-perf
+  #   device_model: a51
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Performance tests for A51 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-a51
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-a51
+  # mozilla-gw-unittest-a55:
+  #   device_group_name: a55-unit
+  #   device_model: a55
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Unit tests for A55 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-a55
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-a55
+  # mozilla-gw-perftest-a55:
+  #   device_group_name: a55-perf
+  #   device_model: a55
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Performance tests for A55 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-a55
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-a55
+  # mozilla-gw-unittest-s24:
+  #   device_group_name: s24-unit
+  #   device_model: s24
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Unit tests for S24 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-s24
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-s24
+  # mozilla-gw-perftest-s24:
+  #   device_group_name: s24-perf
+  #   device_model: s24
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Performance tests for S24 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-s24
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-s24
+  # used for building new docker images
+  # mozilla-docker-build:
+  #   device_group_name: docker-builder
+  #   device_model: motog4  # need to change?
+  #   framework_name: Docker image build
+  #   description: Mozilla Docker image build
+  #   test_file: mozilla-docker-20240307T112108.zip
+  #   # app file is defaulted
+  #   additional_parameters:
+  #     DOCKER_IMAGE_VERSION: 20240307T112108
+  # used for testing new docker images
+  mozilla-gw-test-1:
+    device_group_name: test-1
+    framework_name: mozilla-usb
+    description: used for testing new images, devices, operating systems
+    additional_parameters:
+      TASKCLUSTER_CLIENT_ID: project/autophone/bitbar-x-test-1
+      TC_WORKER_TYPE: gecko-t-bitbar-gw-test-1
+      # replace with version to test
+      # DOCKER_IMAGE_VERSION: 20250304T123621
+  mozilla-gw-test-2:
+    device_group_name: test-2
+    framework_name: mozilla-usb
+    description: used for testing new images, devices, operating systems
+    additional_parameters:
+      TASKCLUSTER_CLIENT_ID: project/autophone/bitbar-x-test-2
+      TC_WORKER_TYPE: gecko-t-bitbar-gw-test-2
+      # replace with version to test
+      # DOCKER_IMAGE_VERSION: 20240307T112108
+  mozilla-gw-test-3:
+    device_group_name: test-3
+    framework_name: mozilla-usb
+    description: used for testing new images, devices, operating systems
+    additional_parameters:
+      TASKCLUSTER_CLIENT_ID: project/autophone/bitbar-x-test-3
+      TC_WORKER_TYPE: gecko-t-bitbar-gw-test-3
+      # replace with version to test
+      # DOCKER_IMAGE_VERSION: 20231106T174322
+  # mozilla-docker-image-test:
+  #   device_group_name: motog5-test
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Docker image test
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/bitbar-x-test-g5
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-test-g5
+  #     # replace with version to test
+  #     DOCKER_IMAGE_VERSION: 20200326T142021
+device_groups:
+  # docker-builder:
+  #   Linux 777:  # Docker Builder
+  # motog4-docker-builder-2:
+  #   Docker Builder:
+  test-1:
+    a55-25:
+    a55-26:
+    a55-27:
+    a55-28:
+    a55-29:
+    a55-30:
+    a55-31:
+    a55-43:
+    a55-44:
+    a55-45:
+    a55-46:
+    a55-47:
+    a55-51:
+    a55-52:
+    a55-56:
+    a55-57:
+    a55-58:
+    a55-59:
+    a55-60:
+    # a55-61:
+    a55-62:
+    a55-63:
+    a55-64:
+    a55-65:
+    a55-66:
+    a55-67:
+    a55-68:
+    a55-69:
+    a55-70:
+    a55-71:
+    a55-72:
+    a55-73:
+    a55-74:
+    a55-75:
+    a55-76:
+    a55-77:
+    a55-78:
+    a55-131:
+    a55-134:
+    a55-135:
+    a55-141:
+    a55-142:
+    a55-143:
+    # pixel5-07:
+    pixel5-12:
+    pixel6-137:
+    pixel6-138:
+    pixel5-144:
+    pixel6-146:
+    pixel6-147:
+    # s24-03:
+    # s24-04:
+    s24-06:
+    s24-05:
+  test-2:
+  test-3:
+    # s21-01:
+    # s24-01:
+    # s24-02:
+    # s24-03:
+    # s24-04:

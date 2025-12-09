@@ -2,20 +2,35 @@ global:
   contract_device_count: 60
 projects:
   defaults:
-    SCRIPT_REPO_COMMIT: master
+    # TODO: start using USER_SCRIPTS_VERSION for git version? name repo `mozilla-lambdatest-files`?
+    # for now this points to a directory name in `mozilla_bitbar_devicepool/lambdatest/user_scripts`
+    USER_SCRIPTS_VERSION: v5-python_runtime
     # fake values. inheriting projects below should set reasonable values.
     TASKCLUSTER_CLIENT_ID: tc-client-id-set-me
     # env var with key is looked for at this with underscores: `tc_worker_type_set_me`
     TC_WORKER_TYPE: tc-worker-type-set-me
+    disabled: false
+    priority_group: set-a-priority-group
+    priority: 1
   a55-alpha:
+    # used for relops testing
+    # TODO: decomm this in favor of test-1, name is confusing given usage in cloud image context
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-alpha-a55
     TC_WORKER_TYPE: gecko-t-lambda-alpha-a55
+    USER_SCRIPTS_VERSION: v6-setup_sets_portrait
+    priority_group: a55
+    priority: 10
   a55-perf:
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-a55
     TC_WORKER_TYPE: gecko-t-lambda-perf-a55
-  # pixel9-perf:
-  #   TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-pixel9
-  #   TC_WORKER_TYPE: gecko-t-lambda-perf-pixel9
+    priority_group: a55
+  p9-perf:
+    TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-p9
+    TC_WORKER_TYPE: gecko-t-lambda-perf-p9
+    priority_group: p9
+  stab:
+    TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-stab
+    TC_WORKER_TYPE: gecko-t-lambda-stab
   # test-1:
   #     SCRIPT_REPO_COMMIT: future_commit
   #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1
@@ -23,71 +38,74 @@ projects:
   #     # override SCRIPT_REPO_COMMIT with a test commit
 device_groups:
   a55-perf:
-    R5CX4089QNL
-    R5CXC1AHV4M
-    R5CXC1ALFED
-    R5CXC1AMMNK
-    R5CXC1AMNFY
-    R5CXC1ANGLT
-    R5CXC1AP2KT
-    R5CXC1ARCER
-    R5CXC1ARELR
-    R5CXC1ARM0A
-    R5CXC1ASA0L
-    R5CXC1ASA2E
-    R5CXC1ASA3P
-    R5CXC1ASLHH
-    R5CXC1HZK0W
-    R5CY21T22NH
-    RZCX31FDGJE
-    RZCX50TW03H
-    RZCX71ZVF6J
-    RZCX821GXDJ
-    RZCX821GYPX
-    RZCY10LGB6W
-    RZCY10Y4HWD
-    RZCY10Y4QVX
-    RZCY10Y4TAV
-    RZCY10Y4TBY
-    RZCY10Y4TJX
-    RZCY10Y548K
-    RZCY203N75Z
-    RZCY204AAZD
-    # second batch of devices for second part of contract
-    # R5CXC1AHWWZ
-    # R5CXC1AHXYD
-    # R5CXC1AHZBW
-    # R5CXC1AJ02Z
-    # R5CXC1AJ07K
-    # R5CXC1ARZDN
-    # R5CXC1ASH4E
-    # R5CXC1ASHNJ
-    # R5CXC1HZ43J
-    # R5CXC1HZ4KD
-    # R5CXC1HZ5PZ
-    # R5CXC1HZ62Y
-    # R5CXC1HZ85W
-    # R5CXC1HZA6V
-    # R5CXC1PW7CR
-    # R5CXC1PW94F
-    # R5CXC1SXMVR
-    # RZCXC15YZVZ
-    # RZCXC16W6KT
-    # RZCXC16WHTA
-    # RZCXC187YCR
-    # RZCXC189JSJ
-    # RZCXC19G1CT
-    # RZCXC19G1DM
-    # RZCXC19G2SH
-    # RZCXC1BK67D
-    # RZCY107MCLV
-  a55-alpha:
     # devices with power meters
-    R5CXC1HZKLR
-    RZCY2011M7N
-  pixel9-perf:
-    47160DLAQ003UB
-    47241FDAQ0016Y
-    47241FDAQ002C0
+    RZCX821GXDJ:  # 9/10/25: previously recabled and verified by jmaher
+    RZCY10Y4HWD:  # 9/10/25: previously recabled and verified by jmaher
+    RZCY10Y4QVX:  # 9/10/25: previously recabled and verified by jmaher
+    RZCY10Y4TAV:  # 9/10/25: previously recabled and verified by jmaher
+    RZCY10Y4TJX:  # 9/10/25: previously recabled and verified by jmaher
+    R5CXC1ASLHH:  # 9/10/25: recabled and verified by jmaher
+    R5CXC1AHV4M:  # 9/10/25: recabled and verified by jmaher
+    R5CXC1ASA3P:  # 9/11/25: recabled and verified by jmaher
+    R5CXC1AP2KT:  # 9/11/25: recabled and verified by jmaher
+    R5CXC1HZK0W:  # 9/11/25: recabled and verified by jmaher
+    R5CXC1ASA2E:  # 9/11/25: recabled and verified by jmaher
+    R5CXC1ARM0A:  # 9/11/25: recabled and verified by jmaher
+    R5CXC1AMNFY:  # 9/15/25: recabled and verified by jmaher
+    RZCX31FDGJE:  # 9/15/25: recabled and verified by jmaher
+    R5CY21T22NH:  # 9/15/25: recabled and verified by jmaher
+    RZCX71ZVF6J:  # 9/15/25: recabled and verified by jmaher
+    RZCY204AAZD:  # 9/15/25: recabled and verified by jmaher
+    # devices on 10.146.2.54 and 10.146.2.53
+    R5CXC1ASH4E:  # 9/16/25: recabled and verified by jmaher
+    RZCXC16WHTA:  # 9/16/25: recabled and verified by jmaher
+    R5CXC1AHZBW:  # 9/16/25: recabled and verified by jmaher
+    RZCXC189JSJ:  # 9/16/25: recabled and verified by jmaher
+    R5CXC1PW7CR:  # 9/16/25: recabled and verified by jmaher
+    R5CXC1PW94F:  # 9/16/25: recabled and verified by jmaher
+    RZCXC187YCR:  # 9/16/25: recabled and verified by jmaher
+    RZCXC16W6KT:  # 9/16/25: recabled and verified by jmaher
+    # devices on 10.146.2.55
+    R5CXC1HZ43J:  # 9/17/25: recabled and verified by jmaher
+    R5CXC1HZ85W:  # 9/17/25: recabled and verified by jmaher
+    RZCXC19G1DM:  # 9/17/25: recabled and verified by jmaher
+    RZCXC1BK67D:  # 9/17/25: recabled and verified by jmaher
+    RZCY107MCLV:  # 9/17/25: recabled and verified by jmaher
+    R5CXC1HZKLR:  # 9/18/25: recabled and verified by jmaher
+    R5CXC1ARCER:  # 9/18/25: recabled and verified by jmaher
+    R5CXC1ANGLT:  # 9/19/25: recabled and verified by jmaher
+    R5CXC1ASHNJ:  # 9/30/25: was quarantined, but reseated and power cycled and tested by jmaher as good
+    R5CXC1HZ4KD:  # 9/30/25: was quarantined, but reseated and power cycled and tested by jmaher as good
+    RZCXC15YZVZ:  # 9/30/25: was quarantined, but reseated and power cycled and tested by jmaher as good
+    R5CXC1HZ5PZ:  # 9/30/25: was quarantined, but reseated and power cycled and tested by jmaher as good
+    RZCXC19G1CT:  # 9/30/25: was quarantined, but reseated and power cycled and tested by jmaher as good
+    R5CXC1AMMNK:  # 10/1/25: was reseated, power cycled, and verified by jmaher
+    R5CX4089QNL:  # 10/1/25: was reseated, power cycled, and verified by jmaher
+    R5CXC1AJ07K:  # 10/2/25: reseated, power cycled, and verified by jmaher
+    R5CXC1AHWWZ:  # 10/2/25: reseated, power cycled, and verified by jmaher
+    R5CXC1HZ62Y:  # 10/2/25: reseated, power cycled, and verified by jmaher
+    RZCXC19G2SH:  # 10/2/25: reseated, power cycled, and verified by jmaher
+    RZCX50TW03H:  # 10/2/25: reseated, power cycled, and verified by jmaher
+    RZCY10Y4TBY:  # 10/2/25: reseated, power cycled, and verified by jmaher
+    R5CXC1AJ02Z:  # 10/2/25: reseated, power cycled, and verified by jmaher
+    R5CXC1SXMVR:  # 10/20/25: tested by joel, power meter good
+    R5CXC1AHXYD:  # 10/20/25: tested by joel, power meter good
+    R5CXC1ARZDN:  # 10/20/25: tested by joel, power meter good
+    R5CXC1HZA6V:  # 10/20/25: tested by joel, power meter good
+  a55-alpha:
+    R5CXC1ASA0L:  # 10/16/25: bad power meter again
+    RZCY203N75Z:  # 10/16/25: bad power meter again
+    RZCX821GYPX:  # 11/3/25: aerickson: bad power meter
+    RZCY2011M7N:  # 11/6/25: bad rotation, testing in alpha
+    RZCY10LGB6W:  # 11/6/25: bad rotation, testing in alpha
+  a55-sheriff-bad:
+  p9-perf:
+    # devices with power meters, have been recabled
+    47160DLAQ003UB:
+    47241FDAQ0016Y:
+    47241FDAQ002C0:
   test-1:
-    # no devices yet
+  stab:
+    R5CXC1ARELR:  # 10/1/25: was reseated, power cycled, and verified by jmaher
+    RZCY10Y548K:  # 10/1/25: was reseated, power cycled, and verified by jmaher
+    R5CXC1ALFED:  # 9/18/25: recabled and verified by jmaher

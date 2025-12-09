@@ -7,6 +7,7 @@ import argparse
 import logging
 import multiprocessing  # Add import for multiprocessing.Manager
 import os
+import pprint
 import shutil
 import signal
 import subprocess
@@ -16,10 +17,12 @@ import time
 
 import sentry_sdk
 
-from mozilla_bitbar_devicepool import configuration_lt, logging_setup
+# run fist to set logging on everything
+# rest
+from mozilla_bitbar_devicepool import configuration_lt, logging_setup, taskcluster_client
 from mozilla_bitbar_devicepool.lambdatest import job_config, status
 from mozilla_bitbar_devicepool.lambdatest.job_tracker import JobTracker
-from mozilla_bitbar_devicepool.taskcluster import get_taskcluster_pending_tasks
+from mozilla_bitbar_devicepool.taskcluster_client import get_taskcluster_pending_tasks
 from mozilla_bitbar_devicepool.util import misc
 
 # TODO: add a semaphore file that makes that turns on --debug mode
@@ -29,6 +32,7 @@ from mozilla_bitbar_devicepool.util import misc
 #  - for development, take over starting jobs for a particlar project
 # TODO: incorporate a call to https://api-hyperexecute.lambdatest.com/sentinel/v1.0/concurrency/<OrgID>
 #  to get the current and allowed number of concurrent jobs for the org (org id is 1611945).
+# TODO: start using `logger = logging.getLogger(__name__)` or set a name for the logger (vs root logger)
 
 
 class TestRunManagerLT(object):
@@ -80,6 +84,8 @@ class TestRunManagerLT(object):
     # Shared data keys for project-specific data
     SHARED_PROJECTS = "projects"
     PROJECT_TC_JOB_COUNT = "tc_job_count"
+    PROJECT_TC_QUARANTINED_WORKERS = "tc_quarantined_workers"
+    PROJECT_TC_QUARANTINED_WORKER_COUNT = "tc_quarantined_worker_count"
     PROJECT_LT_ACTIVE_DEVICE_COUNT = "lt_active_device_count"
     PROJECT_LT_BUSY_DEVICE_COUNT = "lt_busy_device_count"
     PROJECT_LT_CLEANUP_DEVICE_COUNT = "lt_cleanup_device_count"
@@ -101,7 +107,7 @@ class TestRunManagerLT(object):
         self.unit_testing_mode = unit_testing_mode
         self.logging_padding = 12  # Store the padding value as instance variable
         # Skip hyperexecute binary check in unit testing mode or when running tests
-        self.config_object = configuration_lt.ConfigurationLt(ci_mode=self.unit_testing_mode)
+        self.config_object = configuration_lt.ConfigurationLt(ci_mode_envvars=self.unit_testing_mode)
         self.config_object.configure()
         self.status_object = status.Status(self.config_object.lt_username, self.config_object.lt_access_key)
 
@@ -192,18 +198,23 @@ class TestRunManagerLT(object):
     def _taskcluster_monitor_thread(self):
         logging_header = self.format_logging_header(self.TC_THREAD_NAME)
 
+        tcci = taskcluster_client.TaskclusterClient(verbose=False)
+        # define at this level, but updated inside loop below
+        total_quarantined_devices = 0
+
         while not self.shutdown_event.is_set():
-            count_of_fetched_projects = 0
             worker_type_to_count_dict = {}
-            # For each project, get taskcluster job count
+            total_quarantined_devices = 0
+            # do TC things for each project
             for project_name, project_config in self.config_object.config["projects"].items():
+                start_time = time.time()
                 if not self.config_object.is_project_fully_configured(project_name):
                     # logging.warning(f"{logging_header} Project '{project_name}' is not fully configured. Skipping.")
                     continue
+                # update the pending job count for the project
                 try:
                     tc_worker_type = project_config.get("TC_WORKER_TYPE")
                     tc_job_count = get_taskcluster_pending_tasks("proj-autophone", tc_worker_type, verbose=False)
-                    count_of_fetched_projects += 1
                     worker_type_to_count_dict[tc_worker_type] = tc_job_count
 
                     # Update shared data without lock
@@ -212,8 +223,41 @@ class TestRunManagerLT(object):
                 except Exception as e:
                     logging.warning(f"{logging_header} Error fetching TC tasks for {project_name}: {e}", exc_info=True)
 
+                # fetch the quarantined workers and update the shared data structure
+                try:
+                    quarantined_workers = tcci.get_quarantined_worker_names("proj-autophone", tc_worker_type)
+                    self.shared_data[self.SHARED_PROJECTS][project_name][self.PROJECT_TC_QUARANTINED_WORKERS] = (
+                        quarantined_workers
+                    )
+                    self.shared_data[self.SHARED_PROJECTS][project_name][self.PROJECT_TC_QUARANTINED_WORKER_COUNT] = (
+                        len(quarantined_workers)
+                    )
+                    total_quarantined_devices += len(quarantined_workers)
+                    # logging.debug(pprint.pformat(quarantined_workers))
+                except Exception as e:
+                    logging.warning(
+                        f"{logging_header} Error fetching quarantined workers for {project_name}: {e}", exc_info=True
+                    )
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+
+            # format queue count message
+            elapsed_time_str = f"{elapsed_time:.1f}s"
             formatted_wttcd = str(worker_type_to_count_dict).strip("{}").replace("'", "")
-            logging.info(f"{logging_header} Queue counts: {formatted_wttcd}")
+            logging.info(f"{logging_header} Queue counts ({elapsed_time_str}): {formatted_wttcd}")
+
+            # format quarantine message
+            quarantine_string = ""
+            for project_name, project_config in self.config_object.config["projects"].items():
+                if not self.config_object.is_project_fully_configured(project_name):
+                    continue
+                quarantined_count = self.shared_data[self.SHARED_PROJECTS][project_name].get(
+                    self.PROJECT_TC_QUARANTINED_WORKER_COUNT, 0
+                )
+                if quarantine_string:
+                    quarantine_string += ", "
+                quarantine_string += f"{project_name}: {quarantined_count}"
+            logging.info(f"{logging_header} Quarantine counts ({total_quarantined_devices}): {quarantine_string}")
 
             # normal thread sleep
             self.shutdown_event.wait(self.TC_MONITOR_INTERVAL)
@@ -347,7 +391,8 @@ class TestRunManagerLT(object):
                 util_percent = (local_device_stats["busy_devices"] / global_total_device_count) * 100
 
             formatted_active_device_count = str(active_device_count_by_project_dict).strip("{}").replace("'", "")
-            per_queue_string = f"Active device counts: {formatted_active_device_count}"
+            total_active_count = sum(active_device_count_by_project_dict.values())
+            per_queue_string = f"Active device counts ({total_active_count}): {formatted_active_device_count}"
             logging.info(f"{logging_header} {per_queue_string}")
 
             # normal thread sleep
@@ -361,7 +406,7 @@ class TestRunManagerLT(object):
 
         project_source_dir = os.path.dirname(os.path.realpath(__file__))
         project_root_dir = os.path.abspath(os.path.join(project_source_dir, ".."))
-        user_script_golden_dir = os.path.join(project_source_dir, "lambdatest", "user_script")
+        user_script_golden_dir = self.config_object.get_path_to_user_script_directory(project_name)
 
         current_project = self.config_object.config["projects"][project_name]
         tc_worker_type = current_project["TC_WORKER_TYPE"]
@@ -380,6 +425,8 @@ class TestRunManagerLT(object):
             project_active_device_count_api = project_data.get(self.PROJECT_LT_ACTIVE_DEVICE_COUNT, 0)
             project_busy_devices_api = project_data.get(self.PROJECT_LT_BUSY_DEVICE_COUNT, 0)
             project_cleanup_devices_api = project_data.get(self.PROJECT_LT_CLEANUP_DEVICE_COUNT, 0)
+            # project_quarantined_worker_count = project_data.get(self.PROJECT_TC_QUARANTINED_WORKER_COUNT, 0)
+            project_quarantined_workers = project_data.get(self.PROJECT_TC_QUARANTINED_WORKERS, [])
             # Make a copy of the list from shared data
             project_active_devices_api_list = list(project_data.get(self.PROJECT_LT_ACTIVE_DEVICES, []))
 
@@ -389,10 +436,27 @@ class TestRunManagerLT(object):
             job_tracker_active_udids = job_tracker.get_active_udids()  # UDIDs tracked by job tracker
 
             # Calculate devices truly available for starting jobs: API Active minus JobTracker Active
-            available_devices_for_job_start = [
-                udid for udid in project_active_devices_api_list if udid not in job_tracker_active_udids
-            ]
+            available_devices_for_job_start = []
+            for udid in project_active_devices_api_list:
+                if udid not in job_tracker_active_udids:
+                    available_devices_for_job_start.append(udid)
+            # subtract quarantined devices
+            # logging.debug(f"{logging_header} avail devices to start: {available_devices_for_job_start}")
+            # logging.debug(f"{logging_header} quarantined devs: {project_quarantined_workers}")
+            devices_removed_for_quarantine_count = 0
+            devices_removed_for_quarantine = []
+            for udid in project_quarantined_workers:
+                # logging.info(f"{logging_header} pqw udid: {udid}")
+                if udid in available_devices_for_job_start:
+                    # logging.info(f"{logging_header} Removing quarantined device {udid} from available devices list")
+                    available_devices_for_job_start.remove(udid)
+                    devices_removed_for_quarantine_count += 1
+                    devices_removed_for_quarantine.append(udid)
             available_devices_for_job_start_count = len(available_devices_for_job_start)
+            if devices_removed_for_quarantine_count > 0:
+                logging.debug(
+                    f"{logging_header} Removed {devices_removed_for_quarantine_count} quarantined devices from available list ({', '.join(devices_removed_for_quarantine)})"
+                )
 
             # Debug logging for job tracker and available devices calculation
             if self.DEBUG_JOB_STARTER or self.DEBUG_DEVICE_SELECTION:
@@ -434,8 +498,10 @@ class TestRunManagerLT(object):
             # Add global initiated jobs count to the log for better visibility
             logging.info(
                 f"{logging_header} TC Jobs: {tc_job_count:>4}, {lt_blob:>41}, "
-                f"RStarted/NeedH/Avail/ToStart: {recently_started_jobs_count}/{tc_jobs_not_handled}/{available_devices_for_job_start_count}/{jobs_to_start}, "  # Added Avail count
-                f"GInit/GInitMax {self.shared_data[self.SHARED_LT_G_INITIATED_JOBS]}/{self.GLOBAL_MAX_INITITATED_JOBS}"
+                # TODO: split this up differently, show active near available and jobs to start
+                f"RStarted/NeedH/TcQW/AvailW/ToStart: {recently_started_jobs_count}/{tc_jobs_not_handled}/{len(project_quarantined_workers)}/{available_devices_for_job_start_count}/{jobs_to_start}"
+                # TODO: show GInit elsewhere?
+                # f"GInit/GInitMax {self.shared_data[self.SHARED_LT_G_INITIATED_JOBS]}/{self.GLOBAL_MAX_INITITATED_JOBS}"
             )
 
             if jobs_to_start > 0:
@@ -708,6 +774,9 @@ class TestRunManagerLT(object):
         # Create and start a job starter thread for each project
         job_starters = []
         for project_name in self.config_object.get_fully_configured_projects():
+            if self.config_object.is_project_disabled(project_name):
+                logging.info(f"{logging_header} Project '{project_name}' is disabled. Skipping Job Starter thread.")
+                continue
             thread_name = f"{self.JOB_STARTER_THREAD_NAME} {project_name}"
             job_starter = threading.Thread(target=self._job_starter_thread, args=(project_name,), name=thread_name)
             job_starters.append(job_starter)
@@ -933,6 +1002,22 @@ def main():
         # Start the main run loop using the multithreaded runner
         trmlt.run_multithreaded()
 
+    if args.action == "config-check":
+        # Config check action
+        try:
+            trmlt = TestRunManagerLT(unit_testing_mode=args.ci_mode, debug_mode=args.debug)
+            # show the configuration
+            pprint.pprint(trmlt.config_object.config, sort_dicts=False)
+            logging.info("Configuration check passed.")
+            sys.exit(0)
+        except ValueError as e:
+            logging.warning(f"Configuration check failed. {e}")
+            # misc.report_handled_exception_to_sentry(e)
+            sys.exit(1)
+        except Exception as e:
+            logging.warning(f"Configuration check failed with unexpected error. {e}", exc_info=True)
+            # misc.report_handled_exception_to_sentry(e)
+            sys.exit(1)
     elif args.action is None:
         # No action was provided
         # list the available actions

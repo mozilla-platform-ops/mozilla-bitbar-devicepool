@@ -3,6 +3,7 @@
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import faulthandler
+import math
 import re
 import signal
 import threading
@@ -19,7 +20,7 @@ from mozilla_bitbar_devicepool.bitbar.runs import (
     get_active_test_runs,
     run_test_for_project,
 )
-from mozilla_bitbar_devicepool.taskcluster import get_taskcluster_pending_tasks
+from mozilla_bitbar_devicepool.taskcluster_client import get_taskcluster_pending_tasks
 
 #
 # WARNING: not used everywhere yet!!!
@@ -111,7 +112,7 @@ class TestRunManager(object):
                             device_group_name,
                             stats["DISABLED"],
                             stats["OFFLINE"],
-                            ", ".join(stats["OFFLINE_DEVICES"]),
+                            ", ".join(sorted(stats["OFFLINE_DEVICES"])),
                         )
                     )
 
@@ -127,33 +128,60 @@ class TestRunManager(object):
                     logger.warning(e)
                     pending_tasks = 0
 
-                # 'jobs to start' algorithm v1
-                #   - basically start up to the number of devices in a group
-                #
-                # warning: only take the log of positive non-zero numbers, or a
-                # "ValueError: math domain error" will be raised
-                #
-                # jobs_to_start = min(
-                #     pending_tasks,
-                #     stats["IDLE"]
-                #     - stats["WAITING"]
-                #     + 1
-                #     + int(math.log10(1 + pending_tasks)),
-                # )
+                # 'jobs to start' scheduler selection
 
-                # 'jobs to start' algorithm v2
-                #  - start up to max_jobs_to_have_waiting jobs
-                #    - avoids overloading Bitbar with too many waiting jobs
-                #
-                # TODO: vary this based on how many devices out of total this queue has
-                #   - set a global limit and then give each queue a fraction of that
-                #
-                max_jobs_to_have_waiting = 5
-                if stats["WAITING"] >= max_jobs_to_have_waiting or pending_tasks == 0:
-                    jobs_to_start = 0
+                if CONFIG.get("devicepool_config", {}).get("jobs_to_start_algorithm") == "v1":
+                    # 'jobs to start' algorithm v1
+                    #   - basically start up to the number of devices in a group
+
+                    # warning: only take the log of positive non-zero numbers, or a
+                    # "ValueError: math domain error" will be raised
+
+                    jobs_to_start = min(
+                        pending_tasks,
+                        stats["IDLE"] - stats["WAITING"] + 1 + int(math.log10(1 + pending_tasks)),
+                    )
+
+                    # notes: aggresive in the number of jobs it starts
+                    #  - was too aggressive, caused server issues so created v2.
+                elif CONFIG.get("devicepool_config", {}).get("jobs_to_start_algorithm") == "v2":
+                    # 'jobs to start' algorithm v2
+                    #  - start up to max_jobs_to_have_waiting jobs
+                    #    - avoids overloading Bitbar with too many waiting jobs
+
+                    # TODO: vary this based on how many devices out of total this queue has
+                    #   - set a global limit and then give each queue a fraction of that
+
+                    max_jobs_to_have_waiting = 1
+                    if stats["WAITING"] >= max_jobs_to_have_waiting or pending_tasks == 0:
+                        jobs_to_start = 0
+                    else:
+                        jobs_to_start = max(1, max_jobs_to_have_waiting - stats["WAITING"])
+
+                    # v2 issues: waiting tasks... trying to avoid them
+                elif CONFIG.get("devicepool_config", {}).get("jobs_to_start_algorithm") == "v3":
+                    # v3: a modified v1
+                    # goals:
+                    #   - more like lambdatest's algo?
+                    #   - no extra waiting jobs (hmm, has more than one (v2))...
+                    #     - system should be able to handle it. represents a bug to squash.
+                    tasks_that_need_handling = pending_tasks - stats["WAITING"]
+                    # logger.info(f"jts calc: min({tasks_that_need_handling}, {stats['IDLE']} - {stats['WAITING']})")
+                    jobs_to_start = min(
+                        tasks_that_need_handling,
+                        stats["IDLE"] - stats["WAITING"],  # TODO: also subtract just started like in lt?
+                    )
+                    # any waiting jobs indicate a failure somewhere... why?
+                    # if stats["WAITING"] > 0:
+                    #     logger.warning(f"WARNING: {stats['WAITING']} WAITING JOBS")
+                    #
+                    # is it because of way we calculate idle devices (basically conf - running - offline - disabled)?
+                    #   - could be cleaning or some other state
                 else:
-                    jobs_to_start = max(1, max_jobs_to_have_waiting - stats["WAITING"])
+                    logger.debug(CONFIG.get("devicepool_config", {}))
+                    raise RuntimeError("Invalid 'jobs to start' algorithm selected or unset.")
 
+                # make value sane if < 0
                 if jobs_to_start < 0:
                     jobs_to_start = 0
 

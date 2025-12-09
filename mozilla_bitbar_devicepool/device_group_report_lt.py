@@ -12,7 +12,9 @@ class DeviceGroupReportLt:
         self.verbose = verbose
         self.config_path = config_path
         # Using ConfigurationLt to handle config loading
-        self.config_object = ConfigurationLt(ci_mode=True, quiet=True)  # ci_mode=True to avoid credentials check
+        self.config_object = ConfigurationLt(
+            ci_mode_envvars=True, quiet=True
+        )  # ci_mode=True to avoid credentials check
         self.config_object.configure(config_path=self.config_path)
 
     def show_report(self, verbose=False):
@@ -72,11 +74,12 @@ class DeviceGroupReportLt:
         # iterate through the 'projects' in the config
         for project_name, project_config in config_object.config.get("projects", {}).items():
             devices_for_project = config_object.config.get("device_groups", {})[project_name]
-            # no need to worry about the 'defaults' project, already handled in configure()
-            lt_device_selector = project_config.get("lt_device_selector")
-            if lt_device_selector:
+            if devices_for_project:
+                # no need to worry about the 'defaults' project, already handled in configure()
+                device_type = project_name.split("-")[0]  # Get the device type from the project name
                 # project is ready for use
-                device_types[lt_device_selector] = len(devices_for_project)
+                current_count = device_types.get(device_type, 0)
+                device_types[device_type] = current_count + len(devices_for_project)
         # Sort the device types by their counts in descending order
         device_types = dict(sorted(device_types.items(), key=lambda item: item[1], reverse=True))
 

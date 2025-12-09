@@ -147,7 +147,7 @@ Terminate Now
 
     ### test-run-manager ###
     subparser = subparsers.add_parser("start-test-run-manager", help="Run the test run manager.")
-    subparser.add_argument("--bitbar-config", help="Path to Bitbar yaml configuration file.")
+    subparser.add_argument("--bitbar-config", "-b", help="Path to Bitbar yaml configuration file.")
     subparser.add_argument(
         "--wait",
         dest="wait",

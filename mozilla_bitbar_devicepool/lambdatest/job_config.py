@@ -126,6 +126,8 @@ runtime:
     version: "17"
   - language: node
     version: '20'
+  - language: python
+    version: '3.12'
 
 env:
     # inject our own secrets
@@ -137,7 +139,8 @@ env:
 # testRunnerCommand: ls -la
 # testRunnerCommand: cat /home/ltuser/taskcluster/worker-runner-config.yml
 # testRunnerCommand: start-worker /home/ltuser/taskcluster/worker-runner-config.yml
-testRunnerCommand: python3 /home/ltuser/taskcluster/run_gw.py
+# testRunnerCommand: python3 /home/ltuser/taskcluster/run_gw.py
+testRunnerCommand: bash -c 'source /home/ltuser/venv/bin/activate; python3 /home/ltuser/taskcluster/run_gw.py'
 
 # Only report the status of the test framework
 frameworkStatusOnly: true
@@ -150,6 +153,7 @@ shell: bash
 # aje: moved all to test command as something we're doing in pre is disconnecting the device per LT
 #
 # Pre-install required dependencies using pip
+# TODO: remove the pip3 install mozdevice once everything is off v1 of user scripts
 pre:
   - pip3 install mozdevice
   - bash ./user_script/setup_script.sh

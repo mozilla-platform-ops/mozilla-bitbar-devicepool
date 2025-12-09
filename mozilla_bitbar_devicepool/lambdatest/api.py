@@ -42,45 +42,84 @@ def get_jobs(
     lt_api_key,
     label_filter_arr=None,
     jobs=100,
+    page_size=100,
     show_test_summary=False,
     timeout=(10, 30),
+    status=None,
+    print_url=False,
 ):
-    url = (
+    # check that jobs is greater than page_size
+    if jobs < page_size:
+        page_size = jobs
+
+    url_base = (
         "https://api.hyperexecute.cloud/v1.0/jobs"
         f"?show_test_summary={show_test_summary}"
         f"&is_cursor_base_pagination=true"
-        f"&limit={jobs}"
+        f"&limit={page_size}"
     )
 
-    # do basic auth
+    # add status filter if provided
+    if status:
+        if isinstance(status, str):
+            status = [status]
+        status_filter = ",".join(status)
+        url_base += f"&status={status_filter}"
+
     headers = {}
-    # craft a header that does basic auth with username and api key
     auth_string = f"{lt_username}:{lt_api_key}"
     base64_auth_string = base64.b64encode(auth_string.encode("utf-8")).decode("utf-8")
     headers["Authorization"] = f"Basic {base64_auth_string}"
 
-    # Use cached_session instead of requests directly
-    response = cached_session.get(url, headers=headers, timeout=timeout)
-    # check the response code
-    if response.status_code != 200:
-        print(f"Error: {response.status_code}")
-        print(f"  while fetching {url}")
-        print(response.text)
-        return None
-    result = response.json()
+    all_jobs = []
+    next_cursor = None
+    fetched = 0
 
-    if label_filter_arr:
-        current_data = result["data"]
-        result["data"] = []
-        for job in current_data:
-            job_label_data = job["job_label"]
-            if not job_label_data:
-                continue
-            job_labels = job["job_label"]
-            # if all labels are present in job_labels, add to result
-            if all(label in job_labels for label in label_filter_arr):
-                result["data"].append(job)
+    while True:
+        url = url_base
+        if next_cursor:
+            url += f"&cursor={next_cursor}"
 
+        response = cached_session.get(url, headers=headers, timeout=timeout)
+        if print_url:
+            print(f"Fetching {url}...")
+        if response.status_code != 200:
+            print(f"Error: {response.status_code}")
+            print(f"  while fetching {url}")
+            print(response.text)
+            return None
+        result = response.json()
+
+        jobs_data = result.get("data", [])
+        if label_filter_arr:
+            filtered_jobs = []
+            for job in jobs_data:
+                job_label_data = job.get("job_label")
+                if not job_label_data:
+                    continue
+                job_labels = job["job_label"]
+                if all(label in job_labels for label in label_filter_arr):
+                    filtered_jobs.append(job)
+            jobs_data = filtered_jobs
+
+        # update next_cursor with the last job's job_number
+        if jobs_data:
+            next_cursor = jobs_data[-1]["job_number"]
+
+        all_jobs.extend(jobs_data)
+        fetched += len(jobs_data)
+
+        # Check if we have enough jobs or no more pages
+        # next_cursor = result.get("next_cursor") #job['job_number']
+        if fetched >= jobs:
+            break
+
+    # Trim to the requested number of jobs
+    # TODO: needed?
+    all_jobs = all_jobs[:jobs]
+
+    # Return in the same format as before
+    result["data"] = all_jobs
     return result
 
 

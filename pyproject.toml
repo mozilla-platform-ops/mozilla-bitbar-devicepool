@@ -12,7 +12,6 @@ classifiers = ["Operating System :: OS Independent"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-pyyaml = "^6.0.2"
 requests = "^2.28.2"
 # use an unreleased version on master, v2.100.0+
 #   - includes https://github.com/bitbar/testdroid-api-client-python/issues/141
@@ -24,6 +23,10 @@ gitpython = "^3.1.42"
 humanhash3 = "^0.0.6"
 requests-cache = "^1.2.1"
 urllib3 = "^2.3.0"
+ruamel-yaml = "^0.18.15"
+pyyaml = "^6.0.2"
+taskcluster = "^90.0.4"
+natsort = "^8.4.0"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^4.1.0"
@@ -44,6 +47,9 @@ dgr = 'mozilla_bitbar_devicepool.device_group_report:main'
 dgrlt = 'mozilla_bitbar_devicepool.device_group_report_lt:main'
 lt_status = 'mozilla_bitbar_devicepool.lambdatest.status:lt_status_main'
 lt_compare_to_api = 'mozilla_bitbar_devicepool.compare_to_api_lt:main'
+lt_failure_report = 'mozilla_bitbar_devicepool.lambdatest.status:lt_failed_job_report'
+lt_success_rate_report = 'mozilla_bitbar_devicepool.lambdatest.status:lt_success_rate_report'
+lt_job_distribution_report = 'mozilla_bitbar_devicepool.reporting.main:job_distribution_report'
 
 [build-system]
 requires = ["poetry-core"]
@@ -62,4 +68,4 @@ DEP003 = ["google", "mozdevice"]
 DEP004 = ["mozdevice"]
 
 [tool.pytest.ini_options]
-norecursedirs = "mozilla_bitbar_devicepool/lambdatest/user_script"
+norecursedirs = "mozilla_bitbar_devicepool/lambdatest/user_scripts"

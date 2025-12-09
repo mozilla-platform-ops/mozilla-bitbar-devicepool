@@ -62,22 +62,22 @@ projects:
     additional_parameters:
       TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-p6
       TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-p6
-  mozilla-gw-unittest-s21:
-    device_group_name: s21-unit
-    device_model: s21
-    framework_name: mozilla-usb
-    description: Mozilla Unit tests for Samsung Galaxy S21 (using generic-worker)
-    additional_parameters:
-      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-s21
-      TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-s21
-  mozilla-gw-perftest-s21:
-    device_group_name: s21-perf
-    device_model: s21
-    framework_name: mozilla-usb
-    description: Mozilla Performance tests for Samsung Galaxy S21 (using generic-worker)
-    additional_parameters:
-      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-s21
-      TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-s21
+  # mozilla-gw-unittest-s21:
+  #   device_group_name: s21-unit
+  #   device_model: s21
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Unit tests for Samsung Galaxy S21 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-s21
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-s21
+  # mozilla-gw-perftest-s21:
+  #   device_group_name: s21-perf
+  #   device_model: s21
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Performance tests for Samsung Galaxy S21 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-s21
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-s21
   # mozilla-gw-perftest-g5:
   #   device_group_name: motog5-perf-2
   #   device_model: motog5
@@ -126,22 +126,22 @@ projects:
   #   additional_parameters:
   #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-s7
   #     TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-s7
-  mozilla-gw-unittest-a51:
-    device_group_name: a51-unit
-    device_model: a51
-    framework_name: mozilla-usb
-    description: Mozilla Unit tests for A51 (using generic-worker)
-    additional_parameters:
-      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-a51
-      TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-a51
-  mozilla-gw-perftest-a51:
-    device_group_name: a51-perf
-    device_model: a51
-    framework_name: mozilla-usb
-    description: Mozilla Performance tests for A51 (using generic-worker)
-    additional_parameters:
-      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-a51
-      TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-a51
+  # mozilla-gw-unittest-a51:
+  #   device_group_name: a51-unit
+  #   device_model: a51
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Unit tests for A51 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-a51
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-a51
+  # mozilla-gw-perftest-a51:
+  #   device_group_name: a51-perf
+  #   device_model: a51
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Performance tests for A51 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-a51
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-a51
   mozilla-gw-unittest-a55:
     device_group_name: a55-unit
     device_model: a55
@@ -185,33 +185,33 @@ projects:
   #   additional_parameters:
   #     DOCKER_IMAGE_VERSION: 20240307T112108
   # used for testing new docker images
-  mozilla-gw-test-1:
-    device_group_name: test-1
-    framework_name: mozilla-usb
-    description: used for testing new images, devices, operating systems
-    additional_parameters:
-      TASKCLUSTER_CLIENT_ID: project/autophone/bitbar-x-test-1
-      TC_WORKER_TYPE: gecko-t-bitbar-gw-test-1
-      # replace with version to test
-      DOCKER_IMAGE_VERSION: 20250304T123621
-  mozilla-gw-test-2:
-    device_group_name: test-2
-    framework_name: mozilla-usb
-    description: used for testing new images, devices, operating systems
-    additional_parameters:
-      TASKCLUSTER_CLIENT_ID: project/autophone/bitbar-x-test-2
-      TC_WORKER_TYPE: gecko-t-bitbar-gw-test-2
-      # replace with version to test
-      DOCKER_IMAGE_VERSION: 20240307T112108
-  mozilla-gw-test-3:
-    device_group_name: test-3
-    framework_name: mozilla-usb
-    description: used for testing new images, devices, operating systems
-    additional_parameters:
-      TASKCLUSTER_CLIENT_ID: project/autophone/bitbar-x-test-3
-      TC_WORKER_TYPE: gecko-t-bitbar-gw-test-3
-      # replace with version to test
-      DOCKER_IMAGE_VERSION: 20231106T174322
+  # mozilla-gw-test-1:
+  #   device_group_name: test-1
+  #   framework_name: mozilla-usb
+  #   description: used for testing new images, devices, operating systems
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/bitbar-x-test-1
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-test-1
+  #     # replace with version to test
+  #     DOCKER_IMAGE_VERSION: 20250304T123621
+  # mozilla-gw-test-2:
+  #   device_group_name: test-2
+  #   framework_name: mozilla-usb
+  #   description: used for testing new images, devices, operating systems
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/bitbar-x-test-2
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-test-2
+  #     # replace with version to test
+  #     DOCKER_IMAGE_VERSION: 20240307T112108
+  # mozilla-gw-test-3:
+  #   device_group_name: test-3
+  #   framework_name: mozilla-usb
+  #   description: used for testing new images, devices, operating systems
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/bitbar-x-test-3
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-test-3
+  #     # replace with version to test
+  #     DOCKER_IMAGE_VERSION: 20231106T174322
   # mozilla-docker-image-test:
   #   device_group_name: motog5-test
   #   framework_name: mozilla-usb
@@ -307,32 +307,32 @@ device_groups:
     a55-22:
     # a55-23:  # 5/9/25: removed, contract downsizing
     a55-24:
-    a55-25:
-    a55-26:
-    a55-27:
-    a55-28:
-    a55-29:
-    a55-30:
-    a55-31:
-    a55-32:
-    a55-33:
-    a55-34:
-    a55-35:
-    a55-36:
-    a55-37:
-    a55-38:
-    a55-39:
-    a55-40:
-    a55-41:
-    a55-42:
-    a55-43:
-    a55-44:
-    a55-45:
-    a55-46:
-    a55-47:
+    # a55-25:  # 9/29/25: removed, secondary contract not renewed
+    # a55-26:  # 9/29/25: removed, secondary contract not renewed
+    # a55-27:  # 9/29/25: removed, secondary contract not renewed
+    # a55-28:  # 9/29/25: removed, secondary contract not renewed
+    # a55-29:  # 9/29/25: removed, secondary contract not renewed
+    # a55-30:  # 9/29/25: removed, secondary contract not renewed
+    # a55-31:  # 9/29/25: removed, secondary contract not renewed
+    # a55-32:  # 9/29/25: removed, secondary contract not renewed
+    # a55-33:  # 9/29/25: removed, secondary contract not renewed
+    # a55-34:  # 9/29/25: removed, secondary contract not renewed
+    # a55-35:  # 9/29/25: removed, secondary contract not renewed
+    # a55-36:  # 9/29/25: removed, secondary contract not renewed
+    # a55-37:  # 9/29/25: removed, secondary contract not renewed
+    # a55-38:  # 9/29/25: removed, secondary contract not renewed
+    # a55-39:  # 9/29/25: removed, secondary contract not renewed
+    # a55-40:  # 9/29/25: removed, secondary contract not renewed
+    # a55-41:  # 9/29/25: removed, secondary contract not renewed
+    # a55-42:  # 9/29/25: removed, secondary contract not renewed
+    # a55-43:  # 9/29/25: removed, secondary contract not renewed
+    # a55-44:  # 9/29/25: removed, secondary contract not renewed
+    # a55-45:  # 9/29/25: removed, secondary contract not renewed
+    # a55-46:  # 9/29/25: removed, secondary contract not renewed
+    # a55-47:  # 9/29/25: removed, secondary contract not renewed
     # a55-48:  # 6/13/25: removed, contract downsizing
-    a55-49:
-    a55-50:
+    # a55-49:  # 9/29/25: removed, secondary contract not renewed
+    # a55-50:  # 9/29/25: removed, secondary contract not renewed
     # a55-51:  # 6/13/25: removed, contract downsizing
     # a55-52:  # 6/13/25: removed, contract downsizing
     # a55-53:  # 6/13/25: removed, contract downsizing
@@ -372,11 +372,11 @@ device_groups:
     pixel5-04:
     pixel5-05:
     # pixel5-06:  # 5/9/25: removed, contract downsizing
-    pixel5-07:
+    # pixel5-07:  # 9/29/25: removed, secondary contract not renewed
     # pixel5-08:  # 5/9/25: removed, contract downsizing
     pixel5-09:
-    pixel5-10:
-    pixel5-11:
+    # pixel5-10:  # 9/29/25: removed, secondary contract not renewed
+    # pixel5-11:  # 9/29/25: removed, secondary contract not renewed
     # pixel5-12:  # 6/13/25: removed, contract downsizing
     # pixel5-13:  # 6/13/25: removed, contract downsizing
     # pixel5-14:  # 6/13/25: removed, contract downsizing

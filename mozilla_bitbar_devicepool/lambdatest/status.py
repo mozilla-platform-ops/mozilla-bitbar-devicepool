@@ -2,8 +2,13 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import argparse
+import datetime
+import os
 import pprint
+import sys
 
+import mozilla_bitbar_devicepool.lambdatest.util as util
 from mozilla_bitbar_devicepool.lambdatest.api import get_devices, get_jobs
 
 # idea: uses api data to build a status/state
@@ -266,6 +271,269 @@ def lt_status_main():
             print(f"    - {udid}")
 
 
+# TODO: idea: report that gets percentage of failing/total jobs
+def lt_success_rate_report():
+    DEFAULT_JOBS = 100
+
+    # use argparse to get the count of jobs to fetch
+    parser = argparse.ArgumentParser(description="Generate a report on the success rate of jobs.")
+    parser.add_argument(
+        "--jobs",
+        "-j",
+        type=int,
+        default=DEFAULT_JOBS,
+        help=f"Number of jobs to fetch (default: {DEFAULT_JOBS})",
+    )
+    parser.add_argument(
+        "--verbose",
+        "-v",
+        dest="verbose",
+        default=False,
+        action="store_true",
+        help="Enable verbose output",
+    )
+    args = parser.parse_args()
+
+    lt_username = os.environ["LT_USERNAME"]
+    lt_api_key = os.environ["LT_ACCESS_KEY"]
+
+    status = Status(lt_username, lt_api_key)
+
+    # count success and failure jobs
+    skipped_count = 0
+    success_count = 0
+    failure_count = 0
+    running_count = 0
+    completed_count = 0
+    total_count = 0
+    failure_phase_dict = {}
+    # dict of lists, {'pre': ['device1', 'device2'], 'post': ['device3']}
+    failure_phase_device_list_dict = {}
+
+    start_times = []
+
+    for job in get_jobs(lt_username, lt_api_key, jobs=args.jobs)["data"]:
+        # Collect start_time for date range
+        if "start_time" in job and job["start_time"]:
+            try:
+                # Try parsing as ISO 8601, fallback to int if needed
+                if isinstance(job["start_time"], str):
+                    start_times.append(datetime.datetime.fromisoformat(job["start_time"].replace("Z", "+00:00")))
+                else:
+                    # If it's a timestamp (int/float)
+                    start_times.append(datetime.datetime.fromtimestamp(job["start_time"]))
+            except Exception:
+                pass
+
+        job_labels_list = util.string_list_to_list(job["job_label"])
+        device_id = util.get_device_from_job_labels(job_labels_list)
+
+        # only inspect tcdp jobs
+        if "tcdp" not in job_labels_list:
+            skipped_count += 1
+            continue
+
+        if args.verbose:
+            pprint.pprint(job)  # verbose output
+
+        if job["status"] == "completed":
+            success_count += 1
+            completed_count += 1
+        elif job["status"] == "timeout" or job["status"] == "failed":
+            failure_count += 1
+            completed_count += 1
+            failure_phase = extract_failure_phase(job)
+            failure_phase_dict[failure_phase] = failure_phase_dict.get(failure_phase, 0) + 1
+            failure_phase_device_list_dict.setdefault(failure_phase, []).append(device_id)
+        elif job["status"] == "running" or job["status"] == "initiated":
+            # count initiated as running for now
+            running_count += 1
+        else:
+            print(f"Unknown job status: {job['status']}")
+            if args.verbose:
+                pprint.pprint(job)
+            continue
+    total_count = completed_count + running_count + skipped_count
+
+    # create a summary datastructure of failure_phase_device_list_dict with counts per device
+    failure_phase_device_list_summary = {}
+    for phase, device_list in failure_phase_device_list_dict.items():
+        device_count = {}
+        for device in device_list:
+            if device in device_count:
+                device_count[device] += 1
+            else:
+                device_count[device] = 1
+        failure_phase_device_list_summary[phase] = device_count
+    # order the summary by count descending
+    for phase in failure_phase_device_list_summary:
+        failure_phase_device_list_summary[phase] = dict(
+            sorted(failure_phase_device_list_summary[phase].items(), key=lambda item: item[1], reverse=True)
+        )
+
+    # Compute date range string
+    if start_times:
+        min_time = min(start_times)
+        max_time = max(start_times)
+        date_range_string = f"{min_time.isoformat()} to {max_time.isoformat()}"
+    else:
+        date_range_string = "(no start_time data found)"
+
+    print(f"Job Success Report:")
+    print(f"  Total Jobs: {total_count}")
+    print(f"    Job Date Range: {date_range_string}")
+    print(f"    Skipped Jobs: {skipped_count}")
+    print(f"    Running Jobs: {running_count}")
+    print(f"    Completed Jobs: {completed_count}")
+    print(f"      Successful Jobs: {success_count}")
+    print(f"      Failed Jobs: {failure_count}")
+    print(f"        Failure Phase Counts: {failure_phase_dict}")
+    print(
+        f"        Failure Phase Device Frequency: {pprint.pformat(failure_phase_device_list_summary, sort_dicts=False)}"
+    )
+    if success_count == 0:
+        print(f"  Success Rate (success_count / completed_count): 0%")
+    else:
+        print(f"  Success Rate (success_count / completed_count): {success_count / completed_count * 100:.2f}%")
+
+
+def extract_failure_phase(job):
+    test_failure_phase = "testing"  # default phase
+    # TODO: should we not have a default? should we raise in some cases?
+    if "job_summary" in job and job["job_summary"] is not None:
+        # print("job summary:")
+        # pprint.pprint(job["job_summary"])
+        if len(job["job_summary"]) == 0:
+            print("job summary is empty")
+            pprint.pprint(job)
+            return test_failure_phase
+        for phase, phase_details in job["job_summary"].items():
+            # print(f"  - {phase}: {phase_details}")
+            # pprint.pprint(phase_details)
+            if phase_details and "failed" in phase_details and int(phase_details["failed"]) > 0:
+                # print(f"    - {phase_details['name']}: {phase_details['status']}")
+                # print(f"{phase}: failed zazaaz")
+                test_failure_phase = phase.split("_")[0]
+    else:
+        print("job summary not in job or is None")
+        pprint.pprint(job)
+    return test_failure_phase
+
+
+def lt_failed_job_report(verbose=True):
+    DEFAULT_JOBS = 400
+
+    # use argparse to get the count of jobs to fetch
+    parser = argparse.ArgumentParser(description="Generate a report of failed jobs.")
+    parser.add_argument(
+        "--jobs",
+        type=int,
+        default=DEFAULT_JOBS,
+        help=f"Number of jobs to fetch (default: {DEFAULT_JOBS})",
+    )
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Enable verbose output",
+    )
+    args = parser.parse_args()
+
+    lt_username = os.environ["LT_USERNAME"]
+    lt_api_key = os.environ["LT_ACCESS_KEY"]
+
+    status = Status(lt_username, lt_api_key)
+
+    # pprint.pprint(status.get_running_job_count())
+    # sys.exit()
+
+    # maintain a data structure tracking failure counts to devices
+    device_failure_count = {}
+    failure_phase_count = {}
+
+    # pprint.pprint(status.get_jobs())
+    for job in get_jobs(lt_username, lt_api_key, status="failed", jobs=args.jobs)["data"]:
+        inspection_flag = False
+
+        job_labels_list = util.string_list_to_list(job["job_label"])
+
+        device_id = util.get_device_from_job_labels(job_labels_list)
+        if device_id:
+            # if verbose:
+            #     print(f"device id: {device_id}")
+            pass
+
+        if job["status"] == "failed" and "tcdp" in job_labels_list:
+            inspection_flag = True
+
+        if inspection_flag == True:
+            # raw debug output
+            # pprint.pprint(job)
+
+            # inspect job_summary
+            test_failure_phase = "testing"
+            if "job_summary" in job:
+                # print("job summary:")
+                # pprint.pprint(job["job_summary"])
+                for phase, phase_details in job["job_summary"].items():
+                    # print(f"  - {phase}: {phase_details}")
+                    # pprint.pprint(phase_details)
+                    if phase_details and "failed" in phase_details and int(phase_details["failed"]) > 0:
+                        # print(f"    - {phase_details['name']}: {phase_details['status']}")
+                        # print(f"{phase}: failed zazaaz")
+                        test_failure_phase = phase.split("_")[0]
+                failure_phase_count[test_failure_phase] = failure_phase_count.get(test_failure_phase, 0) + 1
+
+            if device_id:
+                # increment the failure count for this device
+                if device_id in device_failure_count:
+                    device_failure_count[device_id] += 1
+                else:
+                    device_failure_count[device_id] = 1
+
+            if verbose:
+                print(
+                    f"job number: {job['job_number']}: device id: {device_id}: {job['status']}: test_failure_phase: {test_failure_phase}  "
+                )
+
+                # more advanced debugging output
+                # print(f"job number: {job['job_number']}")
+                # # print(f"status: {job['status']}")
+                # print(f"job label: {job['job_label']} type: {type(job['job_label'])}")
+                # print(f"test failure phase: {test_failure_phase}")
+                # print("device udid: %s" % job["device_udid"])
+                # print("device name: %s" % job["device_name"])
+                # print("device os: %s" % job["device_os"])
+                # print("device status: %s" % job["device_status"])
+                # if job["status"] == "running":
+                #     # pprint.pprint(job)
+                #     # where number of currently running is for concurrent jobs
+                #     # TODO: incorporate into functions above
+                #     # print(job["job_summary"]["scenario_stage_summary"]["status_counts_excluding_retries"]["in_progress"])
+                #     print(job["Tasks"])
+                # print("")
+
+    print("")
+    print("Device failure counts:")
+    if not device_failure_count:
+        print("  No failed jobs found.")
+    else:
+        # sort by count descending
+        device_failure_count = dict(sorted(device_failure_count.items(), key=lambda item: item[1], reverse=True))
+        for device_id, count in device_failure_count.items():
+            print(f"  {device_id}: {count} failures")
+
+    print("")
+    # show failure_phase_count
+    print("Failure phase counts:")
+    if not failure_phase_count:
+        print("  No failed jobs found.")
+    else:
+        # sort by count descending
+        failure_phase_count = dict(sorted(failure_phase_count.items(), key=lambda item: item[1], reverse=True))
+        for phase, count in failure_phase_count.items():
+            print(f"  {phase}: {count} failures")
+
+
 if __name__ == "__main__":  # pragma: no cover
     import os
     import pprint
@@ -281,20 +549,44 @@ if __name__ == "__main__":  # pragma: no cover
 
     # pprint.pprint(status.get_jobs())
     for job in status.get_jobs()["data"]:
-        print("job number: %s" % job["job_number"])
-        print("status: %s" % job["status"])
-        print("job label: %s" % job["job_label"])
-        # print("device udid: %s" % job["device_udid"])
-        # print("device name: %s" % job["device_name"])
-        # print("device os: %s" % job["device_os"])
-        # print("device status: %s" % job["device_status"])
-        if job["status"] == "running":
-            # pprint.pprint(job)
-            # where number of currently running is for concurrent jobs
-            # TODO: incorporate into functions above
-            # print(job["job_summary"]["scenario_stage_summary"]["status_counts_excluding_retries"]["in_progress"])
-            print(job["Tasks"])
-        print("")
+        output_flag = False
+
+        if job["status"] == "failed":
+            output_flag = True
+
+        if output_flag == True:
+            # raw debug output
+            pprint.pprint(job)
+
+            # inspect job_summary
+            # test_failure_phase = "testing"
+            # if "job_summary" in job:
+            #     # print("job summary:")
+            #     # pprint.pprint(job["job_summary"])
+            #     for phase, phase_details in job["job_summary"].items():
+            #         print(f"  - {phase}: {phase_details}")
+            #         # pprint.pprint(phase_details)
+            #         if phase_details and "failed" in phase_details and int(phase_details["failed"]) > 0:
+            #             # print(f"    - {phase_details['name']}: {phase_details['status']}")
+            #             # print(f"{phase}: failed zazaaz")
+            #             test_failure_phase = phase.split("_")[0]
+            #     print(f"test failure phase: {test_failure_phase}")
+
+            # more advanced debugging output
+            # print(f"job number: {job['job_number']}")
+            # print(f"status: {job['status']}")
+            # print(f"job label: {job['job_label']}")
+            # # print("device udid: %s" % job["device_udid"])
+            # # print("device name: %s" % job["device_name"])
+            # # print("device os: %s" % job["device_os"])
+            # # print("device status: %s" % job["device_status"])
+            # if job["status"] == "running":
+            #     # pprint.pprint(job)
+            #     # where number of currently running is for concurrent jobs
+            #     # TODO: incorporate into functions above
+            #     # print(job["job_summary"]["scenario_stage_summary"]["status_counts_excluding_retries"]["in_progress"])
+            #     print(job["Tasks"])
+            print("")
     print("")
     sys.exit()
 

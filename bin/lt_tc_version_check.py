@@ -42,10 +42,29 @@ def main():
         description="Checks the latest TC version and compares it with the configured version in the setup script."
     )
     parser.add_argument("--change", action="store_true", help="Update the version in the setup script.")
+    parser.add_argument(
+        "-v",
+        "--version",
+        default="latest",
+        help="Version of the setup script to check (default: `latest`, resolves to latest version dir).",
+    )
     args = parser.parse_args()
 
     root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-    setup_script = os.path.join(root_path, "mozilla_bitbar_devicepool", "lambdatest", "user_script", "setup_script.sh")
+
+    #
+    if args.version == "latest":
+        # Find the latest version of the setup script
+        user_scripts_dir = os.path.join(root_path, "mozilla_bitbar_devicepool", "lambdatest", "user_scripts")
+        versions = [d for d in os.listdir(user_scripts_dir) if os.path.isdir(os.path.join(user_scripts_dir, d))]
+        if not versions:
+            error("No user script versions found.")
+        args.version = sorted(versions)[-1]
+        print(f"Using version `latest` (resolved to {args.version})")
+
+    setup_script = os.path.join(
+        root_path, "mozilla_bitbar_devicepool", "lambdatest", "user_scripts", args.version, "setup_script.sh"
+    )
     if not os.path.isfile(setup_script):
         error(f"Setup script not found at {setup_script}")
 

@@ -5,7 +5,7 @@
 
 This project enables the execution of Mozilla's [Taskcluster](https://taskcluster.net/) tests on Android hardware devices via API integrations with various vendors.
 
-Currently supported vendors are [Bitbar](https://bitbar.com/) and [Lamdatest](https://www.lambdatest.com/).
+Currently supported vendors are [Bitbar](https://bitbar.com/) and [Lambdatest](https://www.lambdatest.com/).
 
 ## Installation
 
@@ -70,12 +70,18 @@ You must install the development requirements first.  See the "Development" sect
 # activate venv
 poetry shell
 
-pytest  # runs once
-# or
-pytest-watch  # monitors files for changes and reruns
+# run once
+pytest
+#
+# pytest with coverage (html and terminal)
+pytest --cov --cov-report=html --cov-report=term
+
+ # monitors files for changes and reruns
+pytest-watch
 
 # pytest-watch with coverage and double verbose
-pytest-watch -- -vv --cov
+pytest-watch -- -v --cov --cov-report=html --cov-report=term
+
 ```
 
 ## Running and More Documentation

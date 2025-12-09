@@ -1,0 +1,11 @@
+# Sample YAML config for testing ConfigurationDeviceMover
+# Save as files/test_config.yml
+
+device_groups:
+  groupA:
+    device1: "comment1"
+    device2: "comment2"
+  groupB:
+    device3: "comment3"
+    device4: "comment4"
+  groupC: {}

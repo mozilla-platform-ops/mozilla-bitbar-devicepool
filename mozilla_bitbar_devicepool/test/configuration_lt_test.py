@@ -5,6 +5,7 @@
 import os
 
 import pytest
+import yaml
 
 from mozilla_bitbar_devicepool.configuration_lt import ConfigurationLt
 
@@ -16,7 +17,9 @@ projects:
   defaults:
     # not used yet
     # SCRIPT_REPO_COMMIT: master
+    USER_SCRIPTS_VERSION: v9
     TEST_1: blah
+    disabled: false
   a55-alpha:
     # lt_device_selector: "Galaxy A55 5G-14"
     # swapped for testing
@@ -30,11 +33,10 @@ projects:
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-a55_yy
     TC_WORKER_TYPE: gecko-t-lambda-perf-a55_y
   test-1:
-  #     SCRIPT_REPO_COMMIT: future_commit
+    USER_SCRIPTS_VERSION: v11
     lt_device_selector: "Galaxy A51-11"
-  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1_t
-  #     TC_WORKER_TYPE: gecko-t-lambda-gw-test-1_tt
-  #     # override SCRIPT_REPO_COMMIT with a test commit
+    # TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1_t
+    TC_WORKER_TYPE: gecko-t-lambda-gw-test-1_tt
 device_groups:
   # this block is not used yet (not possible with LT API), future goal. see lt_device_selector in projects.
   a55-perf:
@@ -88,6 +90,7 @@ projects:
     # not used yet
     # SCRIPT_REPO_COMMIT: master
     TEST_1: blah
+    disabled: false
   a55-alpha:
     # lt_device_selector: "Galaxy A55 5G-14"
     # swapped for testing
@@ -100,6 +103,7 @@ projects:
     # lt_device_selector: "Galaxy A51-11"
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-a55
     TC_WORKER_TYPE: gecko-t-lambda-perf-a55
+    disabled: true
   test-1:
   #     SCRIPT_REPO_COMMIT: future_commit
     lt_device_selector: "Galaxy A51-11"
@@ -118,6 +122,51 @@ device_groups:
   test-1:
     # a51
     RZ8NB0WJ47H
+  test-2:
+"""
+
+
+# device_groups use list of strings instead of (string) block
+SAMPLE_FILE_CONFIG_YAML_3 = """
+global:
+  contract_device_count: 1319
+projects:
+  defaults:
+    # not used yet
+    # SCRIPT_REPO_COMMIT: master
+    TEST_1: blah
+    disabled: false
+  a55-alpha:
+    # lt_device_selector: "Galaxy A55 5G-14"
+    # swapped for testing
+    lt_device_selector: "Galaxy A51-11"
+    TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-alpha-a55
+    TC_WORKER_TYPE: gecko-t-lambda-alpha-a55
+  a55-perf:
+    lt_device_selector: "Galaxy A55 5G-14"
+    # swapped for testing
+    # lt_device_selector: "Galaxy A51-11"
+    TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-a55
+    TC_WORKER_TYPE: gecko-t-lambda-perf-a55
+    disabled: true
+  test-1:
+  #     SCRIPT_REPO_COMMIT: future_commit
+    lt_device_selector: "Galaxy A51-11"
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1
+  #     TC_WORKER_TYPE: gecko-t-lambda-gw-test-1
+  #     # override SCRIPT_REPO_COMMIT with a test commit
+device_groups:
+  # this block is not used yet (not possible with LT API), future goal. see lt_device_selector in projects.
+  a55-perf:
+    R5CX4089QNL:
+    R5CXC1AHV4M:
+    R5CXC1ALFED:
+  a55-alpha:
+    # the only device with a power meter
+    R5CXC1HZKLR:
+  test-1:
+    # a51
+    RZ8NB0WJ47H:
   test-2:
 """
 
@@ -151,13 +200,37 @@ def sample_file_config_2(tmp_path):
     return str(config_file)
 
 
+@pytest.fixture
+def sample_file_config_3(tmp_path):
+    """
+    Fixture to create a temporary YAML file with sample configuration data.
+    """
+    # Create a temporary config file
+    config_dir = tmp_path / "config3"
+    config_dir.mkdir()
+    config_file = config_dir / "config.yml"
+    config_file.write_text(SAMPLE_FILE_CONFIG_YAML_3)
+
+    return str(config_file)
+
+
+# a fixture that uses this repo's actual config file (config/lambdatest.yml)
+@pytest.fixture
+def sample_file_config_actual():
+    """
+    Fixture to create a configured instance of ConfigurationLt using the actual config file.
+    """
+    config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "config", "lambdatest.yml"))
+    return config_path
+
+
 # TODO: create a fixture for configured_lt_instance
 @pytest.fixture
 def configured_lt_instance(sample_file_config):
     """
     Fixture to create a configured instance of ConfigurationLt.
     """
-    config_lt = ConfigurationLt(ci_mode=True)
+    config_lt = ConfigurationLt(ci_mode_envvars=True, ci_mode_fs=True)
     config_lt.configure(config_path=sample_file_config)
     return config_lt
 
@@ -167,9 +240,23 @@ def configured_lt_instance2(sample_file_config_2):
     """
     Fixture to create a configured instance of ConfigurationLt.
     """
-    config_lt = ConfigurationLt(ci_mode=True)
+    config_lt = ConfigurationLt(ci_mode_envvars=True, ci_mode_fs=True)
     config_lt.configure(config_path=sample_file_config_2)
     return config_lt
+
+
+# TODO: use this in tests
+@pytest.fixture
+def configured_lt_instance_actual(sample_file_config_actual):
+    """
+    Fixture to create a configured instance of ConfigurationLt using the actual config file.
+    """
+    config_lt = ConfigurationLt(ci_mode_envvars=True)
+    config_lt.configure(config_path=sample_file_config_actual)
+    return config_lt
+
+
+# TODO: run all instance fixtures against all test cases
 
 
 def test_configure(configured_lt_instance):
@@ -189,12 +276,16 @@ def test_configure(configured_lt_instance):
     assert "R5CX4089QNL" in configured_lt_instance.config["device_groups"]["a55-perf"]
     assert "R5CXC1AHV4M" in configured_lt_instance.config["device_groups"]["a55-perf"]
 
+    # check disabled projects
+    # assert configured_lt_instance.config["projects"]["a55-alpha"]["disabled"] is True
+    # assert configured_lt_instance.config["projects"]["a55-perf"]["disabled"] is False
+
 
 def test_load_file_config(sample_file_config):
     """
     Tests that _load_file_config correctly loads configuration from an actual file.
     """
-    config_lt = ConfigurationLt(ci_mode=True)
+    config_lt = ConfigurationLt(ci_mode_envvars=True)
 
     # if we want to do no ci_mode
     #
@@ -252,6 +343,21 @@ def test_get_project_for_udid(configured_lt_instance):
     # TODO: have option that makes it raise on invalid device name
 
 
+def test_get_project_user_scripts_version(configured_lt_instance):
+    """
+    Tests that get_project_user_scripts_version correctly retrieves the user scripts version for a given project.
+    """
+    # Test with a project that has a user scripts version
+    assert configured_lt_instance.get_project_user_dir_version("a55-alpha") == "v9"
+    assert configured_lt_instance.get_project_user_dir_version("a55-perf") == "v9"
+    assert configured_lt_instance.get_project_user_dir_version("test-1") == "v11"
+
+    # Test with a project that does not have a user scripts version
+    # check that it raises an exception
+    with pytest.raises(ValueError):
+        configured_lt_instance.get_project_user_dir_version("non_existent_project")
+
+
 def test_get_fully_configured_projects(configured_lt_instance):
     """
     Tests that the fully_configured method correctly identifies if the configuration is complete.
@@ -283,7 +389,21 @@ def test_is_project_fully_configured(configured_lt_instance):
     assert configured_lt_instance.is_project_fully_configured("non_existent_project") is False
 
 
-def test_get_total_device_count(configured_lt_instance, configured_lt_instance2):
+def test_is_project_disabled(configured_lt_instance2):
+    """
+    Tests that the is_project_disabled method correctly identifies if a specific project is disabled.
+    """
+    # Test with a disabled project
+    assert configured_lt_instance2.is_project_disabled("a55-perf") is True
+
+    # Test with an enabled project
+    assert configured_lt_instance2.is_project_disabled("a55-alpha") is False
+
+    # Test with a non-existent project
+    assert configured_lt_instance2.is_project_disabled("non_existent_project") is False
+
+
+def test_get_total_device_count(configured_lt_instance):
     """
     Tests that the get_total_device_count method correctly counts the total number of devices across all projects.
     """
@@ -304,3 +424,73 @@ def test_global_contract_device_count(configured_lt_instance2):
     Tests that the global.contract_device_count is correctly set in the configuration.
     """
     assert configured_lt_instance2.global_contract_device_count == 1319
+
+
+ALL_LT_CONFIG_FIXTURES = [
+    "sample_file_config",
+    "sample_file_config_2",
+    "sample_file_config_3",
+    "sample_file_config_actual",
+]
+
+ALL_LT_INSTANCE_FIXTURES = [
+    "configured_lt_instance",
+    "configured_lt_instance2",
+    "configured_lt_instance_actual",
+]
+
+
+@pytest.mark.parametrize("fixture_name", ALL_LT_CONFIG_FIXTURES)
+def test_config_file_format(request, fixture_name):
+    """
+    Run test_configure against all instance fixtures.
+    """
+    config_file = request.getfixturevalue(fixture_name)
+    assert isinstance(config_file, str)
+    assert os.path.exists(config_file), f"Config file {config_file} does not exist."
+    # inspect the yaml content
+    with open(config_file, "r") as f:
+        content = f.read()
+        assert content.strip() != "", "Config file is empty."
+        y = None
+        try:
+            y = yaml.safe_load(content)
+        except yaml.YAMLError as e:
+            pytest.fail(f"Config file {config_file} is not valid YAML: {e}")
+    assert "defaults" in y["projects"], "Config file does not contain 'defaults' in 'projects'."
+    assert "projects" in y, "Config file does not contain 'projects'."
+    assert "device_groups" in y, "Config file does not contain 'device_groups'."
+    # assert "global" in y, "Config file does not contain 'global'."
+
+
+@pytest.mark.parametrize("fixture_name", ALL_LT_INSTANCE_FIXTURES)
+def test_instance_format(request, fixture_name):
+    instance = request.getfixturevalue(fixture_name)
+    print(type(instance))
+    assert isinstance(instance, ConfigurationLt)
+    # assert the disabled attribute is a boolean (and present)
+    assert isinstance(instance.disabled, bool), "Instance 'disabled' attribute is not a boolean."
+
+
+def test_get_path_to_user_script_directory(configured_lt_instance):
+    """
+    Tests that get_path_to_user_script_directory returns the correct path for user scripts.
+    """
+    # Test with a project that has a user scripts version
+    project_name = "a55-alpha"
+    expected_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "lambdatest", "user_scripts", "v9"))
+    assert configured_lt_instance.get_path_to_user_script_directory(project_name) == expected_path
+
+    # Test with a project that does not have a user scripts version
+    with pytest.raises(ValueError):
+        configured_lt_instance.get_path_to_user_script_directory("non_existent_project")
+
+
+def test_get_path_to_user_script_directory_2(configured_lt_instance):
+    """
+    Tests that get_path_to_user_script_directory returns the correct path for user scripts.
+    """
+    # Test with a project that has a user scripts version
+    project_name = "test-1"
+    expected_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "lambdatest", "user_scripts", "v11"))
+    assert configured_lt_instance.get_path_to_user_script_directory(project_name) == expected_path

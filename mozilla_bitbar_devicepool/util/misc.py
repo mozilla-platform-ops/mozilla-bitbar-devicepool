@@ -39,26 +39,6 @@ def humanhash_from_string(value, **params):
     return humanhash.humanize(digest, **params)
 
 
-# main
-if __name__ == "__main__":  # pragma: no cover
-    print(get_utc_date_string())
-    print(get_git_info())
-    print(humanhash_from_string("hello world"))
-    #
-    print(humanhash_from_string("hello world", words=1))
-    print(humanhash_from_string("hello world", words=2))
-    print(humanhash_from_string("hello world", words=2))
-    #
-    print(humanhash_from_string("hello world", words=3))
-    print(humanhash_from_string("hello world", words=3))
-    #
-    print(humanhash_from_string("hello world", words=4))
-    print(humanhash_from_string("hello world", words=5))
-    print(humanhash_from_string("hello world", words=6))
-    print(humanhash_from_string("hello world", words=7))
-    print(humanhash_from_string("hello world", words=8))
-
-
 # TODO: is this still needed?
 #   - this is really controlled by sentry detecting the logging level
 #     we use in the exception handler.
@@ -77,3 +57,41 @@ def pluralize(word, count):
         return word
     else:
         return f"{word}s"
+
+
+def humanize_time_duration(seconds):
+    """
+    Convert a time duration in seconds to a human-readable string.
+    """
+    seconds = int(seconds)
+    if seconds < 60:
+        return f"{seconds} {pluralize('second', seconds)}"
+    elif seconds < 3600:
+        minutes = seconds // 60
+        seconds = seconds % 60
+        return f"{minutes} {pluralize('minute', minutes)}, {seconds} {pluralize('second', seconds)}"
+    else:
+        hours = seconds // 3600
+        minutes = (seconds % 3600) // 60
+        seconds = seconds % 60
+        return f"{hours} {pluralize('hour', hours)}, {minutes} {pluralize('minute', minutes)}, {seconds} {pluralize('second', seconds)}"
+
+
+# main
+if __name__ == "__main__":  # pragma: no cover
+    print(get_utc_date_string())
+    print(get_git_info())
+    print(humanhash_from_string("hello world"))
+    #
+    print(humanhash_from_string("hello world", words=1))
+    print(humanhash_from_string("hello world", words=2))
+    print(humanhash_from_string("hello world", words=2))
+    #
+    print(humanhash_from_string("hello world", words=3))
+    print(humanhash_from_string("hello world", words=3))
+    #
+    print(humanhash_from_string("hello world", words=4))
+    print(humanhash_from_string("hello world", words=5))
+    print(humanhash_from_string("hello world", words=6))
+    print(humanhash_from_string("hello world", words=7))
+    print(humanhash_from_string("hello world", words=8))
