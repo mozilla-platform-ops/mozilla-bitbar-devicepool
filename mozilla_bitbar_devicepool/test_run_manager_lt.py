@@ -14,6 +14,7 @@ import subprocess
 import sys
 import threading  # Added import
 import time
+from random import random
 
 import sentry_sdk
 
@@ -429,6 +430,9 @@ class TestRunManagerLT(object):
             project_quarantined_workers = project_data.get(self.PROJECT_TC_QUARANTINED_WORKERS, [])
             # Make a copy of the list from shared data
             project_active_devices_api_list = list(project_data.get(self.PROJECT_LT_ACTIVE_DEVICES, []))
+            # ensure no device hotspots via shuffle
+            #   - it seems the api does return in a consistent order unfortunately
+            random.shuffle(project_active_devices_api_list)
 
             # Get count of recently started jobs (and their UDIDs) from the project-specific job tracker
             job_tracker = self.get_job_tracker(project_name)
