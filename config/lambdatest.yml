@@ -92,10 +92,10 @@ device_groups:
     R5CXC1AHXYD:  # 10/20/25: tested by joel, power meter good
     R5CXC1ARZDN:  # 10/20/25: tested by joel, power meter good
     R5CXC1HZA6V:  # 10/20/25: tested by joel, power meter good
+    R5CXC1ASA0L:  # 10/16/25: bad power meter again, 12/22/25: trying out
+    RZCY203N75Z:  # 10/16/25: bad power meter again, 12/22/25: trying out
+    RZCX821GYPX:  # 11/3/25: aerickson: bad power meter, 12/22/25: trying out
   a55-alpha:
-    R5CXC1ASA0L:  # 10/16/25: bad power meter again
-    RZCY203N75Z:  # 10/16/25: bad power meter again
-    RZCX821GYPX:  # 11/3/25: aerickson: bad power meter
     RZCY2011M7N:  # 11/6/25: bad rotation, testing in alpha
     RZCY10LGB6W:  # 11/6/25: bad rotation, testing in alpha
   a55-sheriff-bad:
