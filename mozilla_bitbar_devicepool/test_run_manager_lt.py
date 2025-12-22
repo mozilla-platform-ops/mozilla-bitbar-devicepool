@@ -8,13 +8,13 @@ import logging
 import multiprocessing  # Add import for multiprocessing.Manager
 import os
 import pprint
+import random
 import shutil
 import signal
 import subprocess
 import sys
 import threading  # Added import
 import time
-from random import random
 
 import sentry_sdk
 
