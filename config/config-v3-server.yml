@@ -4,8 +4,8 @@ projects:
   defaults:
     os_type: ANDROID
     project_type: APPIUM_ANDROID_SERVER_SIDE
-    application_file: relops-testdroid-sample-app.apk
-    test_file: relops-empty-test.zip
+    application_file: v3-testdroid-sample-app.apk
+    test_file: v3-empty-test.zip
     timeout: 0
     scheduler: SINGLE
     archivingStrategy: DAYS
@@ -272,13 +272,16 @@ device_groups:
     a55-141:
     a55-142:
     a55-143:
+  test-p5:
     # pixel5-07:
     pixel5-12:
+  test-p6:
     pixel6-137:
     pixel6-138:
     pixel5-144:
     pixel6-146:
     pixel6-147:
+  test-s24:
     # s24-03:
     # s24-04:
     s24-06:
