@@ -8,6 +8,7 @@ import logging
 import multiprocessing  # Add import for multiprocessing.Manager
 import os
 import pprint
+import random
 import shutil
 import signal
 import subprocess
@@ -429,6 +430,9 @@ class TestRunManagerLT(object):
             project_quarantined_workers = project_data.get(self.PROJECT_TC_QUARANTINED_WORKERS, [])
             # Make a copy of the list from shared data
             project_active_devices_api_list = list(project_data.get(self.PROJECT_LT_ACTIVE_DEVICES, []))
+            # ensure no device hotspots via shuffle
+            #   - it seems the api does return in a consistent order unfortunately
+            random.shuffle(project_active_devices_api_list)
 
             # Get count of recently started jobs (and their UDIDs) from the project-specific job tracker
             job_tracker = self.get_job_tracker(project_name)
