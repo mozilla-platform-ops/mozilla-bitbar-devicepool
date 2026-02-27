@@ -48,7 +48,6 @@ device_groups:
     R5CXC1AHV4M:  # 9/10/25: recabled and verified by jmaher
     R5CXC1ASA3P:  # 9/11/25: recabled and verified by jmaher
     R5CXC1AP2KT:  # 9/11/25: recabled and verified by jmaher
-    R5CXC1HZK0W:  # 9/11/25: recabled and verified by jmaher
     R5CXC1ASA2E:  # 9/11/25: recabled and verified by jmaher
     R5CXC1ARM0A:  # 9/11/25: recabled and verified by jmaher
     R5CXC1AMNFY:  # 9/15/25: recabled and verified by jmaher
@@ -95,6 +94,7 @@ device_groups:
     RZCY10LGB6W:  # 2/23/26: had bad rotation, rotation code landed on master
     RZCY2011M7N:  # 2/23/26: had bad rotation, rotation code landed on master
   a55-alpha:
+    R5CXC1HZK0W:  # now on android 15, move to alpha for testing
   a55-android16:
     R5CXC1ASA0L:  # 12/1/25: lt is attempting to upgrade to android 16, had bad power meter
     RZCY203N75Z:  # 12/1/25: lt is attempting to upgrade to android 16, had bad power meter
