@@ -286,6 +286,16 @@ device_groups:
     s24-06:
     s24-05:
   test-2:
+    a55-25:  # testing out new server Kesrick set up
+    a55-26:  # testing out new server Kesrick set up
+    a55-27:  # testing out new server Kesrick set up
+    a55-28:  # testing out new server Kesrick set up
+    a55-29:  # testing out new server Kesrick set up
+    a55-43:  # testing out new server Kesrick set up
+    a55-44:  # testing out new server Kesrick set up
+    a55-45:  # testing out new server Kesrick set up
+    a55-46:  # testing out new server Kesrick set up
+    a55-47:  # testing out new server Kesrick set up
   test-3:
   test-999:
     a55-46:  # SLOW. DON'T USE.
