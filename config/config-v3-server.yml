@@ -262,6 +262,15 @@ device_groups:
     a55-141:
     a55-142:
     a55-143:
+    a55-25:
+    a55-26:
+    a55-27:
+    a55-28:
+    a55-29:
+    a55-43:
+    a55-44:
+    a55-45:
+    a55-47:
   test-p5:
     # pixel5-07:
     pixel5-12:
@@ -277,19 +286,6 @@ device_groups:
     s24-06:
     s24-05:
   test-2:
-    a55-25:  # testing out new server Kesrick set up
-    a55-26:  # testing out new server Kesrick set up
-    a55-27:  # testing out new server Kesrick set up
-    a55-28:  # testing out new server Kesrick set up
-    a55-29:  # testing out new server Kesrick set up
-    a55-43:  # testing out new server Kesrick set up
-    a55-44:  # testing out new server Kesrick set up
-    a55-45:  # testing out new server Kesrick set up
-    a55-46:  # testing out new server Kesrick set up
-    a55-47:  # testing out new server Kesrick set up
   test-3:
-    # s21-01:
-    # s24-01:
-    # s24-02:
-    # s24-03:
-    # s24-04:
+  test-999:
+    a55-46:  # SLOW. DON'T USE.
