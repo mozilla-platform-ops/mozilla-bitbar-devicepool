@@ -31,10 +31,10 @@ projects:
   stab:
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-stab
     TC_WORKER_TYPE: gecko-t-lambda-stab
-  # test-1:
+  test-1:
   #     SCRIPT_REPO_COMMIT: future_commit
-  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1
-  #     TC_WORKER_TYPE: gecko-t-lambda-gw-test-1
+      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1
+      TC_WORKER_TYPE: gecko-t-lambda-gw-test-1
   #     # override SCRIPT_REPO_COMMIT with a test commit
 device_groups:
   a55-perf:
@@ -106,7 +106,7 @@ device_groups:
     47241FDAQ0016Y:
     47241FDAQ002C0:
   test-1:
+    R5CXC1ALFED:  # 9/18/25: recabled and verified by jmaher, 3/26/26: was in stab, stealing
   stab:
     R5CXC1ARELR:  # 10/1/25: was reseated, power cycled, and verified by jmaher
     RZCY10Y548K:  # 10/1/25: was reseated, power cycled, and verified by jmaher
-    R5CXC1ALFED:  # 9/18/25: recabled and verified by jmaher
