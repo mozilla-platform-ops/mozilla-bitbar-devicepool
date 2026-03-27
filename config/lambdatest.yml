@@ -34,7 +34,7 @@ projects:
   test-1:
   #     SCRIPT_REPO_COMMIT: future_commit
       TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1
-      TC_WORKER_TYPE: gecko-t-lambda-gw-test-1
+      TC_WORKER_TYPE: gecko-t-lambda-test-1
   #     # override SCRIPT_REPO_COMMIT with a test commit
 device_groups:
   a55-perf:
