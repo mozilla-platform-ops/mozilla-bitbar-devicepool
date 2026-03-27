@@ -162,7 +162,7 @@ class ConfigurationDeviceMover:
 
         # Initialize target group if it's None/empty
         if device_groups[target_group] is None:
-            device_groups[target_group] = {}
+            device_groups[target_group] = CommentedMap()
 
         # Track results
         results = {"moved": [], "not_found": [], "already_in_target": [], "errors": []}

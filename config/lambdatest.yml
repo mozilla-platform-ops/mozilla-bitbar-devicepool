@@ -31,10 +31,10 @@ projects:
   stab:
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-stab
     TC_WORKER_TYPE: gecko-t-lambda-stab
-  # test-1:
+  test-1:
   #     SCRIPT_REPO_COMMIT: future_commit
-  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1
-  #     TC_WORKER_TYPE: gecko-t-lambda-gw-test-1
+      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1
+      TC_WORKER_TYPE: gecko-t-lambda-test-1
   #     # override SCRIPT_REPO_COMMIT with a test commit
 device_groups:
   a55-perf:
@@ -48,7 +48,6 @@ device_groups:
     R5CXC1AHV4M:  # 9/10/25: recabled and verified by jmaher
     R5CXC1ASA3P:  # 9/11/25: recabled and verified by jmaher
     R5CXC1AP2KT:  # 9/11/25: recabled and verified by jmaher
-    R5CXC1HZK0W:  # 9/11/25: recabled and verified by jmaher
     R5CXC1ASA2E:  # 9/11/25: recabled and verified by jmaher
     R5CXC1ARM0A:  # 9/11/25: recabled and verified by jmaher
     R5CXC1AMNFY:  # 9/15/25: recabled and verified by jmaher
@@ -92,9 +91,10 @@ device_groups:
     R5CXC1AHXYD:  # 10/20/25: tested by joel, power meter good
     R5CXC1ARZDN:  # 10/20/25: tested by joel, power meter good
     R5CXC1HZA6V:  # 10/20/25: tested by joel, power meter good
+    RZCY10LGB6W:  # 2/23/26: had bad rotation, rotation code landed on master
+    RZCY2011M7N:  # 2/23/26: had bad rotation, rotation code landed on master
   a55-alpha:
-    RZCY2011M7N:  # 11/6/25: bad rotation, testing in alpha
-    RZCY10LGB6W:  # 11/6/25: bad rotation, testing in alpha
+    R5CXC1HZK0W:  # now on android 15, move to alpha for testing
   a55-android16:
     R5CXC1ASA0L:  # 12/1/25: lt is attempting to upgrade to android 16, had bad power meter
     RZCY203N75Z:  # 12/1/25: lt is attempting to upgrade to android 16, had bad power meter
@@ -106,7 +106,7 @@ device_groups:
     47241FDAQ0016Y:
     47241FDAQ002C0:
   test-1:
+    R5CXC1ALFED:  # 9/18/25: recabled and verified by jmaher, 3/26/26: was in stab, stealing
   stab:
     R5CXC1ARELR:  # 10/1/25: was reseated, power cycled, and verified by jmaher
     RZCY10Y548K:  # 10/1/25: was reseated, power cycled, and verified by jmaher
-    R5CXC1ALFED:  # 9/18/25: recabled and verified by jmaher
