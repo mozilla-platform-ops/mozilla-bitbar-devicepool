@@ -292,7 +292,7 @@ showHeader "Power Meter Setup"
 #     echo "cdc_acm driver not loaded, nothing to unbind."
 # fi
 
-bash "$THIS_SCRIPT_DIR/check_power_meter.sh"
+bash "$starting_dir/$script_dir/files/check_power_meter.sh"
 
 
 ### debugging of device rotation state
