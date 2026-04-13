@@ -1,16 +1,17 @@
 #!/bin/bash
 
 set -e
-# TODO: eventually disable -x
-set -x
+# # TODO: eventually disable -x
+# set -x
 
 
 ### variables
 
+set -x
 TC_VERSION=87.0.0
 LT_SETUP_MERCURIAL_VERSION="7.0.2"
 LT_SETUP_PYTHON_VERSION="3.12"
-
+{ set +x; } 2>/dev/null
 
 ### functions
 
@@ -19,11 +20,20 @@ getCurrentWindow() {
     adb shell dumpsys window | grep mFocusedWindow
 }
 
-starting_dir=$(pwd)
-echo "starting_dir: $starting_dir"
+showHeader() {
+    echo ""
+    echo "========================================"
+    echo "$1"
+    echo "========================================"
+    echo ""
+}
 
 
 ### show debugging information
+showHeader "Debugging Information"
+
+starting_dir=$(pwd)
+echo "starting_dir: $starting_dir"
 
 # show information about the user scripts
 THIS_SCRIPT_DIR=$(dirname "$0")
@@ -48,7 +58,9 @@ fi
 
 
 ### general dependencies
+showHeader "General Dependencies"
 
+set -x
 # apt/debs
 sudo apt-get update -y
 sudo apt-get install gettext-base libgtk-3-0 usbutils -y
@@ -92,6 +104,7 @@ which python3.12
 
 # show version
 python3.12 --version
+{ set +x; } 2>/dev/null
 
 # # # check that python3.12 is at the version we want
 if ! python3.12 --version | grep -q "$LT_SETUP_PYTHON_VERSION"; then
@@ -101,6 +114,7 @@ fi
 
 # python pips
 #   - NOTE: pip is pip3 on the lt image
+set -x
 
 # install pips in system python(3)
 sudo pip install zstandard \
@@ -118,6 +132,7 @@ pip install zstandard \
 # show mercurial version
 hg --version
 
+{ set +x; } 2>/dev/null
 # test mercurial version
 if ! hg --version | grep -q "$LT_SETUP_MERCURIAL_VERSION"; then
     echo "Mercurial version is not $LT_SETUP_MERCURIAL_VERSION, exiting."
@@ -129,9 +144,11 @@ if ! python3 -c "import mozdevice" &> /dev/null; then
     echo "mozdevice is not installed, exiting."
     exit 1
 fi
+set -x
 
 
 ### perftest dependencies
+showHeader "Perftest Dependencies"
 
 # mercurial is installed above
 
@@ -152,12 +169,9 @@ sudo cp -R cmdline-tools/bin/* /home/ltuser/taskcluster/android-sdk-linux/tools/
 sudo cp -R cmdline-tools/lib/* /home/ltuser/taskcluster/android-sdk-linux/tools/lib/
 
 
-### for power meter jobs
-
-# TODO: fast fail if power meter missing or device permissions are bad
-
 
 ### taskcluster setup
+showHeader "Taskcluster Setup"
 
 rm -Rf taskcluster/
 
@@ -175,8 +189,8 @@ wget -q -O start-worker https://github.com/taskcluster/taskcluster/releases/down
 
 
 # copy inline files into place
-#
 # TODO: eventually move these to their own repo like mozilla-bitbar-docker?
+showHeader "Copying User Script Files"
 
 # debugging
 # ls -la
@@ -213,6 +227,7 @@ wget https://raw.githubusercontent.com/mozilla-firefox/firefox/15d9e775817fa39fa
 wget https://raw.githubusercontent.com/mozilla-platform-ops/mozilla-bitbar-docker/refs/heads/master/scripts/tooltool.py
 chmod +x robustcheckout.py
 chmod +x tooltool.py
+set -x
 
 export PATH=/home/ltuser/taskcluster:$PATH
 
@@ -236,6 +251,7 @@ export ANDROID_SERIAL=$DEVICE_NAME # mozdevice uses this if it exists, avoids is
 # set the screen to never turn off
 adb shell svc power stayon true
 # detect if screen is off, wake if not
+{ set +x; } 2>/dev/null
 if [ -z "$(getCurrentWindow)" ] || [[ "$(getCurrentWindow)" == *"NotificationShade"* ]]; then
     echo "Screen is asleep or showing notification shade. Waking up..."
     # wake the screen by pressing MENU key
@@ -243,7 +259,11 @@ if [ -z "$(getCurrentWindow)" ] || [[ "$(getCurrentWindow)" == *"NotificationSha
 else
     echo "Screen is awake."
 fi
+set -x
 
+
+### for power meter jobs
+showHeader "Power Meter Setup"
 
 ### cdc_acm detach for power meters
 
@@ -254,29 +274,34 @@ fi
 # when the previous container's libusb handle is closed.
 # See: docs/power-meter-cdc-acm-issue.md
 
-if [ -d /sys/bus/usb/drivers/cdc_acm ]; then
-    detached=0
-    for intf in /sys/bus/usb/drivers/cdc_acm/[0-9]*; do
-        [ -L "$intf" ] || continue
-        intf_name=$(basename "$intf")
-        dev_name="${intf_name%%:*}"
-        vendor_file="/sys/bus/usb/devices/$dev_name/idVendor"
-        if [ -f "$vendor_file" ] && [ "$(cat $vendor_file)" = "0483" ]; then
-            echo "Unbinding $intf_name from cdc_acm (AVHzy power meter, VID 0483)..."
-            echo "$intf_name" | sudo tee /sys/bus/usb/drivers/cdc_acm/unbind > /dev/null
-            detached=$((detached + 1))
-        fi
-    done
-    echo "cdc_acm: detached $detached interface(s) for AVHzy power meter(s)"
-else
-    echo "cdc_acm driver not loaded, nothing to unbind."
-fi
+# if [ -d /sys/bus/usb/drivers/cdc_acm ]; then
+#     detached=0
+#     for intf in /sys/bus/usb/drivers/cdc_acm/[0-9]*; do
+#         [ -L "$intf" ] || continue
+#         intf_name=$(basename "$intf")
+#         dev_name="${intf_name%%:*}"
+#         vendor_file="/sys/bus/usb/devices/$dev_name/idVendor"
+#         if [ -f "$vendor_file" ] && [ "$(cat $vendor_file)" = "0483" ]; then
+#             echo "Unbinding $intf_name from cdc_acm (AVHzy power meter, VID 0483)..."
+#             echo "$intf_name" | sudo tee /sys/bus/usb/drivers/cdc_acm/unbind > /dev/null
+#             detached=$((detached + 1))
+#         fi
+#     done
+#     echo "cdc_acm: detached $detached interface(s) for AVHzy power meter(s)"
+# else
+#     echo "cdc_acm driver not loaded, nothing to unbind."
+# fi
+
+bash "$THIS_SCRIPT_DIR/check_power_meter.sh"
 
 
 ### debugging of device rotation state
+showHeader "Device Rotation State"
 
+{ set +x; } 2>/dev/null
 # Show display info related to rotation capability
 adb shell dumpsys display
+set -x
 
 # Show the current screen size
 adb shell wm size
@@ -286,12 +311,13 @@ adb shell wm density
 
 
 ### other debugging information
+showHeader "Other Debugging Information"
 
 # show current network connections
 ss -np
 
-
 ### start generic worker
+showHeader "Starting Generic Worker"
 
 cd taskcluster
 bash entrypoint.sh
