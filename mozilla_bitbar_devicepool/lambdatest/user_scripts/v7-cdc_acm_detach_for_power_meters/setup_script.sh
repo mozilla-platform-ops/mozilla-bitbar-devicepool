@@ -148,7 +148,9 @@ set -x
 
 
 ### perftest dependencies
+{ set +x; } 2>/dev/null
 showHeader "Perftest Dependencies"
+set -x
 
 # mercurial is installed above
 
@@ -171,7 +173,10 @@ sudo cp -R cmdline-tools/lib/* /home/ltuser/taskcluster/android-sdk-linux/tools/
 
 
 ### taskcluster setup
+{ set +x; } 2>/dev/null
 showHeader "Taskcluster Setup"
+set -x
+
 
 rm -Rf taskcluster/
 
@@ -190,7 +195,9 @@ wget -q -O start-worker https://github.com/taskcluster/taskcluster/releases/down
 
 # copy inline files into place
 # TODO: eventually move these to their own repo like mozilla-bitbar-docker?
+{ set +x; } 2>/dev/null
 showHeader "Copying User Script Files"
+set -x
 
 # debugging
 # ls -la
@@ -263,7 +270,9 @@ set -x
 
 
 ### for power meter jobs
+{ set +x; } 2>/dev/null
 showHeader "Power Meter Setup"
+set -x
 
 ### cdc_acm detach for power meters
 
@@ -296,12 +305,12 @@ bash "$starting_dir/$script_dir/files/check_power_meter.sh"
 
 
 ### debugging of device rotation state
-showHeader "Device Rotation State"
-
 { set +x; } 2>/dev/null
+showHeader "Device Rotation State"
+set -x
+
 # Show display info related to rotation capability
 adb shell dumpsys display
-set -x
 
 # Show the current screen size
 adb shell wm size
@@ -311,13 +320,17 @@ adb shell wm density
 
 
 ### other debugging information
+{ set +x; } 2>/dev/null
 showHeader "Other Debugging Information"
+set -x
 
 # show current network connections
 ss -np
 
 ### start generic worker
+{ set +x; } 2>/dev/null
 showHeader "Starting Generic Worker"
+set -x
 
 cd taskcluster
 bash entrypoint.sh
