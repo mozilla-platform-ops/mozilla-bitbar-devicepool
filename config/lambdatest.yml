@@ -99,10 +99,10 @@ device_groups:
     R5CX23RTCYE:  # 4/21/26: new android 14 device
     R5CX23RTM6H:  # 4/21/26: new android 14 device
     R5CX23RTMPX:  # 4/21/26: new android 14 device
-    # R5CX23RT4SE:  # 4/21/26: new device, verify before using
-    # R5CX23RT6WR:  # 4/21/26: new device, verify before using
-    # R5CX23RTKSK:  # 4/21/26: new device, verify before using
-    # R5CX23RTM4X:  # 4/21/26: new device, verify before using
+    R5CX23RT4SE:  # 4/21/26: new android 14 device
+    R5CX23RT6WR:  # 4/21/26: new android 14 device
+    R5CX23RTKSK:  # 4/21/26: new android 14 device
+    R5CX23RTM4X:  # 4/21/26: new android 14 device
   a55-alpha:
     R5CXC1HZK0W:  # now on android 15, move to alpha for testing
     R5CX23RTGGN:  # 4/21/26: new android 15 device
