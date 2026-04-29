@@ -1,0 +1,217 @@
+# Bitbar v3-server migration
+
+**Deadline: 2026-05-18**
+
+## Background
+
+The legacy Bitbar server (`https://mozilla.bitbar.com`) is being replaced by
+a new server at the new datacenter (`https://mozilla-v3.bitbar.com`).
+
+The v3 server already has its own physical device fleet, registered and online
+today under *test pool* labels in `config/config-v3-server.yml`. Migration
+moves production work pool-by-pool by:
+
+1. Promoting v3 devices from their current test groups into production groups
+   in `config/config-v3-server.yml`.
+2. Retiring the matching pool from the legacy `config/config.yml` so the
+   legacy fleet stops receiving that workload.
+
+During migration both devicepool services run in parallel — one per server —
+and each pool lives in exactly one config at any given time.
+
+Test pools (`test-1/2/3`, `test-p5/p6/s24`, `test-999`) carry no production
+workload and are out of scope except as the source of devices for v3 production
+groups.
+
+## Key files
+
+| File | Role |
+|------|------|
+| `config/config.yml` | Legacy server config (active) |
+| `config/config-v3-server.yml` | v3 server config (test pools only at start) |
+| `bitbar_env.sh` | Sets `TESTDROID_URL=https://mozilla.bitbar.com` for legacy service |
+| `bitbar_env-v3-server.sh` | Sets `TESTDROID_URL=https://mozilla-v3.bitbar.com` for v3 service |
+| `service/bitbar.service` | systemd unit for legacy service (`RuntimeMaxSec=1h`, `Restart=always`) |
+| `bin/start_android_hardware_testing.sh` | Legacy entrypoint (uses `config/config.yml`) |
+| `bin/start_mbd_new_server.sh` | v3 manual launch wrapper; basis for v3 systemd unit |
+| `bin/v3_config_mover.sh` | Pushes v3 config changes to `mozilla-v3.bitbar.com` via `configuration_device_tool` |
+
+## Pool migration order (smallest → largest)
+
+| Phase | Legacy project / device_group | Devices | v3 source test group |
+|-------|-------------------------------|---------|----------------------|
+| 1 | `mozilla-gw-perftest-s24` / `s24-perf` | 4 | `test-s24` |
+| 2 | `mozilla-gw-perftest-p6` / `pixel6-perf` | 4 | `test-p6` |
+| 3 | `mozilla-gw-unittest-p5` / `pixel5-unit` | ~6 | `test-p5` |
+| 4 | `mozilla-gw-perftest-a55` / `a55-perf` | ~21 | `test-1` |
+
+Unit pools (`s24-unit`, `pixel6-unit`, `a55-unit`) are empty in legacy config.
+Handle them in the matching perf phase: uncomment and populate on v3 if needed,
+otherwise leave commented.
+
+---
+
+## Phase 0 — Prerequisites (one-time setup)
+
+Complete before moving any production pool.
+
+1. **Stand up the v3 systemd service** alongside the existing legacy unit.
+   - Create `service/bitbar-v3.service` modeled on `service/bitbar.service`.
+   - `ExecStart` should invoke `bin/start_mbd_new_server.sh` (which already
+     sources `bitbar_env-v3-server.sh` and passes `-b config/config-v3-server.yml`).
+   - Use a distinct `SyslogIdentifier` / log target so both services are
+     independently observable.
+   - Enable and start the unit. Confirm it manages the existing v3 test pools
+     (jobs flow, devices reach ready state) before touching production.
+
+2. **Snapshot state for rollback.**
+   ```
+   git tag pre-v3-migration
+   cp config/config.yml config/config.yml.pre-migration.bak
+   cp config/config-v3-server.yml config/config-v3-server.yml.pre-migration.bak
+   ```
+
+3. **Verification gate.** Both services are running without errors.
+   - Legacy service owns all production pools.
+   - v3 service runs cleanly against test pools only.
+   - `journalctl -u bitbar.service` and `journalctl -u bitbar-v3.service` are
+     both clean.
+
+---
+
+## Phases 1–4 — Per-pool migration
+
+Repeat these steps for each pool in the order above.
+
+### Step 1 — Pre-flight
+
+- Confirm the legacy pool P has no stuck or in-flight jobs.
+- Confirm the v3 source test group has enough ready devices to cover P's
+  required device count. Top up from the wider v3 fleet if short.
+
+### Step 2 — Edit `config/config-v3-server.yml`
+
+- Uncomment or add the production project block for P under `projects:`.
+  - **Do not copy legacy `additional_parameters` verbatim.** Inherit v3
+    defaults: `bitbar_cloud_url: https://mozilla-v3.bitbar.com`,
+    `application_file: v3-testdroid-sample-app.apk`,
+    `test_file: v3-empty-test.zip`.
+- Add a `device_groups:` entry for P populated with the device labels
+  currently in the corresponding `test-*` group.
+- Remove those labels from the `test-*` group in the same commit (a device
+  should be in exactly one group at a time).
+
+### Step 3 — Push v3 config to Bitbar
+
+```
+bin/v3_config_mover.sh
+```
+
+This calls `configuration_device_tool -c config-v3-server.yml` and syncs the
+new project + device group to `mozilla-v3.bitbar.com`.
+
+### Step 4 — Restart v3 service
+
+```
+systemctl restart bitbar-v3.service
+```
+
+Wait for steady state in logs (usually a few minutes). Confirm the new
+production project is being picked up and devices show as online.
+
+### Step 5 — Drain legacy pool P
+
+- Comment out the matching project block and device_group entry in
+  `config/config.yml`.
+- Restart the legacy service, or wait up to 1 hour for the `RuntimeMaxSec`
+  auto-restart to pick up the change.
+
+```
+systemctl restart bitbar.service
+```
+
+### Step 6 — Commit
+
+Commit both YAML changes together:
+
+```
+git add config/config.yml config/config-v3-server.yml
+git commit -m "migrate <pool> from legacy bitbar to v3 server"
+```
+
+### Step 7 — Verify and soak
+
+- `journalctl -u bitbar-v3.service` — production project P picked up, no errors.
+- Bitbar v3 UI — project P present, devices online.
+- Taskcluster — a real job lands on a v3-managed worker for P and completes
+  successfully.
+- Legacy fleet for P is idle (expected; those devices are decommissioned
+  separately, out of scope here).
+
+**Soak period:** hold 24 hours after migrating Phase 1 (`s24-perf`) before
+proceeding to Phase 2. Once the pattern is proven, later phases can move faster.
+
+---
+
+## Rollback
+
+### Per-pool rollback (during or shortly after a phase)
+
+1. `git revert` the migration commit for pool P (restores both YAML files).
+2. Push the reverted v3 config to the server:
+   ```
+   bin/v3_config_mover.sh
+   ```
+3. Restart both services:
+   ```
+   systemctl restart bitbar-v3.service
+   systemctl restart bitbar.service
+   ```
+4. Confirm legacy P resumes and v3 devices return to the `test-*` group.
+
+### Full rollback (abort migration entirely)
+
+1. Restore both configs from the tag:
+   ```
+   git checkout pre-v3-migration -- config/config.yml config/config-v3-server.yml
+   ```
+2. Push reverted v3 config: `bin/v3_config_mover.sh`
+3. Restart both services.
+4. Optionally disable the v3 unit to return to single-service operation:
+   ```
+   systemctl disable --now bitbar-v3.service
+   ```
+
+The `RuntimeMaxSec=1h` auto-restart means worst-case config staleness without a
+manual restart is 1 hour.
+
+---
+
+## Risk notes
+
+- **v3 config defaults differ from legacy.** Key differences in
+  `config-v3-server.yml`: `bitbar_cloud_url` points to `mozilla-v3.bitbar.com`;
+  `application_file` and `test_file` use v3 filenames. Always inherit v3
+  defaults when adding production projects; do not paste from `config.yml`.
+- **`jobs_to_start_algorithm: v3`** is set in `devicepool_config` of the v3
+  config. If job scheduling behavior differs materially from the legacy
+  algorithm, pause and investigate after Phase 1 before continuing.
+- **`test-999`** (`a55-46`, labeled SLOW) must never be promoted into a
+  production device group.
+- **Parallel API key usage.** Both `bitbar_env.sh` and `bitbar_env-v3-server.sh`
+  need valid `TESTDROID_APIKEY` values for their respective servers. Confirm
+  both are active before Phase 0.
+
+---
+
+## Final cutover (after all pools migrated)
+
+Once `a55-perf` (Phase 4) is stable on v3:
+
+- `config/config.yml` should have no active production projects.
+- Stop and disable the legacy systemd unit:
+  ```
+  systemctl disable --now bitbar.service
+  ```
+- Open a follow-up ticket to decommission the legacy device fleet and remove
+  the legacy config/env files from the repo.
