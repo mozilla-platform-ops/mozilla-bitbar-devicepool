@@ -42,7 +42,7 @@ groups.
 | `service/bitbar.service` | systemd unit for legacy service (`RuntimeMaxSec=1h`, `Restart=always`) |
 | `bin/start_android_hardware_testing.sh` | Legacy entrypoint (uses `config/config.yml`) |
 | `bin/start_mbd_new_server.sh` | v3 manual launch wrapper; basis for v3 systemd unit |
-| `bin/v3_config_mover.sh` | Pushes v3 config changes to `mozilla-v3.bitbar.com` via `configuration_device_tool` |
+| `bin/v3_config_mover.sh` | Moves devices between pools on the v3 server via `configuration_device_tool` |
 
 ## Pool migration order (smallest → largest)
 
@@ -109,16 +109,10 @@ Repeat these steps for each pool in the order above.
 - Remove those labels from the `test-*` group in the same commit (a device
   should be in exactly one group at a time).
 
-### Step 3 — Push v3 config to Bitbar
+### Step 3 — Deploy updated config and restart v3 service
 
-```
-bin/v3_config_mover.sh
-```
-
-This calls `configuration_device_tool -c config-v3-server.yml` and syncs the
-new project + device group to `mozilla-v3.bitbar.com`.
-
-### Step 4 — Restart v3 service
+Deploy the updated `config/config-v3-server.yml` to the host manually, then
+restart the service to pick up the changes:
 
 ```
 systemctl restart bitbar-v3.service
@@ -166,10 +160,7 @@ proceeding to Phase 2. Once the pattern is proven, later phases can move faster.
 ### Per-pool rollback (during or shortly after a phase)
 
 1. `git revert` the migration commit for pool P (restores both YAML files).
-2. Push the reverted v3 config to the server:
-   ```
-   bin/v3_config_mover.sh
-   ```
+2. Deploy the reverted configs to the host manually.
 3. Restart both services:
    ```
    systemctl restart bitbar-v3.service
@@ -183,7 +174,7 @@ proceeding to Phase 2. Once the pattern is proven, later phases can move faster.
    ```
    git checkout pre-v3-migration -- config/config.yml config/config-v3-server.yml
    ```
-2. Push reverted v3 config: `bin/v3_config_mover.sh`
+2. Deploy the reverted configs to the host manually.
 3. Restart both services.
 4. Optionally disable the v3 unit to return to single-service operation:
    ```
