@@ -2,6 +2,14 @@
 
 **Deadline: 2026-05-18**
 
+## Status
+
+- [x] Phase 0 — v3 systemd service deployed and running
+- [ ] Phase 1 — s24-perf
+- [ ] Phase 2 — pixel6-perf
+- [ ] Phase 3 — pixel5-unit
+- [ ] Phase 4 — a55-perf
+
 ## Background
 
 The legacy Bitbar server (`https://mozilla.bitbar.com`) is being replaced by
