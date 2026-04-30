@@ -5,10 +5,9 @@
 ## Status
 
 - [x] Phase 0 — v3 systemd service deployed and running
-- [ ] Phase 1 — pixel6-perf
-- [ ] Phase 2 — s24-perf (need 2 more s24 devices from vendor)
-- [ ] Phase 3 — pixel5-unit (need ~5 more pixel5 devices from vendor)
-- [ ] Phase 4 — a55-perf
+- [ ] Phase 1 — pixel6-perf (need 4 more pixel6 devices from vendor)
+- [ ] Phase 2 — s24-perf (need 3 more s24 devices from vendor)
+- [ ] Phase 3 — a55-perf
 
 ## Background
 
@@ -48,13 +47,15 @@ groups.
 
 Ordered by v3 device availability — pools with enough devices on the new server
 go first; pools that need the vendor to bring more devices online go later.
+Vendor is actively working to bring remaining devices online.
 
-| Phase | Legacy project / device_group | Needed | v3 available (test group) | Vendor needed? |
-|-------|-------------------------------|--------|---------------------------|----------------|
-| 1 | `mozilla-gw-perftest-p6` / `pixel6-perf` | 4 | 5 (`test-p6`) | No |
-| 2 | `mozilla-gw-perftest-s24` / `s24-perf` | 4 | 2 (`test-s24`) | Yes — 2 more s24 |
-| 3 | `mozilla-gw-unittest-p5` / `pixel5-unit` | ~6 | 1 (`test-p5`) | Yes — ~5 more pixel5 |
-| 4 | `mozilla-gw-perftest-a55` / `a55-perf` | ~21 | 41 (`test-1`) | No |
+Note: `pixel5-unit` is not being migrated — those tasks are moving to `pixel6-perf`.
+
+| Phase | Legacy project / device_group | v3 target | v3 online now | Vendor needed? |
+|-------|-------------------------------|-----------|---------------|----------------|
+| 1 | `mozilla-gw-perftest-p6` / `pixel6-perf` | 10 | 6 | Yes — 4 more pixel6 |
+| 2 | `mozilla-gw-perftest-s24` / `s24-perf` | 4 | 1 | Yes — 3 more s24 |
+| 3 | `mozilla-gw-perftest-a55` / `a55-perf` | 6 | 43 (trimming to 6) | No |
 
 Unit pools (`s24-unit`, `pixel6-unit`, `a55-unit`) are empty in legacy config.
 Handle them in the matching perf phase: uncomment and populate on v3 if needed,
