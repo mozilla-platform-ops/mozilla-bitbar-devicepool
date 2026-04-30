@@ -25,11 +25,10 @@ class DeviceGroupReport:
             filename_path = os.path.abspath(__file__)
             root_dir = os.path.abspath(os.path.join(filename_path, "..", ".."))
             self.config_path = os.path.join(root_dir, "config", "config.yml")
-            if not quiet:
-                print("INFO: Using config file at '%s'." % self.config_path)
         else:
             self.config_path = config_path
-        print("INFO: Using config file at '%s'." % self.config_path)
+        if not quiet:
+            print("INFO: Using config file at '%s'." % self.config_path)
 
     def get_config_devices(self):
         # TODO: store this data in the instance and only read once
