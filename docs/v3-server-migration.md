@@ -5,9 +5,10 @@
 ## Status
 
 - [x] Phase 0 — v3 systemd service deployed and running
-- [ ] Phase 1 — pixel6-perf (need 4 more pixel6 devices from vendor)
-- [ ] Phase 2 — s24-perf (need 3 more s24 devices from vendor)
-- [ ] Phase 3 — a55-perf
+- [ ] Phase 1 — pixel6-perf — **can proceed** (6 on v3 vs 4 on legacy); ensure vendor brings remaining 4 pixel6 online eventually
+- [ ] Phase 2 — s24-perf — **blocked** (1 on v3 vs 4 on legacy; need 3 more s24 from vendor before migrating)
+- [ ] Phase 3 — a55-perf — **can proceed** once earlier phases done; trim test-1 from 43 to 6 devices before enabling production pool
+- [ ] Phase 4 — device count reconciliation (pixel6: 10, s24: 4, a55: 6)
 
 ## Background
 
@@ -210,7 +211,7 @@ manual restart is 1 hour.
 
 ## Final cutover (after all pools migrated)
 
-Once `a55-perf` (Phase 4) is stable on v3:
+Once `a55-perf` (Phase 3) is stable on v3:
 
 - `config/config.yml` should have no active production projects.
 - Stop and disable the legacy systemd unit:
@@ -219,3 +220,20 @@ Once `a55-perf` (Phase 4) is stable on v3:
   ```
 - Open a follow-up ticket to decommission the legacy device fleet and remove
   the legacy config/env files from the repo.
+
+---
+
+## Phase 4 — Device count reconciliation
+
+Verify final device counts on v3 match the agreed targets:
+
+| Pool | Target | Action if short |
+|------|--------|-----------------|
+| `pixel6-perf` | 10 | Follow up with vendor to bring remaining pixel6 devices online |
+| `s24-perf` | 4 | Follow up with vendor to bring remaining s24 devices online |
+| `a55-perf` | 6 | Follow up with vendor to bring remaining a55 devices online |
+
+Run `dgrv3` and `v3_compare_to_api` to check current state. For any pool short
+of its target, file a vendor request and track until resolved. Update
+`config/config-v3-server.yml` to add newly online devices to the appropriate
+production group as they come online.
