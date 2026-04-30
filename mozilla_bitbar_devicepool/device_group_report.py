@@ -186,3 +186,10 @@ class DeviceGroupReport:
 def main():  # pragma: no cover
     device_group_report = DeviceGroupReport()
     device_group_report.main()
+
+
+def main_v3():  # pragma: no cover
+    _root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    config_path = os.path.join(_root, "config", "config-v3-server.yml")
+    device_group_report = DeviceGroupReport(config_path=config_path)
+    device_group_report.main()
