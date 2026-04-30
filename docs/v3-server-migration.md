@@ -109,17 +109,18 @@ Repeat these steps for each pool in the order above.
 - Remove those labels from the `test-*` group in the same commit (a device
   should be in exactly one group at a time).
 
-### Step 3 — Deploy updated config and restart v3 service
+### Step 3 — Deploy updated configs and restart both services
 
-Deploy the updated `config/config-v3-server.yml` to the host manually, then
-restart the service to pick up the changes:
+Pull the updated configs on the host, then restart both services:
 
 ```
 systemctl restart bitbar-v3.service
+systemctl restart bitbar.service
 ```
 
 Wait for steady state in logs (usually a few minutes). Confirm the new
-production project is being picked up and devices show as online.
+production project is being picked up by the v3 service and dropped by the
+legacy service.
 
 ### Step 5 — Drain legacy pool P
 
