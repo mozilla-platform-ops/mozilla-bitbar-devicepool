@@ -1,20 +1,12 @@
-#!/usr/bin/env python3
-
 # compares bitbar api devices to devices in our config
 
 import argparse
 import os
-import sys
 
-try:
-    from testdroid import Testdroid
+from testdroid import Testdroid
 
-    from mozilla_bitbar_devicepool.bitbar.devices import get_devices
-    from mozilla_bitbar_devicepool.device_group_report import DeviceGroupReport
-except ImportError:
-    print("ERROR: Please install dependencies (`poetry install`)!")
-    sys.exit(1)
-
+from mozilla_bitbar_devicepool.bitbar.devices import get_devices
+from mozilla_bitbar_devicepool.device_group_report import DeviceGroupReport
 
 TESTDROID_URL = os.environ.get("TESTDROID_URL")
 TESTDROID_APIKEY = os.environ.get("TESTDROID_APIKEY")
@@ -23,12 +15,7 @@ if TESTDROID_URL and TESTDROID_APIKEY:
 else:
     TESTDROID = None
 
-# print(TESTDROID)
 
-
-# get devices from the api
-#
-# returns array of strings
 def get_device_names():
     display_names = {}
     for device in get_devices():
@@ -38,9 +25,7 @@ def get_device_names():
             continue
         display_names[dn] = True
 
-    devices = sorted(display_names.keys())
-
-    return devices
+    return sorted(display_names.keys())
 
 
 def main():
@@ -84,5 +69,5 @@ def main():
     print(f"  {sorted(config_devices_set.difference(api_devices_set))}")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()
