@@ -5,9 +5,9 @@
 ## Status
 
 - [x] Phase 0 — v3 systemd service deployed and running
-- [ ] Phase 1 — s24-perf
-- [ ] Phase 2 — pixel6-perf
-- [ ] Phase 3 — pixel5-unit
+- [ ] Phase 1 — pixel6-perf
+- [ ] Phase 2 — s24-perf (need 2 more s24 devices from vendor)
+- [ ] Phase 3 — pixel5-unit (need ~5 more pixel5 devices from vendor)
 - [ ] Phase 4 — a55-perf
 
 ## Background
@@ -44,14 +44,17 @@ groups.
 | `bin/start_mbd_new_server.sh` | v3 manual launch wrapper; basis for v3 systemd unit |
 | `bin/v3_config_mover.sh` | Moves devices between pools on the v3 server via `configuration_device_tool` |
 
-## Pool migration order (smallest → largest)
+## Pool migration order
 
-| Phase | Legacy project / device_group | Devices | v3 source test group |
-|-------|-------------------------------|---------|----------------------|
-| 1 | `mozilla-gw-perftest-s24` / `s24-perf` | 4 | `test-s24` |
-| 2 | `mozilla-gw-perftest-p6` / `pixel6-perf` | 4 | `test-p6` |
-| 3 | `mozilla-gw-unittest-p5` / `pixel5-unit` | ~6 | `test-p5` |
-| 4 | `mozilla-gw-perftest-a55` / `a55-perf` | ~21 | `test-1` |
+Ordered by v3 device availability — pools with enough devices on the new server
+go first; pools that need the vendor to bring more devices online go later.
+
+| Phase | Legacy project / device_group | Needed | v3 available (test group) | Vendor needed? |
+|-------|-------------------------------|--------|---------------------------|----------------|
+| 1 | `mozilla-gw-perftest-p6` / `pixel6-perf` | 4 | 5 (`test-p6`) | No |
+| 2 | `mozilla-gw-perftest-s24` / `s24-perf` | 4 | 2 (`test-s24`) | Yes — 2 more s24 |
+| 3 | `mozilla-gw-unittest-p5` / `pixel5-unit` | ~6 | 1 (`test-p5`) | Yes — ~5 more pixel5 |
+| 4 | `mozilla-gw-perftest-a55` / `a55-perf` | ~21 | 41 (`test-1`) | No |
 
 Unit pools (`s24-unit`, `pixel6-unit`, `a55-unit`) are empty in legacy config.
 Handle them in the matching perf phase: uncomment and populate on v3 if needed,
