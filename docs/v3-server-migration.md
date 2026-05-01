@@ -111,10 +111,22 @@ Repeat these steps for each pool in the order above.
     `test_file: v3-empty-test.zip`.
 - Add a `device_groups:` entry for P populated with the device labels
   currently in the corresponding `test-*` group.
-- Remove those labels from the `test-*` group in the same commit (a device
+- Remove those labels from the `test-*` group in the same edit (a device
   should be in exactly one group at a time).
 
-### Step 3 — Deploy updated configs and restart both services
+### Step 3 — Edit `config/config.yml`
+
+- Comment out the matching project block for P with a note:
+  `# disabled: migrated to v3 server`
+
+### Step 4 — Commit
+
+```
+git add config/config.yml config/config-v3-server.yml
+git commit -m "migrate <pool> from legacy bitbar to v3 server"
+```
+
+### Step 5 — Deploy and restart both services
 
 Pull the updated configs on the host, then restart both services:
 
@@ -123,31 +135,7 @@ systemctl restart bitbar-v3.service
 systemctl restart bitbar.service
 ```
 
-Wait for steady state in logs (usually a few minutes). Confirm the new
-production project is being picked up by the v3 service and dropped by the
-legacy service.
-
-### Step 5 — Drain legacy pool P
-
-- Comment out the matching project block and device_group entry in
-  `config/config.yml`.
-- Restart the legacy service, or wait up to 1 hour for the `RuntimeMaxSec`
-  auto-restart to pick up the change.
-
-```
-systemctl restart bitbar.service
-```
-
-### Step 6 — Commit
-
-Commit both YAML changes together:
-
-```
-git add config/config.yml config/config-v3-server.yml
-git commit -m "migrate <pool> from legacy bitbar to v3 server"
-```
-
-### Step 7 — Verify and soak
+### Step 6 — Verify and soak
 
 - `journalctl -u bitbar-v3.service` — production project P picked up, no errors.
 - Bitbar v3 UI — project P present, devices online.
@@ -163,9 +151,18 @@ proceeding to Phase 2. Once the pattern is proven, later phases can move faster.
 
 ## Rollback
 
+### Rollback commits
+
+| Phase | Pool | Commit |
+|-------|------|--------|
+| pre-migration | — | `a00f278` |
+| 1 | pixel6-perf | TBD |
+| 2 | s24-perf | TBD |
+| 3 | a55-perf | TBD |
+
 ### Per-pool rollback (during or shortly after a phase)
 
-1. `git revert` the migration commit for pool P (restores both YAML files).
+1. `git revert` the migration commit for pool P from the table above (restores both YAML files).
 2. Deploy the reverted configs to the host manually.
 3. Restart both services:
    ```
