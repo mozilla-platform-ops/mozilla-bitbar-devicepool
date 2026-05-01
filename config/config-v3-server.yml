@@ -281,8 +281,12 @@ device_groups:
     pixel6-138:
     pixel6-146:
     pixel6-147:
+    pixel6-158:
     pixel6-165:
     pixel6-166:
+    pixel6-169:
+    pixel6-170:
+    pixel6-173:
   test-p6:
     pixel5-144:
   s24-perf:
