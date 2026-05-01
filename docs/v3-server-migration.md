@@ -5,7 +5,7 @@
 ## Status
 
 - [x] Phase 0 — v3 systemd service deployed and running
-- [ ] Phase 1 — pixel6-perf — **can proceed** (6 on v3 vs 4 on legacy); ensure vendor brings remaining 4 pixel6 online eventually
+- [ ] Phase 1 — pixel6-perf — **can proceed** (10 on v3 vs 4 on legacy; at target)
 - [ ] Phase 2 — s24-perf — **blocked** (1 on v3 vs 4 on legacy; need 3 more s24 from vendor before migrating)
 - [ ] Phase 3 — a55-perf — **can proceed** once earlier phases done; trim test-1 from 43 to 6 devices before enabling production pool
 - [ ] Phase 4 — device count reconciliation (pixel6: 10, s24: 4, a55: 6)
@@ -54,7 +54,7 @@ Note: `pixel5-unit` is not being migrated — those tasks are moving to `pixel6-
 
 | Phase | Legacy project / device_group | v3 target | v3 online now | Vendor needed? |
 |-------|-------------------------------|-----------|---------------|----------------|
-| 1 | `mozilla-gw-perftest-p6` / `pixel6-perf` | 10 | 6 | Yes — 4 more pixel6 |
+| 1 | `mozilla-gw-perftest-p6` / `pixel6-perf` | 10 | 10 | No — at target |
 | 2 | `mozilla-gw-perftest-s24` / `s24-perf` | 4 | 1 | Yes — 3 more s24 |
 | 3 | `mozilla-gw-perftest-a55` / `a55-perf` | 6 | 43 (trimming to 6) | No |
 
