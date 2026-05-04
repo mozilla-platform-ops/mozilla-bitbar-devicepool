@@ -131,8 +131,8 @@ git commit -m "migrate <pool> from legacy bitbar to v3 server"
 Pull the updated configs on the host, then restart both services:
 
 ```
-systemctl restart bitbar-v3.service
 systemctl restart bitbar.service
+systemctl restart bitbar-v3.service
 ```
 
 ### Step 6 — Verify and soak
