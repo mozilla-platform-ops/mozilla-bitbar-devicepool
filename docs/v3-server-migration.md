@@ -155,7 +155,7 @@ proceeding to Phase 2. Once the pattern is proven, later phases can move faster.
 
 | Phase | Pool | Commit |
 |-------|------|--------|
-| pre-migration | — | `a00f278` |
+| pre-migration | — | `67ae46a` |
 | 1 | pixel6-perf | TBD |
 | 2 | s24-perf | TBD |
 | 3 | a55-perf | TBD |
