@@ -10,6 +10,12 @@
 - [ ] Phase 3 — a55-perf — **can proceed** once earlier phases done; trim test-1 from 43 to 6 devices before enabling production pool
 - [ ] Phase 4 — device count reconciliation (pixel6: 10, s24: 4, a55: 6)
 
+## Known issues / blockers
+
+| Phase | Status | Issue |
+|-------|--------|-------|
+| 1 | **Blocking** | New pixel6 devices missing from vendor's `DOCKER_POWER_METER_MAP`, `DOCKER_DEVICE_SERIAL_IP_MAP`, and `DOCKER_DEVICE_SERIAL_NAME_MAP` Jenkins config. Serial `1A011FDF600AMA` (pixel6-137) confirmed missing; likely all new pixel6 devices affected. Vendor needs to add all new serials to those maps before migration can proceed. |
+
 ## Background
 
 The legacy Bitbar server (`https://mozilla.bitbar.com`) is being replaced by
