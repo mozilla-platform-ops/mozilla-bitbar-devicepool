@@ -166,8 +166,8 @@ proceeding to Phase 2. Once the pattern is proven, later phases can move faster.
 2. Deploy the reverted configs to the host manually.
 3. Restart both services:
    ```
-   systemctl restart bitbar-v3.service
    systemctl restart bitbar.service
+   systemctl restart bitbar-v3.service
    ```
 4. Confirm legacy P resumes and v3 devices return to the `test-*` group.
 
