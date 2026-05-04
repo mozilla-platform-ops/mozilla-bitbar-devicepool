@@ -5,7 +5,7 @@
 ## Status
 
 - [x] Phase 0 — v3 systemd service deployed and running
-- [ ] Phase 1 — pixel6-perf — **can proceed** (10 on v3 vs 4 on legacy; at target)
+- [x] Phase 1 — pixel6-perf — complete
 - [ ] Phase 2 — s24-perf — **blocked** (1 on v3 vs 4 on legacy; need 3 more s24 from vendor before migrating)
 - [ ] Phase 3 — a55-perf — **can proceed** once earlier phases done; trim test-1 from 43 to 6 devices before enabling production pool
 - [ ] Phase 4 — device count reconciliation (pixel6: 10, s24: 4, a55: 6)
@@ -156,7 +156,7 @@ proceeding to Phase 2. Once the pattern is proven, later phases can move faster.
 | Phase | Pool | Commit |
 |-------|------|--------|
 | pre-migration | — | `67ae46a` |
-| 1 | pixel6-perf | TBD |
+| 1 | pixel6-perf | `5a571bd` |
 | 2 | s24-perf | TBD |
 | 3 | a55-perf | TBD |
 
