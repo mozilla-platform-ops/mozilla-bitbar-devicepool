@@ -5,7 +5,7 @@
 ## Status
 
 - [x] Phase 0 — v3 systemd service deployed and running
-- [x] Phase 1 — pixel6-perf — complete
+- [ ] Phase 1 — pixel6-perf — **on hold** (power meter mapping issue at vendor; reverted pending fix)
 - [ ] Phase 2 — s24-perf — **blocked** (1 on v3 vs 4 on legacy; need 3 more s24 from vendor before migrating)
 - [ ] Phase 3 — a55-perf — **can proceed** once earlier phases done; trim test-1 from 43 to 6 devices before enabling production pool
 - [ ] Phase 4 — device count reconciliation (pixel6: 10, s24: 4, a55: 6)
