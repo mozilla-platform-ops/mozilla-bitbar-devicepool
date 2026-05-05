@@ -6,8 +6,8 @@
 
 - [x] Phase 0 — v3 systemd service deployed and running
 - [ ] Phase 1 — pixel6-perf — **on hold** (vendor rooting devices; expected 2026-05-06)
-- [ ] Phase 2 — s24-perf — **blocked** (1 on v3 vs 4 on legacy; need 3 more s24 from vendor before migrating)
-- [ ] Phase 3 — a55-perf — **can proceed** once earlier phases done; trim test-1 from 43 to 6 devices before enabling production pool
+- [ ] Phase 2 — s24-perf — **blocked** (waiting on hardware; see work log)
+- [ ] Phase 3 — a55-perf — **in progress** (try push running; see work log)
 - [ ] Phase 4 — device count reconciliation (pixel6: 10, s24: 4, a55: 6)
 
 ## Known issues / blockers
@@ -241,3 +241,12 @@ Run `dgrv3` and `v3_compare_to_api` to check current state. For any pool short
 of its target, file a vendor request and track until resolved. Update
 `config/config-v3-server.yml` to add newly online devices to the appropriate
 production group as they come online.
+
+---
+
+## Work log
+
+### 2026-05-05
+- Attempted p6-perf migration (try 2, commit `70e31127`); reverted (`c0df0a6`) — v3 p6 devices not rooted (`su` binary absent). Vendor rooting; expected done 2026-05-06.
+- s24s being overnighted to FL datacenter; 3 devices needed to reach target of 4.
+- Started a55 try push against test-1 pool on v3: https://treeherder.mozilla.org/jobs?repo=try&landoInstance=lando-prod-2025&landoCommitID=43062
