@@ -5,7 +5,7 @@
 ## Status
 
 - [x] Phase 0 — v3 systemd service deployed and running
-- [ ] Phase 1 — pixel6-perf — **on hold** (power meter mapping issue at vendor; reverted pending fix)
+- [ ] Phase 1 — pixel6-perf — **on hold** (vendor rooting devices; expected 2026-05-06)
 - [ ] Phase 2 — s24-perf — **blocked** (1 on v3 vs 4 on legacy; need 3 more s24 from vendor before migrating)
 - [ ] Phase 3 — a55-perf — **can proceed** once earlier phases done; trim test-1 from 43 to 6 devices before enabling production pool
 - [ ] Phase 4 — device count reconciliation (pixel6: 10, s24: 4, a55: 6)
@@ -14,7 +14,8 @@
 
 | Phase | Status | Issue |
 |-------|--------|-------|
-| 1 | **Blocking** | New pixel6 devices missing from vendor's `DOCKER_POWER_METER_MAP`, `DOCKER_DEVICE_SERIAL_IP_MAP`, and `DOCKER_DEVICE_SERIAL_NAME_MAP` Jenkins config. Serial `1A011FDF600AMA` (pixel6-137) confirmed missing; likely all new pixel6 devices affected. Vendor needs to add all new serials to those maps before migration can proceed. |
+| 1 | **Blocking** | New pixel6 devices missing from vendor's `DOCKER_POWER_METER_MAP`, `DOCKER_DEVICE_SERIAL_IP_MAP`, and `DOCKER_DEVICE_SERIAL_NAME_MAP` Jenkins config. Serial `1A011FDF600AMA` (pixel6-137) confirmed missing; likely all new pixel6 devices affected. Vendor needs to add all new serials to those maps before migration can proceed. **Resolved 2026-05-05.** |
+| 1 | **Blocking** | v3 pixel6 devices are not rooted — `su` binary absent (`su: inaccessible or not found`). Confirmed via task logs 2026-05-05; distinguishable from the benign `setenforce` permission denied which appears on both clusters. Vendor is rooting devices; **expected done 2026-05-06**. |
 
 ## Background
 
@@ -162,7 +163,7 @@ proceeding to Phase 2. Once the pattern is proven, later phases can move faster.
 | Phase | Pool | Commit |
 |-------|------|--------|
 | pre-migration | — | `e4e823d` |
-| 1 | pixel6-perf | `5a571bd` |
+| 1 | pixel6-perf | `5a571bd` (try 1), `70e31127` (try 2), revert: `c0df0a6` |
 | 2 | s24-perf | TBD |
 | 3 | a55-perf | TBD |
 
