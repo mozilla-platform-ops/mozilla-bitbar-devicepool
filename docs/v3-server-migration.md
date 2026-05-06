@@ -9,6 +9,7 @@
 - [ ] Phase 2 — s24-perf — **blocked** (waiting on hardware; see work log)
 - [ ] Phase 3 — a55-perf — **in progress** (try push running; see work log)
 - [ ] Phase 4 — device count reconciliation (pixel6: 10, s24: 4, a55: 6)
+- [ ] Phase 4 — redirect pixel5 load to pixel6-perf (Sparky has phab/PR ready; merge after Phase 1 lands)
 
 ## Known issues / blockers
 
