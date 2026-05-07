@@ -5,17 +5,17 @@
 ## Status
 
 - [x] Phase 0 — v3 systemd service deployed and running
-- [ ] Phase 1 — pixel6-perf — **ready** (vendor rooted devices 2026-05-06)
-- [ ] Phase 2 — s24-perf — **ready** (hardware arrived and online 2026-05-06)
-- [ ] Phase 3 — a55-perf — **ready** (try push clean; see work log)
+- [x] Phase 1 — a55-perf — **done** (migrated 2026-05-06)
+- [ ] Phase 2 — pixel6-perf — **ready** (vendor rooted devices 2026-05-06)
+- [ ] Phase 3 — s24-perf — **ready** (hardware arrived and online 2026-05-06)
 - [ ] Phase 4 — device count reconciliation (pixel6: 10, s24: 4, a55: 6)
 
 ## Known issues / blockers
 
 | Phase | Status | Issue |
 |-------|--------|-------|
-| 1 | **Blocking** | New pixel6 devices missing from vendor's `DOCKER_POWER_METER_MAP`, `DOCKER_DEVICE_SERIAL_IP_MAP`, and `DOCKER_DEVICE_SERIAL_NAME_MAP` Jenkins config. Serial `1A011FDF600AMA` (pixel6-137) confirmed missing; likely all new pixel6 devices affected. Vendor needs to add all new serials to those maps before migration can proceed. **Resolved 2026-05-05.** |
-| 1 | **Blocking** | v3 pixel6 devices are not rooted — `su` binary absent (`su: inaccessible or not found`). Confirmed via task logs 2026-05-05; distinguishable from the benign `setenforce` permission denied which appears on both clusters. Vendor is rooting devices; **expected done 2026-05-06**. |
+| 2 | **Resolved 2026-05-05** | New pixel6 devices missing from vendor's `DOCKER_POWER_METER_MAP`, `DOCKER_DEVICE_SERIAL_IP_MAP`, and `DOCKER_DEVICE_SERIAL_NAME_MAP` Jenkins config. Serial `1A011FDF600AMA` (pixel6-137) confirmed missing; likely all new pixel6 devices affected. |
+| 2 | **Resolved 2026-05-06** | v3 pixel6 devices not rooted — `su` binary absent (`su: inaccessible or not found`). Confirmed via task logs 2026-05-05; distinguishable from the benign `setenforce` permission denied which appears on both clusters. |
 
 ## Background
 
@@ -61,9 +61,9 @@ Note: `pixel5-unit` is not being migrated — those tasks are moving to `pixel6-
 
 | Phase | Legacy project / device_group | v3 target | v3 online now | Vendor needed? |
 |-------|-------------------------------|-----------|---------------|----------------|
-| 1 | `mozilla-gw-perftest-p6` / `pixel6-perf` | 10 | 10 | No — at target |
-| 2 | `mozilla-gw-perftest-s24` / `s24-perf` | 4 | 1 | Yes — 3 more s24 |
-| 3 | `mozilla-gw-perftest-a55` / `a55-perf` | 6 | 43 (trimming to 6) | No |
+| 1 | `mozilla-gw-perftest-a55` / `a55-perf` | 6 | 35 (29 disabled by Bitbar) | No |
+| 2 | `mozilla-gw-perftest-p6` / `pixel6-perf` | 10 | 11 | No — at target |
+| 3 | `mozilla-gw-perftest-s24` / `s24-perf` | 4 | 4 | No — at target |
 
 Unit pools (`s24-unit`, `pixel6-unit`, `a55-unit`) are empty in legacy config.
 Handle them in the matching perf phase: uncomment and populate on v3 if needed,
@@ -163,9 +163,9 @@ proceeding to Phase 2. Once the pattern is proven, later phases can move faster.
 | Phase | Pool | Commit |
 |-------|------|--------|
 | pre-migration | — | `f26e673` |
-| 3 | a55-perf | `6987040` |
-| 1 | pixel6-perf | `5a571bd` (try 1), `70e31127` (try 2), revert: `c0df0a6` |
-| 2 | s24-perf | TBD |
+| 1 | a55-perf | `6987040` |
+| 2 | pixel6-perf | TBD |
+| 3 | s24-perf | TBD |
 
 ### Per-pool rollback (during or shortly after a phase)
 
@@ -256,3 +256,4 @@ production group as they come online.
 - Vendor confirmed p6 devices on v3 are now rooted.
 - s24 devices arrived at FL datacenter and are online.
 - Sparky landing https://phabricator.services.mozilla.com/D298883 to remove all P5 references and redirect pixel5 load to A55s (already running there in LT). No migration action needed.
+- Renumbered phases: a55-perf is now Phase 1 (migrated first due to highest confidence in those workers), pixel6-perf Phase 2, s24-perf Phase 3.
