@@ -232,11 +232,11 @@ Once `a55-perf` (Phase 3) is stable on v3:
 
 Verify final device counts on v3 match the agreed targets:
 
-| Pool | Target | Action if short |
-|------|--------|-----------------|
-| `pixel6-perf` | 10 | Follow up with vendor to bring remaining pixel6 devices online |
-| `s24-perf` | 4 | Follow up with vendor to bring remaining s24 devices online |
-| `a55-perf` | 6 | Follow up with vendor to bring remaining a55 devices online |
+| Pool | Target | Online (2026-05-06) | Notes |
+|------|--------|---------------------|-------|
+| `pixel6-perf` | 10 | 11 | At target; 1 spare |
+| `s24-perf` | 4 | 4 | At target |
+| `a55-perf` | 6 | 35 registered, 29 disabled by Bitbar = 6 active | At target; follow up with Bitbar on disabled devices |
 
 Run `dgrv3` and `v3_compare_to_api` to check current state. For any pool short
 of its target, file a vendor request and track until resolved. Update
