@@ -152,14 +152,14 @@ projects:
   #   additional_parameters:
   #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-a55
   #     TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-a55
-  # mozilla-gw-perftest-a55:
-  #   device_group_name: a55-perf
-  #   device_model: a55
-  #   framework_name: mozilla-usb
-  #   description: Mozilla Performance tests for A55 (using generic-worker)
-  #   additional_parameters:
-  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-a55
-  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-a55
+  mozilla-gw-perftest-a55:
+    device_group_name: a55-perf
+    device_model: a55
+    framework_name: mozilla-usb
+    description: Mozilla Performance tests for A55 (using generic-worker)
+    additional_parameters:
+      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-a55
+      TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-a55
   # mozilla-gw-unittest-s24:
   #   device_group_name: s24-unit
   #   device_model: s24
@@ -229,6 +229,7 @@ device_groups:
   # motog4-docker-builder-2:
   #   Docker Builder:
   test-1:
+  a55-perf:
     a55-33:
     a55-34:
     a55-35:
