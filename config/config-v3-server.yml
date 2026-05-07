@@ -229,11 +229,6 @@ device_groups:
   # motog4-docker-builder-2:
   #   Docker Builder:
   test-1:
-    a55-25:
-    a55-26:
-    a55-27:
-    a55-28:
-    a55-29:
     a55-33:
     a55-34:
     a55-35:
@@ -244,9 +239,6 @@ device_groups:
     a55-40:
     a55-41:
     a55-42:
-    a55-44:
-    a55-45:
-    a55-47:
     a55-49:
     a55-50:
     a55-51:
@@ -275,7 +267,6 @@ device_groups:
     a55-143:
   test-p5:
     # pixel5-07:
-    pixel5-171:
   pixel6-perf:
     pixel6-137:
     pixel6-138:
@@ -287,12 +278,14 @@ device_groups:
     pixel6-169:
     pixel6-170:
     pixel6-173:
+    pixel6-181:
   test-p6:
-    pixel5-144:
   s24-perf:
+    s24-01:
+    s24-02:
+    s24-03:
     s24-05:
   test-s24:
   test-2:
   test-3:
   test-999:
-    a55-46:  # SLOW. DON'T USE.
