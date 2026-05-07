@@ -7,9 +7,8 @@
 - [x] Phase 0 — v3 systemd service deployed and running
 - [ ] Phase 1 — pixel6-perf — **ready** (vendor rooted devices 2026-05-06)
 - [ ] Phase 2 — s24-perf — **ready** (hardware arrived and online 2026-05-06)
-- [ ] Phase 3 — a55-perf — **in progress** (try push running; see work log)
+- [ ] Phase 3 — a55-perf — **ready** (try push clean; see work log)
 - [ ] Phase 4 — device count reconciliation (pixel6: 10, s24: 4, a55: 6)
-- [ ] Phase 4 — redirect pixel5 load to pixel6-perf (Sparky has phab/PR ready; merge after Phase 1 lands)
 
 ## Known issues / blockers
 
@@ -256,3 +255,4 @@ production group as they come online.
 - a55 try push results (revision `5d01ab1da31bc556385ed93300a441908c8d194f`): 174 total jobs — 153 green, 11 testfailed (all `sp3`, all autoclassified intermittent), 6 retry, 4 exception. Try push considered clean; proceeding with a55 production migration.
 - Vendor confirmed p6 devices on v3 are now rooted.
 - s24 devices arrived at FL datacenter and are online.
+- Sparky landing https://phabricator.services.mozilla.com/D298883 to remove all P5 references and redirect pixel5 load to A55s (already running there in LT). No migration action needed.
