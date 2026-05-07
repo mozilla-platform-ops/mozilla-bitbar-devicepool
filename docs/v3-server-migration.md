@@ -251,3 +251,6 @@ production group as they come online.
 - Attempted p6-perf migration (try 2, commit `70e31127`); reverted (`c0df0a6`) — v3 p6 devices not rooted (`su` binary absent). Vendor rooting; expected done 2026-05-06.
 - s24s being overnighted to FL datacenter; 3 devices needed to reach target of 4.
 - Started a55 try push against test-1 pool on v3: https://treeherder.mozilla.org/jobs?repo=try&landoInstance=lando-prod-2025&landoCommitID=43062
+
+### 2026-05-06
+- a55 try push results (revision `5d01ab1da31bc556385ed93300a441908c8d194f`): 174 total jobs — 153 green, 11 testfailed (all `sp3`, all autoclassified intermittent), 6 retry, 4 exception. Try push considered clean; proceeding with a55 production migration.
