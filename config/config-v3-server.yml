@@ -56,14 +56,14 @@ projects:
   #   additional_parameters:
   #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-p6
   #     TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-p6
-  mozilla-gw-perftest-p6:
-    device_group_name: pixel6-perf
-    device_model: pixel6
-    framework_name: mozilla-usb
-    description: Mozilla Performance tests for Pixel6 (using generic-worker)
-    additional_parameters:
-      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-p6
-      TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-p6
+  # mozilla-gw-perftest-p6:
+  #   device_group_name: pixel6-perf
+  #   device_model: pixel6
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Performance tests for Pixel6 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-p6
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-p6
   # mozilla-gw-unittest-s21:
   #   device_group_name: s21-unit
   #   device_model: s21
