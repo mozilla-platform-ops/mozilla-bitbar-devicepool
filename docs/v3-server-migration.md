@@ -16,6 +16,7 @@
 |-------|--------|-------|
 | 2 | **Resolved 2026-05-05** | New pixel6 devices missing from vendor's `DOCKER_POWER_METER_MAP`, `DOCKER_DEVICE_SERIAL_IP_MAP`, and `DOCKER_DEVICE_SERIAL_NAME_MAP` Jenkins config. Serial `1A011FDF600AMA` (pixel6-137) confirmed missing; likely all new pixel6 devices affected. |
 | 2 | **Resolved 2026-05-06** | v3 pixel6 devices not rooted — `su` binary absent (`su: inaccessible or not found`). Confirmed via task logs 2026-05-05; distinguishable from the benign `setenforce` permission denied which appears on both clusters. |
+| 2 | **Blocking** | v3 pixel6 devices provisioned with mixed Android OS versions instead of Android 13 (matching legacy cluster). Only pixel6-137 (Android 13) is rooted and functional. All others (Android 12, 15, 16) are unrooted. Vendor must reflash all devices to Android 13 and re-root before migration can proceed. |
 
 ## Background
 
