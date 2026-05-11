@@ -6,7 +6,7 @@
 
 - [x] Phase 0 — v3 systemd service deployed and running
 - [x] Phase 1 — a55-perf — **done** (migrated 2026-05-06)
-- [ ] Phase 2 — pixel6-perf — **ready** (vendor rooted devices 2026-05-06)
+- [ ] Phase 2 — pixel6-perf — **on hold** (most devices not rooted; see work log 2026-05-11)
 - [ ] Phase 3 — s24-perf — **ready** (hardware arrived and online 2026-05-06)
 - [ ] Phase 4 — device count reconciliation (pixel6: 10, s24: 4, a55: 6)
 
@@ -164,7 +164,7 @@ proceeding to Phase 2. Once the pattern is proven, later phases can move faster.
 |-------|------|--------|
 | pre-migration | — | `f26e673` |
 | 1 | a55-perf | `6987040` |
-| 2 | pixel6-perf | TBD |
+| 2 | pixel6-perf | `98f28fe`, revert: `2d99a0e` |
 | 3 | s24-perf | TBD |
 
 ### Per-pool rollback (during or shortly after a phase)
@@ -257,3 +257,8 @@ production group as they come online.
 - s24 devices arrived at FL datacenter and are online.
 - Sparky landing https://phabricator.services.mozilla.com/D298883 to remove all P5 references and redirect pixel5 load to A55s (already running there in LT). No migration action needed.
 - Renumbered phases: a55-perf is now Phase 1 (migrated first due to highest confidence in those workers), pixel6-perf Phase 2, s24-perf Phase 3.
+
+### 2026-05-11
+- pixel6-perf migration completed successfully (commit `98f28fe`). Jobs confirmed flowing on v3.
+- Verification: retriggered ~10 sp3 jobs from mozilla-central push `5d85334c95eda979785d121004aa4a8ee310deb4` (previously run on old workers). Monitoring worker uptake at https://firefox-ci-tc.services.mozilla.com/provisioners/proj-autophone/worker-types/gecko-t-bitbar-gw-perf-p6?sortBy=Last%20Active&sortDirection=desc.
+- Migration reverted — most v3 pixel6 devices not rooted. Only pixel6-137 confirmed rooted (Android 13). All others unrooted: pixel6-165 (Android 16), pixel6-169 (Android 16), pixel6-166 (Android 12), pixel6-170 (Android 16), pixel6-173 (Android 16), pixel6-138 (Android 16), pixel6-147 (Android 15), pixel6-158 (Android 16). pixel6-181 non-functional. Vendor needs to root all devices — issue appears to be Android version, not just missing su binary.
