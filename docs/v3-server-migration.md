@@ -7,8 +7,9 @@
 - [x] Phase 0 — v3 systemd service deployed and running
 - [x] Phase 1 — a55-perf — **done** (migrated 2026-05-06)
 - [ ] Phase 2 — pixel6-perf — **on hold** (most devices not rooted; see work log 2026-05-11)
-- [ ] Phase 3 — s24-perf — **ready** (hardware arrived and online 2026-05-06)
+- [x] Phase 3 — s24-perf — **done** (migrated 2026-05-11; s24-07 not rooted, see Phase 4)
 - [ ] Phase 4 — device count reconciliation (pixel6: 10, s24: 4, a55: 6)
+- [ ] Phase 4 — root s24-07 (vendor-provisioned device, not rooted; the 3 shipped from old DC are fine)
 
 ## Known issues / blockers
 
@@ -165,8 +166,8 @@ proceeding to Phase 2. Once the pattern is proven, later phases can move faster.
 |-------|------|--------|
 | pre-migration | — | `f26e673` |
 | 1 | a55-perf | `6987040` |
-| 2 | pixel6-perf | `98f28fe`, revert: `2d99a0e` |
-| 3 | s24-perf | TBD |
+| 2 | pixel6-perf | TBD (on hold) |
+| 3 | s24-perf | `b082b7b` |
 
 ### Per-pool rollback (during or shortly after a phase)
 
@@ -263,3 +264,4 @@ production group as they come online.
 - pixel6-perf migration completed successfully (commit `98f28fe`). Jobs confirmed flowing on v3.
 - Verification: retriggered ~10 sp3 jobs from mozilla-central push `5d85334c95eda979785d121004aa4a8ee310deb4` (previously run on old workers). Monitoring worker uptake at https://firefox-ci-tc.services.mozilla.com/provisioners/proj-autophone/worker-types/gecko-t-bitbar-gw-perf-p6?sortBy=Last%20Active&sortDirection=desc.
 - Migration reverted — most v3 pixel6 devices not rooted. Only pixel6-137 confirmed rooted (Android 13). All others unrooted: pixel6-165 (Android 16), pixel6-169 (Android 16), pixel6-166 (Android 12), pixel6-170 (Android 16), pixel6-173 (Android 16), pixel6-138 (Android 16), pixel6-147 (Android 15), pixel6-158 (Android 16). pixel6-181 non-functional. Vendor needs to root all devices — issue appears to be Android version, not just missing su binary.
+- s24-perf migration completed (commit `b082b7b`). s24-01, s24-02, s24-03 (shipped from old DC) working well. s24-07 (vendor-provisioned) not rooted — flagged as Phase 4 follow-up.
