@@ -17,7 +17,7 @@
 |-------|--------|-------|
 | 2 | **Resolved 2026-05-05** | New pixel6 devices missing from vendor's `DOCKER_POWER_METER_MAP`, `DOCKER_DEVICE_SERIAL_IP_MAP`, and `DOCKER_DEVICE_SERIAL_NAME_MAP` Jenkins config. Serial `1A011FDF600AMA` (pixel6-137) confirmed missing; likely all new pixel6 devices affected. |
 | 2 | **Resolved 2026-05-06** | v3 pixel6 devices not rooted — `su` binary absent (`su: inaccessible or not found`). Confirmed via task logs 2026-05-05; distinguishable from the benign `setenforce` permission denied which appears on both clusters. |
-| 2 | **Blocking** | v3 pixel6 devices provisioned with mixed Android OS versions instead of Android 13 (matching legacy cluster). Only pixel6-137 (Android 13) is rooted and functional. All others (Android 12, 15, 16) are unrooted. Vendor must reflash all devices to Android 13 and re-root before migration can proceed. |
+| 2 | **Blocking** | v3 pixel6 devices have two issues: (1) Magisk root authorization not finalized — same exitcode 13 pattern as s24-07 (see 2026-05-12 work log); `_have_su: False` on these devices suggests su detection also failing, possibly OS-version-related. (2) Mixed Android OS versions: pixel6-137 (Android 13, working), pixel6-166 (12), pixel6-147 (15), pixel6-138/158/165/169/170/173 (16), pixel6-181 (non-functional). Vendor must finalize Magisk authorization on all devices and ideally standardize OS version to Android 13. |
 
 ## Background
 
