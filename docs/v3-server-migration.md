@@ -9,7 +9,7 @@
 - [ ] Phase 2 — pixel6-perf — **on hold** (most devices not rooted; see work log 2026-05-11)
 - [x] Phase 3 — s24-perf — **done** (migrated 2026-05-11; s24-07 not rooted, see Phase 4)
 - [ ] Phase 4 — device count reconciliation (pixel6: 10, s24: 4, a55: 6)
-- [ ] Phase 4 — root s24-07 (vendor-provisioned device, not rooted; the 3 shipped from old DC are fine)
+- [x] Phase 4 — root s24-07 (resolved 2026-05-12; Magisk adb shell authorization was never granted)
 
 ## Known issues / blockers
 
@@ -265,3 +265,19 @@ production group as they come online.
 - Verification: retriggered ~10 sp3 jobs from mozilla-central push `5d85334c95eda979785d121004aa4a8ee310deb4` (previously run on old workers). Monitoring worker uptake at https://firefox-ci-tc.services.mozilla.com/provisioners/proj-autophone/worker-types/gecko-t-bitbar-gw-perf-p6?sortBy=Last%20Active&sortDirection=desc.
 - Migration reverted — most v3 pixel6 devices not rooted. Only pixel6-137 confirmed rooted (Android 13). All others unrooted: pixel6-165 (Android 16), pixel6-169 (Android 16), pixel6-166 (Android 12), pixel6-170 (Android 16), pixel6-173 (Android 16), pixel6-138 (Android 16), pixel6-147 (Android 15), pixel6-158 (Android 16). pixel6-181 non-functional. Vendor needs to root all devices — issue appears to be Android version, not just missing su binary.
 - s24-perf migration completed (commit `b082b7b`). s24-01, s24-02, s24-03 (shipped from old DC) working well. s24-07 (vendor-provisioned) not rooted — flagged as Phase 4 follow-up.
+
+### 2026-05-12
+- s24-07 rooting resolved. Bitbar had unlocked the bootloader and flashed a rooted image (Magisk) but never granted the initial adb shell su authorization. Magisk requires an interactive grant on first `su` request — the popup must be accepted on-device to store the policy for `com.android.shell`. Without this step, subsequent `su -c` calls fail with exitcode 13 (Permission denied). Bitbar completed the authorization flow; s24-07 now working.
+
+  **Diagnostic: working device (s24-02)**
+  ```
+  adb Setting SELinux Permissive
+  '_have_su': True
+  ```
+
+  **Diagnostic: broken device (s24-07, before fix)**
+  ```
+  su -c setenforce 0 exitcode 13, stdout: None
+  Unable to set SELinux Permissive due to args: adb wait-for-device shell setenforce Permissive, exitcode: 1, stdout: setenforce: Couldn't set enforcing status to 'Permissive': Permission denied.
+  ```
+  The `exitcode 13` on `su -c` specifically indicates Magisk denied the request (vs `exitcode: 127` / `su: inaccessible or not found` which means `su` is absent entirely).
