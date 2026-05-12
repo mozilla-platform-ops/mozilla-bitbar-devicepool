@@ -168,14 +168,14 @@ projects:
   #   additional_parameters:
   #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-s24
   #     TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-s24
-  # mozilla-gw-perftest-s24:
-  #   device_group_name: s24-perf
-  #   device_model: s24
-  #   framework_name: mozilla-usb
-  #   description: Mozilla Performance tests for S24 (using generic-worker)
-  #   additional_parameters:
-  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-s24
-  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-s24
+  mozilla-gw-perftest-s24:
+    device_group_name: s24-perf
+    device_model: s24
+    framework_name: mozilla-usb
+    description: Mozilla Performance tests for S24 (using generic-worker)
+    additional_parameters:
+      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-s24
+      TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-s24
   # used for building new docker images
   # mozilla-docker-build:
   #   device_group_name: docker-builder
