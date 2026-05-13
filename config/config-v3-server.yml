@@ -229,15 +229,11 @@ device_groups:
   # motog4-docker-builder-2:
   #   Docker Builder:
   test-1:
-    pixel6-137:
-    pixel6-138:
     pixel6-147:
     pixel6-158:
-    pixel6-165:
     pixel6-166:
     pixel6-169:
     pixel6-170:
-    pixel6-173:
     pixel6-181:
   a55-perf:
     a55-33:
@@ -250,6 +246,10 @@ device_groups:
   test-p5:
     # pixel5-07:
   pixel6-perf:
+    pixel6-137:
+    pixel6-138:
+    pixel6-165:
+    pixel6-173:
   test-p6:
   s24-perf:
     s24-01:
