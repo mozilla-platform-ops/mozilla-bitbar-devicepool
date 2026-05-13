@@ -6,7 +6,7 @@
 
 - [x] Phase 0 — v3 systemd service deployed and running
 - [x] Phase 1 — a55-perf — **done** (migrated 2026-05-06)
-- [ ] Phase 2 — pixel6-perf — **on hold** (most devices not rooted; see work log 2026-05-11)
+- [x] Phase 2 — pixel6-perf — **done** (migrated 2026-05-13)
 - [x] Phase 3 — s24-perf — **done** (migrated 2026-05-11; s24-07 not rooted, see Phase 4)
 - [ ] Phase 4 — device count reconciliation (pixel6: 10, s24: 4, a55: 6)
 - [x] Phase 4 — root s24-07 (resolved 2026-05-12; Magisk adb shell authorization was never granted)
