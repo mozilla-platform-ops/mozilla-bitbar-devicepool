@@ -38,14 +38,14 @@ projects:
     additional_parameters:
       TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-p5
       TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-p5
-  mozilla-gw-perftest-p5:
-    device_group_name: pixel5-perf
-    device_model: pixel5
-    framework_name: mozilla-usb
-    description: Mozilla Performance tests for Pixel5 (using generic-worker)
-    additional_parameters:
-      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-p5
-      TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-p5
+  # mozilla-gw-perftest-p5:  # disabled: no devices
+  #   device_group_name: pixel5-perf
+  #   device_model: pixel5
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Performance tests for Pixel5 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-p5
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-p5
   # mozilla-gw-unittest-p6:
   #   device_group_name: pixel6-unit
   #   device_model: pixel6
@@ -142,14 +142,14 @@ projects:
   #   additional_parameters:
   #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-a51
   #     TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-a51
-  mozilla-gw-unittest-a55:
-    device_group_name: a55-unit
-    device_model: a55
-    framework_name: mozilla-usb
-    description: Mozilla Unit tests for A55 (using generic-worker)
-    additional_parameters:
-      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-a55
-      TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-a55
+  # mozilla-gw-unittest-a55:  # disabled: no devices
+  #   device_group_name: a55-unit
+  #   device_model: a55
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Unit tests for A55 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-a55
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-a55
   # mozilla-gw-perftest-a55:  # disabled: migrated to v3 server
   #   device_group_name: a55-perf
   #   device_model: a55
@@ -158,14 +158,14 @@ projects:
   #   additional_parameters:
   #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-perf-a55
   #     TC_WORKER_TYPE: gecko-t-bitbar-gw-perf-a55
-  mozilla-gw-unittest-s24:
-    device_group_name: s24-unit
-    device_model: s24
-    framework_name: mozilla-usb
-    description: Mozilla Unit tests for S24 (using generic-worker)
-    additional_parameters:
-      TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-s24
-      TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-s24
+  # mozilla-gw-unittest-s24:  # disabled: no devices
+  #   device_group_name: s24-unit
+  #   device_model: s24
+  #   framework_name: mozilla-usb
+  #   description: Mozilla Unit tests for S24 (using generic-worker)
+  #   additional_parameters:
+  #     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-bitbar-unit-s24
+  #     TC_WORKER_TYPE: gecko-t-bitbar-gw-unit-s24
   # mozilla-gw-perftest-s24:  # disabled: migrated to v3 server
   #   device_group_name: s24-perf
   #   device_model: s24
