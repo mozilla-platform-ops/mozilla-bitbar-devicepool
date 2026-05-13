@@ -285,3 +285,5 @@ production group as they come online.
 ### 2026-05-13
 - Diagnostic jobs confirmed all 9 tested v3 pixel6 devices are now rooted (vendor completed work), across mixed Android versions (12, 15, 16). pixel6-137 (Android 13) already known good.
 - Updated migration plan with vendor: they are shipping pixel6-01 and pixel6-04 from old DC to new DC, and flashing "several" more p6s to Android 13 and rooting them. Communicated to vendor that we only need 4 pixel6s on Android 13 (rooted, with OS auto-upgrades disabled) to proceed with migration — don't need all 10 perfect before starting.
+- Vendor downgraded and rooted pixel6-138, pixel6-165, pixel6-173 to Android 13 (pixel6-137 was already on Android 13 and working). Moved all 4 into pixel6-perf in v3 config; remaining 6 left in test-1.
+- Verified via diagnostic jobs: all 4 pixel6-perf devices confirmed Android 13 + rooted. test-1 devices also all rooted (mixed OS): pixel6-147 (15), pixel6-158 (16), pixel6-169 (16), pixel6-170 (16), pixel6-181 (12). pixel6-166 not working well — stuck/not completing diagnostic job; left in test-1, not blocking migration.
