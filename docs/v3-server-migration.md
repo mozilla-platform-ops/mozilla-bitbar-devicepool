@@ -281,3 +281,7 @@ production group as they come online.
   Unable to set SELinux Permissive due to args: adb wait-for-device shell setenforce Permissive, exitcode: 1, stdout: setenforce: Couldn't set enforcing status to 'Permissive': Permission denied.
   ```
   The `exitcode 13` on `su -c` specifically indicates Magisk denied the request (vs `exitcode: 127` / `su: inaccessible or not found` which means `su` is absent entirely).
+
+### 2026-05-13
+- Diagnostic jobs confirmed all 9 tested v3 pixel6 devices are now rooted (vendor completed work), across mixed Android versions (12, 15, 16). pixel6-137 (Android 13) already known good.
+- Updated migration plan with vendor: they are shipping pixel6-01 and pixel6-04 from old DC to new DC, and flashing "several" more p6s to Android 13 and rooting them. Communicated to vendor that we only need 4 pixel6s on Android 13 (rooted, with OS auto-upgrades disabled) to proceed with migration — don't need all 10 perfect before starting.
