@@ -162,12 +162,12 @@ proceeding to Phase 2. Once the pattern is proven, later phases can move faster.
 
 ### Rollback commits
 
-| Phase | Pool | Commit |
-|-------|------|--------|
-| pre-migration | — | `f26e673` |
-| 1 | a55-perf | `6987040` |
-| 2 | pixel6-perf | TBD (on hold) |
-| 3 | s24-perf | `b082b7b` |
+| Pool | Commit | Date |
+|------|--------|------|
+| pre-migration | `f26e673` | — |
+| a55-perf | `6987040` | 2026-05-06 |
+| s24-perf | `b082b7b` | 2026-05-11 |
+| pixel6-perf | `4703c93` | 2026-05-13 |
 
 ### Per-pool rollback (during or shortly after a phase)
 
