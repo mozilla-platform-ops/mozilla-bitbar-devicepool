@@ -9,6 +9,7 @@
 - [x] Phase 2 — pixel6-perf — **done** (migrated 2026-05-13)
 - [x] Phase 3 — s24-perf — **done** (migrated 2026-05-11; s24-07 not rooted, see Phase 4)
 - [ ] Phase 4 — device count reconciliation (pixel6: 10, s24: 4, a55: 6)
+- [ ] Phase 4 — pixel6: bring all 10 devices to Android 13, rooted, OS auto-upgrades disabled (currently 4 in production; vendor shipping pixel6-01 and pixel6-04, flashing remaining devices)
 - [x] Phase 4 — root s24-07 (resolved 2026-05-12; Magisk adb shell authorization was never granted)
 
 ## Known issues / blockers
@@ -248,6 +249,8 @@ production group as they come online.
 
 ## Work log
 
+Entries are in chronological order (oldest first). Always append new entries at the bottom.
+
 ### 2026-05-05
 - Attempted p6-perf migration (try 2, commit `70e31127`); reverted (`c0df0a6`) — v3 p6 devices not rooted (`su` binary absent). Vendor rooting; expected done 2026-05-06.
 - s24s being overnighted to FL datacenter; 3 devices needed to reach target of 4.
@@ -287,3 +290,4 @@ production group as they come online.
 - Updated migration plan with vendor: they are shipping pixel6-01 and pixel6-04 from old DC to new DC, and flashing "several" more p6s to Android 13 and rooting them. Communicated to vendor that we only need 4 pixel6s on Android 13 (rooted, with OS auto-upgrades disabled) to proceed with migration — don't need all 10 perfect before starting.
 - Vendor downgraded and rooted pixel6-138, pixel6-165, pixel6-173 to Android 13 (pixel6-137 was already on Android 13 and working). Moved all 4 into pixel6-perf in v3 config; remaining 6 left in test-1.
 - Verified via diagnostic jobs: all 4 pixel6-perf devices confirmed Android 13 + rooted. test-1 devices also all rooted (mixed OS): pixel6-147 (15), pixel6-158 (16), pixel6-169 (16), pixel6-170 (16), pixel6-181 (12). pixel6-166 not working well — stuck/not completing diagnostic job; left in test-1, not blocking migration.
+- pixel6-perf migration confirmed good. Disabled legacy config projects with no remaining devices: `mozilla-gw-perftest-p5` (pixel5-perf empty), `mozilla-gw-unittest-a55` (a55-unit empty), `mozilla-gw-unittest-s24` (s24-unit empty).
