@@ -291,3 +291,15 @@ Entries are in chronological order (oldest first). Always append new entries at 
 - Vendor downgraded and rooted pixel6-138, pixel6-165, pixel6-173 to Android 13 (pixel6-137 was already on Android 13 and working). Moved all 4 into pixel6-perf in v3 config; remaining 6 left in test-1.
 - Verified via diagnostic jobs: all 4 pixel6-perf devices confirmed Android 13 + rooted. test-1 devices also all rooted (mixed OS): pixel6-147 (15), pixel6-158 (16), pixel6-169 (16), pixel6-170 (16), pixel6-181 (12). pixel6-166 not working well — stuck/not completing diagnostic job; left in test-1, not blocking migration.
 - pixel6-perf migration confirmed good. Disabled legacy config projects with no remaining devices: `mozilla-gw-perftest-p5` (pixel5-perf empty), `mozilla-gw-unittest-a55` (a55-unit empty), `mozilla-gw-unittest-s24` (s24-unit empty).
+
+### 2026-05-14
+- Vendor reported downgrade+root complete on the 6 remaining test-1 devices. Ran diagnostic jobs against all 6.
+- 5 of 6 completed; pixel6-181 stalled (contacted vendor — may need restart).
+- Log results for the 5 completed devices: all Android 13 / SDK 33, all rooted (PASS), all Magisk 30.7 (30700).
+  - pixel6-147: `oriole:13/TQ3A.230901.001/10750268` — Pixel 6
+  - pixel6-158: `raven:13/TQ3A.230901.001/10750268` — Pixel 6 Pro
+  - pixel6-166: `raven:13/TQ3A.230901.001/10750268` — Pixel 6 Pro
+  - pixel6-169: `oriole:13/TQ3A.230901.001/10750268` — Pixel 6
+  - pixel6-170: `oriole:13/TQ3A.230901.001/10750268` — Pixel 6
+- Contacted vendor about pixel6-181 (stalled job) and about presence of Pixel 6 Pro units (pixel6-158, pixel6-166) — expected to be standard Pixel 6s.
+- Vendor replaced pixel6-158 and pixel6-166 (Pixel 6 Pros) with standard Pixel 6s. Running diagnostic jobs to verify.
