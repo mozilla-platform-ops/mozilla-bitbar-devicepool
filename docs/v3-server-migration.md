@@ -8,8 +8,8 @@
 - [x] Phase 1 — a55-perf — **done** (migrated 2026-05-06)
 - [x] Phase 2 — pixel6-perf — **done** (migrated 2026-05-13)
 - [x] Phase 3 — s24-perf — **done** (migrated 2026-05-11; s24-07 not rooted, see Phase 4)
-- [ ] Phase 4 — device count reconciliation (pixel6: 10, s24: 4, a55: 6)
-- [ ] Phase 4 — pixel6: bring all 10 devices to Android 13, rooted, OS auto-upgrades disabled (currently 4 in production; vendor shipping pixel6-01 and pixel6-04, flashing remaining devices)
+- [x] Phase 4 — device count reconciliation (pixel6: 10, s24: 4, a55: 6) — **done** (2026-05-14)
+- [x] Phase 4 — pixel6: bring all 10 devices to Android 13, rooted, OS auto-upgrades disabled — **done** (2026-05-14)
 - [x] Phase 4 — root s24-07 (resolved 2026-05-12; Magisk adb shell authorization was never granted)
 
 ## Known issues / blockers
@@ -302,4 +302,6 @@ Entries are in chronological order (oldest first). Always append new entries at 
   - pixel6-169: `oriole:13/TQ3A.230901.001/10750268` — Pixel 6
   - pixel6-170: `oriole:13/TQ3A.230901.001/10750268` — Pixel 6
 - Contacted vendor about pixel6-181 (stalled job) and about presence of Pixel 6 Pro units (pixel6-158, pixel6-166) — expected to be standard Pixel 6s.
-- Vendor replaced pixel6-158 and pixel6-166 (Pixel 6 Pros) with standard Pixel 6s. Running diagnostic jobs to verify.
+- Vendor replaced pixel6-158 and pixel6-166 (Pixel 6 Pros) with standard Pixel 6s (pixel6-148, pixel6-151, pixel6-153). Updated config-v3-server.yml: removed pixel6-158, pixel6-166, pixel6-181, a55-38, a55-39; added pixel6-148, pixel6-151, pixel6-153, a55-52.
+- Ran diagnostic jobs against all 6 test-1 pixel6s (pixel6-147, 148, 151, 153, 169, 170). All completed, all Android 13 / SDK 33 / oriole (Pixel 6) / rooted (PASS). Magisk versions vary: 30.7 on 147/153/169/170, 26.4 on 148, 27.0 on 151 (not a blocker).
+- Moved all 6 test-1 pixel6s into pixel6-perf. Pool now at 10 devices (pixel6-137, 138, 147, 148, 151, 153, 165, 169, 170, 173) — at target. Marked Phase 4 complete.
