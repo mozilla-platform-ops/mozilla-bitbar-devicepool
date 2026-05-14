@@ -230,17 +230,16 @@ device_groups:
   #   Docker Builder:
   test-1:
     pixel6-147:
-    pixel6-158:
-    pixel6-166:
+    pixel6-148:
+    pixel6-151:
+    pixel6-153:
     pixel6-169:
     pixel6-170:
-    pixel6-181:
   a55-perf:
     a55-33:
     a55-34:
     a55-35:
-    a55-38:
-    a55-39:
+    a55-52:
     a55-57:
     a55-58:
   test-p5:
