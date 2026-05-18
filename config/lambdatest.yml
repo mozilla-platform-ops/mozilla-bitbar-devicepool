@@ -12,14 +12,6 @@ projects:
     disabled: false
     priority_group: set-a-priority-group
     priority: 1
-  a55-alpha:
-    # used for relops testing
-    # TODO: decomm this in favor of test-1, name is confusing given usage in cloud image context
-    TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-alpha-a55
-    TC_WORKER_TYPE: gecko-t-lambda-alpha-a55
-    USER_SCRIPTS_VERSION: v6-setup_sets_portrait
-    priority_group: a55
-    priority: 10
   a55-perf:
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-a55
     TC_WORKER_TYPE: gecko-t-lambda-perf-a55
@@ -28,14 +20,22 @@ projects:
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-perf-p9
     TC_WORKER_TYPE: gecko-t-lambda-perf-p9
     priority_group: p9
+  a55-alpha:
+    # used for relops testing
+    # TODO: decomm this in favor of test-1, name is confusing given usage in cloud image context
+    TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-alpha-a55
+    TC_WORKER_TYPE: gecko-t-lambda-alpha-a55
+    USER_SCRIPTS_VERSION: v6-setup_sets_portrait
+    priority_group: a55
+    priority: 10
   stab:
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-stab
     TC_WORKER_TYPE: gecko-t-lambda-stab
   test-1:
-  #     SCRIPT_REPO_COMMIT: future_commit
+      # testing power meter fix
+      # USER_SCRIPTS_VERSION: v7-cdc_acm_detach_for_power_meters
       TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1
       TC_WORKER_TYPE: gecko-t-lambda-test-1
-  #     # override SCRIPT_REPO_COMMIT with a test commit
 device_groups:
   a55-perf:
     # devices with power meters
@@ -48,7 +48,6 @@ device_groups:
     R5CXC1AHV4M:  # 9/10/25: recabled and verified by jmaher
     R5CXC1ASA3P:  # 9/11/25: recabled and verified by jmaher
     R5CXC1AP2KT:  # 9/11/25: recabled and verified by jmaher
-    R5CXC1ASA2E:  # 9/11/25: recabled and verified by jmaher
     R5CXC1ARM0A:  # 9/11/25: recabled and verified by jmaher
     R5CXC1AMNFY:  # 9/15/25: recabled and verified by jmaher
     RZCX31FDGJE:  # 9/15/25: recabled and verified by jmaher
@@ -79,7 +78,7 @@ device_groups:
     R5CXC1HZ5PZ:  # 9/30/25: was quarantined, but reseated and power cycled and tested by jmaher as good
     RZCXC19G1CT:  # 9/30/25: was quarantined, but reseated and power cycled and tested by jmaher as good
     R5CXC1AMMNK:  # 10/1/25: was reseated, power cycled, and verified by jmaher
-    R5CX4089QNL:  # 10/1/25: was reseated, power cycled, and verified by jmaher
+    # R5CX4089QNL:  # 4/14/26: batt bloat, pulled
     R5CXC1AJ07K:  # 10/2/25: reseated, power cycled, and verified by jmaher
     R5CXC1AHWWZ:  # 10/2/25: reseated, power cycled, and verified by jmaher
     R5CXC1HZ62Y:  # 10/2/25: reseated, power cycled, and verified by jmaher
@@ -93,12 +92,22 @@ device_groups:
     R5CXC1HZA6V:  # 10/20/25: tested by joel, power meter good
     RZCY10LGB6W:  # 2/23/26: had bad rotation, rotation code landed on master
     RZCY2011M7N:  # 2/23/26: had bad rotation, rotation code landed on master
+    R5CX23RT5KY:  # 4/21/26: new android 14 device
+    R5CX23RT8WW:  # 4/21/26: new android 14 device
+    R5CX23RT8ZJ:  # 4/21/26: new android 14 device
+    R5CX23RTAMT:  # 4/21/26: new android 14 device
+    R5CX23RTCYE:  # 4/21/26: new android 14 device
+    R5CX23RTM6H:  # 4/21/26: new android 14 device
+    R5CX23RTMPX:  # 4/21/26: new android 14 device
+    R5CX23RT4SE:  # 4/21/26: new android 14 device
+    R5CX23RT6WR:  # 4/21/26: new android 14 device
+    R5CX23RTKSK:  # 4/21/26: new android 14 device
+    R5CX23RTM4X:  # 4/21/26: new android 14 device
   a55-alpha:
     R5CXC1HZK0W:  # now on android 15, move to alpha for testing
-  a55-android16:
-    R5CXC1ASA0L:  # 12/1/25: lt is attempting to upgrade to android 16, had bad power meter
-    RZCY203N75Z:  # 12/1/25: lt is attempting to upgrade to android 16, had bad power meter
-    RZCX821GYPX:  # 12/1/25: lt is attempting to upgrade to android 16, had bad power meter
+    R5CX23RTGGN:  # 4/21/26: new android 15 device
+    R5CX23RTM7P:  # 4/21/26: new android 15 device
+    R5CX23RT9MV:  # 4/21/26: new android 15 device
   a55-sheriff-bad:
   p9-perf:
     # devices with power meters, have been recabled
@@ -106,7 +115,9 @@ device_groups:
     47241FDAQ0016Y:
     47241FDAQ002C0:
   test-1:
-    R5CXC1ALFED:  # 9/18/25: recabled and verified by jmaher, 3/26/26: was in stab, stealing
+    R5CXC1ASA2E:  # 9/11/25: recabled and verified by jmaher, 4/9: 'bad' power meter, moving to test-1 for testing v7 userscripts
   stab:
+    # hosts with performance that is way out of spec
     R5CXC1ARELR:  # 10/1/25: was reseated, power cycled, and verified by jmaher
     RZCY10Y548K:  # 10/1/25: was reseated, power cycled, and verified by jmaher
+    R5CXC1ALFED:  # 9/18/25: recabled and verified by jmaher
