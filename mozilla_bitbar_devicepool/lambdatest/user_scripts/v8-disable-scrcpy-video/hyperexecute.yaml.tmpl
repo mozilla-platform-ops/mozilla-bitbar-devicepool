@@ -65,9 +65,6 @@ differentialUpload:
   enabled: true
   ttlHours: 360
 
-ltOptions:
-  video: false
-
 # Test framework configuration
 framework:
   # Name of the test framework (raw in this case)
@@ -81,7 +78,7 @@ framework:
     # fixedIP: can take the UDID a specific devices to run on
     $fixed_ip_line
     # Enable or disable video recording support
-    video: true
+    video: false
     # Enable or disable device log support
     deviceLogs: true
     # App ID to be installed (mandatory field, using <app_id>)
