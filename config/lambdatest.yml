@@ -25,7 +25,7 @@ projects:
     # TODO: decomm this in favor of test-1, name is confusing given usage in cloud image context
     TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-alpha-a55
     TC_WORKER_TYPE: gecko-t-lambda-alpha-a55
-    USER_SCRIPTS_VERSION: v6-setup_sets_portrait
+    # USER_SCRIPTS_VERSION: v6-setup_sets_portrait
     priority_group: a55
     priority: 10
   stab:
@@ -33,7 +33,7 @@ projects:
     TC_WORKER_TYPE: gecko-t-lambda-stab
   test-1:
       # testing power meter fix
-      # USER_SCRIPTS_VERSION: v7-cdc_acm_detach_for_power_meters
+      USER_SCRIPTS_VERSION: v8-disable-scrcpy-video
       TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1
       TC_WORKER_TYPE: gecko-t-lambda-test-1
 device_groups:
