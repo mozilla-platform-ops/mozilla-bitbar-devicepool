@@ -561,6 +561,7 @@ class TestRunManagerLT(object):
                         shutil.copytree(
                             user_script_golden_dir,
                             os.path.join(test_run_dir, "user_script"),
+                            ignore=shutil.ignore_patterns(job_config.TEMPLATE_FILENAME),
                         )
 
                         # Write config with specific device UDID
@@ -571,6 +572,7 @@ class TestRunManagerLT(object):
                             lt_app_url,
                             udid=device_udid,
                             concurrency=1,
+                            user_script_dir=user_script_golden_dir,
                             path=test_run_file,
                         )
 
