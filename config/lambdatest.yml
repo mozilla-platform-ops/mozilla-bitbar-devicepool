@@ -4,7 +4,7 @@ projects:
   defaults:
     # TODO: start using USER_SCRIPTS_VERSION for git version? name repo `mozilla-lambdatest-files`?
     # for now this points to a directory name in `mozilla_bitbar_devicepool/lambdatest/user_scripts`
-    USER_SCRIPTS_VERSION: v5-python_runtime
+    USER_SCRIPTS_VERSION: v8-disable-scrcpy-video
     # fake values. inheriting projects below should set reasonable values.
     TASKCLUSTER_CLIENT_ID: tc-client-id-set-me
     # env var with key is looked for at this with underscores: `tc_worker_type_set_me`
@@ -33,7 +33,7 @@ projects:
     TC_WORKER_TYPE: gecko-t-lambda-stab
   test-1:
       # testing power meter fix
-      USER_SCRIPTS_VERSION: v8-disable-scrcpy-video
+      # USER_SCRIPTS_VERSION: v8-disable-scrcpy-video
       TASKCLUSTER_CLIENT_ID: project/autophone/gecko-t-lambda-test-1
       TC_WORKER_TYPE: gecko-t-lambda-test-1
 device_groups:
