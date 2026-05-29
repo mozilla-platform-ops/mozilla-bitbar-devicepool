@@ -9,7 +9,10 @@ bitbar_env*
 lt_env*
 *env.sh
 hyperexecute*
+!**/hyperexecute.yaml.tmpl
 .coverage*
 
 *.log
 *.bak
+
+lt_run_cmd_output/

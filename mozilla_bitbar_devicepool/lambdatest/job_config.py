@@ -4,6 +4,9 @@
 
 import logging
 import os
+from string import Template
+
+TEMPLATE_FILENAME = "hyperexecute.yaml.tmpl"
 
 
 def write_config(
@@ -13,6 +16,7 @@ def write_config(
     lt_app_url,
     udid=None,
     concurrency=1,
+    user_script_dir=None,
     path="/tmp/mozilla-lt-devicepool-job-dir/hyperexecute.yaml",
 ):
     """
@@ -23,9 +27,11 @@ def write_config(
         tc_access_token (str): Taskcluster access token for authentication.
         lt_app_url (str): URL to the application under test on LambdaTest.
         udid (str, optional): The unique device identifier if targeting a specific device. Defaults to None.
+        concurrency (int, optional): Number of parallel test executions. Defaults to 1.
+        user_script_dir (str): Path to the userscripts version directory containing
+                               hyperexecute.yaml.tmpl. Required.
         path (str, optional): Destination path for the config file.
                               Defaults to "/tmp/mozilla-lt-devicepool-job-dir/hyperexecute.yaml".
-        concurrency (int, optional): Number of parallel test executions. Defaults to 1.
 
     Returns:
         str: Path where the configuration file was written.
@@ -37,6 +43,7 @@ def write_config(
     logging.debug(f"write_config: tc_worker_type: {tc_worker_type}")
     logging.debug(f"write_config: lt_app_url: {lt_app_url}")
     logging.debug(f"write_config: udid: {udid}")
+    logging.debug(f"write_config: user_script_dir: {user_script_dir}")
     logging.debug(f"write_config: path: {path}")
     logging.debug(f"write_config: concurrency: {concurrency}")
 
@@ -47,6 +54,7 @@ def write_config(
         lt_app_url,
         udid,
         concurrency,
+        user_script_dir,
     )
 
     # mkdir -p the path
@@ -65,9 +73,13 @@ def return_config(
     lt_app_url,
     udid=None,
     concurrency=1,
+    user_script_dir=None,
 ):
     """
     Generate a LambdaTest HyperExecute configuration YAML as a string.
+
+    The YAML template is loaded from <user_script_dir>/hyperexecute.yaml.tmpl so that
+    each userscripts version can ship its own job-config shape alongside its scripts.
 
     Args:
         tc_client_id (str): Taskcluster client ID for authentication.
@@ -75,6 +87,8 @@ def return_config(
         lt_app_url (str): URL to the application under test on LambdaTest.
         udid (str, optional): The unique device identifier if targeting a specific device. Defaults to None.
         concurrency (int, optional): Number of parallel test executions. Defaults to 1.
+        user_script_dir (str): Path to the userscripts version directory containing
+                               hyperexecute.yaml.tmpl. Required.
 
     Returns:
         str: Complete HyperExecute YAML configuration as a string.
@@ -89,6 +103,9 @@ def return_config(
     # TASKCLUSTER_ACCESS_TOKEN: ${{.secrets.TC_ACCESS_TOKEN}}
     # TASKCLUSTER_CLIENT_ID: ${{.secrets.TC_CLIENT_ID}}
 
+    if not user_script_dir:
+        raise ValueError("return_config requires user_script_dir")
+
     test_discover_cmd = ""
     for i in range(concurrency):
         test_discover_cmd += f'echo "taskcluster generic-worker {i}"; '
@@ -97,106 +114,16 @@ def return_config(
     if udid:
         fixed_ip_line = f'fixedIP: "{udid}"'
 
-    # TODO?: sanity check device_type_and_os (includes hyphen, valid device type)
+    template_path = os.path.join(user_script_dir, TEMPLATE_FILENAME)
+    with open(template_path, "r") as f:
+        template = Template(f.read())
 
-    # here doc with the config, we need string interpolation
-    config = f"""
-# Define the version of the configuration file
-version: "0.2"
-
-# Enable autosplit for test execution
-autosplit: true
-
-# Specify the target platform for test execution (Android in this case)
-runson: android
-
-# Set the concurrency level for test execution (2 devices in parallel)
-concurrency: {concurrency}
-
-# Test discovery configuration
-testDiscovery:
-  command: {test_discover_cmd}
-  # Test discovery mode is static
-  mode: static
-  # Test type is raw (custom test implementation)
-  type: raw
-
-runtime:
-  - language: java
-    version: "17"
-  - language: node
-    version: '20'
-  - language: python
-    version: '3.12'
-
-env:
-    # inject our own secrets
-    TASKCLUSTER_CLIENT_ID: {tc_client_id}
-    TASKCLUSTER_ACCESS_TOKEN: {tc_access_token}
-    TC_WORKER_TYPE: {tc_worker_type}
-
-# Command to run the tests using the testRunnerCommand
-# testRunnerCommand: ls -la
-# testRunnerCommand: cat /home/ltuser/taskcluster/worker-runner-config.yml
-# testRunnerCommand: start-worker /home/ltuser/taskcluster/worker-runner-config.yml
-# testRunnerCommand: python3 /home/ltuser/taskcluster/run_gw.py
-testRunnerCommand: bash -c 'source /home/ltuser/venv/bin/activate; python3 /home/ltuser/taskcluster/run_gw.py'
-
-# Only report the status of the test framework
-frameworkStatusOnly: true
-
-# Enable dynamic allocation of resources
-dynamicAllocation: true
-
-shell: bash
-
-# aje: moved all to test command as something we're doing in pre is disconnecting the device per LT
-#
-# Pre-install required dependencies using pip
-# TODO: remove the pip3 install mozdevice once everything is off v1 of user scripts
-pre:
-  - pip3 install mozdevice
-  - bash ./user_script/setup_script.sh
-
-# reboot and wait for device to come online
-post:
-  - python3 ./user_script/reboot_and_wait.py
-
-# cache the payload
-differentialUpload:
-  enabled: true
-  ttlHours: 360
-
-# Test framework configuration
-framework:
-  # Name of the test framework (raw in this case)
-  name: raw
-  args:
-    # used to restrict device model and os version
-    # - we don't use it currently (see fixedIP), so use wildcard
-    devices:
-        - ".*-.*"
-    framework:
-    # fixedIP: can take the UDID a specific devices to run on
-    {fixed_ip_line}
-    # Enable or disable video recording support
-    video: true
-    # Enable or disable device log support
-    deviceLogs: true
-    # App ID to be installed (mandatory field, using <app_id>)
-    # appId: {lt_app_url}
-    # Build name for identification on the automation dashboard
-    buildName: geckoview_example.apk
-    # All devices are in a private cloud
-    privateCloud: true
-    # Timeout for device queue
-    queueTimeout: 600
-    # Configuration fields specific to running raw tests
-    region: us
-    disableReleaseDevice: true
-    isRealMobile: true
-    reservation: false
-    platformName: android
-
-"""
-    return config
+    return template.substitute(
+        tc_client_id=tc_client_id,
+        tc_access_token=tc_access_token,
+        tc_worker_type=tc_worker_type,
+        lt_app_url=lt_app_url,
+        concurrency=concurrency,
+        test_discover_cmd=test_discover_cmd,
+        fixed_ip_line=fixed_ip_line,
+    )

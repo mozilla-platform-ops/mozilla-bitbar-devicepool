@@ -7,5 +7,11 @@
 | v3 | `v3-disable-adb-killserver/` | Deployed | Disable adb kill-server. |
 | v4 | `v4-python_fix/` | Deployed | Python fix. |
 | v5 | `v5-python_runtime/` | Deployed | Python runtime update. |
-| v6 | `v6-setup_sets_portrait/` | Not deployed | Superseded; perf team delivered a fix in-tree. |
-| v7 | `v7-cdc_acm_detach_for_power_meters/` | Not deployed | Does not fully solve the problem — tests still fail because the race condition occurs during the tests, not just at setup. |
+| v6 | `v6-setup_sets_portrait/` | Not deployed | Superseded; perf team delivered a fix in-tree. Based on v5. |
+| v7 | `v7-cdc_acm_detach_for_power_meters/` | Not deployed | Does not fully solve the problem — tests still fail because the race condition occurs during the tests, not just at setup. Based on v5. |
+| v8 | `v8-disable-scrcpy-video/` | Not deployed | Disables scrcpy video. Based on v5. |
+
+Each version directory ships its own `hyperexecute.yaml.tmpl`. `job_config.return_config()` loads
+the template from the version dir resolved by `ConfigurationLt.get_path_to_user_script_directory()`,
+so a version can change the job-config shape (e.g. to disable scrcpy video) without code changes.
+Placeholders use `string.Template` ($-style) syntax.
