@@ -12,11 +12,17 @@ repos:
     -   id: end-of-file-fixer
     -   id: check-yaml
     -   id: check-added-large-files
-- repo: https://github.com/fpgmaas/deptry.git
-  rev: "0.23.0"
+# deptry must run in the local venv (vs pre-commit's isolated env) so it can read
+# installed package metadata to map package names to modules (e.g. pyyaml -> yaml).
+# Otherwise it reports false missing/unused dependency errors.
+- repo: local
   hooks:
     - id: deptry
-    #      args: ["--skip-missing"]
+      name: deptry
+      entry: poetry run deptry .
+      language: system
+      pass_filenames: false
+      always_run: true
 - repo: https://github.com/astral-sh/ruff-pre-commit
   # Ruff version.
   rev: v0.12.2
