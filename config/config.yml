@@ -225,7 +225,7 @@ projects:
 #   - pixel2-34, pixel2-35. motog5-08, motog5-15.
 device_groups:
   motog4-docker-builder-2:
-    Docker Builder:
+    # Docker Builder:  # disabled: old server decommissioned
   test-1:
     # motog5-38:  # 11/30/22: disabling all g5, not used any longer
     #
@@ -237,7 +237,7 @@ device_groups:
     # motog5-40:  # disabled due to a51 device increases (3/29/22)
     # testing new image 20240307T112108
   test-3:
-    s21-01:
+    # s21-01:  # disabled: old server decommissioned
     # pixel2-60 has android 9.0 on it
     #pixel2-60: ## pulled 4/26/22
   a51-unit:
@@ -283,30 +283,30 @@ device_groups:
     # a51-40: 2/26/25: removed
   a55-unit:
   a55-perf:
-    a55-01:
-    a55-02:
-    a55-03:
-    a55-04:
-    a55-05:
-    a55-06:
-    a55-07:
-    a55-08:
-    a55-09:
-    a55-10:
+    # a55-01:  # disabled: old server decommissioned
+    # a55-02:  # disabled: old server decommissioned
+    # a55-03:  # disabled: old server decommissioned
+    # a55-04:  # disabled: old server decommissioned
+    # a55-05:  # disabled: old server decommissioned
+    # a55-06:  # disabled: old server decommissioned
+    # a55-07:  # disabled: old server decommissioned
+    # a55-08:  # disabled: old server decommissioned
+    # a55-09:  # disabled: old server decommissioned
+    # a55-10:  # disabled: old server decommissioned
     # a55-11:  # 5/9/25: removed, contract downsizing
-    a55-12:
-    a55-13:
-    a55-14:
-    a55-15:
-    a55-16:
-    a55-17:
-    a55-18:
-    a55-19:
-    a55-20:
+    # a55-12:  # disabled: old server decommissioned
+    # a55-13:  # disabled: old server decommissioned
+    # a55-14:  # disabled: old server decommissioned
+    # a55-15:  # disabled: old server decommissioned
+    # a55-16:  # disabled: old server decommissioned
+    # a55-17:  # disabled: old server decommissioned
+    # a55-18:  # disabled: old server decommissioned
+    # a55-19:  # disabled: old server decommissioned
+    # a55-20:  # disabled: old server decommissioned
     # a55-21:  # 5/9/25: removed, contract downsizing
-    a55-22:
+    # a55-22:  # disabled: old server decommissioned
     # a55-23:  # 5/9/25: removed, contract downsizing
-    a55-24:
+    # a55-24:  # disabled: old server decommissioned
     # a55-25:  # 9/29/25: removed, secondary contract not renewed
     # a55-26:  # 9/29/25: removed, secondary contract not renewed
     # a55-27:  # 9/29/25: removed, secondary contract not renewed
@@ -361,20 +361,20 @@ device_groups:
     # a55-76:  # 5/9/25: removed, contract downsizing
   s24-unit:
   s24-perf:
-    s24-01:
-    s24-02:
-    s24-03:
-    s24-04:
+    # s24-01:  # disabled: old server decommissioned
+    # s24-02:  # disabled: old server decommissioned
+    # s24-03:  # disabled: old server decommissioned
+    # s24-04:  # disabled: old server decommissioned
   pixel5-unit:
-    pixel5-01:
-    pixel5-02:
-    pixel5-03:
-    pixel5-04:
-    pixel5-05:
+    # pixel5-01:  # disabled: old server decommissioned
+    # pixel5-02:  # disabled: old server decommissioned
+    # pixel5-03:  # disabled: old server decommissioned
+    # pixel5-04:  # disabled: old server decommissioned
+    # pixel5-05:  # disabled: old server decommissioned
     # pixel5-06:  # 5/9/25: removed, contract downsizing
     # pixel5-07:  # 9/29/25: removed, secondary contract not renewed
     # pixel5-08:  # 5/9/25: removed, contract downsizing
-    pixel5-09:
+    # pixel5-09:  # disabled: old server decommissioned
     # pixel5-10:  # 9/29/25: removed, secondary contract not renewed
     # pixel5-11:  # 9/29/25: removed, secondary contract not renewed
     # pixel5-12:  # 6/13/25: removed, contract downsizing
@@ -388,9 +388,9 @@ device_groups:
     # pixel5-19:  # 6/13/25: removed, contract downsizing
   pixel6-unit:
   pixel6-perf:
-    pixel6-01:
-    pixel6-02:
-    pixel6-03:
-    pixel6-04:
+    # pixel6-01:  # disabled: old server decommissioned
+    # pixel6-02:  # disabled: old server decommissioned
+    # pixel6-03:  # disabled: old server decommissioned
+    # pixel6-04:  # disabled: old server decommissioned
   s21-unit:
   s21-perf:
