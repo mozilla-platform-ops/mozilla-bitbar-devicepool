@@ -2,6 +2,8 @@ import datetime
 import json
 import sys
 
+import pytest
+
 from mozilla_bitbar_devicepool.lambdatest import pool_status
 
 
@@ -57,7 +59,9 @@ def test_build_pool_report_suppresses_busy_finding_after_recent_tc_task():
     assert device["tc_latest_task_activity"] == "2026-08-24T21:55:00Z"
 
 
-def test_main_outputs_json(monkeypatch, capsys):
+@pytest.mark.parametrize("output_format", ["--json", "--ids-only"])
+@pytest.mark.parametrize("only_problems", [False, True])
+def test_main_outputs_json(monkeypatch, capsys, output_format, only_problems):
     class FakeConfiguration:
         def __init__(self, **kwargs):
             self.config = {
@@ -98,13 +102,43 @@ def test_main_outputs_json(monkeypatch, capsys):
     monkeypatch.setattr(pool_status, "Status", FakeStatus)
     monkeypatch.setattr(pool_status, "TaskclusterClient", FakeTaskclusterClient)
     monkeypatch.setattr(pool_status, "get_jobs", lambda *args, **kwargs: {"data": []})
-    monkeypatch.setattr(sys, "argv", ["lt_pool_status", "--pool", "a55-perf", "--json"])
+    args = ["lt_pool_status", "--pool", "a55-perf", output_format]
+    if only_problems:
+        args.append("--only-problems")
+    monkeypatch.setattr(sys, "argv", args)
 
     pool_status.main()
 
-    report = json.loads(capsys.readouterr().out)
-    assert report["pool"] == "a55-perf"
-    assert report["devices"][0]["finding"] is None
+    output = capsys.readouterr().out
+    if output_format == "--ids-only":
+        assert output == ("" if only_problems else "device-1\n")
+    else:
+        report = json.loads(output)
+        assert report["pool"] == "a55-perf"
+        assert report["configured_device_count"] == 1
+        if only_problems:
+            assert report["devices"] == []
+        else:
+            assert report["devices"][0]["finding"] is None
+
+
+def test_device_order_groups_findings_then_udid_regardless_of_state():
+    devices = [
+        {"udid": udid, "severity": severity, "finding": finding, "lt_state": state}
+        for udid, severity, finding, state in [
+            ("healthy", None, None, "active"),
+            ("info", "info", "no_active_taskcluster_worker", "maintenance"),
+            ("quarantine", "warning", "taskcluster_quarantined", "active"),
+            ("stuck-b", "warning", "busy_without_running_job", "busy"),
+            ("stuck-a", "warning", "busy_without_running_job", "busy"),
+            ("aaa-healthy-busy", None, None, "busy"),
+        ]
+    ]
+    report = {"devices": devices}
+    expected = ["stuck-a", "stuck-b", "quarantine", "info", "aaa-healthy-busy", "healthy"]
+    assert [device["udid"] for device in pool_status.select_devices(report)] == expected
+    assert [device["udid"] for device in pool_status.select_devices(report, True)] == expected[:4]
+    assert report["devices"][0]["udid"] == "healthy"
 
 
 def test_only_problems_includes_informational_findings(capsys):

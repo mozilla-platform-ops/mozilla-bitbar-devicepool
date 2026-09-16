@@ -114,14 +114,21 @@ def build_pool_report(
     }
 
 
+def select_devices(report, only_problems=False):
+    """Group actionable findings first, with stable UDID ordering."""
+    return sorted(
+        (device for device in report["devices"] if not only_problems or device["finding"]),
+        key=lambda device: (
+            {"warning": 0, "info": 1, None: 2}[device["severity"]],
+            device["finding"] or "",
+            device["udid"],
+        ),
+    )
+
+
 def print_pool_report(report, only_problems=False, color=False):
     """Render a compact, human-readable version of a pool report."""
-    devices = report["devices"]
-    if only_problems:
-        # ``no_active_taskcluster_worker`` is informational because workers
-        # may be short-lived, but it is still a non-OK state worth seeing in
-        # a focused diagnostic report.
-        devices = [device for device in devices if device["finding"]]
+    devices = select_devices(report, only_problems)
 
     print(f"Pool: {report['pool']} ({report['worker_type']})")
     print(
@@ -174,7 +181,9 @@ def main():
         help="Suppress busy-without-job findings after a TC task this recent (default: 10)",
     )
     parser.add_argument("--only-problems", action="store_true", help="Hide healthy rows")
-    parser.add_argument("--json", action="store_true", help="Write the report as JSON")
+    output_format = parser.add_mutually_exclusive_group()
+    output_format.add_argument("--json", action="store_true", help="Write the report as JSON")
+    output_format.add_argument("--ids-only", action="store_true", help="Write only device UDIDs, one per line")
     parser.add_argument(
         "--color",
         choices=("auto", "always", "never"),
@@ -237,7 +246,11 @@ def main():
         recent_activity_minutes=args.recent_tc_task_minutes,
     )
     if args.json:
+        report = {**report, "devices": select_devices(report, args.only_problems)}
         print(json.dumps(report, indent=2, sort_keys=True))
+    elif args.ids_only:
+        for device in select_devices(report, args.only_problems):
+            print(device["udid"])
     else:
         use_color = args.color == "always" or (args.color == "auto" and sys.stdout.isatty())
         print_pool_report(report, only_problems=args.only_problems, color=use_color)
