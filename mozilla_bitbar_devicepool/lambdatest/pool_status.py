@@ -9,13 +9,11 @@ import tempfile
 from pathlib import Path
 
 from mozilla_bitbar_devicepool.configuration_lt import ConfigurationLt
-from mozilla_bitbar_devicepool.lambdatest.api import get_jobs
-from mozilla_bitbar_devicepool.lambdatest.status import RUNNING_JOB_STATUS, Status
+from mozilla_bitbar_devicepool.lambdatest.status import Status, StatusDataUnavailable
 from mozilla_bitbar_devicepool.lambdatest.util import get_device_from_job_labels, string_list_to_list
 from mozilla_bitbar_devicepool.taskcluster_client import TaskclusterClient
 
 PROVISIONER_ID = "proj-autophone"
-RUNNING_JOBS_TIME_BUDGET_SECONDS = 15
 RESET = "\033[0m"
 FINDING_COLORS = {"warning": "\033[31m", "info": "\033[33m", None: "\033[32m"}
 LT_STATE_COLORS = {
@@ -56,8 +54,7 @@ def load_observations(observation_path):
 
 def write_observations(observation_path, observations):
     """Atomically write the private observation cache."""
-    observation_path.parent.mkdir(parents=True, exist_ok=True)
-    observation_path.parent.chmod(0o700)
+    observation_path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile("w", dir=observation_path.parent, delete=False) as temp_file:
         json.dump({"version": 1, "observations": observations}, temp_file, indent=2, sort_keys=True)
         temp_file.write("\n")
@@ -315,15 +312,11 @@ def main():
         parser.error(f"pool {args.pool!r} has no Taskcluster project configuration")
 
     status_client = Status(os.environ["LT_USERNAME"], os.environ["LT_ACCESS_KEY"])
-    lt_device_list = status_client.get_device_list()
-    job_scan = get_jobs(
-        status_client.lt_username,
-        status_client.lt_api_key,
-        jobs=args.jobs,
-        status=RUNNING_JOB_STATUS,
-        allow_partial=True,
-        time_budget=RUNNING_JOBS_TIME_BUDGET_SECONDS,
-    )
+    try:
+        lt_device_list = status_client.get_device_list(require_inventory=True)
+    except StatusDataUnavailable as exc:
+        raise SystemExit(str(exc)) from exc
+    job_scan = status_client.get_running_job_scan(jobs=args.jobs)
     running_jobs = job_scan["data"]
     incomplete_reason = job_scan["incomplete_reason"]
     if incomplete_reason:

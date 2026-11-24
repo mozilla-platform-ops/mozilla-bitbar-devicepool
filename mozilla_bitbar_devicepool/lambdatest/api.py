@@ -157,7 +157,7 @@ def get_jobs(
 
 # WORKS
 # timeout arg: 10 seconds to establish connection, 30 seconds to read response
-def get_devices(lt_username, lt_api_key, timeout=(10, 30)):
+def get_devices(lt_username, lt_api_key, timeout=(10, 30), *, raise_on_error=False):
     # curl --location --request GET 'https://mobile-api.lambdatest.com/mobile-automation/api/v1/privatecloud_devices' -H  "Authorization: Basic REDACTED"
 
     url = "https://mobile-api.lambdatest.com/mobile-automation/api/v1/privatecloud_devices"
@@ -173,6 +173,8 @@ def get_devices(lt_username, lt_api_key, timeout=(10, 30)):
     response = cached_session.get(url, headers=headers, timeout=timeout)
     # check the response code
     if response.status_code != 200:
+        if raise_on_error:
+            raise requests.HTTPError(f"HTTP {response.status_code}", response=response)
         print(f"Error: {response.status_code}")
         print(f"  while fetching {url}")
         print(response.text)

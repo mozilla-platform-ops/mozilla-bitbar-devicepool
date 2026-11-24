@@ -111,6 +111,39 @@ def test_run_on_device_fails_when_required_artifact_is_missing(tmp_path, monkeyp
     assert result == ("SERIAL", "command output", "failed")
 
 
+def test_required_artifact_is_checked_after_retrying_queue_timeout(tmp_path, monkeypatch):
+    user_script_dir = tmp_path / "user_script"
+    user_script_dir.mkdir()
+    attempts = []
+
+    def fake_run(cmd, **_kwargs):
+        attempts.append(cmd)
+        if len(attempts) == 1:
+            return subprocess.CompletedProcess(cmd, 1, stdout="", stderr="queue timeout")
+        args = shlex.split(cmd)
+        artifacts_dir = args[args.index("--download-artifacts-path") + 1]
+        for name, contents in (("output.txt", "command output"), ("result.json", "{}")):
+            with open(os.path.join(artifacts_dir, name), "w") as artifact_file:
+                artifact_file.write(contents)
+        return subprocess.CompletedProcess(cmd, 0, stdout="", stderr="")
+
+    monkeypatch.setattr(run_cmd.subprocess, "run", fake_run)
+
+    result = run_cmd.run_on_all_devices(
+        ["SERIAL"],
+        "echo hello",
+        str(tmp_path),
+        str(user_script_dir),
+        max_retries=1,
+        retry_wait=0,
+        start_delay=0,
+        required_artifact_globs=["result.json"],
+    )
+
+    assert len(attempts) == 2
+    assert result == {"SERIAL": ("command output", "ok")}
+
+
 def test_run_batch_progress_identifies_the_latest_completed_device(monkeypatch):
     postfixes = []
     progress_options = []

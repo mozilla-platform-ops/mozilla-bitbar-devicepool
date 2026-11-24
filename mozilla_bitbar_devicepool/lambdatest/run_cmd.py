@@ -217,16 +217,16 @@ def run_on_device(
 
         if result.returncode == 0:
             status = "ok"
+            missing_globs = missing_required_artifacts(artifacts_dir, required_artifact_globs)
+            if missing_globs:
+                status = "failed"
+                logging.error(
+                    f"run_on_device [{udid}]: missing required artifact(s) in {artifacts_dir}: {', '.join(missing_globs)}"
+                )
         elif _is_queue_timeout(result.stdout + result.stderr):
             status = "queue_timeout"
         else:
             status = "failed"
-        missing_globs = missing_required_artifacts(artifacts_dir, required_artifact_globs)
-        if missing_globs:
-            status = "failed"
-            logging.error(
-                f"run_on_device [{udid}]: missing required artifact(s) in {artifacts_dir}: {', '.join(missing_globs)}"
-            )
         return (udid, output_text, status)
 
     except subprocess.TimeoutExpired:

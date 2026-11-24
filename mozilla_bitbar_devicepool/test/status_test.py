@@ -4,8 +4,9 @@ from unittest.mock import patch
 
 import pytest
 
+from mozilla_bitbar_devicepool.lambdatest import api
 from mozilla_bitbar_devicepool.lambdatest import status as status_module
-from mozilla_bitbar_devicepool.lambdatest.status import Status
+from mozilla_bitbar_devicepool.lambdatest.status import RUNNING_JOBS_TIME_BUDGET_SECONDS, Status
 
 
 # Sample mock data
@@ -238,13 +239,21 @@ class TestStatus:
             "data": [
                 {"job_label": '["tcdp", "pool", "busy-with-job"]'},
                 {"job_label": '["tcdp", "pool", "available-device"]'},
-            ]
+            ],
+            "incomplete_reason": None,
         }
 
         result = status_instance.get_busy_devices_without_running_jobs(jobs=25)
 
         assert result == [{"udid": "stuck-device", "device_type": "Galaxy A55 5G"}]
-        mock_get_jobs.assert_called_once_with("test_user", "test_key", jobs=25, status="running")
+        mock_get_jobs.assert_called_once_with(
+            "test_user",
+            "test_key",
+            jobs=25,
+            status="running",
+            allow_partial=True,
+            time_budget=RUNNING_JOBS_TIME_BUDGET_SECONDS,
+        )
 
     def test_lt_stuck_device_report(self, monkeypatch, capsys):
         class FakeStatus:
@@ -271,3 +280,26 @@ class TestStatus:
         mock_get_devices.return_value = None
         result = status_instance.get_device_list()
         assert result == {}
+
+
+@pytest.mark.parametrize("complete", [True, False])
+def test_stuck_report_distinguishes_empty_jobs_from_failed_request(monkeypatch, mocker, capsys, complete):
+    mocker.patch.object(
+        status_module,
+        "get_devices",
+        return_value={"data": {"private_cloud_devices": [{"name": "A55", "udid": "busy-device", "status": "busy"}]}},
+    )
+    response = mocker.Mock(status_code=200 if complete else 503)
+    response.json.return_value = {"data": []}
+    mocker.patch.object(api.bounded_jobs_session, "get", return_value=response)
+    monkeypatch.setenv("LT_USERNAME", "user")
+    monkeypatch.setenv("LT_ACCESS_KEY", "key")
+    monkeypatch.setattr(sys, "argv", ["lt_stuck_device_report"])
+
+    if complete:
+        status_module.lt_stuck_device_report()
+        assert "busy-device (A55)" in capsys.readouterr().out
+    else:
+        with pytest.raises(SystemExit, match="job scan incomplete .*HTTP 503"):
+            status_module.lt_stuck_device_report()
+        assert capsys.readouterr().out == ""

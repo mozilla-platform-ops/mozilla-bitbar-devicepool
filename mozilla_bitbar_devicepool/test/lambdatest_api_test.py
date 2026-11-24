@@ -9,6 +9,15 @@ def job_page(mocker, *jobs):
     return response
 
 
+def test_jobs_stop_on_empty_first_page(mocker):
+    fetch = mocker.patch.object(api.cached_session, "get", return_value=job_page(mocker))
+
+    result = api.get_jobs("user", "key", allow_partial=True)
+
+    assert result == {"data": [], "incomplete_reason": None}
+    fetch.assert_called_once()
+
+
 def test_jobs_stop_on_repeated_cursor_and_keep_unique_jobs(mocker):
     first_job = {"job_number": 42}
     last_job = {"job_number": 40}

@@ -5,7 +5,7 @@ import sys
 
 import pytest
 
-from mozilla_bitbar_devicepool.lambdatest import api, pool_status
+from mozilla_bitbar_devicepool.lambdatest import api, pool_status, status
 
 
 def test_build_pool_report_identifies_actionable_device_states():
@@ -71,6 +71,7 @@ def test_stuck_observation_tracks_continuous_state_and_resets(tmp_path):
     pool_status.update_state_observations(report, "user", observation_path, now=initial_time)
     assert report["devices"][0]["stuck_observed_for_seconds"] == 0
     assert stat.S_IMODE(observation_path.stat().st_mode) == 0o600
+    assert stat.S_IMODE(observation_path.parent.stat().st_mode) == 0o700
 
     later_report = {
         "pool": "a55-perf",
@@ -140,9 +141,21 @@ def test_state_observation_preserves_legacy_stuck_cache(tmp_path):
     assert report["devices"][0]["stuck_observed_for_seconds"] == 420
 
 
-@pytest.mark.parametrize("output_format", ["--json", "--ids-only"])
+def test_write_observations_preserves_existing_parent_permissions(tmp_path):
+    parent = tmp_path / "shared"
+    parent.mkdir()
+    parent.chmod(0o755)
+    path = parent / "state.json"
+
+    pool_status.write_observations(path, {})
+
+    assert stat.S_IMODE(parent.stat().st_mode) == 0o755
+    assert stat.S_IMODE(path.stat().st_mode) == 0o600
+
+
+@pytest.mark.parametrize("output_format", ["--json", "--ids-only", "--color=never"])
 @pytest.mark.parametrize("only_problems", [False, True])
-def test_main_outputs_json(monkeypatch, capsys, tmp_path, output_format, only_problems):
+def test_main_output_formats(monkeypatch, capsys, tmp_path, output_format, only_problems):
     class FakeConfiguration:
         def __init__(self, **kwargs):
             self.config = {
@@ -163,8 +176,13 @@ def test_main_outputs_json(monkeypatch, capsys, tmp_path, output_format, only_pr
         def __init__(self, username, api_key):
             assert (username, api_key) == ("user", "key")
 
-        def get_device_list(self):
+        def get_device_list(self, *, require_inventory):
+            assert require_inventory
             return {"A55": {"device-1": "active"}}
+
+        def get_running_job_scan(self, jobs):
+            assert jobs == 100
+            return {"data": [], "incomplete_reason": None}
 
     class FakeTaskclusterClient:
         def __init__(self, verbose=False):
@@ -186,7 +204,6 @@ def test_main_outputs_json(monkeypatch, capsys, tmp_path, output_format, only_pr
     monkeypatch.setattr(pool_status, "ConfigurationLt", FakeConfiguration)
     monkeypatch.setattr(pool_status, "Status", FakeStatus)
     monkeypatch.setattr(pool_status, "TaskclusterClient", FakeTaskclusterClient)
-    monkeypatch.setattr(pool_status, "get_jobs", lambda *args, **kwargs: {"data": [], "incomplete_reason": None})
     args = ["lt_pool_status", "--pool", "a55-perf", "--state-file", str(tmp_path / "observations.json"), output_format]
     if only_problems:
         args.append("--only-problems")
@@ -197,6 +214,9 @@ def test_main_outputs_json(monkeypatch, capsys, tmp_path, output_format, only_pr
     output = capsys.readouterr().out
     if output_format == "--ids-only":
         assert output == ("" if only_problems else "device-1\n")
+    elif output_format == "--color=never":
+        assert ("device-1" in output) is not only_problems
+        assert ("No matching devices." in output) is only_problems
     else:
         report = json.loads(output)
         assert report["pool"] == "a55-perf"
@@ -217,9 +237,17 @@ def test_main_keeps_running_jobs_after_page_404(monkeypatch, mocker, capsys, tmp
         "projects": {"a55-perf": {"TC_WORKER_TYPE": "worker-type"}},
         "device_groups": {"a55-perf": ["running-device", "unknown-device"]},
     }
-    status = mocker.patch.object(pool_status, "Status").return_value
-    status.lt_username, status.lt_api_key = "user", "key"
-    status.get_device_list.return_value = {"A55": {"running-device": "busy", "unknown-device": "busy"}}
+    mocker.patch.object(
+        status,
+        "get_devices",
+        return_value={
+            "data": {
+                "private_cloud_devices": [
+                    {"name": "A55", "udid": device, "status": "busy"} for device in ("running-device", "unknown-device")
+                ]
+            }
+        },
+    )
     taskcluster = mocker.patch.object(pool_status, "TaskclusterClient").return_value
     taskcluster.get_workers.return_value = [{"workerId": device} for device in ("running-device", "unknown-device")]
     taskcluster.get_quarantined_workers.return_value = []
@@ -257,6 +285,29 @@ def test_main_keeps_running_jobs_after_page_404(monkeypatch, mocker, capsys, tmp
     else:
         assert "unknown-device  busy      ok         unknown" in output.out
         assert "pending Taskcluster tasks: 5" in output.out
+
+
+def test_main_fails_without_writing_observations_when_inventory_is_unavailable(monkeypatch, mocker, capsys, tmp_path):
+    config = mocker.patch.object(pool_status, "ConfigurationLt").return_value
+    config.get_config.return_value = {
+        "projects": {"a55-perf": {"TC_WORKER_TYPE": "worker-type"}},
+        "device_groups": {"a55-perf": ["device-1"]},
+    }
+    mocker.patch.object(api.cached_session, "get", return_value=mocker.Mock(status_code=503))
+    fetch_jobs = mocker.patch.object(status, "get_jobs")
+    taskcluster = mocker.patch.object(pool_status, "TaskclusterClient")
+    monkeypatch.setenv("LT_USERNAME", "user")
+    monkeypatch.setenv("LT_ACCESS_KEY", "key")
+    path = tmp_path / "observations.json"
+    monkeypatch.setattr(sys, "argv", ["lt_pool_status", "--pool", "a55-perf", "--state-file", str(path), "--json"])
+
+    with pytest.raises(SystemExit, match="LambdaTest device inventory unavailable"):
+        pool_status.main()
+
+    assert capsys.readouterr().out == ""
+    assert not path.exists()
+    fetch_jobs.assert_not_called()
+    taskcluster.assert_not_called()
 
 
 def test_device_order_groups_findings_then_udid_regardless_of_state():
