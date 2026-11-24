@@ -15,6 +15,7 @@ from mozilla_bitbar_devicepool.lambdatest.util import get_device_from_job_labels
 from mozilla_bitbar_devicepool.taskcluster_client import TaskclusterClient
 
 PROVISIONER_ID = "proj-autophone"
+RUNNING_JOBS_TIME_BUDGET_SECONDS = 15
 RESET = "\033[0m"
 FINDING_COLORS = {"warning": "\033[31m", "info": "\033[33m", None: "\033[32m"}
 LT_STATE_COLORS = {
@@ -131,6 +132,8 @@ def build_pool_report(
     tc_task_activity_by_udid=None,
     recent_activity_minutes=10,
     now=None,
+    *,
+    running_jobs_incomplete_reason=None,
 ):
     """Join the three service views into a serializable per-device report."""
     now = now or datetime.datetime.now(datetime.timezone.utc)
@@ -151,6 +154,9 @@ def build_pool_report(
 
     devices = []
     for udid in sorted(pool_devices):
+        running_lt_job = udid in running_devices
+        if not running_lt_job and running_jobs_incomplete_reason:
+            running_lt_job = None
         lt_device = lt_devices.get(udid)
         worker = workers_by_id.get(udid)
         lt_state = lt_device["state"] if lt_device else "missing"
@@ -160,14 +166,14 @@ def build_pool_report(
         severity = None
         if not lt_device:
             finding, severity = "missing_from_lambdatest", "warning"
-        elif lt_state == "busy" and udid not in running_devices:
+        elif lt_state == "busy" and running_lt_job is False:
             if recent_tc_task:
                 # A worker that just completed or started a task is normally
                 # in the LT/TC handoff or teardown window. Keep metadata in
                 # JSON, but do not add noise to the human report.
                 pass
             else:
-                finding, severity = "busy_without_running_job", "warning"
+                finding, severity = STUCK_FINDING, "warning"
         elif worker and worker.get("quarantined"):
             finding, severity = "taskcluster_quarantined", "warning"
         elif not worker:
@@ -187,7 +193,7 @@ def build_pool_report(
                 "tc_last_active": worker.get("lastDateActive") if worker else None,
                 "tc_latest_task_activity": tc_task_activity,
                 "recent_tc_task": recent_tc_task,
-                "running_lt_job": udid in running_devices,
+                "running_lt_job": running_lt_job,
                 "state_observed_since": None,
                 "state_observed_for_seconds": None,
                 "stuck_observed_since": None,
@@ -202,6 +208,7 @@ def build_pool_report(
         "worker_type": worker_type,
         "configured_device_count": len(pool_devices),
         "taskcluster_worker_count": len(tc_workers),
+        "running_jobs_incomplete_reason": running_jobs_incomplete_reason,
         "unconfigured_taskcluster_workers": sorted(set(workers_by_id) - pool_devices),
         "devices": devices,
     }
@@ -229,12 +236,13 @@ def print_pool_report(report, only_problems=False, color=False):
         f"active Taskcluster workers: {report['taskcluster_worker_count']}; "
         f"pending Taskcluster tasks: {report['pending_task_count']}"
     )
+    job_states = {True: "running", False: "-", None: "unknown"}
     rows = [
         (
             device["udid"],
             device["lt_state"],
             "missing" if device["tc_worker_state"] == "missing" else "ok",
-            "running" if device["running_lt_job"] else "-",
+            job_states[device["running_lt_job"]],
             format_duration(datetime.timedelta(seconds=device["state_observed_for_seconds"]))
             if device.get("state_observed_for_seconds") is not None
             else "-",
@@ -243,7 +251,7 @@ def print_pool_report(report, only_problems=False, color=False):
         for device in devices
     ]
     headings = ("UDID", "LT state", "TC worker", "LT job", "observed", "finding")
-    widths = [max(len(heading), *(len(row[index]) for row in rows)) for index, heading in enumerate(headings)]
+    widths = [max([len(heading), *(len(row[index]) for row in rows)]) for index, heading in enumerate(headings)]
     print("  ".join(f"{heading:<{width}}" for heading, width in zip(headings, widths)))
     for device, row in zip(devices, rows):
         formatted_row = [f"{value:<{width}}" for value, width in zip(row, widths)]
@@ -293,6 +301,8 @@ def main():
         help="Color findings in terminal output (default: auto)",
     )
     args = parser.parse_args()
+    if args.jobs <= 0:
+        parser.error("--jobs must be positive")
     if args.recent_tc_task_minutes < 0:
         parser.error("--recent-tc-task-minutes must be non-negative")
 
@@ -306,9 +316,18 @@ def main():
 
     status_client = Status(os.environ["LT_USERNAME"], os.environ["LT_ACCESS_KEY"])
     lt_device_list = status_client.get_device_list()
-    running_jobs = (
-        get_jobs(status_client.lt_username, status_client.lt_api_key, jobs=args.jobs, status=RUNNING_JOB_STATUS) or {}
-    ).get("data", [])
+    job_scan = get_jobs(
+        status_client.lt_username,
+        status_client.lt_api_key,
+        jobs=args.jobs,
+        status=RUNNING_JOB_STATUS,
+        allow_partial=True,
+        time_budget=RUNNING_JOBS_TIME_BUDGET_SECONDS,
+    )
+    running_jobs = job_scan["data"]
+    incomplete_reason = job_scan["incomplete_reason"]
+    if incomplete_reason:
+        print(f"Running LambdaTest job scan incomplete ({incomplete_reason}).", file=sys.stderr)
 
     tc_client = TaskclusterClient(verbose=False)
     workers = tc_client.get_workers(PROVISIONER_ID, config["projects"][args.pool]["TC_WORKER_TYPE"])
@@ -321,22 +340,24 @@ def main():
     for worker in workers:
         worker["quarantined"] = worker.get("workerId") in quarantined_ids
 
-    pool_devices = set(config["device_groups"].get(args.pool) or [])
-    busy_devices = {
-        udid
-        for devices in lt_device_list.values()
-        for udid, state in devices.items()
-        if state == "busy" and udid in pool_devices
-    }
-    running_devices = {
-        get_device_from_job_labels(string_list_to_list(job.get("job_label")), known_device_ids=pool_devices)
-        for job in running_jobs
-    }
-    tc_task_activity_by_udid = {
-        worker["workerId"]: tc_client.get_worker_latest_task_activity(worker)
-        for worker in workers
-        if worker.get("workerId") in busy_devices - running_devices
-    }
+    tc_task_activity_by_udid = {}
+    if not incomplete_reason:
+        pool_devices = set(config["device_groups"].get(args.pool) or [])
+        busy_devices = {
+            udid
+            for devices in lt_device_list.values()
+            for udid, state in devices.items()
+            if state == "busy" and udid in pool_devices
+        }
+        running_devices = {
+            get_device_from_job_labels(string_list_to_list(job.get("job_label")), known_device_ids=pool_devices)
+            for job in running_jobs
+        }
+        tc_task_activity_by_udid = {
+            worker["workerId"]: tc_client.get_worker_latest_task_activity(worker)
+            for worker in workers
+            if worker.get("workerId") in busy_devices - running_devices
+        }
 
     report = build_pool_report(
         config,
@@ -346,6 +367,7 @@ def main():
         args.pool,
         tc_task_activity_by_udid=tc_task_activity_by_udid,
         recent_activity_minutes=args.recent_tc_task_minutes,
+        running_jobs_incomplete_reason=incomplete_reason,
     )
     if not args.ids_only:
         report["pending_task_count"] = tc_client.get_pending_tasks(

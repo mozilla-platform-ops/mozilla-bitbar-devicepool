@@ -5,7 +5,7 @@ import sys
 
 import pytest
 
-from mozilla_bitbar_devicepool.lambdatest import pool_status
+from mozilla_bitbar_devicepool.lambdatest import api, pool_status
 
 
 def test_build_pool_report_identifies_actionable_device_states():
@@ -186,7 +186,7 @@ def test_main_outputs_json(monkeypatch, capsys, tmp_path, output_format, only_pr
     monkeypatch.setattr(pool_status, "ConfigurationLt", FakeConfiguration)
     monkeypatch.setattr(pool_status, "Status", FakeStatus)
     monkeypatch.setattr(pool_status, "TaskclusterClient", FakeTaskclusterClient)
-    monkeypatch.setattr(pool_status, "get_jobs", lambda *args, **kwargs: {"data": []})
+    monkeypatch.setattr(pool_status, "get_jobs", lambda *args, **kwargs: {"data": [], "incomplete_reason": None})
     args = ["lt_pool_status", "--pool", "a55-perf", "--state-file", str(tmp_path / "observations.json"), output_format]
     if only_problems:
         args.append("--only-problems")
@@ -208,6 +208,55 @@ def test_main_outputs_json(monkeypatch, capsys, tmp_path, output_format, only_pr
             assert report["devices"][0]["finding"] is None
             assert report["devices"][0]["state_observed_for_seconds"] == 0
             assert report["devices"][0]["state_observed_since"]
+
+
+@pytest.mark.parametrize("output_format", [[], ["--json"], ["--only-problems"], ["--only-problems", "--ids-only"]])
+def test_main_keeps_running_jobs_after_page_404(monkeypatch, mocker, capsys, tmp_path, output_format):
+    config = mocker.patch.object(pool_status, "ConfigurationLt").return_value
+    config.get_config.return_value = {
+        "projects": {"a55-perf": {"TC_WORKER_TYPE": "worker-type"}},
+        "device_groups": {"a55-perf": ["running-device", "unknown-device"]},
+    }
+    status = mocker.patch.object(pool_status, "Status").return_value
+    status.lt_username, status.lt_api_key = "user", "key"
+    status.get_device_list.return_value = {"A55": {"running-device": "busy", "unknown-device": "busy"}}
+    taskcluster = mocker.patch.object(pool_status, "TaskclusterClient").return_value
+    taskcluster.get_workers.return_value = [{"workerId": device} for device in ("running-device", "unknown-device")]
+    taskcluster.get_quarantined_workers.return_value = []
+    taskcluster.get_pending_tasks.return_value = 5
+    first_page = mocker.Mock(status_code=200)
+    first_page.json.return_value = {"data": [{"job_number": 42, "job_label": '["running-device"]'}]}
+    fetch = mocker.patch.object(api.bounded_jobs_session, "get", side_effect=[first_page, mocker.Mock(status_code=404)])
+    monkeypatch.setenv("LT_USERNAME", "user")
+    monkeypatch.setenv("LT_ACCESS_KEY", "key")
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["lt_pool_status", "--pool", "a55-perf", "--state-file", str(tmp_path / "observations.json"), *output_format],
+    )
+
+    pool_status.main()
+
+    assert fetch.call_count == 2
+    taskcluster.get_worker_latest_task_activity.assert_not_called()
+    output = capsys.readouterr()
+    assert "job scan incomplete (HyperExecute returned HTTP 404)" in output.err
+    assert "busy_without_running_job" not in output.out
+    if "--json" in output_format:
+        report = json.loads(output.out)
+        running, unknown = report["devices"]
+        assert running["running_lt_job"] is True
+        assert unknown["running_lt_job"] is None
+        assert unknown["finding"] is None
+        assert report["running_jobs_incomplete_reason"] == "HyperExecute returned HTTP 404"
+        assert report["pending_task_count"] == 5
+    elif "--ids-only" in output_format:
+        assert output.out == ""
+    elif "--only-problems" in output_format:
+        assert "No matching devices." in output.out
+    else:
+        assert "unknown-device  busy      ok         unknown" in output.out
+        assert "pending Taskcluster tasks: 5" in output.out
 
 
 def test_device_order_groups_findings_then_udid_regardless_of_state():
