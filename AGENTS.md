@@ -12,6 +12,8 @@ Stick to Python 3.9+ with 4-space indentation and descriptive, snake_case names 
 ## Testing Guidelines
 Place new tests in `mozilla_bitbar_devicepool/test/` following the `<module>_test.py` pattern and reuse helpers in `util_test.py`. Prefer `pytest` fixtures over ad-hoc setup; store serialized inputs in `test_data/`. Validate coverage locally with `pytest --cov --cov-report=html` and ensure critical branches that touch vendor APIs are exercised via mocks.
 
+Before submitting standalone Raptor jobs, compare their bootstrap with the production worker and verify archive extraction and baseline-profile generation before the harness can clear or uninstall Fenix.
+
 ## Commit & Pull Request Guidelines
 Commit messages are short (≤72 characters), lowercase, and often scoped (`lt status: refresh cache`). Group related edits per commit and reference Bugzilla or GitHub IDs when applicable. Pull requests should describe vendor impact, outline testing (`pytest`, manual device run), and include screenshots or log snippets when UI or report output changes. Link configuration updates to rollout plans so reviewers can validate credentials and scheduling.
 
